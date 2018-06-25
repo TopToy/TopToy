@@ -1,7 +1,8 @@
 package consensus.vpbc;
 
 import bftsmart.tom.ServiceProxy;
-import org.apache.commons.lang.SerializationUtils;
+import com.google.protobuf.InvalidProtocolBufferException;
+import protos.VpbcProtos;
 
 public class vpbcClient {
     int id;
@@ -12,11 +13,11 @@ public class vpbcClient {
         vpbcProxy = new ServiceProxy(id, configHome);
     }
 
-    public byte[] propose(vpbcMessage msg) {
-        byte[] data = SerializationUtils.serialize(msg);
+    public byte[] propose(VpbcProtos.VpbcMsg msg) throws InvalidProtocolBufferException {
+        byte[] data = msg.toByteArray();
         byte[] ret = vpbcProxy.invokeOrdered(data);
-        vpbcMessage m = (vpbcMessage) SerializationUtils.deserialize(ret);
-        return m.data;
+        VpbcProtos.VpbcMsg m = VpbcProtos.VpbcMsg.parseFrom(ret);
+        return m.getData().toByteArray();
     }
 
     public void close() {
