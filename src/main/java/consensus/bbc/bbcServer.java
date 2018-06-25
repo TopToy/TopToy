@@ -4,25 +4,39 @@ import bftsmart.tom.MessageContext;
 import bftsmart.tom.ServiceReplica;
 import bftsmart.tom.server.defaultservices.DefaultSingleRecoverable;
 import protos.BbcProtos;
+
+import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
+/*
+    TODO:
+    1. Truncate the executed consensuses (or swap them to db)
+ */
 public class bbcServer extends DefaultSingleRecoverable {
+    private int id;
     private Map<Integer, ArrayList<BbcProtos.BbcMsg>> rec;
-    private List<Integer> done;
+//    private List<Integer> done;
     private Lock lock;
     private Condition consEnd;
     private int quorumSize;
+    private String configHome;
 
     public bbcServer(int id, int quorumSize, String configHome) {
+        this.id = id;
         rec = new HashMap<>();
-        done = new ArrayList<>();
+//        done = new ArrayList<>();
         lock = new ReentrantLock();
         consEnd = lock.newCondition();
         this.quorumSize = quorumSize;
+        this.configHome = configHome;
+
+    }
+
+    public void start() {
         new ServiceReplica(id, this, this, configHome);
     }
 
@@ -43,18 +57,20 @@ public class bbcServer extends DefaultSingleRecoverable {
         try {
             BbcProtos.BbcMsg msg = BbcProtos.BbcMsg.parseFrom(command);
             int key = msg.getConsID();
-            if (done.contains(key)) {
-                lock.unlock();
-                return new byte[0];
-            }
+//            if (done.contains(key)) {
+//                lock.unlock();
+//                return new byte[0];
+//            }
             if (rec.containsKey(key)) {
-                rec.get(key).add(msg);
+                if (rec.get(key).size() < quorumSize) {
+                    rec.get(key).add(msg);
+                }
             } else {
                 ArrayList<BbcProtos.BbcMsg> newList = new ArrayList<>();
                 newList.add(msg);
                 rec.put(key, newList);
             }
-            if (rec.get(key).size() >= quorumSize) {
+            if (rec.get(key).size() == quorumSize) {
                 consEnd.signal();
             }
         } catch (Exception e) {
@@ -66,8 +82,20 @@ public class bbcServer extends DefaultSingleRecoverable {
 
     @Override
     public byte[] appExecuteUnordered(byte[] command, MessageContext msgCtx) {
-        System.out.println("appExecuteUnordered currently not implemented");
-        return new byte[0];
+        int consID = ByteBuffer.wrap(command).getInt();
+        lock.lock();
+        while (!rec.containsKey(consID) ||  rec.get(consID).size() < quorumSize) {
+            try {
+                consEnd.await();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        int ret = calcMaj(rec.get(consID));
+//        done.add(consID);
+        rec.remove(consID);
+        lock.unlock();
+        return ByteBuffer.allocate(Integer.SIZE/Byte.SIZE).putInt(ret).array();
     }
 
     private int calcMaj(ArrayList<BbcProtos.BbcMsg> rec) {
@@ -92,15 +120,15 @@ public class bbcServer extends DefaultSingleRecoverable {
 
     public int decide(int consID) {
         lock.lock();
-        while (rec.get(consID).size() < quorumSize) {
+        while (!rec.containsKey(consID) ||  rec.get(consID).size() < quorumSize) {
             try {
-                consEnd.wait();
+                consEnd.await();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
         int ret = calcMaj(rec.get(consID));
-        done.add(consID);
+//        done.add(consID);
         rec.remove(consID);
         lock.unlock();
         return ret;

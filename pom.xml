@@ -60,9 +60,6 @@
             <artifactId>protobuf-java</artifactId>
             <version>3.6.0</version>
         </dependency>
-
-
-
     </dependencies>
 
 </project>
