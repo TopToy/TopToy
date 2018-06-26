@@ -45,7 +45,7 @@ public class ViewManager {
     private List<Integer> addIds = new LinkedList<Integer>();
 
     public ViewManager() {
-        this("");
+        this("config");
     }
 
     public ViewManager(String configHome) {

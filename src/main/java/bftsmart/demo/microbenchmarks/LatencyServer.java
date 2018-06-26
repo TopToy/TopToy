@@ -51,7 +51,7 @@ public class LatencyServer extends DefaultRecoverable{
         writeLatency = new Storage(interval);
         acceptLatency = new Storage(interval);
         
-    	replica = new ServiceReplica(id, this, this, "");
+    	replica = new ServiceReplica(id, this, this, "config");
     }
     
     @Override

@@ -36,7 +36,7 @@ public abstract class TOMSender implements ReplyReceiver, Closeable, AutoCloseab
 	private int me; // process id
 
 	private ClientViewController viewController;
-
+	private String configHome = "config";
 	private int session = 0; // session id
 	private int sequence = 0; // sequence number
 	private int unorderedMessageSequence = 0; // sequence number for readonly messages
@@ -74,7 +74,7 @@ public abstract class TOMSender implements ReplyReceiver, Closeable, AutoCloseab
 	 * @param processId ID of the process
 	 */
 	public void init(int processId) {
-		this.viewController = new ClientViewController(processId);
+		this.viewController = new ClientViewController(processId, "config");
 		startsCS(processId);
 	}
 

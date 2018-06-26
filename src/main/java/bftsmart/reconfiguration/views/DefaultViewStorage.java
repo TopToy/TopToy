@@ -31,9 +31,15 @@ public class DefaultViewStorage implements ViewStorage {
 
     private String path = "";
 
-    public DefaultViewStorage() {
+    public DefaultViewStorage(String configHome) {
         String sep = System.getProperty("file.separator");
-        path = System.getProperty("user.dir") + sep + "config";
+        path = System.getProperty("user.dir") + sep;
+//        if (configHome == null) {
+//            path += "config";
+//        } else {
+//            path += configHome;
+//        }
+        path += configHome;
         File f = new File(path);
         if (!f.exists()) {
             f.mkdirs();
@@ -75,16 +81,16 @@ public class DefaultViewStorage implements ViewStorage {
         }
     }
 
-    @Override
-    public void setCustomView(String configHome) {
-        String sep = System.getProperty("file.separator");
-        path = System.getProperty("user.dir") + sep + configHome;
-        File f = new File(path);
-        if (!f.exists()) {
-            f.mkdirs();
-        }
-        path = path + sep + "currentView";
-    }
+//    @Override
+//    public void setCustomView(String configHome) {
+//        String sep = System.getProperty("file.separator");
+//        path = System.getProperty("user.dir") + sep + configHome;
+//        File f = new File(path);
+//        if (!f.exists()) {
+//            f.mkdirs();
+//        }
+//        path = path + sep + "currentView";
+//    }
 
     public byte[] getBytes(View view) {
         try {

@@ -63,7 +63,7 @@ public class ServiceProxy extends TOMSender {
 	 * @see bellow
 	 */
 	public ServiceProxy(int processId) {
-		this(processId, null, null, null);
+		this(processId, "config", null, null);
 	}
 
 	/**
@@ -293,7 +293,7 @@ public class ServiceProxy extends TOMSender {
 	protected void reconfigureTo(View v) {
 		Logger.println("Installing a most up-to-date view with id=" + v.getId());
 		getViewManager().reconfigureTo(v);
-		getViewManager().getViewStore("").storeView(v);
+		getViewManager().getViewStore().storeView(v);
 		replies = new TOMMessage[getViewManager().getCurrentViewN()];
 		getCommunicationSystem().updateConnections();
 	}

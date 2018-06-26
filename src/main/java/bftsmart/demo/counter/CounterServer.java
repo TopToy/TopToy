@@ -42,7 +42,7 @@ public final class CounterServer extends DefaultSingleRecoverable  {
     private int iterations = 0;
     
     public CounterServer(int id) {
-    	new ServiceReplica(id, this, this, "");
+    	new ServiceReplica(id, this, this, "config");
     }
             
     @Override

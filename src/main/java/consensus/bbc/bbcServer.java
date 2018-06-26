@@ -3,8 +3,10 @@ package consensus.bbc;
 import bftsmart.tom.MessageContext;
 import bftsmart.tom.ServiceReplica;
 import bftsmart.tom.server.defaultservices.DefaultSingleRecoverable;
+import org.apache.commons.lang.SerializationUtils;
 import protos.BbcProtos;
 
+import java.io.*;
 import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.concurrent.locks.Condition;
@@ -18,7 +20,7 @@ import java.util.stream.Collectors;
  */
 public class bbcServer extends DefaultSingleRecoverable {
     private int id;
-    private Map<Integer, ArrayList<BbcProtos.BbcMsg>> rec;
+    private TreeMap<Integer, ArrayList<BbcProtos.BbcMsg>> rec;
 //    private List<Integer> done;
     private Lock lock;
     private Condition consEnd;
@@ -27,7 +29,7 @@ public class bbcServer extends DefaultSingleRecoverable {
 
     public bbcServer(int id, int quorumSize, String configHome) {
         this.id = id;
-        rec = new HashMap<>();
+        rec = new TreeMap<>();
 //        done = new ArrayList<>();
         lock = new ReentrantLock();
         consEnd = lock.newCondition();
@@ -42,13 +44,18 @@ public class bbcServer extends DefaultSingleRecoverable {
 
     @Override
     public void installSnapshot(byte[] state) {
-        System.out.println("installSnapshot currently not implemented");
+        System.out.println("installSnapshot called");
+        state newState = (consensus.bbc.state) SerializationUtils.deserialize(state);
+        quorumSize = newState.quorumSize;
+        rec = newState.rec;
     }
 
     @Override
     public byte[] getSnapshot() {
-        System.out.println("getSnapshot currently not implemented");
-        return new byte[0];
+        System.out.println("getSnapshot called");
+        state newState = new state(rec, quorumSize);
+        byte[] data = SerializationUtils.serialize(newState);
+        return data;
     }
 
     @Override
@@ -134,4 +141,14 @@ public class bbcServer extends DefaultSingleRecoverable {
         return ret;
     }
 
+}
+
+class state implements Serializable{
+    public TreeMap<Integer, ArrayList<BbcProtos.BbcMsg>> rec;
+    public int quorumSize;
+
+    public state(TreeMap<Integer, ArrayList<BbcProtos.BbcMsg>> rec, int quorumSize) {
+        this.rec = rec;
+        this.quorumSize = quorumSize;
+    }
 }

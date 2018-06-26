@@ -23,6 +23,6 @@ public interface ViewStorage {
     
     public boolean storeView(View view);
     public View readView();
-    public void setCustomView(String configHome);
+//    public void setCustomView(String configHome);
     
 }

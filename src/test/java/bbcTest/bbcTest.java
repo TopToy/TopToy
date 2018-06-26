@@ -137,34 +137,34 @@ public class bbcTest {
         assertEquals(1, s3.decide(consID));
     }
 
-//    @Test
-//    void testFourServersBasicFault2() throws InterruptedException {
-//        int consID = 0;
-//        bbcServer s0 = new bbcServer(0, 3, FourServerconfigHome.toString());
-//        bbcServer s1 = new bbcServer(1, 3, FourServerconfigHome.toString());
-//        bbcServer s2 = new bbcServer(2, 3, FourServerconfigHome.toString());
-//        bbcServer s3 = new bbcServer(3, 3, FourServerconfigHome.toString());
-//
+    @Test
+    void testFourServersBasicFault2() throws InterruptedException {
+        int consID = 0;
+        bbcServer s0 = new bbcServer(0, 3, FourServerconfigHome.toString());
+        bbcServer s1 = new bbcServer(1, 3, FourServerconfigHome.toString());
+        bbcServer s2 = new bbcServer(2, 3, FourServerconfigHome.toString());
+        bbcServer s3 = new bbcServer(3, 3, FourServerconfigHome.toString());
+
 //        new Thread(s0::start).start();
 //        Thread.sleep(1000 * 5);
-//        new Thread(s1::start).start();
-//        Thread.sleep(1000 * 5);
-//        new Thread(s2::start).start();
-//        Thread.sleep(1000 * 5);
-//        new Thread(s3::start).start();
-//        Thread.sleep(1000 * 5);
+        new Thread(s1::start).start();
+        Thread.sleep(1000 * 5);
+        new Thread(s2::start).start();
+        Thread.sleep(1000 * 5);
+        new Thread(s3::start).start();
+        Thread.sleep(1000 * 5);
 //        bbcClient c0 = new bbcClient(0, FourServerconfigHome.toString());
-//        bbcClient c1 = new bbcClient(1, FourServerconfigHome.toString());
-//        bbcClient c2 = new bbcClient(2, FourServerconfigHome.toString());
-//        bbcClient c3 = new bbcClient(3, FourServerconfigHome.toString());
+        bbcClient c1 = new bbcClient(1, FourServerconfigHome.toString());
+        bbcClient c2 = new bbcClient(2, FourServerconfigHome.toString());
+        bbcClient c3 = new bbcClient(3, FourServerconfigHome.toString());
 //        c0.propose(1,consID);
-//        c1.propose(1, consID);
-//        c2.propose(1, consID);
-//        c3.propose(1, consID);
+        c1.propose(1, consID);
+        c2.propose(1, consID);
+        c3.propose(1, consID);
 //        assertEquals(1, s0.decide(consID));
-//        assertEquals(1, s1.decide(consID));
-//        assertEquals(1, s2.decide(consID));
-//        assertEquals(1, s3.decide(consID));
-//    }
+        assertEquals(1, s1.decide(consID));
+        assertEquals(1, s2.decide(consID));
+        assertEquals(1, s3.decide(consID));
+    }
 
 }

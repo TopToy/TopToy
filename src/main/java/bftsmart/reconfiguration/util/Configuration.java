@@ -208,7 +208,7 @@ public class Configuration {
                 configHome="config";
             }
             String sep = System.getProperty("file.separator");
-            String path =  configHome+sep+"system.config";;
+            String path =  configHome+sep+"system.config";
             FileReader fr = new FileReader(path);
             BufferedReader rd = new BufferedReader(fr);
             String line = null;

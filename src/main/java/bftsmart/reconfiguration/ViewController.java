@@ -32,6 +32,7 @@ public class ViewController {
     protected View currentView = null;
     private TOMConfiguration staticConf;
     private ViewStorage viewStore;
+    private String configHome = "config";
 
     public ViewController(int procId) {
         this.staticConf = new TOMConfiguration(procId);
@@ -39,28 +40,29 @@ public class ViewController {
 
     
     public ViewController(int procId, String configHome) {
+        this.configHome = configHome;
         this.staticConf = new TOMConfiguration(procId, configHome);
     }
 
     
-    public final ViewStorage getViewStore(String configHome) {
+    public final ViewStorage getViewStore() {
         if (this.viewStore == null) {
             String className = staticConf.getViewStoreClass();
             try {
                 this.viewStore = (ViewStorage) Class.forName(className).newInstance();
             } catch (Exception e) {
-                this.viewStore = new DefaultViewStorage();
+                this.viewStore = new DefaultViewStorage(configHome);
             }
-            if (!configHome.equals("")) {
-                this.viewStore.setCustomView(configHome);
-            }
+//            if (!configHome.equals("")) {
+//                this.viewStore.setCustomView(configHome);
+//            }
         }
         return this.viewStore;
     }
 
     public View getCurrentView(){
         if(this.currentView == null){
-             this.currentView = getViewStore("").readView();
+             this.currentView = getViewStore().readView();
         }
         return this.currentView;
     }

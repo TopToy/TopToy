@@ -44,18 +44,18 @@ public class ServerViewController extends ViewController {
     private TOMLayer tomLayer;
    // protected View initialView;
     
-    public ServerViewController(int procId) {
-        this(procId,"");
-        /*super(procId);
-        initialView = new View(0, getStaticConf().getInitialView(), 
-                getStaticConf().getF(), getInitAdddresses());
-        getViewStore().storeView(initialView);
-        reconfigureTo(initialView);*/
-    }
+//    public ServerViewController(int procId) {
+//        this(procId,"");
+//        /*super(procId);
+//        initialView = new View(0, getStaticConf().getInitialView(),
+//                getStaticConf().getF(), getInitAdddresses());
+//        getViewStore().storeView(initialView);
+//        reconfigureTo(initialView);*/
+//    }
 
     public ServerViewController(int procId, String configHome) {
         super(procId, configHome);
-        View cv = getViewStore(configHome).readView();
+        View cv = getViewStore().readView();
         if(cv == null){
             
             System.out.println("-- Creating current view from configuration file");
@@ -293,7 +293,7 @@ public class ServerViewController extends ViewController {
     @Override
     public final void reconfigureTo(View newView) {
         this.currentView = newView;
-        getViewStore("").storeView(this.currentView);
+        getViewStore().storeView(this.currentView);
         if (newView.isMember(getStaticConf().getProcessId())) {
             //membro da view atual
             otherProcesses = new int[currentView.getProcesses().length - 1];
