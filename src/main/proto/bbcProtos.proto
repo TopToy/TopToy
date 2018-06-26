@@ -1,0 +1,12 @@
+syntax = "proto3";
+option java_multiple_files = true;
+option java_package = "protos";
+option java_outer_classname = "BbcProto";
+//option objc_class_prefix = "RTG";
+
+message BbcMsg {
+    int32 clientID = 1;
+    int32 consID = 2;
+    int32 vote = 3;
+    int32 a = 4;
+}
