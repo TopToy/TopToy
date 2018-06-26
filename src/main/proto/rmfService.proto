@@ -1,0 +1,37 @@
+syntax = "proto3";
+option java_package = "proto";
+option java_multiple_files = true;
+
+package proto;
+
+
+//option java_outer_classname="RmfGrpc";
+
+message Empty {
+
+}
+
+message Meta {
+    int32 sender = 1;
+    int32 height = 2;
+}
+
+message Data {
+    Meta _meta = 1;
+    bytes data = 2;
+}
+
+message Req {
+    Meta _meta = 1;
+}
+
+message Res {
+    Meta _meta = 1;
+    Data _data = 2;
+}
+
+service Rmf {
+    rpc sendMessage(Data) returns (Empty) {};
+    rpc reqMessage(Req) returns (Res) {};
+}
+

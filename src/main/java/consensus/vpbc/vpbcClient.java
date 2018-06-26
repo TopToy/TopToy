@@ -2,7 +2,7 @@ package consensus.vpbc;
 
 import bftsmart.tom.ServiceProxy;
 import com.google.protobuf.InvalidProtocolBufferException;
-import protos.VpbcProtos;
+import proto.VpbcProtos;
 
 public class vpbcClient {
     int id;

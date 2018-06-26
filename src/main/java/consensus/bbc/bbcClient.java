@@ -3,12 +3,9 @@ package consensus.bbc;
 import bftsmart.communication.client.ReplyListener;
 import bftsmart.tom.AsynchServiceProxy;
 import bftsmart.tom.RequestContext;
-import bftsmart.tom.ServiceProxy;
 import bftsmart.tom.core.messages.TOMMessage;
 import bftsmart.tom.core.messages.TOMMessageType;
-import protos.BbcProtos;
-
-import java.util.Arrays;
+import proto.BbcProtos;
 
 
 public class bbcClient {
