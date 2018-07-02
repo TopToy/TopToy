@@ -39,6 +39,11 @@ public final class RmfService {
   static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_proto_Res_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_proto_FastBbcVote_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_proto_FastBbcVote_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -53,10 +58,13 @@ public final class RmfService {
       "ta\022\032\n\005_meta\030\001 \001(\0132\013.proto.Meta\022\014\n\004data\030\002" +
       " \001(\014\"!\n\003Req\022\032\n\005_meta\030\001 \001(\0132\013.proto.Meta\"" +
       "=\n\003Res\022\032\n\005_meta\030\001 \001(\0132\013.proto.Meta\022\032\n\005_d" +
-      "ata\030\002 \001(\0132\013.proto.Data2Y\n\003Rmf\022*\n\013sendMes" +
-      "sage\022\013.proto.Data\032\014.proto.Empty\"\000\022&\n\nreq" +
-      "Message\022\n.proto.Req\032\n.proto.Res\"\000B\t\n\005pro" +
-      "toP\001b\006proto3"
+      "ata\030\002 \001(\0132\013.proto.Data\"7\n\013FastBbcVote\022\032\n" +
+      "\005_meta\030\001 \001(\0132\013.proto.Meta\022\014\n\004vote\030\002 \001(\0052" +
+      "\220\001\n\003Rmf\0221\n\022DisseminateMessage\022\013.proto.Da" +
+      "ta\032\014.proto.Empty\"\000\022.\n\010FastVote\022\022.proto.F" +
+      "astBbcVote\032\014.proto.Empty\"\000\022&\n\nreqMessage" +
+      "\022\n.proto.Req\032\n.proto.Res\"\000B\t\n\005protoP\001b\006p" +
+      "roto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -100,6 +108,12 @@ public final class RmfService {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_Res_descriptor,
         new java.lang.String[] { "Meta", "Data", });
+    internal_static_proto_FastBbcVote_descriptor =
+      getDescriptor().getMessageTypes().get(5);
+    internal_static_proto_FastBbcVote_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_proto_FastBbcVote_descriptor,
+        new java.lang.String[] { "Meta", "Vote", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

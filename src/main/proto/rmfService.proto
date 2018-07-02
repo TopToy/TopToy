@@ -30,8 +30,13 @@ message Res {
     Data _data = 2;
 }
 
+message FastBbcVote {
+    Meta _meta = 1;
+    int32 vote = 2;
+}
 service Rmf {
-    rpc sendMessage(Data) returns (Empty) {};
+    rpc DisseminateMessage(Data) returns (Empty) {};
+    rpc FastVote(FastBbcVote) returns (Empty) {};
     rpc reqMessage(Req) returns (Res) {};
 }
 
