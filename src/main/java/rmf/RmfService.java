@@ -1,16 +1,23 @@
 package rmf;
 
+import config.Node;
 import consensus.bbc.bbcClient;
 import consensus.bbc.bbcServer;
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
+import io.grpc.Server;
 import io.grpc.stub.StreamObserver;
 import proto.*;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /*
 TODO:
@@ -20,6 +27,37 @@ TODO:
 public class RmfService extends RmfGrpc.RmfImplBase {
 
     static String bbcConfig = Paths.get("config", "rmfbbc").toString();
+    class vote {
+        int ones;
+        int consID;
+
+        vote(int consID) {
+            this.ones = 0;
+            this.consID = consID;
+        }
+    }
+
+    class peer {
+        ManagedChannel channel;
+        RmfGrpc.RmfStub stub;
+
+        peer(Node node) {
+            channel = ManagedChannelBuilder.
+                    forAddress(node.getAddr(), node.getPort()).
+                    usePlaintext().
+                    build();
+            stub = RmfGrpc.newStub(channel);
+        }
+
+        void shutdown() {
+            try {
+                channel.shutdown().awaitTermination(3, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     private int currHeight;
     private int id;
     private int timeoutMs;
@@ -34,20 +72,44 @@ public class RmfService extends RmfGrpc.RmfImplBase {
     private Lock recMsgLock;
     private Lock heightLock;
     private Semaphore receivedSem;
-    class vote {
-        int ones;
-        int consID;
 
-        vote(int consID) {
-            this.ones = 0;
-            this.consID = consID;
-        }
-    }
 
     private Map<Integer, vote> votes;
     private Map<Integer, Data> pendingMsg;
     private Map<Integer, Data> recMsg;
-    private List<RmfGrpc.RmfStub> stubs;
+    private Map<Integer, peer> peers;
+
+    private Server server;
+
+    public RmfService(int id, int f, int tmoInterval, int tmo, ArrayList<Node> nodes) {
+        this.currHeight = 0;
+        this.bbcServer = new bbcServer(id, 2*f + 1, bbcConfig);
+        this.bbcClient = new bbcClient(id, bbcConfig);
+        this.pendingsRecLock = new ReentrantLock();
+        this.votesLock = new ReentrantLock();
+        this.recMsgLock = new ReentrantLock();
+        this.heightLock = new ReentrantLock();
+        this.receivedSem = new Semaphore(0, true);
+        this.votes = new HashMap<>();
+        this.pendingMsg = new HashMap<>();
+        this.recMsg = new HashMap<>();
+        this.peers = new HashMap<>();
+        this.f = f;
+        this.n = 3*f +1;
+        this.timeoutInterval = tmoInterval;
+        this.timeoutMs = tmo;
+        this.id = id;
+
+        for (Node n : nodes) {
+            peers.put(n.getID(), new peer(n));
+        }
+    }
+
+    public void shutdown() {
+        for (peer p : peers.values()) {
+            p.shutdown();
+        }
+    }
 
     // TODO: This should be called by only one process per round.
 
@@ -121,19 +183,19 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         return null;
     }
     private void broadcastReqMsg(Req req) {
-        for (RmfGrpc.RmfStub s : stubs) {
-            sendReqMessage(s, req);
+        for (peer p : peers.values()) {
+            sendReqMessage(p.stub, req);
         }
     }
     private void broadcastFastVoteMessage(FastBbcVote v) {
-        for (RmfGrpc.RmfStub s : stubs) {
-            sendFastVoteMessage(s, v);
+        for (peer p : peers.values()) {
+            sendFastVoteMessage(p.stub, v);
         }
     }
 
     public void Broadcast(Data msg) {
-        for (RmfGrpc.RmfStub s: stubs) {
-            sendDataMessage(s, msg);
+        for (peer p : peers.values()) {
+            sendDataMessage(p.stub, msg);
         }
     }
 
