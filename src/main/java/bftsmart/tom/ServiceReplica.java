@@ -158,13 +158,13 @@ public class ServiceReplica {
         }
 
         if (this.SVController.isInCurrentView()) {
-            System.out.println("-- In current view: " + this.SVController.getCurrentView());
+            logger.info("-- In current view: " + this.SVController.getCurrentView());
             initTOMLayer(); // initiaze the TOM layer
         } else {
-            System.out.println("-- Not in current view: " + this.SVController.getCurrentView());
+            logger.info("-- Not in current view: " + this.SVController.getCurrentView());
             
             //Not in the initial view, just waiting for the view where the join has been executed
-            System.out.println("-- Waiting for the TTP: " + this.SVController.getCurrentView());
+            logger.info("-- Waiting for the TTP: " + this.SVController.getCurrentView());
             waitTTPJoinMsgLock.lock();
             try {
                 canProceed.awaitUninterruptibly();
@@ -389,8 +389,8 @@ public class ServiceReplica {
                 
                 logger.info("(ServiceReplica.receiveMessages) Delivering a no-op to the recoverer");
 
-                System.out.println(" --- A consensus instance finished, but there were no commands to deliver to the application.");
-                System.out.println(" --- Notifying recoverable about a blank consensus.");
+                logger.info(" --- A consensus instance finished, but there were no commands to deliver to the application.");
+                logger.info(" --- Notifying recoverable about a blank consensus.");
 
                 byte[][] batch = null;
                 MessageContext[] msgCtx = null;

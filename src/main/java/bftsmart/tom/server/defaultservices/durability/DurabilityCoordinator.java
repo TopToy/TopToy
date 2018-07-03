@@ -145,7 +145,7 @@ public abstract class DurabilityCoordinator implements Recoverable, BatchExecuta
 
 			// execute the second half if it exists
 			if(secondHalf.length > 0) {
-				//	        	System.out.println("----THERE IS A SECOND HALF----");
+				//	        	logger.info("----THERE IS A SECOND HALF----");
 				cid = msgCtx[msgCtx.length - 1].getConsensusId();
 				if (!noop) {
                                     
@@ -222,7 +222,7 @@ public abstract class DurabilityCoordinator implements Recoverable, BatchExecuta
 				break;
 			index++;
 		}
-		System.out.println("--- Checkpoint is in position " + index);
+		logger.info("--- Checkpoint is in position " + index);
 		return index;
 	}
 
@@ -249,7 +249,7 @@ public abstract class DurabilityCoordinator implements Recoverable, BatchExecuta
 
 			stateLock.lock();
 			if(state.getSerializedState() != null) {
-				System.out.println("The state is not null. Will install it");
+				logger.info("The state is not null. Will install it");
 				log.update(state);
 				installSnapshot(state.getSerializedState());
 			}
@@ -273,7 +273,7 @@ public abstract class DurabilityCoordinator implements Recoverable, BatchExecuta
 				}
 
 			}
-			System.out.println("--- Installed");
+			logger.info("--- Installed");
 			stateLock.unlock();
 
 		}
@@ -312,8 +312,8 @@ public abstract class DurabilityCoordinator implements Recoverable, BatchExecuta
 			return;       
                 
                 if (commands.length != msgCtx.length) {
-                    System.out.println("----SIZE OF COMMANDS AND MESSAGE CONTEXTS IS DIFFERENT----");
-                    System.out.println("----COMMANDS: " + commands.length + ", CONTEXTS: " + msgCtx.length + " ----");
+                    logger.info("----SIZE OF COMMANDS AND MESSAGE CONTEXTS IS DIFFERENT----");
+                    logger.info("----COMMANDS: " + commands.length + ", CONTEXTS: " + msgCtx.length + " ----");
                 }
                 
                 logLock.lock();
@@ -327,12 +327,12 @@ public abstract class DurabilityCoordinator implements Recoverable, BatchExecuta
 				log.addMessageBatch(batch, batchMsgCtx, cid);
 				log.setLastCID(cid, globalCheckpointPeriod, checkpointPortion);
 				//				if(batchStart > 0)
-				//					System.out.println("Last batch: " + commands.length + "," + batchStart + "-" + i + "," + batch.length);
+				//					logger.info("Last batch: " + commands.length + "," + batchStart + "-" + i + "," + batch.length);
 			} else {
 				if(msgCtx[i].getConsensusId() > cid) { // saves commands when the CID changes or when it is the last batch
 					byte[][] batch = Arrays.copyOfRange(commands, batchStart, i);
 					MessageContext[] batchMsgCtx = Arrays.copyOfRange(msgCtx, batchStart, i);
-					//					System.out.println("THERE IS MORE THAN ONE CID in this batch." + commands.length + "," + batchStart + "-" + i + "," + batch.length);
+					//					logger.info("THERE IS MORE THAN ONE CID in this batch." + commands.length + "," + batchStart + "-" + i + "," + batch.length);
 					log.addMessageBatch(batch, batchMsgCtx, cid);
 					log.setLastCID(cid, globalCheckpointPeriod, checkpointPortion);
 					cid = msgCtx[i].getConsensusId();
@@ -367,11 +367,11 @@ public abstract class DurabilityCoordinator implements Recoverable, BatchExecuta
 				log = new DurableStateLog(replicaId, null, null, isToLog, syncLog, syncCkp);
 				CSTState storedState = log.loadDurableState();
 				if(storedState.getLastCID() > -1) {
-					System.out.println("LAST CID RECOVERED FROM LOG: " + storedState.getLastCID());
+					logger.info("LAST CID RECOVERED FROM LOG: " + storedState.getLastCID());
 					setState(storedState);
 					getStateManager().setLastCID(storedState.getLastCID());
 				} else {
-					System.out.println("REPLICA IS IN INITIAL STATE");
+					logger.info("REPLICA IS IN INITIAL STATE");
 				}
 			}
 			getStateManager().askCurrentConsensusId();
@@ -409,7 +409,7 @@ public abstract class DurabilityCoordinator implements Recoverable, BatchExecuta
 	public byte[] getCurrentStateHash() {
 		byte[] currentState = getSnapshot();
 		byte[] currentStateHash = TOMUtil.computeHash(currentState);
-		System.out.println("--- State size: " + currentState.length + " Current state Hash: " + Arrays.toString(currentStateHash));
+		logger.info("--- State size: " + currentState.length + " Current state Hash: " + Arrays.toString(currentStateHash));
 		return currentStateHash;
 	}
 

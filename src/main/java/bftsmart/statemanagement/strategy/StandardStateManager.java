@@ -44,7 +44,8 @@ import bftsmart.tom.leaderchange.CertifiedDecision;
  *
  */
 public class StandardStateManager extends BaseStateManager {
-	
+
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(StandardStateManager.class);
     private int replica;
     private ReentrantLock lockTimer = new ReentrantLock();
     private Timer stateTimer = null;
@@ -108,11 +109,11 @@ public class StandardStateManager extends BaseStateManager {
                 waitingCID, TOMUtil.SM_REQUEST, replica, null, null, -1, -1);
         tomLayer.getCommunication().send(SVController.getCurrentViewOtherAcceptors(), smsg);
 
-        System.out.println("(StandardStateManager.requestState) I just sent a request to the other replicas for the state up to CID " + waitingCID);
+        logger.info("(StandardStateManager.requestState) I just sent a request to the other replicas for the state up to CID " + waitingCID);
 
         TimerTask stateTask =  new TimerTask() {
             public void run() {
-            	System.out.println("Timeout to retrieve state");
+            	logger.info("Timeout to retrieve state");
                 int[] myself = new int[1];
                 myself[0] = SVController.getStaticConf().getProcessId();
                 tomLayer.getCommunication().send(myself, new StandardSMMessage(-1, waitingCID, TOMUtil.TRIGGER_SM_LOCALLY, -1, null, null, -1, -1));
@@ -128,7 +129,7 @@ public class StandardStateManager extends BaseStateManager {
     public void stateTimeout() {
         lockTimer.lock();
         Logger.println("(StateManager.stateTimeout) Timeout for the replica that was supposed to send the complete state. Changing desired replica.");
-        System.out.println("Timeout no timer do estado!");
+        logger.info("Timeout no timer do estado!");
         if (stateTimer != null)
         	stateTimer.cancel();
         changeReplica();
@@ -143,25 +144,25 @@ public class StandardStateManager extends BaseStateManager {
         	StandardSMMessage stdMsg = (StandardSMMessage)msg;
             boolean sendState = stdMsg.getReplica() == SVController.getStaticConf().getProcessId();
             
-            System.out.println("-- Should I send the state? " + sendState);
+            logger.info("-- Should I send the state? " + sendState);
             
             ApplicationState thisState = dt.getRecoverer().getState(msg.getCID(), sendState);
             if (thisState == null) {
                 
-                System.out.println("-- For some reason, I am sending a void state");
+                logger.info("-- For some reason, I am sending a void state");
               thisState = dt.getRecoverer().getState(-1, sendState);
             }
             else {
-                System.out.println("-- Will I send the state? " + thisState.getSerializedState() != null);
+                logger.info("-- Will I send the state? " + thisState.getSerializedState() != null);
             }
             int[] targets = { msg.getSender() };
             SMMessage smsg = new StandardSMMessage(SVController.getStaticConf().getProcessId(),
                     msg.getCID(), TOMUtil.SM_REPLY, -1, thisState, SVController.getCurrentView(),
                     tomLayer.getSynchronizer().getLCManager().getLastReg(), tomLayer.execManager.getCurrentLeader());
             
-            System.out.println("Sending state");
+            logger.info("Sending state");
             tomLayer.getCommunication().send(targets, smsg);
-            System.out.println("Sent");
+            logger.info("Sent");
         }
     }
 
@@ -192,18 +193,18 @@ public class StandardStateManager extends BaseStateManager {
                 }
                 
                 if (msg.getSender() == replica && msg.getState().getSerializedState() != null) {
-                	System.out.println("Expected replica sent state. Setting it to state");
+                	logger.info("Expected replica sent state. Setting it to state");
                     state = msg.getState();
                     if (stateTimer != null) stateTimer.cancel();
                 }
 
                 senderStates.put(msg.getSender(), msg.getState());
 
-                System.out.println("Verifying more than F replies");
+                logger.info("Verifying more than F replies");
                 if (enoughReplies()) {
-                    System.out.println("More than F confirmed");
+                    logger.info("More than F confirmed");
                     ApplicationState otherReplicaState = getOtherReplicaState();
-                    System.out.println("State != null: " + (state != null) + ", recvState != null: " + (otherReplicaState != null));
+                    logger.info("State != null: " + (state != null) + ", recvState != null: " + (otherReplicaState != null));
                     int haveState = 0;
                         if(state != null) {
                             byte[] hash = null;
@@ -215,12 +216,12 @@ public class StandardStateManager extends BaseStateManager {
                             }
                         }
                     
-                    System.out.println("haveState: " + haveState);
+                    logger.info("haveState: " + haveState);
                                             
                     if (otherReplicaState != null && haveState == 1 && currentRegency > -1 &&
                             currentLeader > -1 && currentView != null && (!isBFT || currentProof != null || appStateOnly)) {
 
-                    	System.out.println("Received state. Will install it");
+                    	logger.info("Received state. Will install it");
                     	
                         tomLayer.getSynchronizer().getLCManager().setLastReg(currentRegency);
                         tomLayer.getSynchronizer().getLCManager().setNextReg(currentRegency);
@@ -229,7 +230,7 @@ public class StandardStateManager extends BaseStateManager {
                         
                         if (currentProof != null && !appStateOnly) {
                             
-                            System.out.println("Installing proof for consensus " + waitingCID);
+                            logger.info("Installing proof for consensus " + waitingCID);
 
                             Consensus cons = execManager.getConsensus(waitingCID);
                             Epoch e = null;
@@ -239,7 +240,7 @@ public class StandardStateManager extends BaseStateManager {
                                 e = cons.getEpoch(cm.getEpoch(), true, SVController);
                                 if (e.getTimestamp() != cm.getEpoch()) {
 
-                                    System.out.println("Strange... proof contains messages from more than just one epoch");
+                                    logger.info("Strange... proof contains messages from more than just one epoch");
                                     e = cons.getEpoch(cm.getEpoch(), true, SVController);
                                 }
                                 e.addToProof(cm);
@@ -263,10 +264,10 @@ public class StandardStateManager extends BaseStateManager {
                                 e.deserializedPropValue = tomLayer.checkProposedValue(currentProof.getDecision(), false);
                                  cons.decided(e, false);
                                  
-                                System.out.println("Successfully installed proof for consensus " + waitingCID);
+                                logger.info("Successfully installed proof for consensus " + waitingCID);
 
                             } else {
-                                System.out.println("Failed to install proof for consensus " + waitingCID);
+                                logger.info("Failed to install proof for consensus " + waitingCID);
 
                             }
 
@@ -295,7 +296,7 @@ public class StandardStateManager extends BaseStateManager {
                         tomLayer.processOutOfContext();
                         
                         if (SVController.getCurrentViewId() != currentView.getId()) {
-                            System.out.println("Installing current view!");
+                            logger.info("Installing current view!");
                             SVController.reconfigureTo(currentView);
                         }
                         
@@ -306,7 +307,7 @@ public class StandardStateManager extends BaseStateManager {
 
                         reset();
 
-                        System.out.println("I updated the state!");
+                        logger.info("I updated the state!");
 
                         tomLayer.requestsTimer.Enabled(true);
                         tomLayer.requestsTimer.startTimer();
@@ -317,7 +318,7 @@ public class StandardStateManager extends BaseStateManager {
                             tomLayer.getSynchronizer().resumeLC();
                         }
                     } else if (otherReplicaState == null && (SVController.getCurrentViewN() / 2) < getReplies()) {
-                    	System.out.println("otherReplicaState == null && (SVController.getCurrentViewN() / 2) < getReplies()");
+                    	logger.info("otherReplicaState == null && (SVController.getCurrentViewN() / 2) < getReplies()");
                         waitingCID = -1;
                         reset();
  
@@ -327,7 +328,7 @@ public class StandardStateManager extends BaseStateManager {
                             requestState();
                         }
                     } else if (haveState == -1) {
-                        System.out.println("haveState == -1");
+                        logger.info("haveState == -1");
                         Logger.println("(TOMLayer.SMReplyDeliver) The replica from which I expected the state, sent one which doesn't match the hash of the others, or it never sent it at all");
 
                         changeReplica();
@@ -343,7 +344,7 @@ public class StandardStateManager extends BaseStateManager {
                         waitingCID = -1;
                         //requestState();
                     } else {
-                        System.out.println(" -- State transfer not yet finished");
+                        logger.info(" -- State transfer not yet finished");
 
                     }
                 }

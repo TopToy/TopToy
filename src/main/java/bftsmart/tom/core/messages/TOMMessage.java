@@ -32,6 +32,7 @@ import bftsmart.tom.util.DebugInfo;
  */
 public class TOMMessage extends SystemMessage implements Externalizable, Comparable, Cloneable {
 
+	private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(TOMMessage.class);
 	//******* EDUARDO BEGIN **************//
 	private int viewID; //current sender view
 	private TOMMessageType type; // request type: application or reconfiguration request
@@ -296,7 +297,7 @@ public class TOMMessage extends SystemMessage implements Externalizable, Compara
 		 try{
 			 m.rExternal(dis);
 		 }catch(Exception e) {
-			 System.out.println("error on bytesToMessage " + e);
+			 logger.info("error on bytesToMessage " + e);
 			 return null;
 		 }
 

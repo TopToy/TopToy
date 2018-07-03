@@ -19,6 +19,7 @@ import java.net.InetSocketAddress;
 
 public class TestViewSerialization {
 
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(TestViewSerialization.class);
     /**
      * @param args the command line arguments
      */
@@ -34,7 +35,7 @@ public class TestViewSerialization {
         st.storeView(v);
         
         View r = st.readView();
-        System.out.println(r);
+        logger.info(r);
     }
 
 }

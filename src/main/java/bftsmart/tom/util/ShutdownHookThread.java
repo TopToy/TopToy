@@ -28,6 +28,7 @@ import java.util.Date;
  *
  */
 public class ShutdownHookThread extends Thread {
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ShutdownHookThread.class);
 
     private final TOMLayer tomLayer;
     private final MessageDigest md;
@@ -95,6 +96,6 @@ public class ShutdownHookThread extends Thread {
 
         buffer.append("\n\n---------- ---------- ----------\n");
         
-        System.out.println(buffer);
+        logger.info(buffer);
     }
 }

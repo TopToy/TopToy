@@ -94,7 +94,7 @@ public class bbcTest {
         c2.propose(0,consID);
         c3.propose(0,consID);
         int res = s0.decide(consID);
-        System.out.println("Consensus result is " + res);
+//        logger.info("Consensus result is " + res);
 //        assertEquals(s0.decide(consID), 0);
         assertEquals(res, s1.decide(consID));
         assertEquals(res, s2.decide(consID));

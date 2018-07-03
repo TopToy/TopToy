@@ -26,6 +26,7 @@ import bftsmart.tom.core.messages.TOMMessage;
  */
 public class Decision {
 
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Decision.class);
     private final int cid; // Consensus ID in which the value was decided
     private Epoch decisionEpoch = null; // Epoch in which the value was decided
     private int regency; // Regency in which the value was decided
@@ -128,7 +129,7 @@ public class Decision {
         while (decisionEpoch == null &&
                 decisionEpoch.deserializedPropValue == null) {
             try {
-                System.out.println("waiting for propose for consensus" + cid);
+                logger.info("waiting for propose for consensus" + cid);
                 Thread.sleep(1);
             } catch (InterruptedException ie) {
             }

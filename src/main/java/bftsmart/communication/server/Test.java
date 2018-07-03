@@ -24,6 +24,7 @@ import bftsmart.tom.core.messages.TOMMessageType;
 import bftsmart.tom.util.Storage;
 
 public class Test {
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Test.class);
 
     /**
      * @param args the command line arguments
@@ -42,7 +43,7 @@ public class Test {
 
         int[] targets = new int[n-1];
 
-        System.out.println("n = "+n);
+        logger.info("n = "+n);
 
         for (int i=1; i<n; i++) {
             targets[i-1] = i;
@@ -56,7 +57,7 @@ public class Test {
         for(int i=0; i<warmup; i++) {
             String msg = "m"+i;
 
-            //System.out.println("sending "+msg);
+            //logger.info("sending "+msg);
 
             if(id == 0) {
                 long time = System.nanoTime();
@@ -69,15 +70,15 @@ public class Test {
                     rec++;
                 }
 
-                //System.out.println();
-                System.out.println("Roundtrip "+((System.nanoTime()-time)/1000.0)+" us");
+                //logger.info();
+                logger.info("Roundtrip "+((System.nanoTime()-time)/1000.0)+" us");
             } else {
                 TOMMessage m = (TOMMessage) inQueue.take();
                 scl.send(new int[]{m.getSender()}, new TOMMessage(id,0,0,i,m.getContent(),0,TOMMessageType.ORDERED_REQUEST), true);
             }
         }
 
-        System.out.println("Beginning the real test with "+test+" roundtrips");
+        logger.info("Beginning the real test with "+test+" roundtrips");
         Storage st = new Storage(test);
 
         for(int i=0; i<test; i++) {
@@ -100,12 +101,12 @@ public class Test {
             }
         }
 
-        System.out.println("Average time for "+test+" executions (-10%) = "+st.getAverage(true)/1000+ " us ");
-        System.out.println("Standard desviation for "+test+" executions (-10%) = "+st.getDP(true)/1000 + " us ");
-        System.out.println("Maximum time for "+test+" executions (-10%) = "+st.getMax(true)/1000+ " us ");
-        System.out.println("Average time for "+test+" executions (all samples) = "+st.getAverage(false)/1000+ " us ");
-        System.out.println("Standard desviation for "+test+" executions (all samples) = "+st.getDP(false)/1000 + " us ");
-        System.out.println("Maximum time for "+test+" executions (all samples) = "+st.getMax(false)/1000+ " us ");
+        logger.info("Average time for "+test+" executions (-10%) = "+st.getAverage(true)/1000+ " us ");
+        logger.info("Standard desviation for "+test+" executions (-10%) = "+st.getDP(true)/1000 + " us ");
+        logger.info("Maximum time for "+test+" executions (-10%) = "+st.getMax(true)/1000+ " us ");
+        logger.info("Average time for "+test+" executions (all samples) = "+st.getAverage(false)/1000+ " us ");
+        logger.info("Standard desviation for "+test+" executions (all samples) = "+st.getDP(false)/1000 + " us ");
+        logger.info("Maximum time for "+test+" executions (all samples) = "+st.getMax(false)/1000+ " us ");
 
         //scl.shutdown();
     }

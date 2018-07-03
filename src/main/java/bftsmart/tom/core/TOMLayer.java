@@ -399,7 +399,7 @@ public final class TOMLayer extends Thread implements RequestReceiver {
                     epoch.getConsensus().getDecision().firstMessageProposed = epoch.deserializedPropValue[0];
                     dec.setDecisionEpoch(epoch);
 
-                    //System.out.println("ESTOU AQUI!");
+                    //logger.info("ESTOU AQUI!");
                     dt.delivery(dec);
                     continue;
 
@@ -464,7 +464,7 @@ public final class TOMLayer extends Thread implements RequestReceiver {
                     if (!clientsManager.requestReceived(requests[i], false)) {
                         clientsManager.getClientsLock().unlock();
                         logger.info("(TOMLayer.isProposedValueValid) finished, return=false");
-                        System.out.println("failure in deserialize batch");
+                        logger.info("failure in deserialize batch");
                         return null;
                     }
                 }

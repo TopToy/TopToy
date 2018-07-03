@@ -156,7 +156,7 @@ public class NettyTOMMessageDecoder extends ByteToMessageDecoder {
                 //verify MAC
                 if (useMAC) {
                     if (!verifyMAC(sm.getSender(), data, digest)) {
-                        System.out.println("MAC error: message discarded");
+                        logger.info("MAC error: message discarded");
                         return;
                     }
                 }

@@ -24,7 +24,8 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 public class Configuration {
-    
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Configuration.class);
+
     protected int processId;
     protected boolean channelsBlocking;
     protected BigInteger DH_P;
@@ -108,7 +109,7 @@ public class Configuration {
             }
             
         }catch(Exception e){
-            System.err.println("Wrong system.config file format.");
+            logger.warn("Wrong system.config file format.");
             e.printStackTrace(System.out);
         }
     }

@@ -27,6 +27,7 @@ import bftsmart.tom.util.TOMUtil;
 
 
 public class ClientData {
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ClientData.class);
 
     ReentrantLock clientLock = new ReentrantLock();
 
@@ -115,7 +116,7 @@ public class ClientData {
             try {
                 return TOMUtil.verifySignature(signatureVerificator, message, signature);
             } catch (SignatureException ex) {
-                System.err.println("Error in processing client "+clientId+" signature: "+ex.getMessage());
+                logger.warn("Error in processing client "+clientId+" signature: "+ex.getMessage());
             }
         }
         return false;

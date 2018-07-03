@@ -31,8 +31,9 @@ import bftsmart.statemanagement.ApplicationState;
 import bftsmart.tom.MessageContext;
 
 public class DiskStateLog extends StateLog {
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(DiskStateLog.class);
 
-	private int id;
+    private int id;
 	public final static String DEFAULT_DIR = "files".concat(System
 			.getProperty("file.separator"));
 	private static final int INT_BYTE_SIZE = 4;
@@ -192,9 +193,9 @@ public class DiskStateLog extends StateLog {
 
 		int lastCheckpointCID = getLastCheckpointCID();
 		int lastCID = getLastCID();
-		System.out.println("LAST CKP CID = " + lastCheckpointCID);
-		System.out.println("CID = " + cid);
-		System.out.println("LAST CID = " + lastCID);
+		logger.info("LAST CKP CID = " + lastCheckpointCID);
+		logger.info("CID = " + cid);
+		logger.info("LAST CID = " + lastCID);
 		if (cid >= lastCheckpointCID && cid <= lastCID) {
 
 			int size = cid - lastCheckpointCID;
@@ -216,7 +217,7 @@ public class DiskStateLog extends StateLog {
 			byte[] ckpStateHash = fr.getCkpStateHash();
 			checkpointLock.unlock();
 
-			System.out.println("--- FINISHED READING STATE");
+			logger.info("--- FINISHED READING STATE");
 //			readingState = false;
 
 //			return new DefaultApplicationState((sendState ? batches : null), lastCheckpointCID,
@@ -244,7 +245,7 @@ public class DiskStateLog extends StateLog {
 		if((cid % checkpointPeriod) % checkpointPortion == checkpointPortion -1) {
 			int ckpReplicaIndex = (((cid % checkpointPeriod) + 1) / checkpointPortion) -1;
 			try {
-				System.out.println(" --- Replica " + ckpReplicaIndex + " took checkpoint. My current log pointer is " + log.getFilePointer());
+				logger.info(" --- Replica " + ckpReplicaIndex + " took checkpoint. My current log pointer is " + log.getFilePointer());
 				logPointers.put(ckpReplicaIndex, log.getFilePointer());
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -278,7 +279,7 @@ public class DiskStateLog extends StateLog {
 			log = fr.getLogState(0, logPath);
 		int ckpLastConsensusId = fr.getCkpLastConsensusId();
 		int logLastConsensusId = fr.getLogLastConsensusId();
-		System.out.println("log last consensus di: " + logLastConsensusId);
+		logger.info("log last consensus di: " + logLastConsensusId);
 		ApplicationState state = new DefaultApplicationState(log, ckpLastConsensusId,
 				logLastConsensusId, checkpoint, fr.getCkpStateHash(), this.id);
 		if(logLastConsensusId > ckpLastConsensusId) {

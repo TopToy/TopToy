@@ -1,5 +1,6 @@
 package rmfTest;
 
+import config.Config;
 import config.Node;
 import org.junit.jupiter.api.Test;
 import rmf.RmfNode;
@@ -10,6 +11,7 @@ import java.util.ArrayList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class rmfTest {
+    static Config conf = new Config();
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(rmfTest.class);
     private String localHost = "127.0.0.1";
     private int s0Port = 20000;

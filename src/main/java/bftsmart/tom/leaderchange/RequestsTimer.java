@@ -38,6 +38,7 @@ import bftsmart.tom.util.TOMUtil;
  */
 public class RequestsTimer {
 
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(RequestsTimer.class);
     private Timer timer = new Timer("request timer");
     private RequestTimerTask rtTask = null;
     private TOMLayer tomLayer; // TOM layer
@@ -151,7 +152,7 @@ public class RequestsTimer {
         
         long t = (shortTimeout > -1 ? shortTimeout : timeout);
         
-        //System.out.println("(RequestTimerTask.run) I SOULD NEVER RUN WHEN THERE IS NO TIMEOUT");
+        //logger.info("(RequestTimerTask.run) I SOULD NEVER RUN WHEN THERE IS NO TIMEOUT");
 
         LinkedList<TOMMessage> pendingRequests = new LinkedList<TOMMessage>();
 
@@ -181,7 +182,7 @@ public class RequestsTimer {
             }
 
             if (!pendingRequests.isEmpty()) {
-                System.out.println("Timeout for messages: " + pendingRequests);
+                logger.info("Timeout for messages: " + pendingRequests);
                 //Logger.debug = true;
                 //tomLayer.requestTimeout(pendingRequests);
                 //if (reconfManager.getStaticConf().getProcessId() == 4) Logger.debug = true;
@@ -270,7 +271,7 @@ public class RequestsTimer {
          */
         public void run() {
 
-                System.out.println("(SendStopTask.run) Re-transmitting STOP message to install regency " + stop.getReg());
+                logger.info("(SendStopTask.run) Re-transmitting STOP message to install regency " + stop.getReg());
                 communication.send(controller.getCurrentViewOtherAcceptors(),this.stop);
 
                 setSTOP(stop.getReg(), stop); //repeat

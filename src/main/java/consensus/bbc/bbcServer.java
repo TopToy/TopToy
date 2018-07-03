@@ -19,6 +19,8 @@ import java.util.stream.Collectors;
     1. Truncate the executed consensuses (or swap them to db)
  */
 public class bbcServer extends DefaultSingleRecoverable {
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(bbcServer.class);
+
     private int id;
     private TreeMap<Integer, ArrayList<BbcProtos.BbcMsg>> rec;
 //    private List<Integer> done;
@@ -44,7 +46,7 @@ public class bbcServer extends DefaultSingleRecoverable {
 
     @Override
     public void installSnapshot(byte[] state) {
-        System.out.println("installSnapshot called");
+        logger.info("installSnapshot called");
         state newState = (consensus.bbc.state) SerializationUtils.deserialize(state);
         quorumSize = newState.quorumSize;
         rec = newState.rec;
@@ -52,7 +54,7 @@ public class bbcServer extends DefaultSingleRecoverable {
 
     @Override
     public byte[] getSnapshot() {
-        System.out.println("getSnapshot called");
+        logger.info("getSnapshot called");
         state newState = new state(rec, quorumSize);
         byte[] data = SerializationUtils.serialize(newState);
         return data;

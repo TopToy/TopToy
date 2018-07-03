@@ -54,6 +54,7 @@ import java.util.HashSet;
  */
 public class ServerConnection {
 
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ServerConnection.class);
     public static final String MAC_ALGORITHM = "HmacMD5";
     private static final long POOL_TIME = 5000;
     //private static final int SEND_QUEUE_SIZE = 50;
@@ -293,7 +294,7 @@ public class ServerConnection {
                 ex.printStackTrace();
             } catch (IOException ex) {
                 
-                System.out.println("Impossible to reconnect to replica " + remoteId);
+                logger.info("Impossible to reconnect to replica " + remoteId);
                 //ex.printStackTrace();
             }
 
@@ -376,7 +377,7 @@ public class ServerConnection {
             
             if (!TOMUtil.verifySignature(remoteRSAPubkey, remote_Bytes, remote_Signature)) {
                 
-                System.out.println(remoteId + " sent an invalid signature!");
+                logger.info(remoteId + " sent an invalid signature!");
                 shutdown();
                 return;
             }
@@ -387,7 +388,7 @@ public class ServerConnection {
             BigInteger secretKey =
                     remoteDHPubKey.modPow(DHPrivKey, controller.getStaticConf().getDHP());
             
-           System.out.println("-- Diffie-Hellman complete with " + remoteId);
+           logger.info("-- Diffie-Hellman complete with " + remoteId);
             
             SecretKeyFactory fac = SecretKeyFactory.getInstance("PBEWithMD5AndDES");
             PBEKeySpec spec = new PBEKeySpec(secretKey.toString().toCharArray());
@@ -518,7 +519,7 @@ public class ServerConnection {
                             if (sm.getSender() == remoteId) {
                                 if (!inQueue.offer(sm)) {
                                     Logger.println("(ReceiverThread.run) in queue full (message from " + remoteId + " discarded).");
-                                    System.out.println("(ReceiverThread.run) in queue full (message from " + remoteId + " discarded).");
+                                    logger.info("(ReceiverThread.run) in queue full (message from " + remoteId + " discarded).");
                                 }
                             }
                         } else {
@@ -586,7 +587,7 @@ public class ServerConnection {
                         byte hasMAC = socketInStream.readByte();
                         if (controller.getStaticConf().getUseMACs() == 1 && hasMAC == 1) {
                             
-                            System.out.println("TTP CON USEMAC");
+                            logger.info("TTP CON USEMAC");
                             read = 0;
                             do {
                                 read += socketInStream.read(receivedMac, read, macSize - read);
@@ -599,10 +600,10 @@ public class ServerConnection {
                             SystemMessage sm = (SystemMessage) (new ObjectInputStream(new ByteArrayInputStream(data)).readObject());
 
                             if (sm.getSender() == remoteId) {
-                                //System.out.println("Mensagem recebia de: "+remoteId);
+                                //logger.info("Mensagem recebia de: "+remoteId);
                                 /*if (!inQueue.offer(sm)) {
                                 bftsmart.tom.util.Logger.println("(ReceiverThread.run) in queue full (message from " + remoteId + " discarded).");
-                                System.out.println("(ReceiverThread.run) in queue full (message from " + remoteId + " discarded).");
+                                logger.info("(ReceiverThread.run) in queue full (message from " + remoteId + " discarded).");
                                 }*/
                                 this.replica.joinMsgReceived((VMMessage) sm);
                             }

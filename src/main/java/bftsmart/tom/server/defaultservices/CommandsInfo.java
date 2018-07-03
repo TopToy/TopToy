@@ -65,41 +65,41 @@ public class CommandsInfo implements Serializable {
 
             if ((this.commands != null && ci.commands == null) ||
                     (this.commands == null && ci.commands != null)) {
-                //System.out.println("[CommandsInfo] returing FALSE!1");
+                //logger.info("[CommandsInfo] returing FALSE!1");
                 return false;
             }
 
             if (this.commands != null && ci.commands != null) {
 
                 if (this.commands.length != ci.commands.length) {
-                    //System.out.println("[CommandsInfo] returing FALSE!2");
+                    //logger.info("[CommandsInfo] returing FALSE!2");
                     return false;
                 }
                 
                 for (int i = 0; i < this.commands.length; i++) {
                     
                     if (this.commands[i] == null && ci.commands[i] != null) {
-                        //System.out.println("[CommandsInfo] returing FALSE!3");
+                        //logger.info("[CommandsInfo] returing FALSE!3");
                         return false;
                     }
 
                     if (this.commands[i] != null && ci.commands[i] == null) {
-                        //System.out.println("[CommandsInfo] returing FALSE!4");
+                        //logger.info("[CommandsInfo] returing FALSE!4");
                         return false;
                     }
                     
                     if (!(this.commands[i] == null && ci.commands[i] == null) &&
                         (!Arrays.equals(this.commands[i], ci.commands[i]))) {
-                        //System.out.println("[CommandsInfo] returing FALSE!5" + (this.commands[i] == null) + " " + (ci.commands[i] == null));
+                        //logger.info("[CommandsInfo] returing FALSE!5" + (this.commands[i] == null) + " " + (ci.commands[i] == null));
                         return false;
                     }
                 }
             }
             //System.out.print("[CommandsInfo] returnig........");
-            //System.out.println((this.epoch == ci.epoch) + " " + (this.leader == ci.leader));
+            //logger.info((this.epoch == ci.epoch) + " " + (this.leader == ci.leader));
             return true;
         }
-        //System.out.println("[CommandsInfo] returing FALSE!");
+        //logger.info("[CommandsInfo] returing FALSE!");
         return false;
     }
 

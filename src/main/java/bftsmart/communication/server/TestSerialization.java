@@ -26,6 +26,8 @@ import bftsmart.tom.core.messages.TOMMessageType;
 
 
 public class TestSerialization {
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(TestSerialization.class);
+
 
     /**
      * @param args the command line arguments
@@ -43,7 +45,7 @@ public class TestSerialization {
 
 
         byte[] message = baos.toByteArray();
-        System.out.println(message.length);
+        logger.info(message.length);
 
         ByteArrayInputStream bais = new ByteArrayInputStream(message);
         DataInputStream ois = new DataInputStream(bais);
@@ -52,7 +54,7 @@ public class TestSerialization {
         TOMMessage tm2 = new TOMMessage();
         tm2.rExternal(ois);
 
-//        System.out.println(new String(tm2.getContent()));
+//        logger.info(new String(tm2.getContent()));
     }
 
 }

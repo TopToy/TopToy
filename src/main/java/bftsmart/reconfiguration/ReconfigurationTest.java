@@ -23,6 +23,7 @@ import bftsmart.reconfiguration.views.View;
  */
 public class ReconfigurationTest {
 
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ReconfigurationTest.class);
     public ReconfigurationTest() {
     }
 
@@ -32,7 +33,7 @@ public class ReconfigurationTest {
         ReconfigureRequest request = new ReconfigureRequest(id);
         request.setProperty("f","1");
         
-        System.out.println("Going to send a reconf!!!");
+        logger.info("Going to send a reconf!!!");
         
         byte[] reply = proxy.invoke(TOMUtil.getBytes(request), ReconfigurationManager.TOM_RECONFIG_REQUEST, false);
         
@@ -49,7 +50,7 @@ public class ReconfigurationTest {
         
         View v = r.getView();
         
-        System.out.println("New view f: "+v.getF());
+        logger.info("New view f: "+v.getF());
         
         rec.close();
    }

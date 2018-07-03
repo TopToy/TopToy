@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class RmfNode extends Node{
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(RmfNode.class);
+
     private RmfService rmfService;
     private Server rmfServer;
     int height;
@@ -36,9 +38,9 @@ public class RmfNode extends Node{
             @Override
             public void run() {
                 // Use stderr here since the logger may have been reset by its JVM shutdown hook.
-                System.err.println("*** shutting down gRPC server since JVM is shutting down");
+                logger.warn("*** shutting down gRPC server since JVM is shutting down");
                 RmfNode.this.stop();
-                System.err.println("*** server shut down");
+                logger.warn("*** server shut down");
             }
         });
     }

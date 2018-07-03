@@ -35,7 +35,7 @@ import bftsmart.tom.util.Logger;
  * @author alysson
  */
 public class ClientsManager {
-
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ClientsManager.class);
     private ServerViewController controller;
     private RequestsTimer timer;
     private HashMap<Integer, ClientData> clientsData = new HashMap<Integer, ClientData>();
@@ -294,7 +294,7 @@ public class ClientsManager {
                 if (reply != null && cs != null) {
 
                     if (reply.recvFromClient && fromClient) {
-                        System.out.println("[CACHE] re-send reply [Sender: " + reply.getSender() + ", sequence: " + reply.getSequence()+", session: " + reply.getSession()+ "]");
+                        logger.info("[CACHE] re-send reply [Sender: " + reply.getSender() + ", sequence: " + reply.getSequence()+", session: " + reply.getSession()+ "]");
                         cs.send(new int[]{request.getSender()}, reply);
 
                     } 

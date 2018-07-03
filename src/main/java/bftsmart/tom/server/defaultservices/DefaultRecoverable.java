@@ -122,7 +122,7 @@ public abstract class DefaultRecoverable implements Recoverable, BatchExecutable
                 stateLock.unlock();
             }
 
-            System.out.println("(DefaultRecoverable.executeBatch) Performing checkpoint for consensus " + cid);
+            logger.info("(DefaultRecoverable.executeBatch) Performing checkpoint for consensus " + cid);
             stateLock.lock();
             byte[] snapshot = getSnapshot();
             stateLock.unlock();
@@ -132,7 +132,7 @@ public abstract class DefaultRecoverable implements Recoverable, BatchExecutable
 
             // execute the second half if it exists
             if (secondHalf.length > 0) {
-//	        	System.out.println("----THERE IS A SECOND HALF----");
+//	        	logger.info("----THERE IS A SECOND HALF----");
                 cid = msgCtxs[msgCtxs.length - 1].getConsensusId();
 
                 if (!noop) {
@@ -195,8 +195,8 @@ public abstract class DefaultRecoverable implements Recoverable, BatchExecutable
         //if(!config.isToLog())
         //	return;        
         if (commands.length != msgCtx.length) {
-            System.out.println("----SIZE OF COMMANDS AND MESSAGE CONTEXTS IS DIFFERENT----");
-            System.out.println("----COMMANDS: " + commands.length + ", CONTEXTS: " + msgCtx.length + " ----");
+            logger.info("----SIZE OF COMMANDS AND MESSAGE CONTEXTS IS DIFFERENT----");
+            logger.info("----COMMANDS: " + commands.length + ", CONTEXTS: " + msgCtx.length + " ----");
         }
         logLock.lock();
 
@@ -245,7 +245,7 @@ public abstract class DefaultRecoverable implements Recoverable, BatchExecutable
             int lastCheckpointCID = state.getLastCheckpointCID();
             lastCID = state.getLastCID();
 
-            System.out.println("(DefaultRecoverable.setState) I'm going to update myself from CID "
+            logger.info("(DefaultRecoverable.setState) I'm going to update myself from CID "
                     + lastCheckpointCID + " to CID " + lastCID);
 
             logger.info("(DefaultRecoverable.setState) I'm going to update myself from CID "
@@ -253,7 +253,7 @@ public abstract class DefaultRecoverable implements Recoverable, BatchExecutable
 
             stateLock.lock();
             if (state.getSerializedState() != null) {
-                System.out.println("The state is not null. Will install it");
+                logger.info("The state is not null. Will install it");
                 initLog();
                 log.update(state);
                 installSnapshot(state.getSerializedState());
@@ -264,7 +264,7 @@ public abstract class DefaultRecoverable implements Recoverable, BatchExecutable
 
                     logger.info("(DefaultRecoverable.setState) interpreting and verifying batched requests for cid " + cid);
                     if (state.getMessageBatch(cid) == null) {
-                        System.out.println("(DefaultRecoverable.setState) " + cid + " NULO!!!");
+                        logger.info("(DefaultRecoverable.setState) " + cid + " NULO!!!");
                     }
 
                     CommandsInfo cmdInfo = state.getMessageBatch(cid); 
@@ -279,10 +279,10 @@ public abstract class DefaultRecoverable implements Recoverable, BatchExecutable
                 } catch (Exception e) {
                     e.printStackTrace(System.err);
                     if (e instanceof ArrayIndexOutOfBoundsException) {
-                       System.out.println("Last checkpoint, last consensus ID (CID): " + state.getLastCheckpointCID());
-                        System.out.println("Last CID: " + state.getLastCID());
-                        System.out.println("number of messages expected to be in the batch: " + (state.getLastCID() - state.getLastCheckpointCID() + 1));
-                        System.out.println("number of messages in the batch: " + state.getMessageBatches().length);
+                       logger.info("Last checkpoint, last consensus ID (CID): " + state.getLastCheckpointCID());
+                        logger.info("Last CID: " + state.getLastCID());
+                        logger.info("number of messages expected to be in the batch: " + (state.getLastCID() - state.getLastCheckpointCID() + 1));
+                        logger.info("number of messages in the batch: " + state.getMessageBatches().length);
                      }
                 }
 
@@ -367,7 +367,7 @@ public abstract class DefaultRecoverable implements Recoverable, BatchExecutable
             }
             index++;
         }
-        System.out.println("--- Checkpoint is in position " + index);
+        logger.info("--- Checkpoint is in position " + index);
         return index;
     }
    

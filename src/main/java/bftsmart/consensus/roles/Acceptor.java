@@ -50,7 +50,7 @@ import javax.crypto.SecretKey;
  * @author Alysson Bessani
  */
 public final class Acceptor {
-
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Acceptor.class);
     private int me; // This replica ID
     private ExecutionManager executionManager; // Execution manager of consensus's executions
     private MessageFactory factory; // Factory for PaW messages
@@ -355,7 +355,7 @@ public final class Acceptor {
                     do {
                         key = communication.getServersConn().getSecretKey(id);
                         if (key == null) {
-                            System.out.println("(Acceptor.insertProof) I don't have yet a secret key with " + id + ". Retrying.");
+                            logger.info("(Acceptor.insertProof) I don't have yet a secret key with " + id + ". Retrying.");
                             Thread.sleep(1000);
                         }
 
@@ -370,7 +370,7 @@ public final class Acceptor {
                     ex.printStackTrace();
                 } catch (InvalidKeyException ex) {
 
-                    System.out.println("Problem with secret key from " + id);
+                    logger.info("Problem with secret key from " + id);
                     ex.printStackTrace();
                 }
             }

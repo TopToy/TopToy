@@ -30,7 +30,8 @@ import org.apache.commons.codec.binary.Base64;
  *
  */
 public class RSAKeyPairGenerator {
-    
+//    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Configuration.class);
+
     /** Creates a new instance of KeyPairGenerator */
     public RSAKeyPairGenerator() {
     }
@@ -77,7 +78,7 @@ public class RSAKeyPairGenerator {
         try{
             new RSAKeyPairGenerator().run(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
         }catch(Exception e){
-            System.err.println("Use: RSAKeyPairGenerator <id> <key size>");
+            System.out.println("Use: RSAKeyPairGenerator <id> <key size>");
         }
     }
 

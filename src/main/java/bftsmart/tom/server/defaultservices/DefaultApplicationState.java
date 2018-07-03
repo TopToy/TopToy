@@ -211,32 +211,32 @@ public class DefaultApplicationState implements ApplicationState {
 
             if ((this.messageBatches != null && tState.messageBatches == null) ||
                     (this.messageBatches == null && tState.messageBatches != null)) {
-                //System.out.println("[DefaultApplicationState] returing FALSE1!");
+                //logger.info("[DefaultApplicationState] returing FALSE1!");
                 return false;
             }
 
             if (this.messageBatches != null && tState.messageBatches != null) {
 
                 if (this.messageBatches.length != tState.messageBatches.length) {
-                    //System.out.println("[DefaultApplicationState] returing FALSE2!");
+                    //logger.info("[DefaultApplicationState] returing FALSE2!");
                     return false;
                 }
                 
                 for (int i = 0; i < this.messageBatches.length; i++) {
                     
                     if (this.messageBatches[i] == null && tState.messageBatches[i] != null) {
-                        //System.out.println("[DefaultApplicationState] returing FALSE3!");
+                        //logger.info("[DefaultApplicationState] returing FALSE3!");
                         return false;
                     }
 
                     if (this.messageBatches[i] != null && tState.messageBatches[i] == null) {
-                        //System.out.println("[DefaultApplicationState] returing FALSE4!");
+                        //logger.info("[DefaultApplicationState] returing FALSE4!");
                         return false;
                     }
                     
                     if (!(this.messageBatches[i] == null && tState.messageBatches[i] == null) &&
                         (!this.messageBatches[i].equals(tState.messageBatches[i]))) {
-                        //System.out.println("[DefaultApplicationState] returing FALSE5!" + (this.messageBatches[i] == null) + " " + (tState.messageBatches[i] == null));
+                        //logger.info("[DefaultApplicationState] returing FALSE5!" + (this.messageBatches[i] == null) + " " + (tState.messageBatches[i] == null));
                         return false;
                     }
                 }
@@ -245,7 +245,7 @@ public class DefaultApplicationState implements ApplicationState {
                     tState.lastCheckpointCID == this.lastCheckpointCID &&
                     tState.lastCID == this.lastCID && tState.hasState == this.hasState);
         }
-        //System.out.println("[DefaultApplicationState] returing FALSE!");
+        //logger.info("[DefaultApplicationState] returing FALSE!");
         return false;
     }
 

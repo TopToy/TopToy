@@ -26,6 +26,7 @@ import java.security.Signature;
  * @author alysson
  */
 public class SignatureTest {
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(SignatureTest.class);
 
     public static void main(String[] args) throws Exception {
         byte[] data = new byte[20];
@@ -51,7 +52,7 @@ public class SignatureTest {
             signEng.initSign(privateKey);
         }
         end = System.currentTimeMillis();
-        System.out.println("1000 init sign: "+(end-start)+"ms");
+        logger.info("1000 init sign: "+(end-start)+"ms");
 
         for(int i=0; i<1000; i++) {
             signEng.update(data);
@@ -63,7 +64,7 @@ public class SignatureTest {
             signature = signEng.sign();
         }
         end = System.currentTimeMillis();
-        System.out.println("1000 sign: "+(end-start)+"ms");
+        logger.info("1000 sign: "+(end-start)+"ms");
 
         signEng.update(data);
         signature = signEng.sign();
@@ -78,7 +79,7 @@ public class SignatureTest {
             signEng.initVerify(publicKey);
         }
         end = System.currentTimeMillis();
-        System.out.println("1000 init verify: "+(end-start)+"ms");
+        logger.info("1000 init verify: "+(end-start)+"ms");
 
         for(int i=0; i<1000; i++) {
             signEng.update(data);
@@ -90,7 +91,7 @@ public class SignatureTest {
             signEng.verify(signature);
         }
         end = System.currentTimeMillis();
-        System.out.println("1000 verify: "+(end-start)+"ms");
+        logger.info("1000 verify: "+(end-start)+"ms");
     }
 
 }

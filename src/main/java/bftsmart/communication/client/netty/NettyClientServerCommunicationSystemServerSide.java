@@ -111,14 +111,14 @@ public class NettyClientServerCommunicationSystemServerSide extends SimpleChanne
 					controller.getStaticConf().getProcessId()),
 					controller.getStaticConf().getPort(controller.getStaticConf().getProcessId()))).sync(); 
 
-			System.out.println("-- ID = " + controller.getStaticConf().getProcessId());
-			System.out.println("-- N = " + controller.getCurrentViewN());
-			System.out.println("-- F = " + controller.getCurrentViewF());
-        		System.out.println("-- Port = " + controller.getStaticConf().getPort(controller.getStaticConf().getProcessId()));
-			System.out.println("-- requestTimeout = " + controller.getStaticConf().getRequestTimeout());
-			System.out.println("-- maxBatch = " + controller.getStaticConf().getMaxBatchSize());
-			if (controller.getStaticConf().getUseMACs() == 1) System.out.println("-- Using MACs");
-			if(controller.getStaticConf().getUseSignatures() == 1) System.out.println("-- Using Signatures");
+			logger.info("-- ID = " + controller.getStaticConf().getProcessId());
+			logger.info("-- N = " + controller.getCurrentViewN());
+			logger.info("-- F = " + controller.getCurrentViewF());
+        		logger.info("-- Port = " + controller.getStaticConf().getPort(controller.getStaticConf().getProcessId()));
+			logger.info("-- requestTimeout = " + controller.getStaticConf().getRequestTimeout());
+			logger.info("-- maxBatch = " + controller.getStaticConf().getMaxBatchSize());
+			if (controller.getStaticConf().getUseMACs() == 1) logger.info("-- Using MACs");
+			if(controller.getStaticConf().getUseSignatures() == 1) logger.info("-- Using Signatures");
 			//******* EDUARDO END **************//
                         
                         mainChannel = f.channel();
@@ -140,7 +140,7 @@ public class NettyClientServerCommunicationSystemServerSide extends SimpleChanne
         @Override
         public void shutdown() {
             
-            System.out.println("Shutting down Netty system");
+            logger.info("Shutting down Netty system");
             
             this.closed = true;
 
@@ -168,9 +168,9 @@ public class NettyClientServerCommunicationSystemServerSide extends SimpleChanne
                 }
             
                 if(cause instanceof ClosedChannelException)
-			System.out.println("Connection with client closed.");
+			logger.info("Connection with client closed.");
 		else if(cause instanceof ConnectException) {
-			System.out.println("Impossible to connect to client.");
+			logger.info("Impossible to connect to client.");
 		} else {
 			cause.printStackTrace(System.err);
 		}
@@ -186,7 +186,7 @@ public class NettyClientServerCommunicationSystemServerSide extends SimpleChanne
                             
                 //delivers message to TOMLayer
 		if (requestReceiver == null)
-			System.out.println("RECEIVER NULO!!!!!!!!!!!!");
+			logger.info("RECEIVER NULO!!!!!!!!!!!!");
 		else requestReceiver.requestReceived(sm);
 	}
 
@@ -198,7 +198,7 @@ public class NettyClientServerCommunicationSystemServerSide extends SimpleChanne
                     return;
                 }
 		logger.info("Session Created, active clients=" + sessionTable.size());
-		System.out.println("Session Created, active clients=" + sessionTable.size());
+		logger.info("Session Created, active clients=" + sessionTable.size());
 	}
 
 	@Override
@@ -218,9 +218,9 @@ public class NettyClientServerCommunicationSystemServerSide extends SimpleChanne
 				NettyClientServerSession value = (NettyClientServerSession) m.getValue();
 				if (ctx.channel().equals(value.getChannel())) {
 					int key = (Integer) m.getKey();
-					System.out.println("#Removing client channel with ID= " + key);
+					logger.info("#Removing client channel with ID= " + key);
 					sessionTable.remove(key);
-					System.out.println("#active clients=" + sessionTable.size());
+					logger.info("#active clients=" + sessionTable.size());
 					break;
 				}
 			}
@@ -258,7 +258,7 @@ public class NettyClientServerCommunicationSystemServerSide extends SimpleChanne
 			try {
 				dos.close();
 			} catch (IOException ex) {
-				System.out.println("Exception closing DataOutputStream: " + ex.getMessage());
+				logger.info("Exception closing DataOutputStream: " + ex.getMessage());
 			}
 		}
 
@@ -293,7 +293,7 @@ public class NettyClientServerCommunicationSystemServerSide extends SimpleChanne
                                                                                         
                                             public void run() {
                                                 
-                                                System.out.println("Received request from " + id + " before establishing Netty connection. Re-trying until connection is established");
+                                                logger.info("Received request from " + id + " before establishing Netty connection. Re-trying until connection is established");
 
                                                 NettyClientServerSession ncss = null;
                                                 while (ncss == null) {
@@ -318,7 +318,7 @@ public class NettyClientServerCommunicationSystemServerSide extends SimpleChanne
                                                     
                                                 }
                                                  
-                                                System.out.println("Connection with " + id + " established!");
+                                                logger.info("Connection with " + id + " established!");
 
                                                 
                                             }
@@ -328,7 +328,7 @@ public class NettyClientServerCommunicationSystemServerSide extends SimpleChanne
                                         t.start();
                                         ///////////////////////////////////////////
 				} else {
-                                    System.out.println("!!!!!!!!NettyClientServerSession NULL !!!!!! sequence: " + sm.getSequence() + ", ID; " + targets[i]);
+                                    logger.info("!!!!!!!!NettyClientServerSession NULL !!!!!! sequence: " + sm.getSequence() + ", ID; " + targets[i]);
                                 }
 			} finally {
 				//sendLock.unlock();

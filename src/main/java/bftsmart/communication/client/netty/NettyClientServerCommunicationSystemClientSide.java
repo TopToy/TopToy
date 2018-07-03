@@ -69,7 +69,7 @@ import bftsmart.tom.util.TOMUtil;
  */
 @Sharable
 public class NettyClientServerCommunicationSystemClientSide extends SimpleChannelInboundHandler<TOMMessage> implements CommunicationSystemClientSide {
-
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(NettyClientServerCommunicationSystemClientSide.class);
     private int clientId;
     protected ReplyReceiver trr;
     //******* EDUARDO BEGIN **************//
@@ -135,18 +135,18 @@ public class NettyClientServerCommunicationSystemClientSide extends SimpleChanne
                     NettyClientServerSession cs = new NettyClientServerSession(future.channel(), macSend, macReceive, currV[i]);
                     sessionTable.put(currV[i], cs);
 
-                    System.out.println("Connecting to replica " + currV[i] + " at " + controller.getRemoteAddress(currV[i]));
+                    logger.info("Connecting to replica " + currV[i] + " at " + controller.getRemoteAddress(currV[i]));
                     //******* EDUARDO END **************//
 
                     future.awaitUninterruptibly();
 
                     if (!future.isSuccess()) {
-                            System.err.println("Impossible to connect to " + currV[i]);
+                            logger.warn("Impossible to connect to " + currV[i]);
                     }
 
                 } catch (NullPointerException ex) {
                         //What the fuck is this??? This is not possible!!!
-                        System.err.println("Should fix the problem, and I think it has no other implications :-), "
+                        logger.warn("Should fix the problem, and I think it has no other implications :-), "
                                         + "but we must make the servers store the view in a different place.");
                 } catch (InvalidKeyException ex) {
                         ex.printStackTrace(System.err);
@@ -205,13 +205,13 @@ public class NettyClientServerCommunicationSystemClientSide extends SimpleChanne
                         NettyClientServerSession cs = new NettyClientServerSession(future.channel(), macSend, macReceive, currV[i]);
                         sessionTable.put(currV[i], cs);
 
-                        System.out.println("Connecting to replica " + currV[i] + " at " + controller.getRemoteAddress(currV[i]));
+                        logger.info("Connecting to replica " + currV[i] + " at " + controller.getRemoteAddress(currV[i]));
                         //******* EDUARDO END **************//
 
                         future.awaitUninterruptibly();
 
                         if (!future.isSuccess()) {
-                            System.err.println("Impossible to connect to " + currV[i]);
+                            logger.warn("Impossible to connect to " + currV[i]);
                         }
 
                     } catch (InvalidKeyException ex) {
@@ -232,11 +232,11 @@ public class NettyClientServerCommunicationSystemClientSide extends SimpleChanne
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx,Throwable cause)  throws Exception {
         if(cause instanceof ClosedChannelException) {
-            System.out.println("Connection with replica closed.");
+            logger.info("Connection with replica closed.");
         } else if(cause instanceof ConnectException) {
-            System.out.println("Impossible to connect to replica.");
+            logger.info("Impossible to connect to replica.");
         } else {
-            System.out.println("Replica disconnected.");
+            logger.info("Replica disconnected.");
         }
         cause.printStackTrace();
     }
@@ -263,7 +263,7 @@ public class NettyClientServerCommunicationSystemClientSide extends SimpleChanne
             return;
         }
         
-        System.out.println("Channel active");
+        logger.info("Channel active");
     }
 
     public void reconnect(final ChannelHandlerContext ctx){
@@ -304,7 +304,7 @@ public class NettyClientServerCommunicationSystemClientSide extends SimpleChanne
                         sessionTable.remove(ncss.getReplicaId());
                         sessionTable.put(ncss.getReplicaId(), cs);
 
-                        System.out.println("re-connecting to replica "+ncss.getReplicaId()+" at " + controller.getRemoteAddress(ncss.getReplicaId()));
+                        logger.info("re-connecting to replica "+ncss.getReplicaId()+" at " + controller.getRemoteAddress(ncss.getReplicaId()));
                     } else {
                         // This cleans an olde server from the session table
                         sessionTable.remove(ncss.getReplicaId());

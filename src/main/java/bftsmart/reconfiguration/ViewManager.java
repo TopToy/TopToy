@@ -35,6 +35,7 @@ import bftsmart.reconfiguration.views.View;
  * @author eduardo
  */
 public class ViewManager {
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ViewManager.class);
 
     private int id;
     private Reconfiguration rec = null;
@@ -108,7 +109,7 @@ public class ViewManager {
         connect();
         ReconfigureReply r = rec.execute();
         View v = r.getView();
-        System.out.println("New view f: " + v.getF());
+        logger.info("New view f: " + v.getF());
 
         VMMessage msg = new VMMessage(id, r);
 
@@ -143,7 +144,7 @@ public class ViewManager {
                 }
             } catch (InterruptedException ex) {
                // ex.printStackTrace();
-                System.err.println(ex);
+                logger.warn(ex);
             }
         }
         //br.ufsc.das.tom.util.Logger.println("(ServersCommunicationLayer.send) Finished sending messages to replicas");

@@ -29,7 +29,7 @@ import bftsmart.tom.core.messages.TOMMessage;
 
 
 public class NettyTOMMessageEncoder extends MessageToByteEncoder<TOMMessage> {
-    
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(NettyTOMMessageEncoder.class);
     private boolean isClient;
     private Map sessionTable;
     private int macLength;
@@ -57,13 +57,13 @@ public class NettyTOMMessageEncoder extends MessageToByteEncoder<TOMMessage> {
             //signature was already produced before            
             signatureData = sm.serializedMessageSignature;
             if (signatureData.length != signatureLength)
-                System.out.println("WARNING: message signature has size "+signatureData.length+" and should have "+signatureLength);
+                logger.info("WARNING: message signature has size "+signatureData.length+" and should have "+signatureLength);
         }
         
         if (useMAC) {
             macData = produceMAC(sm.destination, msgData, sm.getSender());
             if(macData == null) {
-            	System.out.println("uses MAC and the MAC returned is null. Won't write to channel");
+            	logger.info("uses MAC and the MAC returned is null. Won't write to channel");
             	return;
             }
         }
@@ -91,7 +91,7 @@ public class NettyTOMMessageEncoder extends MessageToByteEncoder<TOMMessage> {
     byte[] produceMAC(int id, byte[] data, int me) {
         NettyClientServerSession session = (NettyClientServerSession)sessionTable.get(id);
         if(session == null) {
-        	System.out.println("NettyTOMMessageEncoder.produceMAC(). session for client " + id + " is null");
+        	logger.info("NettyTOMMessageEncoder.produceMAC(). session for client " + id + " is null");
         	return null;
         }
         Mac macSend = session.getMacSend();

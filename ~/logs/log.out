@@ -1,0 +1,801 @@
+start TestFourServersNoFailures
+init server #0
+-- Using view stored on disk
+Using SLF4J as the default logging framework
+-Dio.netty.threadLocalMap.stringBuilder.initialSize: 1024
+-Dio.netty.threadLocalMap.stringBuilder.maxSize: 4096
+-Dio.netty.eventLoopThreads: 8
+-Dio.netty.noKeySetOptimization: false
+-Dio.netty.selectorAutoRebuildThreshold: 512
+-Dio.netty.noUnsafe: false
+Java version: 10
+sun.misc.Unsafe.theUnsafe: available
+sun.misc.Unsafe.copyMemory: available
+java.nio.Buffer.address: available
+direct buffer constructor: unavailable
+java.lang.UnsupportedOperationException: Reflective setAccessible(true) disabled
+	at io.netty.util.internal.ReflectionUtil.trySetAccessible(ReflectionUtil.java:31)
+	at io.netty.util.internal.PlatformDependent0$4.run(PlatformDependent0.java:224)
+	at java.base/java.security.AccessController.doPrivileged(Native Method)
+	at io.netty.util.internal.PlatformDependent0.<clinit>(PlatformDependent0.java:218)
+	at io.netty.util.internal.PlatformDependent.isAndroid(PlatformDependent.java:208)
+	at io.netty.util.internal.PlatformDependent.<clinit>(PlatformDependent.java:79)
+	at io.netty.channel.nio.NioEventLoop.newTaskQueue(NioEventLoop.java:261)
+	at io.netty.util.concurrent.SingleThreadEventExecutor.<init>(SingleThreadEventExecutor.java:165)
+	at io.netty.channel.SingleThreadEventLoop.<init>(SingleThreadEventLoop.java:58)
+	at io.netty.channel.nio.NioEventLoop.<init>(NioEventLoop.java:143)
+	at io.netty.channel.nio.NioEventLoopGroup.newChild(NioEventLoopGroup.java:127)
+	at io.netty.channel.nio.NioEventLoopGroup.newChild(NioEventLoopGroup.java:36)
+	at io.netty.util.concurrent.MultithreadEventExecutorGroup.<init>(MultithreadEventExecutorGroup.java:84)
+	at io.netty.util.concurrent.MultithreadEventExecutorGroup.<init>(MultithreadEventExecutorGroup.java:58)
+	at io.netty.channel.MultithreadEventLoopGroup.<init>(MultithreadEventLoopGroup.java:52)
+	at io.netty.channel.nio.NioEventLoopGroup.<init>(NioEventLoopGroup.java:87)
+	at io.netty.channel.nio.NioEventLoopGroup.<init>(NioEventLoopGroup.java:82)
+	at io.netty.channel.nio.NioEventLoopGroup.<init>(NioEventLoopGroup.java:63)
+	at io.netty.channel.nio.NioEventLoopGroup.<init>(NioEventLoopGroup.java:51)
+	at io.netty.channel.nio.NioEventLoopGroup.<init>(NioEventLoopGroup.java:43)
+	at bftsmart.communication.client.netty.NettyClientServerCommunicationSystemClientSide.<init>(NettyClientServerCommunicationSystemClientSide.java:93)
+	at bftsmart.communication.client.CommunicationSystemClientSideFactory.getCommunicationSystemClientSide(CommunicationSystemClientSideFactory.java:28)
+	at bftsmart.tom.TOMSender.startsCS(TOMSender.java:87)
+	at bftsmart.tom.TOMSender.init(TOMSender.java:83)
+	at bftsmart.tom.ServiceProxy.<init>(ServiceProxy.java:94)
+	at bftsmart.tom.ServiceProxy.<init>(ServiceProxy.java:76)
+	at bftsmart.tom.AsynchServiceProxy.<init>(AsynchServiceProxy.java:47)
+	at consensus.bbc.bbcClient.<init>(bbcClient.java:17)
+	at rmf.RmfService.<init>(RmfService.java:90)
+	at rmf.RmfNode.<init>(RmfNode.java:21)
+	at rmfTest.rmfTest.initLocalRmfNode(rmfTest.java:31)
+	at rmfTest.rmfTest.TestFourServersNoFailures(rmfTest.java:60)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:564)
+	at org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:515)
+	at org.junit.jupiter.engine.execution.ExecutableInvoker.invoke(ExecutableInvoker.java:115)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$invokeTestMethod$6(TestMethodTestDescriptor.java:170)
+	at org.junit.jupiter.engine.execution.ThrowableCollector.execute(ThrowableCollector.java:40)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.invokeTestMethod(TestMethodTestDescriptor.java:166)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:113)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:58)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$5(NodeTestTask.java:134)
+	at org.junit.platform.engine.support.hierarchical.SingleTestExecutor.executeSafely(SingleTestExecutor.java:66)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:128)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:109)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1378)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:38)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$5(NodeTestTask.java:138)
+	at org.junit.platform.engine.support.hierarchical.SingleTestExecutor.executeSafely(SingleTestExecutor.java:66)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:128)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:109)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1378)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:38)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$5(NodeTestTask.java:138)
+	at org.junit.platform.engine.support.hierarchical.SingleTestExecutor.executeSafely(SingleTestExecutor.java:66)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:128)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:109)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:32)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:49)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:47)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:184)
+	at org.junit.platform.launcher.core.DefaultLauncher.lambda$execute$5(DefaultLauncher.java:152)
+	at org.junit.platform.launcher.core.DefaultLauncher.withInterceptedStreams(DefaultLauncher.java:166)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:145)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:92)
+	at com.intellij.junit5.JUnit5IdeaTestRunner.startRunnerWithArgs(JUnit5IdeaTestRunner.java:74)
+	at com.intellij.rt.execution.junit.IdeaTestRunner$Repeater.startRunnerWithArgs(IdeaTestRunner.java:47)
+	at com.intellij.rt.execution.junit.JUnitStarter.prepareStreamsAndStart(JUnitStarter.java:242)
+	at com.intellij.rt.execution.junit.JUnitStarter.main(JUnitStarter.java:70)
+java.nio.Bits.unaligned: unavailable true
+java.lang.UnsupportedOperationException: Reflective setAccessible(true) disabled
+	at io.netty.util.internal.ReflectionUtil.trySetAccessible(ReflectionUtil.java:31)
+	at io.netty.util.internal.PlatformDependent0$5.run(PlatformDependent0.java:273)
+	at java.base/java.security.AccessController.doPrivileged(Native Method)
+	at io.netty.util.internal.PlatformDependent0.<clinit>(PlatformDependent0.java:266)
+	at io.netty.util.internal.PlatformDependent.isAndroid(PlatformDependent.java:208)
+	at io.netty.util.internal.PlatformDependent.<clinit>(PlatformDependent.java:79)
+	at io.netty.channel.nio.NioEventLoop.newTaskQueue(NioEventLoop.java:261)
+	at io.netty.util.concurrent.SingleThreadEventExecutor.<init>(SingleThreadEventExecutor.java:165)
+	at io.netty.channel.SingleThreadEventLoop.<init>(SingleThreadEventLoop.java:58)
+	at io.netty.channel.nio.NioEventLoop.<init>(NioEventLoop.java:143)
+	at io.netty.channel.nio.NioEventLoopGroup.newChild(NioEventLoopGroup.java:127)
+	at io.netty.channel.nio.NioEventLoopGroup.newChild(NioEventLoopGroup.java:36)
+	at io.netty.util.concurrent.MultithreadEventExecutorGroup.<init>(MultithreadEventExecutorGroup.java:84)
+	at io.netty.util.concurrent.MultithreadEventExecutorGroup.<init>(MultithreadEventExecutorGroup.java:58)
+	at io.netty.channel.MultithreadEventLoopGroup.<init>(MultithreadEventLoopGroup.java:52)
+	at io.netty.channel.nio.NioEventLoopGroup.<init>(NioEventLoopGroup.java:87)
+	at io.netty.channel.nio.NioEventLoopGroup.<init>(NioEventLoopGroup.java:82)
+	at io.netty.channel.nio.NioEventLoopGroup.<init>(NioEventLoopGroup.java:63)
+	at io.netty.channel.nio.NioEventLoopGroup.<init>(NioEventLoopGroup.java:51)
+	at io.netty.channel.nio.NioEventLoopGroup.<init>(NioEventLoopGroup.java:43)
+	at bftsmart.communication.client.netty.NettyClientServerCommunicationSystemClientSide.<init>(NettyClientServerCommunicationSystemClientSide.java:93)
+	at bftsmart.communication.client.CommunicationSystemClientSideFactory.getCommunicationSystemClientSide(CommunicationSystemClientSideFactory.java:28)
+	at bftsmart.tom.TOMSender.startsCS(TOMSender.java:87)
+	at bftsmart.tom.TOMSender.init(TOMSender.java:83)
+	at bftsmart.tom.ServiceProxy.<init>(ServiceProxy.java:94)
+	at bftsmart.tom.ServiceProxy.<init>(ServiceProxy.java:76)
+	at bftsmart.tom.AsynchServiceProxy.<init>(AsynchServiceProxy.java:47)
+	at consensus.bbc.bbcClient.<init>(bbcClient.java:17)
+	at rmf.RmfService.<init>(RmfService.java:90)
+	at rmf.RmfNode.<init>(RmfNode.java:21)
+	at rmfTest.rmfTest.initLocalRmfNode(rmfTest.java:31)
+	at rmfTest.rmfTest.TestFourServersNoFailures(rmfTest.java:60)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:564)
+	at org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:515)
+	at org.junit.jupiter.engine.execution.ExecutableInvoker.invoke(ExecutableInvoker.java:115)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$invokeTestMethod$6(TestMethodTestDescriptor.java:170)
+	at org.junit.jupiter.engine.execution.ThrowableCollector.execute(ThrowableCollector.java:40)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.invokeTestMethod(TestMethodTestDescriptor.java:166)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:113)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:58)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$5(NodeTestTask.java:134)
+	at org.junit.platform.engine.support.hierarchical.SingleTestExecutor.executeSafely(SingleTestExecutor.java:66)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:128)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:109)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1378)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:38)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$5(NodeTestTask.java:138)
+	at org.junit.platform.engine.support.hierarchical.SingleTestExecutor.executeSafely(SingleTestExecutor.java:66)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:128)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:109)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1378)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:38)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$5(NodeTestTask.java:138)
+	at org.junit.platform.engine.support.hierarchical.SingleTestExecutor.executeSafely(SingleTestExecutor.java:66)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:128)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:109)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:32)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:49)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:47)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:184)
+	at org.junit.platform.launcher.core.DefaultLauncher.lambda$execute$5(DefaultLauncher.java:152)
+	at org.junit.platform.launcher.core.DefaultLauncher.withInterceptedStreams(DefaultLauncher.java:166)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:145)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:92)
+	at com.intellij.junit5.JUnit5IdeaTestRunner.startRunnerWithArgs(JUnit5IdeaTestRunner.java:74)
+	at com.intellij.rt.execution.junit.IdeaTestRunner$Repeater.startRunnerWithArgs(IdeaTestRunner.java:47)
+	at com.intellij.rt.execution.junit.JUnitStarter.prepareStreamsAndStart(JUnitStarter.java:242)
+	at com.intellij.rt.execution.junit.JUnitStarter.main(JUnitStarter.java:70)
+jdk.internal.misc.Unsafe.allocateUninitializedArray(int): unavailable
+java.lang.IllegalAccessException: class io.netty.util.internal.PlatformDependent0$6 cannot access class jdk.internal.misc.Unsafe (in module java.base) because module java.base does not export jdk.internal.misc to unnamed module @c333c60
+	at java.base/jdk.internal.reflect.Reflection.newIllegalAccessException(Reflection.java:360)
+	at java.base/java.lang.reflect.AccessibleObject.checkAccess(AccessibleObject.java:589)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:556)
+	at io.netty.util.internal.PlatformDependent0$6.run(PlatformDependent0.java:315)
+	at java.base/java.security.AccessController.doPrivileged(Native Method)
+	at io.netty.util.internal.PlatformDependent0.<clinit>(PlatformDependent0.java:306)
+	at io.netty.util.internal.PlatformDependent.isAndroid(PlatformDependent.java:208)
+	at io.netty.util.internal.PlatformDependent.<clinit>(PlatformDependent.java:79)
+	at io.netty.channel.nio.NioEventLoop.newTaskQueue(NioEventLoop.java:261)
+	at io.netty.util.concurrent.SingleThreadEventExecutor.<init>(SingleThreadEventExecutor.java:165)
+	at io.netty.channel.SingleThreadEventLoop.<init>(SingleThreadEventLoop.java:58)
+	at io.netty.channel.nio.NioEventLoop.<init>(NioEventLoop.java:143)
+	at io.netty.channel.nio.NioEventLoopGroup.newChild(NioEventLoopGroup.java:127)
+	at io.netty.channel.nio.NioEventLoopGroup.newChild(NioEventLoopGroup.java:36)
+	at io.netty.util.concurrent.MultithreadEventExecutorGroup.<init>(MultithreadEventExecutorGroup.java:84)
+	at io.netty.util.concurrent.MultithreadEventExecutorGroup.<init>(MultithreadEventExecutorGroup.java:58)
+	at io.netty.channel.MultithreadEventLoopGroup.<init>(MultithreadEventLoopGroup.java:52)
+	at io.netty.channel.nio.NioEventLoopGroup.<init>(NioEventLoopGroup.java:87)
+	at io.netty.channel.nio.NioEventLoopGroup.<init>(NioEventLoopGroup.java:82)
+	at io.netty.channel.nio.NioEventLoopGroup.<init>(NioEventLoopGroup.java:63)
+	at io.netty.channel.nio.NioEventLoopGroup.<init>(NioEventLoopGroup.java:51)
+	at io.netty.channel.nio.NioEventLoopGroup.<init>(NioEventLoopGroup.java:43)
+	at bftsmart.communication.client.netty.NettyClientServerCommunicationSystemClientSide.<init>(NettyClientServerCommunicationSystemClientSide.java:93)
+	at bftsmart.communication.client.CommunicationSystemClientSideFactory.getCommunicationSystemClientSide(CommunicationSystemClientSideFactory.java:28)
+	at bftsmart.tom.TOMSender.startsCS(TOMSender.java:87)
+	at bftsmart.tom.TOMSender.init(TOMSender.java:83)
+	at bftsmart.tom.ServiceProxy.<init>(ServiceProxy.java:94)
+	at bftsmart.tom.ServiceProxy.<init>(ServiceProxy.java:76)
+	at bftsmart.tom.AsynchServiceProxy.<init>(AsynchServiceProxy.java:47)
+	at consensus.bbc.bbcClient.<init>(bbcClient.java:17)
+	at rmf.RmfService.<init>(RmfService.java:90)
+	at rmf.RmfNode.<init>(RmfNode.java:21)
+	at rmfTest.rmfTest.initLocalRmfNode(rmfTest.java:31)
+	at rmfTest.rmfTest.TestFourServersNoFailures(rmfTest.java:60)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:564)
+	at org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:515)
+	at org.junit.jupiter.engine.execution.ExecutableInvoker.invoke(ExecutableInvoker.java:115)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$invokeTestMethod$6(TestMethodTestDescriptor.java:170)
+	at org.junit.jupiter.engine.execution.ThrowableCollector.execute(ThrowableCollector.java:40)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.invokeTestMethod(TestMethodTestDescriptor.java:166)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:113)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:58)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$5(NodeTestTask.java:134)
+	at org.junit.platform.engine.support.hierarchical.SingleTestExecutor.executeSafely(SingleTestExecutor.java:66)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:128)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:109)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1378)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:38)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$5(NodeTestTask.java:138)
+	at org.junit.platform.engine.support.hierarchical.SingleTestExecutor.executeSafely(SingleTestExecutor.java:66)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:128)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:109)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1378)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:38)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$5(NodeTestTask.java:138)
+	at org.junit.platform.engine.support.hierarchical.SingleTestExecutor.executeSafely(SingleTestExecutor.java:66)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:128)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:109)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:32)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:49)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:47)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:184)
+	at org.junit.platform.launcher.core.DefaultLauncher.lambda$execute$5(DefaultLauncher.java:152)
+	at org.junit.platform.launcher.core.DefaultLauncher.withInterceptedStreams(DefaultLauncher.java:166)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:145)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:92)
+	at com.intellij.junit5.JUnit5IdeaTestRunner.startRunnerWithArgs(JUnit5IdeaTestRunner.java:74)
+	at com.intellij.rt.execution.junit.IdeaTestRunner$Repeater.startRunnerWithArgs(IdeaTestRunner.java:47)
+	at com.intellij.rt.execution.junit.JUnitStarter.prepareStreamsAndStart(JUnitStarter.java:242)
+	at com.intellij.rt.execution.junit.JUnitStarter.main(JUnitStarter.java:70)
+java.nio.DirectByteBuffer.<init>(long, int): unavailable
+sun.misc.Unsafe: available
+maxDirectMemory: 4141875200 bytes (maybe)
+-Dio.netty.tmpdir: /tmp (java.io.tmpdir)
+-Dio.netty.bitMode: 64 (sun.arch.data.model)
+-Dio.netty.noPreferDirect: false
+-Dio.netty.maxDirectMemory: -1 bytes
+-Dio.netty.uninitializedArrayAllocationThreshold: -1
+java.nio.ByteBuffer.cleaner(): available
+org.jctools-core.MpscChunkedArrayQueue: available
+-Dio.netty.processId: 13898 (auto-detected)
+-Djava.net.preferIPv4Stack: false
+-Djava.net.preferIPv6Addresses: false
+Loopback interface: lo (lo, 0:0:0:0:0:0:0:1%lo)
+/proc/sys/net/core/somaxconn: 128
+-Dio.netty.machineId: 00:50:56:ff:fe:c0:00:08 (auto-detected)
+-Dio.netty.leakDetection.level: simple
+-Dio.netty.leakDetection.targetRecords: 4
+-Dio.netty.allocator.numHeapArenas: 8
+-Dio.netty.allocator.numDirectArenas: 8
+-Dio.netty.allocator.pageSize: 8192
+-Dio.netty.allocator.maxOrder: 11
+-Dio.netty.allocator.chunkSize: 16777216
+-Dio.netty.allocator.tinyCacheSize: 512
+-Dio.netty.allocator.smallCacheSize: 256
+-Dio.netty.allocator.normalCacheSize: 64
+-Dio.netty.allocator.maxCachedBufferCapacity: 32768
+-Dio.netty.allocator.cacheTrimInterval: 8192
+-Dio.netty.allocator.useCacheForAllThreads: true
+-Dio.netty.allocator.type: pooled
+-Dio.netty.threadLocalDirectBufferSize: 0
+-Dio.netty.maxThreadLocalCharBufferSize: 16384
+Connecting to replica 0 at /127.0.0.1:13000
+new NettyTOMMessageDecoder!!, isClient=true
+-- ID = 0
+-- N = 4
+-- F = 1
+-- Port = 13000
+-- requestTimeout = 2000
+-- maxBatch = 400
+-- Using MACs
+-- In current view: ID:0; F:1; Processes:0(/127.0.0.1:13000),1(/127.0.0.1:13010),2(/127.0.0.1:13020),3(/127.0.0.1:13030),
+Channel active
+Connecting to replica 1 at /127.0.0.1:13010
+new NettyTOMMessageDecoder!!, isClient=true
+getSnapshot called
+Running.
+Next leader for CID=0: 0
+(TOMLayer.run) I'm the leader.
+Impossible to connect to 1
+new NettyTOMMessageDecoder!!, isClient=false
+Connecting to replica 2 at /127.0.0.1:13020
+--------sending----------> bftsmart.statemanagement.strategy.StandardSMMessage@709e97a
+--------sending----------> bftsmart.statemanagement.strategy.StandardSMMessage@709e97a
+<-------receiving---------- bftsmart.statemanagement.strategy.StandardSMMessage@709e97a
+--------sending----------> bftsmart.statemanagement.strategy.StandardSMMessage@3cbbc806
+<-------receiving---------- bftsmart.statemanagement.strategy.StandardSMMessage@3cbbc806
+Session Created, active clients=0
+Session Created, active clients=0
+new NettyTOMMessageDecoder!!, isClient=true
+Impossible to connect to 2
+Connecting to replica 3 at /127.0.0.1:13030
+new NettyTOMMessageDecoder!!, isClient=true
+Impossible to connect to 3
+init server #1
+-- Using view stored on disk
+Connecting to replica 0 at /127.0.0.1:13000
+new NettyTOMMessageDecoder!!, isClient=true
+Channel active
+Connecting to replica 1 at /127.0.0.1:13010
+new NettyTOMMessageDecoder!!, isClient=false
+Session Created, active clients=0
+Session Created, active clients=0
+new NettyTOMMessageDecoder!!, isClient=true
+Impossible to connect to 1
+Connecting to replica 2 at /127.0.0.1:13020
+new NettyTOMMessageDecoder!!, isClient=true
+Impossible to connect to 2
+Connecting to replica 3 at /127.0.0.1:13030
+new NettyTOMMessageDecoder!!, isClient=true
+Impossible to connect to 3
+init server #2
+Connecting to replica 0 at /127.0.0.1:13000
+new NettyTOMMessageDecoder!!, isClient=true
+-- Using view stored on disk
+Channel active
+new NettyTOMMessageDecoder!!, isClient=false
+Session Created, active clients=0
+Session Created, active clients=0
+Connecting to replica 1 at /127.0.0.1:13010
+-- Diffie-Hellman complete with 0
+new NettyTOMMessageDecoder!!, isClient=true
+-- Diffie-Hellman complete with 1
+Impossible to connect to 1
+Connecting to replica 2 at /127.0.0.1:13020
+new NettyTOMMessageDecoder!!, isClient=true
+Impossible to connect to 2
+-- Diffie-Hellman complete with 2
+-- Diffie-Hellman complete with 0
+Connecting to replica 3 at /127.0.0.1:13030
+new NettyTOMMessageDecoder!!, isClient=true
+Impossible to connect to 3
+init server #3
+-- ID = 1
+-- N = 4
+-- F = 1
+-- Port = 13010
+-- requestTimeout = 2000
+-- maxBatch = 400
+-- Using MACs
+-- In current view: ID:0; F:1; Processes:0(/127.0.0.1:13000),1(/127.0.0.1:13010),2(/127.0.0.1:13020),3(/127.0.0.1:13030),
+-- Using view stored on disk
+-- Retrieving State
+-- Diffie-Hellman complete with 0
+Connecting to replica 0 at /127.0.0.1:13000
+-- Diffie-Hellman complete with 3
+-- Diffie-Hellman complete with 1
+-- Diffie-Hellman complete with 2
+getSnapshot called
+--------sending----------> bftsmart.statemanagement.strategy.StandardSMMessage@4b4cb6c5
+new NettyTOMMessageDecoder!!, isClient=true
+Running.
+Next leader for CID=0: 0
+-- ID = 2
+-- N = 4
+-- F = 1
+-- Port = 13020
+-- requestTimeout = 2000
+-- maxBatch = 400
+-- Using MACs
+-- In current view: ID:0; F:1; Processes:0(/127.0.0.1:13000),1(/127.0.0.1:13010),2(/127.0.0.1:13020),3(/127.0.0.1:13030),
+Channel active
+-- Diffie-Hellman complete with 3
+-- Diffie-Hellman complete with 1
+--------sending----------> bftsmart.statemanagement.strategy.StandardSMMessage@4b4cb6c5
+<-------receiving---------- bftsmart.statemanagement.strategy.StandardSMMessage@4b4cb6c5
+--------sending----------> bftsmart.statemanagement.strategy.StandardSMMessage@647507ee
+<-------receiving---------- bftsmart.statemanagement.strategy.StandardSMMessage@647507ee
+Running.
+Next leader for CID=0: 0
+getSnapshot called
+--------sending----------> bftsmart.statemanagement.strategy.StandardSMMessage@2095274d
+--------sending----------> bftsmart.statemanagement.strategy.StandardSMMessage@2095274d
+<-------receiving---------- bftsmart.statemanagement.strategy.StandardSMMessage@2095274d
+--------sending----------> bftsmart.statemanagement.strategy.StandardSMMessage@c0ba325
+<-------receiving---------- bftsmart.statemanagement.strategy.StandardSMMessage@c0ba325
+-- Retrieving State
+<-------receiving---------- bftsmart.statemanagement.strategy.StandardSMMessage@2cc4cd4
+--------sending----------> bftsmart.statemanagement.strategy.StandardSMMessage@6f3c855
+Connecting to replica 1 at /127.0.0.1:13010
+<-------receiving---------- bftsmart.statemanagement.strategy.StandardSMMessage@43f146ef
+--------sending----------> bftsmart.statemanagement.strategy.StandardSMMessage@1232d73f
+new NettyTOMMessageDecoder!!, isClient=true
+new NettyTOMMessageDecoder!!, isClient=false
+Session Created, active clients=0
+Session Created, active clients=0
+Channel active
+-- Diffie-Hellman complete with 2
+-- Diffie-Hellman complete with 3
+Connecting to replica 2 at /127.0.0.1:13020
+new NettyTOMMessageDecoder!!, isClient=false
+new NettyTOMMessageDecoder!!, isClient=true
+Session Created, active clients=0
+Session Created, active clients=0
+Channel active
+new NettyTOMMessageDecoder!!, isClient=false
+Connecting to replica 3 at /127.0.0.1:13030
+-- ID = 3
+-- N = 4
+-- F = 1
+-- Port = 13030
+-- requestTimeout = 2000
+-- maxBatch = 400
+-- Using MACs
+-- In current view: ID:0; F:1; Processes:0(/127.0.0.1:13000),1(/127.0.0.1:13010),2(/127.0.0.1:13020),3(/127.0.0.1:13030),
+Session Created, active clients=0
+Session Created, active clients=0
+-- Retrieving State
+new NettyTOMMessageDecoder!!, isClient=true
+getSnapshot called
+Running.
+Next leader for CID=0: 0
+<-------receiving---------- bftsmart.statemanagement.strategy.StandardSMMessage@6f078b41
+--------sending----------> bftsmart.statemanagement.strategy.StandardSMMessage@d76792d
+--------sending----------> bftsmart.statemanagement.strategy.StandardSMMessage@d76792d
+--------sending----------> bftsmart.statemanagement.strategy.StandardSMMessage@61c078d1
+Channel active
+<-------receiving---------- bftsmart.statemanagement.strategy.StandardSMMessage@65ffe031
+--------sending----------> bftsmart.statemanagement.strategy.StandardSMMessage@20fd72ea
+<-------receiving---------- bftsmart.statemanagement.strategy.StandardSMMessage@d76792d
+--------sending----------> bftsmart.statemanagement.strategy.StandardSMMessage@73f3b837
+<-------receiving---------- bftsmart.statemanagement.strategy.StandardSMMessage@73f3b837
+new NettyTOMMessageDecoder!!, isClient=false
+Session Created, active clients=0
+Session Created, active clients=0
+-Dio.netty.buffer.bytebuf.checkAccessible: true
+Loaded default ResourceLeakDetector: io.netty.util.ResourceLeakDetector@350bfc61
+-Dio.netty.recycler.maxCapacityPerThread: 4096
+-Dio.netty.recycler.maxSharedCapacityFactor: 2
+-Dio.netty.recycler.linkCapacity: 16
+-Dio.netty.recycler.ratio: 8
+[id: 0x2d134ac7, L:/127.0.0.1:34076 - R:/127.0.0.1:20010] OUTBOUND SETTINGS: ack=false settings={ENABLE_PUSH=0, MAX_CONCURRENT_STREAMS=0, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0x63e92ee8, L:/127.0.0.1:37790 - R:/127.0.0.1:20030] OUTBOUND SETTINGS: ack=false settings={ENABLE_PUSH=0, MAX_CONCURRENT_STREAMS=0, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0x2498611d, L:/127.0.0.1:41076 - R:/127.0.0.1:20000] OUTBOUND SETTINGS: ack=false settings={ENABLE_PUSH=0, MAX_CONCURRENT_STREAMS=0, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0x4ff45ae7, L:/127.0.0.1:52154 - R:/127.0.0.1:20020] OUTBOUND SETTINGS: ack=false settings={ENABLE_PUSH=0, MAX_CONCURRENT_STREAMS=0, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0x999a0254, L:/127.0.0.1:20020 - R:/127.0.0.1:52154] OUTBOUND SETTINGS: ack=false settings={MAX_CONCURRENT_STREAMS=2147483647, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0x0e1b2fa1, L:/127.0.0.1:20030 - R:/127.0.0.1:37790] OUTBOUND SETTINGS: ack=false settings={MAX_CONCURRENT_STREAMS=2147483647, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0xbb2df64e, L:/127.0.0.1:20010 - R:/127.0.0.1:34076] OUTBOUND SETTINGS: ack=false settings={MAX_CONCURRENT_STREAMS=2147483647, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0x68c4a95f, L:/127.0.0.1:20000 - R:/127.0.0.1:41076] OUTBOUND SETTINGS: ack=false settings={MAX_CONCURRENT_STREAMS=2147483647, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0x999a0254, L:/127.0.0.1:20020 - R:/127.0.0.1:52154] OUTBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0xbb2df64e, L:/127.0.0.1:20010 - R:/127.0.0.1:34076] OUTBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0x68c4a95f, L:/127.0.0.1:20000 - R:/127.0.0.1:41076] OUTBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0x0e1b2fa1, L:/127.0.0.1:20030 - R:/127.0.0.1:37790] OUTBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0x2498611d, L:/127.0.0.1:41076 - R:/127.0.0.1:20000] OUTBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0x2d134ac7, L:/127.0.0.1:34076 - R:/127.0.0.1:20010] OUTBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0x2498611d, L:/127.0.0.1:41076 - R:/127.0.0.1:20000] INBOUND SETTINGS: ack=false settings={MAX_CONCURRENT_STREAMS=2147483647, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0x2d134ac7, L:/127.0.0.1:34076 - R:/127.0.0.1:20010] INBOUND SETTINGS: ack=false settings={MAX_CONCURRENT_STREAMS=2147483647, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0x0e1b2fa1, L:/127.0.0.1:20030 - R:/127.0.0.1:37790] INBOUND SETTINGS: ack=false settings={ENABLE_PUSH=0, MAX_CONCURRENT_STREAMS=0, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0x0e1b2fa1, L:/127.0.0.1:20030 - R:/127.0.0.1:37790] OUTBOUND SETTINGS: ack=true
+[id: 0x2d134ac7, L:/127.0.0.1:34076 - R:/127.0.0.1:20010] OUTBOUND SETTINGS: ack=true
+[id: 0x999a0254, L:/127.0.0.1:20020 - R:/127.0.0.1:52154] INBOUND SETTINGS: ack=false settings={ENABLE_PUSH=0, MAX_CONCURRENT_STREAMS=0, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0xbb2df64e, L:/127.0.0.1:20010 - R:/127.0.0.1:34076] INBOUND SETTINGS: ack=false settings={ENABLE_PUSH=0, MAX_CONCURRENT_STREAMS=0, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0x999a0254, L:/127.0.0.1:20020 - R:/127.0.0.1:52154] OUTBOUND SETTINGS: ack=true
+[id: 0xbb2df64e, L:/127.0.0.1:20010 - R:/127.0.0.1:34076] OUTBOUND SETTINGS: ack=true
+[id: 0xbb2df64e, L:/127.0.0.1:20010 - R:/127.0.0.1:34076] INBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0x68c4a95f, L:/127.0.0.1:20000 - R:/127.0.0.1:41076] INBOUND SETTINGS: ack=false settings={ENABLE_PUSH=0, MAX_CONCURRENT_STREAMS=0, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0x4ff45ae7, L:/127.0.0.1:52154 - R:/127.0.0.1:20020] OUTBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0x68c4a95f, L:/127.0.0.1:20000 - R:/127.0.0.1:41076] OUTBOUND SETTINGS: ack=true
+[id: 0x63e92ee8, L:/127.0.0.1:37790 - R:/127.0.0.1:20030] OUTBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0x0e1b2fa1, L:/127.0.0.1:20030 - R:/127.0.0.1:37790] INBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0x63e92ee8, L:/127.0.0.1:37790 - R:/127.0.0.1:20030] INBOUND SETTINGS: ack=false settings={MAX_CONCURRENT_STREAMS=2147483647, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0x2498611d, L:/127.0.0.1:41076 - R:/127.0.0.1:20000] OUTBOUND SETTINGS: ack=true
+[id: 0x63e92ee8, L:/127.0.0.1:37790 - R:/127.0.0.1:20030] OUTBOUND SETTINGS: ack=true
+[id: 0x63e92ee8, L:/127.0.0.1:37790 - R:/127.0.0.1:20030] INBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0x63e92ee8, L:/127.0.0.1:37790 - R:/127.0.0.1:20030] INBOUND SETTINGS: ack=true
+[id: 0x68c4a95f, L:/127.0.0.1:20000 - R:/127.0.0.1:41076] INBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0x2498611d, L:/127.0.0.1:41076 - R:/127.0.0.1:20000] INBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0x68c4a95f, L:/127.0.0.1:20000 - R:/127.0.0.1:41076] INBOUND SETTINGS: ack=true
+[id: 0x0e1b2fa1, L:/127.0.0.1:20030 - R:/127.0.0.1:37790] INBOUND SETTINGS: ack=true
+[id: 0x2498611d, L:/127.0.0.1:41076 - R:/127.0.0.1:20000] INBOUND SETTINGS: ack=true
+[id: 0x999a0254, L:/127.0.0.1:20020 - R:/127.0.0.1:52154] INBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0x4ff45ae7, L:/127.0.0.1:52154 - R:/127.0.0.1:20020] INBOUND SETTINGS: ack=false settings={MAX_CONCURRENT_STREAMS=2147483647, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0x4ff45ae7, L:/127.0.0.1:52154 - R:/127.0.0.1:20020] OUTBOUND SETTINGS: ack=true
+[id: 0x2d134ac7, L:/127.0.0.1:34076 - R:/127.0.0.1:20010] INBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0xbb2df64e, L:/127.0.0.1:20010 - R:/127.0.0.1:34076] INBOUND SETTINGS: ack=true
+[id: 0x2d134ac7, L:/127.0.0.1:34076 - R:/127.0.0.1:20010] INBOUND SETTINGS: ack=true
+[id: 0x4ff45ae7, L:/127.0.0.1:52154 - R:/127.0.0.1:20020] INBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0x4ff45ae7, L:/127.0.0.1:52154 - R:/127.0.0.1:20020] INBOUND SETTINGS: ack=true
+[id: 0x999a0254, L:/127.0.0.1:20020 - R:/127.0.0.1:52154] INBOUND SETTINGS: ack=true
+[id: 0x2498611d, L:/127.0.0.1:41076 - R:/127.0.0.1:20000] OUTBOUND HEADERS: streamId=3 headers=GrpcHttp2OutboundHeaders[:authority: 127.0.0.1:20000, :path: /proto.Rmf/DisseminateMessage, :method: POST, :scheme: http, content-type: application/grpc, te: trailers, user-agent: grpc-java-netty/1.13.1, grpc-accept-encoding: gzip, grpc-trace-bin: ] streamDependency=0 weight=16 exclusive=false padding=0 endStream=false
+[id: 0x63e92ee8, L:/127.0.0.1:37790 - R:/127.0.0.1:20030] OUTBOUND HEADERS: streamId=3 headers=GrpcHttp2OutboundHeaders[:authority: 127.0.0.1:20030, :path: /proto.Rmf/DisseminateMessage, :method: POST, :scheme: http, content-type: application/grpc, te: trailers, user-agent: grpc-java-netty/1.13.1, grpc-accept-encoding: gzip, grpc-trace-bin: ] streamDependency=0 weight=16 exclusive=false padding=0 endStream=false
+[id: 0x2d134ac7, L:/127.0.0.1:34076 - R:/127.0.0.1:20010] OUTBOUND HEADERS: streamId=3 headers=GrpcHttp2OutboundHeaders[:authority: 127.0.0.1:20010, :path: /proto.Rmf/DisseminateMessage, :method: POST, :scheme: http, content-type: application/grpc, te: trailers, user-agent: grpc-java-netty/1.13.1, grpc-accept-encoding: gzip, grpc-trace-bin: ] streamDependency=0 weight=16 exclusive=false padding=0 endStream=false
+[id: 0x4ff45ae7, L:/127.0.0.1:52154 - R:/127.0.0.1:20020] OUTBOUND HEADERS: streamId=3 headers=GrpcHttp2OutboundHeaders[:authority: 127.0.0.1:20020, :path: /proto.Rmf/DisseminateMessage, :method: POST, :scheme: http, content-type: application/grpc, te: trailers, user-agent: grpc-java-netty/1.13.1, grpc-accept-encoding: gzip, grpc-trace-bin: ] streamDependency=0 weight=16 exclusive=false padding=0 endStream=false
+[id: 0x2d134ac7, L:/127.0.0.1:34076 - R:/127.0.0.1:20010] OUTBOUND DATA: streamId=3 padding=0 endStream=true length=14 bytes=00000000090a00120548656c6c6f
+[id: 0x2498611d, L:/127.0.0.1:41076 - R:/127.0.0.1:20000] OUTBOUND DATA: streamId=3 padding=0 endStream=true length=14 bytes=00000000090a00120548656c6c6f
+[id: 0x63e92ee8, L:/127.0.0.1:37790 - R:/127.0.0.1:20030] OUTBOUND DATA: streamId=3 padding=0 endStream=true length=14 bytes=00000000090a00120548656c6c6f
+[id: 0xbb2df64e, L:/127.0.0.1:20010 - R:/127.0.0.1:34076] INBOUND HEADERS: streamId=3 headers=GrpcHttp2RequestHeaders[:path: /proto.Rmf/DisseminateMessage, :authority: 127.0.0.1:20010, :method: POST, :scheme: http, te: trailers, content-type: application/grpc, user-agent: grpc-java-netty/1.13.1, grpc-accept-encoding: gzip, grpc-trace-bin: ] streamDependency=0 weight=16 exclusive=false padding=0 endStream=false
+[id: 0x0e1b2fa1, L:/127.0.0.1:20030 - R:/127.0.0.1:37790] INBOUND HEADERS: streamId=3 headers=GrpcHttp2RequestHeaders[:path: /proto.Rmf/DisseminateMessage, :authority: 127.0.0.1:20030, :method: POST, :scheme: http, te: trailers, content-type: application/grpc, user-agent: grpc-java-netty/1.13.1, grpc-accept-encoding: gzip, grpc-trace-bin: ] streamDependency=0 weight=16 exclusive=false padding=0 endStream=false
+[id: 0x68c4a95f, L:/127.0.0.1:20000 - R:/127.0.0.1:41076] INBOUND HEADERS: streamId=3 headers=GrpcHttp2RequestHeaders[:path: /proto.Rmf/DisseminateMessage, :authority: 127.0.0.1:20000, :method: POST, :scheme: http, te: trailers, content-type: application/grpc, user-agent: grpc-java-netty/1.13.1, grpc-accept-encoding: gzip, grpc-trace-bin: ] streamDependency=0 weight=16 exclusive=false padding=0 endStream=false
+[id: 0x4ff45ae7, L:/127.0.0.1:52154 - R:/127.0.0.1:20020] OUTBOUND DATA: streamId=3 padding=0 endStream=true length=14 bytes=00000000090a00120548656c6c6f
+[id: 0x999a0254, L:/127.0.0.1:20020 - R:/127.0.0.1:52154] INBOUND HEADERS: streamId=3 headers=GrpcHttp2RequestHeaders[:path: /proto.Rmf/DisseminateMessage, :authority: 127.0.0.1:20020, :method: POST, :scheme: http, te: trailers, content-type: application/grpc, user-agent: grpc-java-netty/1.13.1, grpc-accept-encoding: gzip, grpc-trace-bin: ] streamDependency=0 weight=16 exclusive=false padding=0 endStream=false
+[id: 0x68c4a95f, L:/127.0.0.1:20000 - R:/127.0.0.1:41076] INBOUND DATA: streamId=3 padding=0 endStream=true length=14 bytes=00000000090a00120548656c6c6f
+[id: 0xbb2df64e, L:/127.0.0.1:20010 - R:/127.0.0.1:34076] INBOUND DATA: streamId=3 padding=0 endStream=true length=14 bytes=00000000090a00120548656c6c6f
+[id: 0x0e1b2fa1, L:/127.0.0.1:20030 - R:/127.0.0.1:37790] INBOUND DATA: streamId=3 padding=0 endStream=true length=14 bytes=00000000090a00120548656c6c6f
+[id: 0x999a0254, L:/127.0.0.1:20020 - R:/127.0.0.1:52154] INBOUND DATA: streamId=3 padding=0 endStream=true length=14 bytes=00000000090a00120548656c6c6f
+[id: 0x2498611d, L:/127.0.0.1:41076 - R:/127.0.0.1:20000] OUTBOUND HEADERS: streamId=5 headers=GrpcHttp2OutboundHeaders[:authority: 127.0.0.1:20000, :path: /proto.Rmf/FastVote, :method: POST, :scheme: http, content-type: application/grpc, te: trailers, user-agent: grpc-java-netty/1.13.1, grpc-accept-encoding: gzip, grpc-trace-bin: ] streamDependency=0 weight=16 exclusive=false padding=0 endStream=false
+[id: 0x2d134ac7, L:/127.0.0.1:34076 - R:/127.0.0.1:20010] OUTBOUND HEADERS: streamId=5 headers=GrpcHttp2OutboundHeaders[:authority: 127.0.0.1:20010, :path: /proto.Rmf/FastVote, :method: POST, :scheme: http, content-type: application/grpc, te: trailers, user-agent: grpc-java-netty/1.13.1, grpc-accept-encoding: gzip, grpc-trace-bin: ] streamDependency=0 weight=16 exclusive=false padding=0 endStream=false
+[id: 0x2498611d, L:/127.0.0.1:41076 - R:/127.0.0.1:20000] OUTBOUND DATA: streamId=5 padding=0 endStream=true length=9 bytes=00000000040a001001
+[id: 0x2d134ac7, L:/127.0.0.1:34076 - R:/127.0.0.1:20010] OUTBOUND DATA: streamId=5 padding=0 endStream=true length=9 bytes=00000000040a001001
+[id: 0x63e92ee8, L:/127.0.0.1:37790 - R:/127.0.0.1:20030] OUTBOUND HEADERS: streamId=5 headers=GrpcHttp2OutboundHeaders[:authority: 127.0.0.1:20030, :path: /proto.Rmf/FastVote, :method: POST, :scheme: http, content-type: application/grpc, te: trailers, user-agent: grpc-java-netty/1.13.1, grpc-accept-encoding: gzip, grpc-trace-bin: ] streamDependency=0 weight=16 exclusive=false padding=0 endStream=false
+[id: 0x4ff45ae7, L:/127.0.0.1:52154 - R:/127.0.0.1:20020] OUTBOUND HEADERS: streamId=5 headers=GrpcHttp2OutboundHeaders[:authority: 127.0.0.1:20020, :path: /proto.Rmf/FastVote, :method: POST, :scheme: http, content-type: application/grpc, te: trailers, user-agent: grpc-java-netty/1.13.1, grpc-accept-encoding: gzip, grpc-trace-bin: ] streamDependency=0 weight=16 exclusive=false padding=0 endStream=false
+[id: 0x68c4a95f, L:/127.0.0.1:20000 - R:/127.0.0.1:41076] INBOUND HEADERS: streamId=5 headers=GrpcHttp2RequestHeaders[:path: /proto.Rmf/FastVote, :authority: 127.0.0.1:20000, :method: POST, :scheme: http, te: trailers, content-type: application/grpc, user-agent: grpc-java-netty/1.13.1, grpc-accept-encoding: gzip, grpc-trace-bin: ] streamDependency=0 weight=16 exclusive=false padding=0 endStream=false
+[id: 0x63e92ee8, L:/127.0.0.1:37790 - R:/127.0.0.1:20030] OUTBOUND DATA: streamId=5 padding=0 endStream=true length=9 bytes=00000000040a001001
+[id: 0xbb2df64e, L:/127.0.0.1:20010 - R:/127.0.0.1:34076] INBOUND HEADERS: streamId=5 headers=GrpcHttp2RequestHeaders[:path: /proto.Rmf/FastVote, :authority: 127.0.0.1:20010, :method: POST, :scheme: http, te: trailers, content-type: application/grpc, user-agent: grpc-java-netty/1.13.1, grpc-accept-encoding: gzip, grpc-trace-bin: ] streamDependency=0 weight=16 exclusive=false padding=0 endStream=false
+[id: 0xbb2df64e, L:/127.0.0.1:20010 - R:/127.0.0.1:34076] INBOUND DATA: streamId=5 padding=0 endStream=true length=9 bytes=00000000040a001001
+[id: 0x0e1b2fa1, L:/127.0.0.1:20030 - R:/127.0.0.1:37790] INBOUND HEADERS: streamId=5 headers=GrpcHttp2RequestHeaders[:path: /proto.Rmf/FastVote, :authority: 127.0.0.1:20030, :method: POST, :scheme: http, te: trailers, content-type: application/grpc, user-agent: grpc-java-netty/1.13.1, grpc-accept-encoding: gzip, grpc-trace-bin: ] streamDependency=0 weight=16 exclusive=false padding=0 endStream=false
+[id: 0x4ff45ae7, L:/127.0.0.1:52154 - R:/127.0.0.1:20020] OUTBOUND DATA: streamId=5 padding=0 endStream=true length=9 bytes=00000000040a001001
+[id: 0x999a0254, L:/127.0.0.1:20020 - R:/127.0.0.1:52154] INBOUND HEADERS: streamId=5 headers=GrpcHttp2RequestHeaders[:path: /proto.Rmf/FastVote, :authority: 127.0.0.1:20020, :method: POST, :scheme: http, te: trailers, content-type: application/grpc, user-agent: grpc-java-netty/1.13.1, grpc-accept-encoding: gzip, grpc-trace-bin: ] streamDependency=0 weight=16 exclusive=false padding=0 endStream=false
+[id: 0x68c4a95f, L:/127.0.0.1:20000 - R:/127.0.0.1:41076] INBOUND DATA: streamId=5 padding=0 endStream=true length=9 bytes=00000000040a001001
+--------sending----------> bftsmart.statemanagement.strategy.StandardSMMessage@709e97a
+[id: 0x957a2f9e, L:/127.0.0.1:34084 - R:/127.0.0.1:20010] OUTBOUND SETTINGS: ack=false settings={ENABLE_PUSH=0, MAX_CONCURRENT_STREAMS=0, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0x0e1b2fa1, L:/127.0.0.1:20030 - R:/127.0.0.1:37790] INBOUND DATA: streamId=5 padding=0 endStream=true length=9 bytes=00000000040a001001
+[id: 0x957a2f9e, L:/127.0.0.1:34084 - R:/127.0.0.1:20010] OUTBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0xf38522b7, L:/127.0.0.1:41082 - R:/127.0.0.1:20000] OUTBOUND SETTINGS: ack=false settings={ENABLE_PUSH=0, MAX_CONCURRENT_STREAMS=0, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0xa420b463, L:/127.0.0.1:41084 - R:/127.0.0.1:20000] OUTBOUND SETTINGS: ack=false settings={ENABLE_PUSH=0, MAX_CONCURRENT_STREAMS=0, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0xf38522b7, L:/127.0.0.1:41082 - R:/127.0.0.1:20000] OUTBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0xfb75f8fc, L:/127.0.0.1:52162 - R:/127.0.0.1:20020] OUTBOUND SETTINGS: ack=false settings={ENABLE_PUSH=0, MAX_CONCURRENT_STREAMS=0, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0xa420b463, L:/127.0.0.1:41084 - R:/127.0.0.1:20000] OUTBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0x999a0254, L:/127.0.0.1:20020 - R:/127.0.0.1:52154] INBOUND DATA: streamId=5 padding=0 endStream=true length=9 bytes=00000000040a001001
+[id: 0x9c63702a, L:/127.0.0.1:37808 - R:/127.0.0.1:20030] OUTBOUND SETTINGS: ack=false settings={ENABLE_PUSH=0, MAX_CONCURRENT_STREAMS=0, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0xa62dca15, L:/127.0.0.1:20000 - R:/127.0.0.1:41084] OUTBOUND SETTINGS: ack=false settings={MAX_CONCURRENT_STREAMS=2147483647, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0xa62dca15, L:/127.0.0.1:20000 - R:/127.0.0.1:41084] OUTBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0x9c63702a, L:/127.0.0.1:37808 - R:/127.0.0.1:20030] OUTBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0xa62dca15, L:/127.0.0.1:20000 - R:/127.0.0.1:41084] INBOUND SETTINGS: ack=false settings={ENABLE_PUSH=0, MAX_CONCURRENT_STREAMS=0, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0xa62dca15, L:/127.0.0.1:20000 - R:/127.0.0.1:41084] OUTBOUND SETTINGS: ack=true
+[id: 0xa420b463, L:/127.0.0.1:41084 - R:/127.0.0.1:20000] INBOUND SETTINGS: ack=false settings={MAX_CONCURRENT_STREAMS=2147483647, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0xa420b463, L:/127.0.0.1:41084 - R:/127.0.0.1:20000] OUTBOUND SETTINGS: ack=true
+[id: 0xa420b463, L:/127.0.0.1:41084 - R:/127.0.0.1:20000] INBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0xa420b463, L:/127.0.0.1:41084 - R:/127.0.0.1:20000] INBOUND SETTINGS: ack=true
+[id: 0x321e689b, L:/127.0.0.1:34096 - R:/127.0.0.1:20010] OUTBOUND SETTINGS: ack=false settings={ENABLE_PUSH=0, MAX_CONCURRENT_STREAMS=0, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0x321e689b, L:/127.0.0.1:34096 - R:/127.0.0.1:20010] OUTBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0xfb75f8fc, L:/127.0.0.1:52162 - R:/127.0.0.1:20020] OUTBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0x2a626db3, L:/127.0.0.1:20010 - R:/127.0.0.1:34084] OUTBOUND SETTINGS: ack=false settings={MAX_CONCURRENT_STREAMS=2147483647, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0x2a626db3, L:/127.0.0.1:20010 - R:/127.0.0.1:34084] OUTBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0x888ca609, L:/127.0.0.1:20000 - R:/127.0.0.1:41088] OUTBOUND SETTINGS: ack=false settings={MAX_CONCURRENT_STREAMS=2147483647, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0xa62dca15, L:/127.0.0.1:20000 - R:/127.0.0.1:41084] INBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0xf4fbba73, L:/127.0.0.1:20010 - R:/127.0.0.1:34096] OUTBOUND SETTINGS: ack=false settings={MAX_CONCURRENT_STREAMS=2147483647, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0xf4fbba73, L:/127.0.0.1:20010 - R:/127.0.0.1:34096] OUTBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0xa420b463, L:/127.0.0.1:41084 - R:/127.0.0.1:20000] OUTBOUND HEADERS: streamId=3 headers=GrpcHttp2OutboundHeaders[:authority: 127.0.0.1:20000, :path: /proto.Rmf/FastVote, :method: POST, :scheme: http, content-type: application/grpc, te: trailers, user-agent: grpc-java-netty/1.13.1, grpc-accept-encoding: gzip, grpc-trace-bin: ] streamDependency=0 weight=16 exclusive=false padding=0 endStream=false
+[id: 0x6997805e, L:/127.0.0.1:20020 - R:/127.0.0.1:52162] OUTBOUND SETTINGS: ack=false settings={MAX_CONCURRENT_STREAMS=2147483647, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0xa420b463, L:/127.0.0.1:41084 - R:/127.0.0.1:20000] OUTBOUND DATA: streamId=3 padding=0 endStream=true length=11 bytes=00000000060a0208031001
+[id: 0x888ca609, L:/127.0.0.1:20000 - R:/127.0.0.1:41088] OUTBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0x2a626db3, L:/127.0.0.1:20010 - R:/127.0.0.1:34084] INBOUND SETTINGS: ack=false settings={ENABLE_PUSH=0, MAX_CONCURRENT_STREAMS=0, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0x2a626db3, L:/127.0.0.1:20010 - R:/127.0.0.1:34084] OUTBOUND SETTINGS: ack=true
+[id: 0x390da274, L:/127.0.0.1:20000 - R:/127.0.0.1:41082] OUTBOUND SETTINGS: ack=false settings={MAX_CONCURRENT_STREAMS=2147483647, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0x2a626db3, L:/127.0.0.1:20010 - R:/127.0.0.1:34084] INBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0x6997805e, L:/127.0.0.1:20020 - R:/127.0.0.1:52162] OUTBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0xf4fbba73, L:/127.0.0.1:20010 - R:/127.0.0.1:34096] INBOUND SETTINGS: ack=false settings={ENABLE_PUSH=0, MAX_CONCURRENT_STREAMS=0, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0xf4fbba73, L:/127.0.0.1:20010 - R:/127.0.0.1:34096] OUTBOUND SETTINGS: ack=true
+[id: 0xf4fbba73, L:/127.0.0.1:20010 - R:/127.0.0.1:34096] INBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0xce9ab2a8, L:/127.0.0.1:52170 - R:/127.0.0.1:20020] OUTBOUND SETTINGS: ack=false settings={ENABLE_PUSH=0, MAX_CONCURRENT_STREAMS=0, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0xd0e74967, L:/127.0.0.1:34100 - R:/127.0.0.1:20010] OUTBOUND SETTINGS: ack=false settings={ENABLE_PUSH=0, MAX_CONCURRENT_STREAMS=0, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0xa62dca15, L:/127.0.0.1:20000 - R:/127.0.0.1:41084] INBOUND SETTINGS: ack=true
+[id: 0xce9ab2a8, L:/127.0.0.1:52170 - R:/127.0.0.1:20020] OUTBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0xd0e74967, L:/127.0.0.1:34100 - R:/127.0.0.1:20010] OUTBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0xbd7d8636, L:/127.0.0.1:37816 - R:/127.0.0.1:20030] OUTBOUND SETTINGS: ack=false settings={ENABLE_PUSH=0, MAX_CONCURRENT_STREAMS=0, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0x6997805e, L:/127.0.0.1:20020 - R:/127.0.0.1:52162] INBOUND SETTINGS: ack=false settings={ENABLE_PUSH=0, MAX_CONCURRENT_STREAMS=0, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0x6997805e, L:/127.0.0.1:20020 - R:/127.0.0.1:52162] OUTBOUND SETTINGS: ack=true
+[id: 0x85d3cd24, L:/127.0.0.1:37820 - R:/127.0.0.1:20030] OUTBOUND SETTINGS: ack=false settings={ENABLE_PUSH=0, MAX_CONCURRENT_STREAMS=0, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0xbd7d8636, L:/127.0.0.1:37816 - R:/127.0.0.1:20030] OUTBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0x85d3cd24, L:/127.0.0.1:37820 - R:/127.0.0.1:20030] OUTBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0xfb75f8fc, L:/127.0.0.1:52162 - R:/127.0.0.1:20020] INBOUND SETTINGS: ack=false settings={MAX_CONCURRENT_STREAMS=2147483647, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0xfb75f8fc, L:/127.0.0.1:52162 - R:/127.0.0.1:20020] OUTBOUND SETTINGS: ack=true
+[id: 0xa62dca15, L:/127.0.0.1:20000 - R:/127.0.0.1:41084] INBOUND HEADERS: streamId=3 headers=GrpcHttp2RequestHeaders[:path: /proto.Rmf/FastVote, :authority: 127.0.0.1:20000, :method: POST, :scheme: http, te: trailers, content-type: application/grpc, user-agent: grpc-java-netty/1.13.1, grpc-accept-encoding: gzip, grpc-trace-bin: ] streamDependency=0 weight=16 exclusive=false padding=0 endStream=false
+[id: 0xfb75f8fc, L:/127.0.0.1:52162 - R:/127.0.0.1:20020] INBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0xafa5f4f2, L:/127.0.0.1:52176 - R:/127.0.0.1:20020] OUTBOUND SETTINGS: ack=false settings={ENABLE_PUSH=0, MAX_CONCURRENT_STREAMS=0, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0x957a2f9e, L:/127.0.0.1:34084 - R:/127.0.0.1:20010] INBOUND SETTINGS: ack=false settings={MAX_CONCURRENT_STREAMS=2147483647, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0x957a2f9e, L:/127.0.0.1:34084 - R:/127.0.0.1:20010] OUTBOUND SETTINGS: ack=true
+[id: 0xafa5f4f2, L:/127.0.0.1:52176 - R:/127.0.0.1:20020] OUTBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0x390da274, L:/127.0.0.1:20000 - R:/127.0.0.1:41082] OUTBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0x28852df6, L:/127.0.0.1:20030 - R:/127.0.0.1:37816] OUTBOUND SETTINGS: ack=false settings={MAX_CONCURRENT_STREAMS=2147483647, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0x28852df6, L:/127.0.0.1:20030 - R:/127.0.0.1:37816] OUTBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0x7424a393, L:/127.0.0.1:20030 - R:/127.0.0.1:37808] OUTBOUND SETTINGS: ack=false settings={MAX_CONCURRENT_STREAMS=2147483647, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0x7424a393, L:/127.0.0.1:20030 - R:/127.0.0.1:37808] OUTBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0x28852df6, L:/127.0.0.1:20030 - R:/127.0.0.1:37816] INBOUND SETTINGS: ack=false settings={ENABLE_PUSH=0, MAX_CONCURRENT_STREAMS=0, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0x28852df6, L:/127.0.0.1:20030 - R:/127.0.0.1:37816] OUTBOUND SETTINGS: ack=true
+[id: 0x28852df6, L:/127.0.0.1:20030 - R:/127.0.0.1:37816] INBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0xe2f17ff8, L:/127.0.0.1:20020 - R:/127.0.0.1:52170] OUTBOUND SETTINGS: ack=false settings={MAX_CONCURRENT_STREAMS=2147483647, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0xe2f17ff8, L:/127.0.0.1:20020 - R:/127.0.0.1:52170] OUTBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0x7424a393, L:/127.0.0.1:20030 - R:/127.0.0.1:37808] INBOUND SETTINGS: ack=false settings={ENABLE_PUSH=0, MAX_CONCURRENT_STREAMS=0, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0x7424a393, L:/127.0.0.1:20030 - R:/127.0.0.1:37808] OUTBOUND SETTINGS: ack=true
+[id: 0x7424a393, L:/127.0.0.1:20030 - R:/127.0.0.1:37808] INBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0xe2f17ff8, L:/127.0.0.1:20020 - R:/127.0.0.1:52170] INBOUND SETTINGS: ack=false settings={ENABLE_PUSH=0, MAX_CONCURRENT_STREAMS=0, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0xe2f17ff8, L:/127.0.0.1:20020 - R:/127.0.0.1:52170] OUTBOUND SETTINGS: ack=true
+[id: 0xe2f17ff8, L:/127.0.0.1:20020 - R:/127.0.0.1:52170] INBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0x6a9812de, L:/127.0.0.1:41088 - R:/127.0.0.1:20000] OUTBOUND SETTINGS: ack=false settings={ENABLE_PUSH=0, MAX_CONCURRENT_STREAMS=0, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0x6a9812de, L:/127.0.0.1:41088 - R:/127.0.0.1:20000] OUTBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0x888ca609, L:/127.0.0.1:20000 - R:/127.0.0.1:41088] INBOUND SETTINGS: ack=false settings={ENABLE_PUSH=0, MAX_CONCURRENT_STREAMS=0, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0x888ca609, L:/127.0.0.1:20000 - R:/127.0.0.1:41088] OUTBOUND SETTINGS: ack=true
+[id: 0xf38522b7, L:/127.0.0.1:41082 - R:/127.0.0.1:20000] INBOUND SETTINGS: ack=false settings={MAX_CONCURRENT_STREAMS=2147483647, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0xf38522b7, L:/127.0.0.1:41082 - R:/127.0.0.1:20000] OUTBOUND SETTINGS: ack=true
+[id: 0xf38522b7, L:/127.0.0.1:41082 - R:/127.0.0.1:20000] INBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0x9c63702a, L:/127.0.0.1:37808 - R:/127.0.0.1:20030] INBOUND SETTINGS: ack=false settings={MAX_CONCURRENT_STREAMS=2147483647, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0x9c63702a, L:/127.0.0.1:37808 - R:/127.0.0.1:20030] OUTBOUND SETTINGS: ack=true
+[id: 0x9c63702a, L:/127.0.0.1:37808 - R:/127.0.0.1:20030] INBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0x9c63702a, L:/127.0.0.1:37808 - R:/127.0.0.1:20030] INBOUND SETTINGS: ack=true
+[id: 0xce9ab2a8, L:/127.0.0.1:52170 - R:/127.0.0.1:20020] INBOUND SETTINGS: ack=false settings={MAX_CONCURRENT_STREAMS=2147483647, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0x321e689b, L:/127.0.0.1:34096 - R:/127.0.0.1:20010] INBOUND SETTINGS: ack=false settings={MAX_CONCURRENT_STREAMS=2147483647, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0xce9ab2a8, L:/127.0.0.1:52170 - R:/127.0.0.1:20020] OUTBOUND SETTINGS: ack=true
+[id: 0x390da274, L:/127.0.0.1:20000 - R:/127.0.0.1:41082] INBOUND SETTINGS: ack=false settings={ENABLE_PUSH=0, MAX_CONCURRENT_STREAMS=0, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0x390da274, L:/127.0.0.1:20000 - R:/127.0.0.1:41082] OUTBOUND SETTINGS: ack=true
+[id: 0x390da274, L:/127.0.0.1:20000 - R:/127.0.0.1:41082] INBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0x390da274, L:/127.0.0.1:20000 - R:/127.0.0.1:41082] INBOUND SETTINGS: ack=true
+[id: 0x888ca609, L:/127.0.0.1:20000 - R:/127.0.0.1:41088] INBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0x7424a393, L:/127.0.0.1:20030 - R:/127.0.0.1:37808] INBOUND SETTINGS: ack=true
+[id: 0xce9ab2a8, L:/127.0.0.1:52170 - R:/127.0.0.1:20020] INBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0xce9ab2a8, L:/127.0.0.1:52170 - R:/127.0.0.1:20020] INBOUND SETTINGS: ack=true
+[id: 0x6a9812de, L:/127.0.0.1:41088 - R:/127.0.0.1:20000] INBOUND SETTINGS: ack=false settings={MAX_CONCURRENT_STREAMS=2147483647, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0x6a9812de, L:/127.0.0.1:41088 - R:/127.0.0.1:20000] OUTBOUND SETTINGS: ack=true
+[id: 0x9c63702a, L:/127.0.0.1:37808 - R:/127.0.0.1:20030] OUTBOUND HEADERS: streamId=3 headers=GrpcHttp2OutboundHeaders[:authority: 127.0.0.1:20030, :path: /proto.Rmf/FastVote, :method: POST, :scheme: http, content-type: application/grpc, te: trailers, user-agent: grpc-java-netty/1.13.1, grpc-accept-encoding: gzip, grpc-trace-bin: ] streamDependency=0 weight=16 exclusive=false padding=0 endStream=false
+[id: 0x9375f0de, L:/127.0.0.1:20020 - R:/127.0.0.1:52176] OUTBOUND SETTINGS: ack=false settings={MAX_CONCURRENT_STREAMS=2147483647, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0x9375f0de, L:/127.0.0.1:20020 - R:/127.0.0.1:52176] OUTBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0x957a2f9e, L:/127.0.0.1:34084 - R:/127.0.0.1:20010] INBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0xa62dca15, L:/127.0.0.1:20000 - R:/127.0.0.1:41084] INBOUND DATA: streamId=3 padding=0 endStream=true length=11 bytes=00000000060a0208031001
+[id: 0x957a2f9e, L:/127.0.0.1:34084 - R:/127.0.0.1:20010] INBOUND SETTINGS: ack=true
+[id: 0xfb75f8fc, L:/127.0.0.1:52162 - R:/127.0.0.1:20020] OUTBOUND HEADERS: streamId=3 headers=GrpcHttp2OutboundHeaders[:authority: 127.0.0.1:20020, :path: /proto.Rmf/FastVote, :method: POST, :scheme: http, content-type: application/grpc, te: trailers, user-agent: grpc-java-netty/1.13.1, grpc-accept-encoding: gzip, grpc-trace-bin: ] streamDependency=0 weight=16 exclusive=false padding=0 endStream=false
+[id: 0xbd7d8636, L:/127.0.0.1:37816 - R:/127.0.0.1:20030] INBOUND SETTINGS: ack=false settings={MAX_CONCURRENT_STREAMS=2147483647, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0xbd7d8636, L:/127.0.0.1:37816 - R:/127.0.0.1:20030] OUTBOUND SETTINGS: ack=true
+[id: 0x9799fc3a, L:/127.0.0.1:20030 - R:/127.0.0.1:37820] OUTBOUND SETTINGS: ack=false settings={MAX_CONCURRENT_STREAMS=2147483647, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0x2a626db3, L:/127.0.0.1:20010 - R:/127.0.0.1:34084] INBOUND SETTINGS: ack=true
+[id: 0xbd7d8636, L:/127.0.0.1:37816 - R:/127.0.0.1:20030] INBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0x9799fc3a, L:/127.0.0.1:20030 - R:/127.0.0.1:37820] OUTBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0xbd7d8636, L:/127.0.0.1:37816 - R:/127.0.0.1:20030] INBOUND SETTINGS: ack=true
+[id: 0x6a9812de, L:/127.0.0.1:41088 - R:/127.0.0.1:20000] INBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0x6a9812de, L:/127.0.0.1:41088 - R:/127.0.0.1:20000] INBOUND SETTINGS: ack=true
+[id: 0x957a2f9e, L:/127.0.0.1:34084 - R:/127.0.0.1:20010] OUTBOUND HEADERS: streamId=3 headers=GrpcHttp2OutboundHeaders[:authority: 127.0.0.1:20010, :path: /proto.Rmf/FastVote, :method: POST, :scheme: http, content-type: application/grpc, te: trailers, user-agent: grpc-java-netty/1.13.1, grpc-accept-encoding: gzip, grpc-trace-bin: ] streamDependency=0 weight=16 exclusive=false padding=0 endStream=false
+[id: 0xe2f17ff8, L:/127.0.0.1:20020 - R:/127.0.0.1:52170] INBOUND SETTINGS: ack=true
+[id: 0x888ca609, L:/127.0.0.1:20000 - R:/127.0.0.1:41088] INBOUND SETTINGS: ack=true
+[id: 0x28852df6, L:/127.0.0.1:20030 - R:/127.0.0.1:37816] INBOUND SETTINGS: ack=true
+[id: 0x957a2f9e, L:/127.0.0.1:34084 - R:/127.0.0.1:20010] OUTBOUND DATA: streamId=3 padding=0 endStream=true length=11 bytes=00000000060a0208011001
+[id: 0xbd7d8636, L:/127.0.0.1:37816 - R:/127.0.0.1:20030] OUTBOUND HEADERS: streamId=3 headers=GrpcHttp2OutboundHeaders[:authority: 127.0.0.1:20030, :path: /proto.Rmf/FastVote, :method: POST, :scheme: http, content-type: application/grpc, te: trailers, user-agent: grpc-java-netty/1.13.1, grpc-accept-encoding: gzip, grpc-trace-bin: ] streamDependency=0 weight=16 exclusive=false padding=0 endStream=false
+[id: 0x9799fc3a, L:/127.0.0.1:20030 - R:/127.0.0.1:37820] INBOUND SETTINGS: ack=false settings={ENABLE_PUSH=0, MAX_CONCURRENT_STREAMS=0, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0x9799fc3a, L:/127.0.0.1:20030 - R:/127.0.0.1:37820] OUTBOUND SETTINGS: ack=true
+[id: 0x6997805e, L:/127.0.0.1:20020 - R:/127.0.0.1:52162] INBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0x9799fc3a, L:/127.0.0.1:20030 - R:/127.0.0.1:37820] INBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0x6997805e, L:/127.0.0.1:20020 - R:/127.0.0.1:52162] INBOUND SETTINGS: ack=true
+[id: 0xbd7d8636, L:/127.0.0.1:37816 - R:/127.0.0.1:20030] OUTBOUND DATA: streamId=3 padding=0 endStream=true length=11 bytes=00000000060a0208031001
+[id: 0x6a9812de, L:/127.0.0.1:41088 - R:/127.0.0.1:20000] OUTBOUND HEADERS: streamId=3 headers=GrpcHttp2OutboundHeaders[:authority: 127.0.0.1:20000, :path: /proto.Rmf/FastVote, :method: POST, :scheme: http, content-type: application/grpc, te: trailers, user-agent: grpc-java-netty/1.13.1, grpc-accept-encoding: gzip, grpc-trace-bin: ] streamDependency=0 weight=16 exclusive=false padding=0 endStream=false
+[id: 0xfb75f8fc, L:/127.0.0.1:52162 - R:/127.0.0.1:20020] OUTBOUND DATA: streamId=3 padding=0 endStream=true length=11 bytes=00000000060a0208011001
+[id: 0x2a626db3, L:/127.0.0.1:20010 - R:/127.0.0.1:34084] INBOUND HEADERS: streamId=3 headers=GrpcHttp2RequestHeaders[:path: /proto.Rmf/FastVote, :authority: 127.0.0.1:20010, :method: POST, :scheme: http, te: trailers, content-type: application/grpc, user-agent: grpc-java-netty/1.13.1, grpc-accept-encoding: gzip, grpc-trace-bin: ] streamDependency=0 weight=16 exclusive=false padding=0 endStream=false
+[id: 0x6a9812de, L:/127.0.0.1:41088 - R:/127.0.0.1:20000] OUTBOUND DATA: streamId=3 padding=0 endStream=true length=11 bytes=00000000060a0208021001
+[id: 0x321e689b, L:/127.0.0.1:34096 - R:/127.0.0.1:20010] OUTBOUND SETTINGS: ack=true
+[id: 0x321e689b, L:/127.0.0.1:34096 - R:/127.0.0.1:20010] INBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0xc70deb3a, L:/127.0.0.1:20010 - R:/127.0.0.1:34100] OUTBOUND SETTINGS: ack=false settings={MAX_CONCURRENT_STREAMS=2147483647, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0xc70deb3a, L:/127.0.0.1:20010 - R:/127.0.0.1:34100] OUTBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0x321e689b, L:/127.0.0.1:34096 - R:/127.0.0.1:20010] OUTBOUND HEADERS: streamId=3 headers=GrpcHttp2OutboundHeaders[:authority: 127.0.0.1:20010, :path: /proto.Rmf/FastVote, :method: POST, :scheme: http, content-type: application/grpc, te: trailers, user-agent: grpc-java-netty/1.13.1, grpc-accept-encoding: gzip, grpc-trace-bin: ] streamDependency=0 weight=16 exclusive=false padding=0 endStream=false
+[id: 0xf4fbba73, L:/127.0.0.1:20010 - R:/127.0.0.1:34096] INBOUND SETTINGS: ack=true
+[id: 0x2a626db3, L:/127.0.0.1:20010 - R:/127.0.0.1:34084] INBOUND DATA: streamId=3 padding=0 endStream=true length=11 bytes=00000000060a0208011001
+[id: 0x9c63702a, L:/127.0.0.1:37808 - R:/127.0.0.1:20030] OUTBOUND DATA: streamId=3 padding=0 endStream=true length=11 bytes=00000000060a0208021001
+[id: 0x6997805e, L:/127.0.0.1:20020 - R:/127.0.0.1:52162] INBOUND HEADERS: streamId=3 headers=GrpcHttp2RequestHeaders[:path: /proto.Rmf/FastVote, :authority: 127.0.0.1:20020, :method: POST, :scheme: http, te: trailers, content-type: application/grpc, user-agent: grpc-java-netty/1.13.1, grpc-accept-encoding: gzip, grpc-trace-bin: ] streamDependency=0 weight=16 exclusive=false padding=0 endStream=false
+[id: 0x85d3cd24, L:/127.0.0.1:37820 - R:/127.0.0.1:20030] INBOUND SETTINGS: ack=false settings={MAX_CONCURRENT_STREAMS=2147483647, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0x85d3cd24, L:/127.0.0.1:37820 - R:/127.0.0.1:20030] OUTBOUND SETTINGS: ack=true
+[id: 0x85d3cd24, L:/127.0.0.1:37820 - R:/127.0.0.1:20030] INBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0x85d3cd24, L:/127.0.0.1:37820 - R:/127.0.0.1:20030] INBOUND SETTINGS: ack=true
+[id: 0xce9ab2a8, L:/127.0.0.1:52170 - R:/127.0.0.1:20020] OUTBOUND HEADERS: streamId=3 headers=GrpcHttp2OutboundHeaders[:authority: 127.0.0.1:20020, :path: /proto.Rmf/FastVote, :method: POST, :scheme: http, content-type: application/grpc, te: trailers, user-agent: grpc-java-netty/1.13.1, grpc-accept-encoding: gzip, grpc-trace-bin: ] streamDependency=0 weight=16 exclusive=false padding=0 endStream=false
+[id: 0x9375f0de, L:/127.0.0.1:20020 - R:/127.0.0.1:52176] INBOUND SETTINGS: ack=false settings={ENABLE_PUSH=0, MAX_CONCURRENT_STREAMS=0, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0x9375f0de, L:/127.0.0.1:20020 - R:/127.0.0.1:52176] OUTBOUND SETTINGS: ack=true
+[id: 0x9375f0de, L:/127.0.0.1:20020 - R:/127.0.0.1:52176] INBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0xce9ab2a8, L:/127.0.0.1:52170 - R:/127.0.0.1:20020] OUTBOUND DATA: streamId=3 padding=0 endStream=true length=11 bytes=00000000060a0208031001
+[id: 0xfb75f8fc, L:/127.0.0.1:52162 - R:/127.0.0.1:20020] INBOUND SETTINGS: ack=true
+[id: 0xafa5f4f2, L:/127.0.0.1:52176 - R:/127.0.0.1:20020] INBOUND SETTINGS: ack=false settings={MAX_CONCURRENT_STREAMS=2147483647, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0xafa5f4f2, L:/127.0.0.1:52176 - R:/127.0.0.1:20020] OUTBOUND SETTINGS: ack=true
+[id: 0x9799fc3a, L:/127.0.0.1:20030 - R:/127.0.0.1:37820] INBOUND SETTINGS: ack=true
+[id: 0xafa5f4f2, L:/127.0.0.1:52176 - R:/127.0.0.1:20020] INBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0xafa5f4f2, L:/127.0.0.1:52176 - R:/127.0.0.1:20020] INBOUND SETTINGS: ack=true
+[id: 0x9375f0de, L:/127.0.0.1:20020 - R:/127.0.0.1:52176] INBOUND SETTINGS: ack=true
+[id: 0x7424a393, L:/127.0.0.1:20030 - R:/127.0.0.1:37808] INBOUND HEADERS: streamId=3 headers=GrpcHttp2RequestHeaders[:path: /proto.Rmf/FastVote, :authority: 127.0.0.1:20030, :method: POST, :scheme: http, te: trailers, content-type: application/grpc, user-agent: grpc-java-netty/1.13.1, grpc-accept-encoding: gzip, grpc-trace-bin: ] streamDependency=0 weight=16 exclusive=false padding=0 endStream=false
+[id: 0x888ca609, L:/127.0.0.1:20000 - R:/127.0.0.1:41088] INBOUND HEADERS: streamId=3 headers=GrpcHttp2RequestHeaders[:path: /proto.Rmf/FastVote, :authority: 127.0.0.1:20000, :method: POST, :scheme: http, te: trailers, content-type: application/grpc, user-agent: grpc-java-netty/1.13.1, grpc-accept-encoding: gzip, grpc-trace-bin: ] streamDependency=0 weight=16 exclusive=false padding=0 endStream=false
+[id: 0x7424a393, L:/127.0.0.1:20030 - R:/127.0.0.1:37808] INBOUND DATA: streamId=3 padding=0 endStream=true length=11 bytes=00000000060a0208021001
+[id: 0x888ca609, L:/127.0.0.1:20000 - R:/127.0.0.1:41088] INBOUND DATA: streamId=3 padding=0 endStream=true length=11 bytes=00000000060a0208021001
+[id: 0x28852df6, L:/127.0.0.1:20030 - R:/127.0.0.1:37816] INBOUND HEADERS: streamId=3 headers=GrpcHttp2RequestHeaders[:path: /proto.Rmf/FastVote, :authority: 127.0.0.1:20030, :method: POST, :scheme: http, te: trailers, content-type: application/grpc, user-agent: grpc-java-netty/1.13.1, grpc-accept-encoding: gzip, grpc-trace-bin: ] streamDependency=0 weight=16 exclusive=false padding=0 endStream=false
+[id: 0xafa5f4f2, L:/127.0.0.1:52176 - R:/127.0.0.1:20020] OUTBOUND HEADERS: streamId=3 headers=GrpcHttp2OutboundHeaders[:authority: 127.0.0.1:20020, :path: /proto.Rmf/FastVote, :method: POST, :scheme: http, content-type: application/grpc, te: trailers, user-agent: grpc-java-netty/1.13.1, grpc-accept-encoding: gzip, grpc-trace-bin: ] streamDependency=0 weight=16 exclusive=false padding=0 endStream=false
+[id: 0xafa5f4f2, L:/127.0.0.1:52176 - R:/127.0.0.1:20020] OUTBOUND DATA: streamId=3 padding=0 endStream=true length=11 bytes=00000000060a0208021001
+[id: 0x85d3cd24, L:/127.0.0.1:37820 - R:/127.0.0.1:20030] OUTBOUND HEADERS: streamId=3 headers=GrpcHttp2OutboundHeaders[:authority: 127.0.0.1:20030, :path: /proto.Rmf/FastVote, :method: POST, :scheme: http, content-type: application/grpc, te: trailers, user-agent: grpc-java-netty/1.13.1, grpc-accept-encoding: gzip, grpc-trace-bin: ] streamDependency=0 weight=16 exclusive=false padding=0 endStream=false
+[id: 0x85d3cd24, L:/127.0.0.1:37820 - R:/127.0.0.1:20030] OUTBOUND DATA: streamId=3 padding=0 endStream=true length=11 bytes=00000000060a0208011001
+[id: 0x9375f0de, L:/127.0.0.1:20020 - R:/127.0.0.1:52176] INBOUND HEADERS: streamId=3 headers=GrpcHttp2RequestHeaders[:path: /proto.Rmf/FastVote, :authority: 127.0.0.1:20020, :method: POST, :scheme: http, te: trailers, content-type: application/grpc, user-agent: grpc-java-netty/1.13.1, grpc-accept-encoding: gzip, grpc-trace-bin: ] streamDependency=0 weight=16 exclusive=false padding=0 endStream=false
+[id: 0x9375f0de, L:/127.0.0.1:20020 - R:/127.0.0.1:52176] INBOUND DATA: streamId=3 padding=0 endStream=true length=11 bytes=00000000060a0208021001
+[id: 0x9799fc3a, L:/127.0.0.1:20030 - R:/127.0.0.1:37820] INBOUND HEADERS: streamId=3 headers=GrpcHttp2RequestHeaders[:path: /proto.Rmf/FastVote, :authority: 127.0.0.1:20030, :method: POST, :scheme: http, te: trailers, content-type: application/grpc, user-agent: grpc-java-netty/1.13.1, grpc-accept-encoding: gzip, grpc-trace-bin: ] streamDependency=0 weight=16 exclusive=false padding=0 endStream=false
+[id: 0x28852df6, L:/127.0.0.1:20030 - R:/127.0.0.1:37816] INBOUND DATA: streamId=3 padding=0 endStream=true length=11 bytes=00000000060a0208031001
+[id: 0x9799fc3a, L:/127.0.0.1:20030 - R:/127.0.0.1:37820] INBOUND DATA: streamId=3 padding=0 endStream=true length=11 bytes=00000000060a0208011001
+[id: 0xf38522b7, L:/127.0.0.1:41082 - R:/127.0.0.1:20000] INBOUND SETTINGS: ack=true
+[id: 0x6997805e, L:/127.0.0.1:20020 - R:/127.0.0.1:52162] INBOUND DATA: streamId=3 padding=0 endStream=true length=11 bytes=00000000060a0208011001
+[id: 0xf38522b7, L:/127.0.0.1:41082 - R:/127.0.0.1:20000] OUTBOUND HEADERS: streamId=3 headers=GrpcHttp2OutboundHeaders[:authority: 127.0.0.1:20000, :path: /proto.Rmf/FastVote, :method: POST, :scheme: http, content-type: application/grpc, te: trailers, user-agent: grpc-java-netty/1.13.1, grpc-accept-encoding: gzip, grpc-trace-bin: ] streamDependency=0 weight=16 exclusive=false padding=0 endStream=false
+[id: 0xd0e74967, L:/127.0.0.1:34100 - R:/127.0.0.1:20010] INBOUND SETTINGS: ack=false settings={MAX_CONCURRENT_STREAMS=2147483647, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0xd0e74967, L:/127.0.0.1:34100 - R:/127.0.0.1:20010] OUTBOUND SETTINGS: ack=true
+[id: 0xd0e74967, L:/127.0.0.1:34100 - R:/127.0.0.1:20010] INBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0x321e689b, L:/127.0.0.1:34096 - R:/127.0.0.1:20010] OUTBOUND DATA: streamId=3 padding=0 endStream=true length=11 bytes=00000000060a0208021001
+[id: 0xd0e74967, L:/127.0.0.1:34100 - R:/127.0.0.1:20010] OUTBOUND HEADERS: streamId=3 headers=GrpcHttp2OutboundHeaders[:authority: 127.0.0.1:20010, :path: /proto.Rmf/FastVote, :method: POST, :scheme: http, content-type: application/grpc, te: trailers, user-agent: grpc-java-netty/1.13.1, grpc-accept-encoding: gzip, grpc-trace-bin: ] streamDependency=0 weight=16 exclusive=false padding=0 endStream=false
+[id: 0xc70deb3a, L:/127.0.0.1:20010 - R:/127.0.0.1:34100] INBOUND SETTINGS: ack=false settings={ENABLE_PUSH=0, MAX_CONCURRENT_STREAMS=0, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+[id: 0xc70deb3a, L:/127.0.0.1:20010 - R:/127.0.0.1:34100] OUTBOUND SETTINGS: ack=true
+[id: 0xd0e74967, L:/127.0.0.1:34100 - R:/127.0.0.1:20010] OUTBOUND DATA: streamId=3 padding=0 endStream=true length=11 bytes=00000000060a0208031001
+[id: 0xc70deb3a, L:/127.0.0.1:20010 - R:/127.0.0.1:34100] INBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+[id: 0xc70deb3a, L:/127.0.0.1:20010 - R:/127.0.0.1:34100] INBOUND SETTINGS: ack=true
+[id: 0x321e689b, L:/127.0.0.1:34096 - R:/127.0.0.1:20010] INBOUND SETTINGS: ack=true
+[id: 0xd0e74967, L:/127.0.0.1:34100 - R:/127.0.0.1:20010] INBOUND SETTINGS: ack=true
+[id: 0xc70deb3a, L:/127.0.0.1:20010 - R:/127.0.0.1:34100] INBOUND HEADERS: streamId=3 headers=GrpcHttp2RequestHeaders[:path: /proto.Rmf/FastVote, :authority: 127.0.0.1:20010, :method: POST, :scheme: http, te: trailers, content-type: application/grpc, user-agent: grpc-java-netty/1.13.1, grpc-accept-encoding: gzip, grpc-trace-bin: ] streamDependency=0 weight=16 exclusive=false padding=0 endStream=false
+[id: 0xf4fbba73, L:/127.0.0.1:20010 - R:/127.0.0.1:34096] INBOUND HEADERS: streamId=3 headers=GrpcHttp2RequestHeaders[:path: /proto.Rmf/FastVote, :authority: 127.0.0.1:20010, :method: POST, :scheme: http, te: trailers, content-type: application/grpc, user-agent: grpc-java-netty/1.13.1, grpc-accept-encoding: gzip, grpc-trace-bin: ] streamDependency=0 weight=16 exclusive=false padding=0 endStream=false
+[id: 0xc70deb3a, L:/127.0.0.1:20010 - R:/127.0.0.1:34100] INBOUND DATA: streamId=3 padding=0 endStream=true length=11 bytes=00000000060a0208031001
+[id: 0xf4fbba73, L:/127.0.0.1:20010 - R:/127.0.0.1:34096] INBOUND DATA: streamId=3 padding=0 endStream=true length=11 bytes=00000000060a0208021001
+[id: 0xf38522b7, L:/127.0.0.1:41082 - R:/127.0.0.1:20000] OUTBOUND DATA: streamId=3 padding=0 endStream=true length=11 bytes=00000000060a0208011001
+[id: 0xe2f17ff8, L:/127.0.0.1:20020 - R:/127.0.0.1:52170] INBOUND HEADERS: streamId=3 headers=GrpcHttp2RequestHeaders[:path: /proto.Rmf/FastVote, :authority: 127.0.0.1:20020, :method: POST, :scheme: http, te: trailers, content-type: application/grpc, user-agent: grpc-java-netty/1.13.1, grpc-accept-encoding: gzip, grpc-trace-bin: ] streamDependency=0 weight=16 exclusive=false padding=0 endStream=false
+[id: 0xe2f17ff8, L:/127.0.0.1:20020 - R:/127.0.0.1:52170] INBOUND DATA: streamId=3 padding=0 endStream=true length=11 bytes=00000000060a0208031001
+[id: 0x390da274, L:/127.0.0.1:20000 - R:/127.0.0.1:41082] INBOUND HEADERS: streamId=3 headers=GrpcHttp2RequestHeaders[:path: /proto.Rmf/FastVote, :authority: 127.0.0.1:20000, :method: POST, :scheme: http, te: trailers, content-type: application/grpc, user-agent: grpc-java-netty/1.13.1, grpc-accept-encoding: gzip, grpc-trace-bin: ] streamDependency=0 weight=16 exclusive=false padding=0 endStream=false
+[id: 0x390da274, L:/127.0.0.1:20000 - R:/127.0.0.1:41082] INBOUND DATA: streamId=3 padding=0 endStream=true length=11 bytes=00000000060a0208011001
+*** shutting down gRPC server since JVM is shutting down
+[id: 0x6997805e, L:/127.0.0.1:20020 - R:/127.0.0.1:52162] OUTBOUND GO_AWAY: lastStreamId=3 errorCode=0 length=0 bytes=
+[id: 0xe2f17ff8, L:/127.0.0.1:20020 - R:/127.0.0.1:52170] OUTBOUND GO_AWAY: lastStreamId=3 errorCode=0 length=0 bytes=
+[id: 0x9375f0de, L:/127.0.0.1:20020 - R:/127.0.0.1:52176] OUTBOUND GO_AWAY: lastStreamId=3 errorCode=0 length=0 bytes=
+[id: 0xce9ab2a8, L:/127.0.0.1:52170 - R:/127.0.0.1:20020] INBOUND GO_AWAY: lastStreamId=3 errorCode=0 length=0 bytes=
+[id: 0xafa5f4f2, L:/127.0.0.1:52176 - R:/127.0.0.1:20020] INBOUND GO_AWAY: lastStreamId=3 errorCode=0 length=0 bytes=
+[id: 0x999a0254, L:/127.0.0.1:20020 - R:/127.0.0.1:52154] OUTBOUND GO_AWAY: lastStreamId=5 errorCode=0 length=0 bytes=
+[id: 0x4ff45ae7, L:/127.0.0.1:52154 - R:/127.0.0.1:20020] INBOUND GO_AWAY: lastStreamId=5 errorCode=0 length=0 bytes=
+[id: 0xfb75f8fc, L:/127.0.0.1:52162 - R:/127.0.0.1:20020] INBOUND GO_AWAY: lastStreamId=3 errorCode=0 length=0 bytes=
+*** shutting down gRPC server since JVM is shutting down
+*** server shut down
+[id: 0x28852df6, L:/127.0.0.1:20030 - R:/127.0.0.1:37816] OUTBOUND GO_AWAY: lastStreamId=3 errorCode=0 length=0 bytes=
+[id: 0x7424a393, L:/127.0.0.1:20030 - R:/127.0.0.1:37808] OUTBOUND GO_AWAY: lastStreamId=3 errorCode=0 length=0 bytes=
+[id: 0x9799fc3a, L:/127.0.0.1:20030 - R:/127.0.0.1:37820] OUTBOUND GO_AWAY: lastStreamId=3 errorCode=0 length=0 bytes=
+[id: 0xbd7d8636, L:/127.0.0.1:37816 - R:/127.0.0.1:20030] INBOUND GO_AWAY: lastStreamId=3 errorCode=0 length=0 bytes=
+[id: 0x9c63702a, L:/127.0.0.1:37808 - R:/127.0.0.1:20030] INBOUND GO_AWAY: lastStreamId=3 errorCode=0 length=0 bytes=
+*** server shut down
+[id: 0x0e1b2fa1, L:/127.0.0.1:20030 - R:/127.0.0.1:37790] OUTBOUND GO_AWAY: lastStreamId=5 errorCode=0 length=0 bytes=
+[id: 0x85d3cd24, L:/127.0.0.1:37820 - R:/127.0.0.1:20030] INBOUND GO_AWAY: lastStreamId=3 errorCode=0 length=0 bytes=
+[id: 0x63e92ee8, L:/127.0.0.1:37790 - R:/127.0.0.1:20030] INBOUND GO_AWAY: lastStreamId=5 errorCode=0 length=0 bytes=
+*** shutting down gRPC server since JVM is shutting down
+*** server shut down
+[id: 0x68c4a95f, L:/127.0.0.1:20000 - R:/127.0.0.1:41076] OUTBOUND GO_AWAY: lastStreamId=5 errorCode=0 length=0 bytes=
+[id: 0x888ca609, L:/127.0.0.1:20000 - R:/127.0.0.1:41088] OUTBOUND GO_AWAY: lastStreamId=3 errorCode=0 length=0 bytes=
+[id: 0x390da274, L:/127.0.0.1:20000 - R:/127.0.0.1:41082] OUTBOUND GO_AWAY: lastStreamId=3 errorCode=0 length=0 bytes=
+[id: 0xa62dca15, L:/127.0.0.1:20000 - R:/127.0.0.1:41084] OUTBOUND GO_AWAY: lastStreamId=3 errorCode=0 length=0 bytes=
+[id: 0x6a9812de, L:/127.0.0.1:41088 - R:/127.0.0.1:20000] INBOUND GO_AWAY: lastStreamId=3 errorCode=0 length=0 bytes=
+[id: 0x2498611d, L:/127.0.0.1:41076 - R:/127.0.0.1:20000] INBOUND GO_AWAY: lastStreamId=5 errorCode=0 length=0 bytes=
+[id: 0xa420b463, L:/127.0.0.1:41084 - R:/127.0.0.1:20000] INBOUND GO_AWAY: lastStreamId=3 errorCode=0 length=0 bytes=
+[id: 0xf38522b7, L:/127.0.0.1:41082 - R:/127.0.0.1:20000] INBOUND GO_AWAY: lastStreamId=3 errorCode=0 length=0 bytes=
+*** shutting down gRPC server since JVM is shutting down
+*** server shut down
+[id: 0xc70deb3a, L:/127.0.0.1:20010 - R:/127.0.0.1:34100] OUTBOUND GO_AWAY: lastStreamId=3 errorCode=0 length=0 bytes=
+[id: 0xbb2df64e, L:/127.0.0.1:20010 - R:/127.0.0.1:34076] OUTBOUND GO_AWAY: lastStreamId=5 errorCode=0 length=0 bytes=
+[id: 0x2a626db3, L:/127.0.0.1:20010 - R:/127.0.0.1:34084] OUTBOUND GO_AWAY: lastStreamId=3 errorCode=0 length=0 bytes=
+[id: 0xd0e74967, L:/127.0.0.1:34100 - R:/127.0.0.1:20010] INBOUND GO_AWAY: lastStreamId=3 errorCode=0 length=0 bytes=
+[id: 0x2d134ac7, L:/127.0.0.1:34076 - R:/127.0.0.1:20010] INBOUND GO_AWAY: lastStreamId=5 errorCode=0 length=0 bytes=
+[id: 0x957a2f9e, L:/127.0.0.1:34084 - R:/127.0.0.1:20010] INBOUND GO_AWAY: lastStreamId=3 errorCode=0 length=0 bytes=
+[id: 0xf4fbba73, L:/127.0.0.1:20010 - R:/127.0.0.1:34096] OUTBOUND GO_AWAY: lastStreamId=3 errorCode=0 length=0 bytes=
+[id: 0x321e689b, L:/127.0.0.1:34096 - R:/127.0.0.1:20010] INBOUND GO_AWAY: lastStreamId=3 errorCode=0 length=0 bytes=
+
+---------- DEBUG INFO ----------
+
+Current time: 17:10:36.833
+Current leader: 0
+Current regency: 0
+
+Last finished consensus: None
+
+Consensus in execution: None
+
+---------- ---------- ----------
+
+
+---------- DEBUG INFO ----------
+
+Current time: 17:10:36.836
+Current leader: 0
+Current regency: 0
+
+Last finished consensus: None
+
+Consensus in execution: None
+
+---------- ---------- ----------
+
+
+---------- DEBUG INFO ----------
+
+Current time: 17:10:36.833
+Current leader: 0
+Current regency: 0
+
+Last finished consensus: None
+
+Consensus in execution: None
+
+---------- ---------- ----------
+
+
+---------- DEBUG INFO ----------
+
+Current time: 17:10:36.836
+Current leader: 0
+Current regency: 0
+
+Last finished consensus: None
+
+Consensus in execution: None
+
+---------- ---------- ----------
+

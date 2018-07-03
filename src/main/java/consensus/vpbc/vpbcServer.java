@@ -5,6 +5,8 @@ import bftsmart.tom.ServiceReplica;
 import bftsmart.tom.server.defaultservices.DefaultSingleRecoverable;
 
 public class vpbcServer extends DefaultSingleRecoverable {
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(vpbcServer.class);
+
     int id;
     Validator v;
     public vpbcServer(int id, Validator v, String configHome) {
@@ -15,12 +17,12 @@ public class vpbcServer extends DefaultSingleRecoverable {
 
     @Override
     public void installSnapshot(byte[] state) {
-        System.out.println("installSnapshot currently not implemented");
+        logger.info("installSnapshot currently not implemented");
     }
 
     @Override
     public byte[] getSnapshot() {
-        System.out.println("getSnapshot currently not implemented");
+        logger.info("getSnapshot currently not implemented");
         return new byte[0];
     }
 
@@ -29,13 +31,13 @@ public class vpbcServer extends DefaultSingleRecoverable {
         String data = new String(command);
         if (!v.validate(data))
             return null;
-        System.out.println(data + " from " + msgCtx.getSender());
+        logger.info(data + " from " + msgCtx.getSender());
         return new byte[0];
     }
 
     @Override
     public byte[] appExecuteUnordered(byte[] command, MessageContext msgCtx) {
-        System.out.println("appExecuteUnordered currently not implemented");
+        logger.info("appExecuteUnordered currently not implemented");
         return new byte[0];
     }
 

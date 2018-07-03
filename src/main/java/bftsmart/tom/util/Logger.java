@@ -19,6 +19,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Logger {
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Logger.class);
 
     //public static long startInstant = System.currentTimeMillis();
     public static boolean debug = false;
@@ -26,7 +27,7 @@ public class Logger {
     public static void println(String msg) {
         if (debug) {
             String dataActual = new SimpleDateFormat("yy/MM/dd HH:mm:ss").format(new Date());
-            System.out.println(
+            logger.info(
                     "(" + dataActual
                     + " - " + Thread.currentThread().getName()
                     + ") " + msg);
