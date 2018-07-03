@@ -131,13 +131,13 @@ public class ViewManager {
         try {
             new ObjectOutputStream(bOut).writeObject(sm);
         } catch (IOException ex) {
-            Logger.getLogger(ServerConnection.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error("", ex);
         }
 
         byte[] data = bOut.toByteArray();
 
         for (Integer i : targets) {
-            //br.ufsc.das.tom.util.Logger.println("(ServersCommunicationLayer.send) Sending msg to replica "+i);
+            //br.ufsc.das.tom.util.logger.info("(ServersCommunicationLayer.send) Sending msg to replica "+i);
             try {
                 if (i.intValue() != id) {
                     getConnection(i.intValue()).send(data, true);
@@ -147,7 +147,7 @@ public class ViewManager {
                 logger.warn(ex);
             }
         }
-        //br.ufsc.das.tom.util.Logger.println("(ServersCommunicationLayer.send) Finished sending messages to replicas");
+        //br.ufsc.das.tom.util.logger.info("(ServersCommunicationLayer.send) Finished sending messages to replicas");
     }
 
     public void close() {

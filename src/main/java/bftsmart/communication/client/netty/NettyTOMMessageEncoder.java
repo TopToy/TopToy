@@ -71,7 +71,7 @@ public class NettyTOMMessageEncoder extends MessageToByteEncoder<TOMMessage> {
         int dataLength = 1+msgData.length+(macData==null?0:macData.length)+
                 (signatureData==null?0:signatureData.length);
 
-        //Logger.println("Sending message with "+dataLength+" bytes.");
+        //logger.info("Sending message with "+dataLength+" bytes.");
         /* msg size */
         buffer.writeInt(dataLength);
         /* control byte indicating if the message is signed or not */

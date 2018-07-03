@@ -32,7 +32,7 @@ import bftsmart.tom.util.Logger;
  * for the Byzantine fault model described in Cachin's 'Yet Another Visit to Paxos' (April 2011)
  */
 public class Consensus {
-
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Consensus.class);
     private ExecutionManager manager; // Execution manager for this replica's consensus instances
 
     private Decision decision; // Decision instance to which this consensus works for
@@ -312,7 +312,7 @@ public class Consensus {
             decisionEpoch = epoch.getTimestamp();
             decision.setDecisionEpoch(epoch);
             if (deliver) {
-                Logger.println("(Consensus.decided) Delivering decision from consensus " + getId() + " to the TOMLayer/DeliveryThread");
+                logger.info("(Consensus.decided) Delivering decision from consensus " + getId() + " to the TOMLayer/DeliveryThread");
                 manager.getTOMLayer().decided(decision);
             }
         }

@@ -113,7 +113,7 @@ public class ServerConnection {
                 socketOutStream = new DataOutputStream(this.socket.getOutputStream());
                 socketInStream = new DataInputStream(this.socket.getInputStream());
             } catch (IOException ex) {
-                Logger.println("Error creating connection to "+remoteId);
+                logger.info("Error creating connection to "+remoteId);
                 ex.printStackTrace();
             }
         }
@@ -147,7 +147,7 @@ public class ServerConnection {
      * Stop message sending and reception.
      */
     public void shutdown() {
-        Logger.println("SHUTDOWN for "+remoteId);
+        logger.info("SHUTDOWN for "+remoteId);
         
         doWork = false;
         closeSocket();
@@ -160,12 +160,12 @@ public class ServerConnection {
         if (useSenderThread) {
             //only enqueue messages if there queue is not full
             if (!useMAC) {
-                Logger.println("(ServerConnection.send) Not sending defaultMAC " + System.identityHashCode(data));
+                logger.info("(ServerConnection.send) Not sending defaultMAC " + System.identityHashCode(data));
                 noMACs.add(System.identityHashCode(data));
             }
 
             if (!outQueue.offer(data)) {
-                Logger.println("(ServerConnection.send) out queue for " + remoteId + " full (message discarded).");
+                logger.info("(ServerConnection.send) out queue for " + remoteId + " full (message discarded).");
             }
         } else {
             sendLock.lock();
@@ -412,9 +412,9 @@ public class ServerConnection {
                 socketOutStream.flush();
                 socket.close();
             } catch (IOException ex) {
-                Logger.println("Error closing socket to "+remoteId);
+                logger.info("Error closing socket to "+remoteId);
             } catch (NullPointerException npe) {
-            	Logger.println("Socket already closed");
+            	logger.info("Socket already closed");
             }
 
             socket = null;
@@ -459,12 +459,12 @@ public class ServerConnection {
                     //sendBytes(data, noMACs.contains(System.identityHashCode(data)));
                     int ref = System.identityHashCode(data);
                     boolean sendMAC = !noMACs.remove(ref);
-                    Logger.println("(ServerConnection.run) " + (sendMAC ? "Sending" : "Not sending") + " MAC for data " + ref);
+                    logger.info("(ServerConnection.run) " + (sendMAC ? "Sending" : "Not sending") + " MAC for data " + ref);
                     sendBytes(data, sendMAC);
                 }
             }
 
-            Logger.println("Sender for " + remoteId + " stopped!");
+            logger.info("Sender for " + remoteId + " stopped!");
         }
     }
 
@@ -518,19 +518,19 @@ public class ServerConnection {
                             
                             if (sm.getSender() == remoteId) {
                                 if (!inQueue.offer(sm)) {
-                                    Logger.println("(ReceiverThread.run) in queue full (message from " + remoteId + " discarded).");
+                                    logger.info("(ReceiverThread.run) in queue full (message from " + remoteId + " discarded).");
                                     logger.info("(ReceiverThread.run) in queue full (message from " + remoteId + " discarded).");
                                 }
                             }
                         } else {
                             //TODO: violation of authentication... we should do something
-                            Logger.println("WARNING: Violation of authentication in message received from " + remoteId);
+                            logger.info("WARNING: Violation of authentication in message received from " + remoteId);
                         }
                     } catch (ClassNotFoundException ex) {
                         //invalid message sent, just ignore;
                     } catch (IOException ex) {
                         if (doWork) {
-                            Logger.println("Closing socket and reconnecting");
+                            logger.info("Closing socket and reconnecting");
                             closeSocket();
                             waitAndConnect();
                         }
@@ -602,14 +602,14 @@ public class ServerConnection {
                             if (sm.getSender() == remoteId) {
                                 //logger.info("Mensagem recebia de: "+remoteId);
                                 /*if (!inQueue.offer(sm)) {
-                                bftsmart.tom.util.Logger.println("(ReceiverThread.run) in queue full (message from " + remoteId + " discarded).");
+                                bftsmart.tom.util.logger.info("(ReceiverThread.run) in queue full (message from " + remoteId + " discarded).");
                                 logger.info("(ReceiverThread.run) in queue full (message from " + remoteId + " discarded).");
                                 }*/
                                 this.replica.joinMsgReceived((VMMessage) sm);
                             }
                         } else {
                             //TODO: violation of authentication... we should do something
-                            Logger.println("WARNING: Violation of authentication in message received from " + remoteId);
+                            logger.info("WARNING: Violation of authentication in message received from " + remoteId);
                         }
                     } catch (ClassNotFoundException ex) {
                         ex.printStackTrace();

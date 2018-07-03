@@ -30,7 +30,7 @@ import java.util.logging.Logger;
  * @author miguel
  */
 public class DefaultReplier implements Replier{
-    
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(DefaultReplier.class);
     private Lock replyLock = new ReentrantLock();
     private Condition contextSetted = replyLock.newCondition();
     private ReplicaContext rc;
@@ -50,7 +50,7 @@ public class DefaultReplier implements Replier{
                 this.replyLock.unlock();
 
             } catch (InterruptedException ex) {
-                Logger.getLogger(DefaultReplier.class.getName()).log(Level.SEVERE, null, ex);
+                logger.error("", ex);
             }
         }
         

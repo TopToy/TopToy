@@ -151,7 +151,7 @@ public class ServersCommunicationLayer extends Thread {
         try {
             new ObjectOutputStream(bOut).writeObject(sm);
         } catch (IOException ex) {
-            Logger.getLogger(ServerConnection.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error("", ex);
         }
 
         byte[] data = bOut.toByteArray();
@@ -237,17 +237,17 @@ public class ServersCommunicationLayer extends Thread {
             } catch (SocketTimeoutException ex) {
             //timeout on the accept... do nothing
             } catch (IOException ex) {
-                Logger.getLogger(ServersCommunicationLayer.class.getName()).log(Level.SEVERE, null, ex);
+                logger.error("", ex);
             }
         }
 
         try {
             serverSocket.close();
         } catch (IOException ex) {
-            Logger.getLogger(ServersCommunicationLayer.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error("", ex);
         }
 
-        Logger.getLogger(ServersCommunicationLayer.class.getName()).log(Level.INFO, "ServerCommunicationLayer stopped.");
+        logger.info("ServerCommunicationLayer stopped.");
     }
 
     //******* EDUARDO BEGIN **************//
@@ -276,7 +276,7 @@ public class ServersCommunicationLayer extends Thread {
         try {
             socket.setTcpNoDelay(true);
         } catch (SocketException ex) {
-            Logger.getLogger(ServersCommunicationLayer.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error("", ex);
         }
     }
 

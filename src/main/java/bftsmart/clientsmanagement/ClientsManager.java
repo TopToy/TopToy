@@ -63,7 +63,7 @@ public class ClientsManager {
         ClientData clientData = clientsData.get(clientId);
 
         if (clientData == null) {
-            Logger.println("(ClientsManager.getClientData) Creating new client data, client id=" + clientId);
+            logger.info("(ClientsManager.getClientData) Creating new client data, client id=" + clientId);
 
             //******* EDUARDO BEGIN **************//
             clientData = new ClientData(clientId,
@@ -227,13 +227,13 @@ public class ClientsManager {
         int clientId = request.getSender();
         boolean accounted = false;
 
-        //Logger.println("(ClientsManager.requestReceived) getting info about client "+clientId);
+        //logger.info("(ClientsManager.requestReceived) getting info about client "+clientId);
         ClientData clientData = getClientData(clientId);
         
-        //Logger.println("(ClientsManager.requestReceived) wait for lock for client "+clientData.getClientId());
+        //logger.info("(ClientsManager.requestReceived) wait for lock for client "+clientData.getClientId());
         clientData.clientLock.lock();
         /******* BEGIN CLIENTDATA CRITICAL SECTION ******/
-        //Logger.println("(ClientsManager.requestReceived) lock for client "+clientData.getClientId()+" acquired");
+        //logger.info("(ClientsManager.requestReceived) lock for client "+clientData.getClientId()+" acquired");
 
         /* ################################################ */
         //pjsousa: simple flow control mechanism to avoid out of memory exception
@@ -324,11 +324,11 @@ public class ClientsManager {
      */
     public void requestsOrdered(TOMMessage[] requests) {
         clientsLock.lock();
-        Logger.println("(ClientsManager.requestOrdered) Updating client manager");
+        logger.info("(ClientsManager.requestOrdered) Updating client manager");
         for (TOMMessage request : requests) {
             requestOrdered(request);
         }
-        Logger.println("(ClientsManager.requestOrdered) Finished updating client manager");
+        logger.info("(ClientsManager.requestOrdered) Finished updating client manager");
         clientsLock.unlock();
     }
 
@@ -349,7 +349,7 @@ public class ClientsManager {
         clientData.clientLock.lock();
         /******* BEGIN CLIENTDATA CRITICAL SECTION ******/
         if (!clientData.removeOrderedRequest(request)) {
-            Logger.println("(ClientsManager.requestOrdered) Request "
+            logger.info("(ClientsManager.requestOrdered) Request "
                     + request + " does not exist in pending requests");
         }
         clientData.setLastMessageExecuted(request.getSequence());
@@ -366,7 +366,7 @@ public class ClientsManager {
         clientsLock.lock();
         clientsData.clear();
         clientsLock.unlock();
-        java.util.logging.Logger.getLogger(ClientsManager.class.getName()).log(Level.INFO, "ClientsManager cleared.");
+        logger.info("ClientsManager cleared.");
 
     }
 }

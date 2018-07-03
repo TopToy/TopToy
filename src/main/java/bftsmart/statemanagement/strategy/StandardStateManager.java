@@ -128,7 +128,7 @@ public class StandardStateManager extends BaseStateManager {
     @Override
     public void stateTimeout() {
         lockTimer.lock();
-        Logger.println("(StateManager.stateTimeout) Timeout for the replica that was supposed to send the complete state. Changing desired replica.");
+        logger.info("(StateManager.stateTimeout) Timeout for the replica that was supposed to send the complete state. Changing desired replica.");
         logger.info("Timeout no timer do estado!");
         if (stateTimer != null)
         	stateTimer.cancel();
@@ -329,7 +329,7 @@ public class StandardStateManager extends BaseStateManager {
                         }
                     } else if (haveState == -1) {
                         logger.info("haveState == -1");
-                        Logger.println("(TOMLayer.SMReplyDeliver) The replica from which I expected the state, sent one which doesn't match the hash of the others, or it never sent it at all");
+                        logger.info("(TOMLayer.SMReplyDeliver) The replica from which I expected the state, sent one which doesn't match the hash of the others, or it never sent it at all");
 
                         changeReplica();
                         reset();
@@ -338,7 +338,7 @@ public class StandardStateManager extends BaseStateManager {
                         if (stateTimer != null) stateTimer.cancel();
                     } else if (haveState == 0 && (SVController.getCurrentViewN() - SVController.getCurrentViewF()) <= getReplies()) {
 
-                        Logger.println("(TOMLayer.SMReplyDeliver) Could not obtain the state, retrying");
+                        logger.info("(TOMLayer.SMReplyDeliver) Could not obtain the state, retrying");
                         reset();
                         if (stateTimer != null) stateTimer.cancel();
                         waitingCID = -1;

@@ -114,7 +114,7 @@ public class DurableStateManager extends BaseStateManager {
 	@Override
 	public void stateTimeout() {
 		lockTimer.lock();
-		Logger.println("(StateManager.stateTimeout) Timeout for the replica that was supposed to send the complete state. Changing desired replica.");
+		logger.info("(StateManager.stateTimeout) Timeout for the replica that was supposed to send the complete state. Changing desired replica.");
 		logger.info("Timeout no timer do estado!");
 		if (stateTimer != null)
 			stateTimer.cancel();
@@ -126,18 +126,18 @@ public class DurableStateManager extends BaseStateManager {
 	@Override
 	public void SMRequestDeliver(SMMessage msg, boolean isBFT) {
 		logger.info("(TOMLayer.SMRequestDeliver) invoked method");
-		Logger.println("(TOMLayer.SMRequestDeliver) invoked method");
+		logger.info("(TOMLayer.SMRequestDeliver) invoked method");
 		if (SVController.getStaticConf().isStateTransferEnabled()
 				&& dt.getRecoverer() != null) {
-			Logger.println("(TOMLayer.SMRequestDeliver) The state transfer protocol is enabled");
-			Logger.println("(TOMLayer.SMRequestDeliver) I received a state request for CID "
+			logger.info("(TOMLayer.SMRequestDeliver) The state transfer protocol is enabled");
+			logger.info("(TOMLayer.SMRequestDeliver) I received a state request for CID "
 					+ msg.getCID() + " from replica " + msg.getSender());
 			CSTSMMessage cstMsg = (CSTSMMessage) msg;
 			CSTRequestF1 cstConfig = cstMsg.getCstConfig();
 			boolean sendState = cstConfig.getCheckpointReplica() == SVController
 					.getStaticConf().getProcessId();
 			if (sendState)
-				Logger.println("(TOMLayer.SMRequestDeliver) I should be the one sending the state");
+				logger.info("(TOMLayer.SMRequestDeliver) I should be the one sending the state");
 
 			logger.info("--- state asked");
 
@@ -169,7 +169,7 @@ public class DurableStateManager extends BaseStateManager {
 		lockTimer.lock();
 		CSTSMMessage reply = (CSTSMMessage) msg;
 		if (SVController.getStaticConf().isStateTransferEnabled()) {
-			Logger.println("(TOMLayer.SMReplyDeliver) The state transfer protocol is enabled");
+			logger.info("(TOMLayer.SMReplyDeliver) The state transfer protocol is enabled");
 			System.out
 			.println("(TOMLayer.SMReplyDeliver) I received a state reply for CID "
 					+ reply.getCID()
@@ -209,7 +209,7 @@ public class DurableStateManager extends BaseStateManager {
 					currentView = SVController.getCurrentView();
 				}
 
-				Logger.println("(TOMLayer.SMReplyDeliver) The reply is for the CID that I want!");
+				logger.info("(TOMLayer.SMReplyDeliver) The reply is for the CID that I want!");
 
 				InetSocketAddress address = reply.getCstConfig().getAddress();
 				Socket clientSocket;
@@ -296,9 +296,9 @@ public class DurableStateManager extends BaseStateManager {
 							&& currentView != null && haveState && (!isBFT || /*currentProof != null ||*/ appStateOnly)) {
 						logger.info("---- RECEIVED VALID STATE ----");
 
-						Logger.println("(TOMLayer.SMReplyDeliver) The state of those replies is good!");
-						Logger.println("(TOMLayer.SMReplyDeliver) CID State requested: " + reply.getCID());
-						Logger.println("(TOMLayer.SMReplyDeliver) CID State received: "	+ stateUpper.getLastCID());
+						logger.info("(TOMLayer.SMReplyDeliver) The state of those replies is good!");
+						logger.info("(TOMLayer.SMReplyDeliver) CID State requested: " + reply.getCID());
+						logger.info("(TOMLayer.SMReplyDeliver) CID State received: "	+ stateUpper.getLastCID());
 
 						tomLayer.getSynchronizer().getLCManager().setLastReg(currentRegency);
 						tomLayer.getSynchronizer().getLCManager().setNextReg(currentRegency);
@@ -406,7 +406,7 @@ public class DurableStateManager extends BaseStateManager {
 							&& (SVController.getCurrentViewN() / 2) < getReplies()) {
 						logger.info("---- DIDNT RECEIVE STATE ----");
 
-						Logger.println("(TOMLayer.SMReplyDeliver) I have more than "
+						logger.info("(TOMLayer.SMReplyDeliver) I have more than "
 								+ (SVController.getCurrentViewN() / 2)
 								+ " messages that are no good!");
 
@@ -422,7 +422,7 @@ public class DurableStateManager extends BaseStateManager {
 					} else if (!haveState) {
 						logger.info("---- RECEIVED INVALID STATE  ----");
 
-						Logger.println("(TOMLayer.SMReplyDeliver) The replica from which I expected the state, sent one which doesn't match the hash of the others, or it never sent it at all");
+						logger.info("(TOMLayer.SMReplyDeliver) The replica from which I expected the state, sent one which doesn't match the hash of the others, or it never sent it at all");
 
 						reset();
 						requestState();

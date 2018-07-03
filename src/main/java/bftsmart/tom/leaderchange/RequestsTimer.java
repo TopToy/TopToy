@@ -235,7 +235,7 @@ public class RequestsTimer {
     public void shutdown() {
         timer.cancel();
         stopAllSTOPs();
-        java.util.logging.Logger.getLogger(RequestsTimer.class.getName()).log(Level.INFO, "RequestsTimer stopped.");
+        logger.info( "RequestsTimer stopped.");
 
     }
     
