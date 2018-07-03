@@ -26,6 +26,12 @@ public class bbcTest {
     @Test
     void testSingleDecision() {
         bbcServer s = new bbcServer(0, 1, SingleServerconfigHome.toString());
+        s.start();
+//        try {
+//            Thread.sleep(1000 * 3);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
         bbcClient c = new bbcClient(0, SingleServerconfigHome.toString());
         c.propose(1,0);
         int d = s.decide(0);

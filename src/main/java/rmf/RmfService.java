@@ -26,7 +26,6 @@ TODO:
  */
 public class RmfService extends RmfGrpc.RmfImplBase {
 
-    static String bbcConfig = Paths.get("config", "rmfbbc").toString();
     class vote {
         int ones;
         int consID;
@@ -58,7 +57,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         }
     }
 
-    private int currHeight;
+//    private int currHeight;
     private int id;
     private int timeoutMs;
     private int timeoutInterval;
@@ -72,7 +71,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
 //    private Lock recMsgLock;
 //    private Lock heightLock;
     private Semaphore receivedSem;
-    final private Object votesEvent;
+//    final private Object votesEvent;
 //    final private Object receiveEvent;
 
 
@@ -80,12 +79,14 @@ public class RmfService extends RmfGrpc.RmfImplBase {
     final private Map<Integer, Data> pendingMsg;
     final private Map<Integer, Data> recMsg;
     private Map<Integer, peer> peers;
+    private List<Node> nodes;
 
     private Server server;
 
-    public RmfService(int id, int f, int tmoInterval, int tmo, ArrayList<Node> nodes) {
-        this.currHeight = 0;
+    public RmfService(int id, int f, int tmoInterval, int tmo, ArrayList<Node> nodes, String bbcConfig) {
+//        this.currHeight = 0;
         this.bbcServer = new bbcServer(id, 2*f + 1, bbcConfig);
+        new Thread(this.bbcServer::start).start();
         this.bbcClient = new bbcClient(id, bbcConfig);
 //        this.pendingsRecLock = new ReentrantLock();
 //        this.votesLock = new ReentrantLock();
@@ -101,13 +102,19 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         this.timeoutInterval = tmoInterval;
         this.timeoutMs = tmo;
         this.id = id;
-        this.votesEvent = new Object();
+//        this.votesEvent = new Object();
+        this.nodes = nodes;
 //        this.receiveEvent = new Object();
+//        for (Node n : nodes) {
+//            peers.put(n.getID(), new peer(n));
+//        }
+    }
+
+    public void start() {
         for (Node n : nodes) {
             peers.put(n.getID(), new peer(n));
         }
     }
-
     public void shutdown() {
         for (peer p : peers.values()) {
             p.shutdown();
@@ -154,15 +161,15 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         });
     }
 
-    private Res sendReqMessage(RmfGrpc.RmfStub stub, Req req) {
+    private Res sendReqMessage(RmfGrpc.RmfStub stub, Req req, int cHeight) {
         stub.reqMessage(req, new StreamObserver<Res>() {
             @Override
             public void onNext(Res res) {
                 // TODO: We should validate the answer
-                int cHeight = 0;
-                synchronized ((Object) currHeight) {
-                    cHeight = currHeight;
-                }
+//                int cHeight = 0;
+//                synchronized ((Object) currHeight) {
+//                    cHeight = currHeight;
+//                }
 //                heightLock.lock();
 //                int cHeight = currHeight;
 //                heightLock.unlock();
@@ -195,9 +202,9 @@ public class RmfService extends RmfGrpc.RmfImplBase {
 
         return null;
     }
-    private void broadcastReqMsg(Req req) {
+    private void broadcastReqMsg(Req req, int height) {
         for (peer p : peers.values()) {
-            sendReqMessage(p.stub, req);
+            sendReqMessage(p.stub, req, height);
         }
     }
     private void broadcastFastVoteMessage(FastBbcVote v) {
@@ -206,7 +213,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         }
     }
 
-    public void Broadcast(Data msg) {
+    public void rmfBroadcast(Data msg) {
         for (peer p : peers.values()) {
             sendDataMessage(p.stub, msg);
         }
@@ -254,7 +261,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             votes.get(height).ones++;
             int nVotes = votes.get(height).ones;
             if (nVotes == n) {
-                votesEvent.notify();
+                votes.notify();
             }
         }
 //        votesLock.lock();
@@ -294,17 +301,21 @@ public class RmfService extends RmfGrpc.RmfImplBase {
     }
 
     public byte[] deliver(int height) {
-       synchronized (votes) {
-           if (votes.get(height).ones < n) {
+        int fVotes = 0;
+        synchronized (votes) {
+            if (votes.containsKey(height)) {
+                fVotes = votes.get(height).ones;
+            }
+           if (fVotes < n) {
                try {
-                   votesEvent.wait(timeoutInterval);
+                   votes.wait(timeoutMs);
                } catch (InterruptedException e) {
                    e.printStackTrace();
                }
            }
 
        }
-       int fVotes = 0;
+//       int fVotes = 0;
        synchronized (votes) {
            if (votes.containsKey(height)) {
                fVotes = votes.get(height).ones;
@@ -324,9 +335,9 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             handlePositiveDec(height);
         }
         // We assume that n = 3f + 1
-        synchronized ((Object) currHeight) {
-           currHeight++;
-        }
+//        synchronized ((Object) currHeight) {
+//           currHeight++;
+//        }
 //        heightLock.lock();
 //        currHeight++;
 //        heightLock.unlock();
@@ -395,7 +406,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                 setSender(id).
                 build();
         Req req = Req.newBuilder().setMeta(meta).build();
-        broadcastReqMsg(req);
+        broadcastReqMsg(req, height);
         try {
             receivedSem.acquire();
         } catch (InterruptedException e) {

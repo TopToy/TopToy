@@ -31,7 +31,7 @@ public class Test {
     public static void main(String[] args) throws Exception {
 
         //******* EDUARDO BEGIN **************//
-        ServerViewController controller = new ServerViewController(Integer.parseInt(args[0]), "config");
+        ServerViewController controller = new ServerViewController(Integer.parseInt(args[0]), "config/bbcConfig/bbcSingleServer");
         LinkedBlockingQueue<SystemMessage> inQueue = new LinkedBlockingQueue<SystemMessage>();
         ServersCommunicationLayer scl = new ServersCommunicationLayer(controller, inQueue,null);
 

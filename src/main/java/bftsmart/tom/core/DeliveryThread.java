@@ -21,7 +21,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.logging.Level;
+//import java.util.logging.Level;
 
 import bftsmart.consensus.Decision;
 import bftsmart.reconfiguration.ServerViewController;
@@ -33,13 +33,15 @@ import bftsmart.tom.core.messages.TOMMessageType;
 import bftsmart.tom.leaderchange.CertifiedDecision;
 import bftsmart.tom.server.Recoverable;
 import bftsmart.tom.util.BatchReader;
-import bftsmart.tom.util.Logger;
+import org.apache.log4j.Logger;
+//import bftsmart.tom.util.Logger;
 
 /**
  * This class implements a thread which will deliver totally ordered requests to the application
  * 
  */
 public final class DeliveryThread extends Thread {
+    private final static Logger logger = Logger.getLogger(DeliveryThread.class);
 
     private boolean doWork = true;
     private final LinkedBlockingQueue<Decision> decided; 
@@ -79,7 +81,7 @@ public final class DeliveryThread extends Thread {
     public void delivery(Decision dec) {
         if (!containsGoodReconfig(dec)) {
 
-            Logger.println("(DeliveryThread.delivery) Decision from consensus " + dec.getConsensusId() + " does not contain good reconfiguration");
+            logger.info("(DeliveryThread.delivery) Decision from consensus " + dec.getConsensusId() + " does not contain good reconfiguration");
             //set this decision as the last one from this replica
             tomLayer.setLastExec(dec.getConsensusId());
             //define that end of this execution
@@ -95,7 +97,7 @@ public final class DeliveryThread extends Thread {
             
             notEmptyQueue.signalAll();
             decidedLock.unlock();
-            Logger.println("(DeliveryThread.delivery) Consensus " + dec.getConsensusId() + " finished. Decided size=" + decided.size());
+            logger.info("(DeliveryThread.delivery) Consensus " + dec.getConsensusId() + " finished. Decided size=" + decided.size());
         } catch (Exception e) {
             e.printStackTrace(System.out);
         }
@@ -255,7 +257,7 @@ public final class DeliveryThread extends Thread {
             deliverUnlock();
             /******************************************************************/
         }
-        java.util.logging.Logger.getLogger(DeliveryThread.class.getName()).log(Level.INFO, "DeliveryThread stopped.");
+        logger.info("DeliveryThread stopped.");
 
     }
     
@@ -266,14 +268,14 @@ public final class DeliveryThread extends Thread {
             // this may happen if this batch proposal was not verified
             // TODO: this condition is possible?
 
-            Logger.println("(DeliveryThread.run) interpreting and verifying batched requests.");
+            logger.info("(DeliveryThread.run) interpreting and verifying batched requests.");
 
             // obtain an array of requests from the decisions obtained
             BatchReader batchReader = new BatchReader(dec.getValue(),
                             controller.getStaticConf().getUseSignatures() == 1);
             requests = batchReader.deserialiseRequests(controller);
     	} else {
-            Logger.println("(DeliveryThread.run) using cached requests from the propose.");
+            logger.info("(DeliveryThread.run) using cached requests from the propose.");
     	}
 
     	return requests;

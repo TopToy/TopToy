@@ -1,0 +1,69 @@
+2018-07-03 16:35:18 INFO  rmfTest:58 - start TestFourServersNoFailures
+2018-07-03 16:35:18 INFO  rmfTest:28 - init server #0
+2018-07-03 16:35:19 INFO  NettyTOMMessageDecoder:85 - new NettyTOMMessageDecoder!!, isClient=true
+2018-07-03 16:35:19 INFO  TOMLayer:333 - Running.
+2018-07-03 16:35:19 INFO  TOMLayer:338 - Next leader for CID=0: 0
+2018-07-03 16:35:19 INFO  TOMLayer:361 - (TOMLayer.run) I'm the leader.
+2018-07-03 16:35:19 INFO  NettyTOMMessageDecoder:85 - new NettyTOMMessageDecoder!!, isClient=true
+2018-07-03 16:35:19 INFO  NettyTOMMessageDecoder:85 - new NettyTOMMessageDecoder!!, isClient=false
+2018-07-03 16:35:19 INFO  ServerCommunicationSystem:145 - --------sending----------> bftsmart.statemanagement.strategy.StandardSMMessage@7e3dcad5
+2018-07-03 16:35:19 INFO  NettyClientServerCommunicationSystemServerSide:200 - Session Created, active clients=0
+2018-07-03 16:35:19 INFO  ServerCommunicationSystem:145 - --------sending----------> bftsmart.statemanagement.strategy.StandardSMMessage@7e3dcad5
+2018-07-03 16:35:19 INFO  ServerCommunicationSystem:119 - <-------receiving---------- bftsmart.statemanagement.strategy.StandardSMMessage@7e3dcad5
+2018-07-03 16:35:19 INFO  ServerCommunicationSystem:145 - --------sending----------> bftsmart.statemanagement.strategy.StandardSMMessage@69ef9c96
+2018-07-03 16:35:19 INFO  ServerCommunicationSystem:119 - <-------receiving---------- bftsmart.statemanagement.strategy.StandardSMMessage@69ef9c96
+2018-07-03 16:35:19 INFO  NettyTOMMessageDecoder:85 - new NettyTOMMessageDecoder!!, isClient=true
+2018-07-03 16:35:19 INFO  NettyTOMMessageDecoder:85 - new NettyTOMMessageDecoder!!, isClient=true
+2018-07-03 16:35:19 INFO  rmfTest:28 - init server #1
+2018-07-03 16:35:19 INFO  NettyTOMMessageDecoder:85 - new NettyTOMMessageDecoder!!, isClient=true
+2018-07-03 16:35:19 INFO  NettyTOMMessageDecoder:85 - new NettyTOMMessageDecoder!!, isClient=false
+2018-07-03 16:35:19 INFO  NettyTOMMessageDecoder:85 - new NettyTOMMessageDecoder!!, isClient=true
+2018-07-03 16:35:19 INFO  NettyClientServerCommunicationSystemServerSide:200 - Session Created, active clients=0
+2018-07-03 16:35:19 INFO  NettyTOMMessageDecoder:85 - new NettyTOMMessageDecoder!!, isClient=true
+2018-07-03 16:35:19 INFO  NettyTOMMessageDecoder:85 - new NettyTOMMessageDecoder!!, isClient=true
+2018-07-03 16:35:19 INFO  rmfTest:28 - init server #2
+2018-07-03 16:35:19 INFO  NettyTOMMessageDecoder:85 - new NettyTOMMessageDecoder!!, isClient=true
+2018-07-03 16:35:19 INFO  NettyTOMMessageDecoder:85 - new NettyTOMMessageDecoder!!, isClient=false
+2018-07-03 16:35:19 INFO  NettyClientServerCommunicationSystemServerSide:200 - Session Created, active clients=0
+2018-07-03 16:35:19 INFO  NettyTOMMessageDecoder:85 - new NettyTOMMessageDecoder!!, isClient=true
+2018-07-03 16:35:19 INFO  NettyTOMMessageDecoder:85 - new NettyTOMMessageDecoder!!, isClient=true
+2018-07-03 16:35:19 INFO  NettyTOMMessageDecoder:85 - new NettyTOMMessageDecoder!!, isClient=true
+2018-07-03 16:35:19 INFO  rmfTest:28 - init server #3
+2018-07-03 16:35:19 INFO  NettyTOMMessageDecoder:85 - new NettyTOMMessageDecoder!!, isClient=true
+2018-07-03 16:35:19 INFO  NettyTOMMessageDecoder:85 - new NettyTOMMessageDecoder!!, isClient=false
+2018-07-03 16:35:19 INFO  NettyClientServerCommunicationSystemServerSide:200 - Session Created, active clients=0
+2018-07-03 16:35:19 INFO  NettyTOMMessageDecoder:85 - new NettyTOMMessageDecoder!!, isClient=true
+2018-07-03 16:35:20 INFO  NettyTOMMessageDecoder:85 - new NettyTOMMessageDecoder!!, isClient=true
+2018-07-03 16:35:20 INFO  NettyTOMMessageDecoder:85 - new NettyTOMMessageDecoder!!, isClient=false
+2018-07-03 16:35:20 INFO  NettyClientServerCommunicationSystemServerSide:200 - Session Created, active clients=0
+2018-07-03 16:35:20 INFO  ServerCommunicationSystem:145 - --------sending----------> bftsmart.statemanagement.strategy.StandardSMMessage@a38a0d
+2018-07-03 16:35:20 INFO  NettyTOMMessageDecoder:85 - new NettyTOMMessageDecoder!!, isClient=true
+2018-07-03 16:35:20 INFO  TOMLayer:333 - Running.
+2018-07-03 16:35:20 INFO  TOMLayer:338 - Next leader for CID=0: 0
+2018-07-03 16:35:20 INFO  ServerCommunicationSystem:145 - --------sending----------> bftsmart.statemanagement.strategy.StandardSMMessage@a38a0d
+2018-07-03 16:35:20 INFO  ServerCommunicationSystem:119 - <-------receiving---------- bftsmart.statemanagement.strategy.StandardSMMessage@a38a0d
+2018-07-03 16:35:20 INFO  ServerCommunicationSystem:145 - --------sending----------> bftsmart.statemanagement.strategy.StandardSMMessage@596d66b1
+2018-07-03 16:35:20 INFO  ServerCommunicationSystem:119 - <-------receiving---------- bftsmart.statemanagement.strategy.StandardSMMessage@596d66b1
+2018-07-03 16:35:20 INFO  TOMLayer:333 - Running.
+2018-07-03 16:35:20 INFO  TOMLayer:338 - Next leader for CID=0: 0
+2018-07-03 16:35:20 INFO  ServerCommunicationSystem:145 - --------sending----------> bftsmart.statemanagement.strategy.StandardSMMessage@50fe702a
+2018-07-03 16:35:20 INFO  ServerCommunicationSystem:145 - --------sending----------> bftsmart.statemanagement.strategy.StandardSMMessage@50fe702a
+2018-07-03 16:35:20 INFO  ServerCommunicationSystem:119 - <-------receiving---------- bftsmart.statemanagement.strategy.StandardSMMessage@31e71e02
+2018-07-03 16:35:20 INFO  ServerCommunicationSystem:145 - --------sending----------> bftsmart.statemanagement.strategy.StandardSMMessage@3f20e64e
+2018-07-03 16:35:20 INFO  ServerCommunicationSystem:119 - <-------receiving---------- bftsmart.statemanagement.strategy.StandardSMMessage@3b1f7572
+2018-07-03 16:35:20 INFO  ServerCommunicationSystem:145 - --------sending----------> bftsmart.statemanagement.strategy.StandardSMMessage@7e1dec75
+2018-07-03 16:35:20 INFO  ServerCommunicationSystem:119 - <-------receiving---------- bftsmart.statemanagement.strategy.StandardSMMessage@50fe702a
+2018-07-03 16:35:20 INFO  ServerCommunicationSystem:145 - --------sending----------> bftsmart.statemanagement.strategy.StandardSMMessage@7703eaba
+2018-07-03 16:35:20 INFO  ServerCommunicationSystem:119 - <-------receiving---------- bftsmart.statemanagement.strategy.StandardSMMessage@7703eaba
+2018-07-03 16:35:20 INFO  TOMLayer:333 - Running.
+2018-07-03 16:35:20 INFO  TOMLayer:338 - Next leader for CID=0: 0
+2018-07-03 16:35:20 INFO  ServerCommunicationSystem:119 - <-------receiving---------- bftsmart.statemanagement.strategy.StandardSMMessage@65c5fd35
+2018-07-03 16:35:20 INFO  ServerCommunicationSystem:145 - --------sending----------> bftsmart.statemanagement.strategy.StandardSMMessage@6b021ffd
+2018-07-03 16:35:20 INFO  ServerCommunicationSystem:145 - --------sending----------> bftsmart.statemanagement.strategy.StandardSMMessage@6115dae1
+2018-07-03 16:35:20 INFO  ServerCommunicationSystem:119 - <-------receiving---------- bftsmart.statemanagement.strategy.StandardSMMessage@6f3d9645
+2018-07-03 16:35:20 INFO  ServerCommunicationSystem:145 - --------sending----------> bftsmart.statemanagement.strategy.StandardSMMessage@6115dae1
+2018-07-03 16:35:20 INFO  ServerCommunicationSystem:145 - --------sending----------> bftsmart.statemanagement.strategy.StandardSMMessage@2a3f15c6
+2018-07-03 16:35:20 INFO  ServerCommunicationSystem:119 - <-------receiving---------- bftsmart.statemanagement.strategy.StandardSMMessage@6115dae1
+2018-07-03 16:35:20 INFO  ServerCommunicationSystem:145 - --------sending----------> bftsmart.statemanagement.strategy.StandardSMMessage@60d969e1
+2018-07-03 16:35:20 INFO  ServerCommunicationSystem:119 - <-------receiving---------- bftsmart.statemanagement.strategy.StandardSMMessage@60d969e1
+2018-07-03 16:35:20 INFO  ServerCommunicationSystem:145 - --------sending----------> bftsmart.statemanagement.strategy.StandardSMMessage@7e3dcad5

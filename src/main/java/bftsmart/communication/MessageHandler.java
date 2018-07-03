@@ -24,8 +24,10 @@ import bftsmart.tom.core.TOMLayer;
 import bftsmart.tom.core.messages.TOMMessage;
 import bftsmart.tom.core.messages.ForwardedMessage;
 import bftsmart.tom.leaderchange.LCMessage;
-import bftsmart.tom.util.Logger;
+//import bftsmart.tom.util.Logger;
 import bftsmart.tom.util.TOMUtil;
+import org.apache.log4j.Logger;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -41,7 +43,7 @@ import javax.crypto.SecretKey;
  * @author edualchieri
  */
 public class MessageHandler {
-
+    private final static Logger logger = Logger.getLogger(MessageHandler.class);
     private Acceptor acceptor;
     private TOMLayer tomLayer;
     //private Cipher cipher;
@@ -109,12 +111,12 @@ public class MessageHandler {
                 if (recvMAC != null && myMAC != null && Arrays.equals(recvMAC, myMAC))
                     acceptor.deliver(consMsg);
                 else {
-                    Logger.println("(MessageHandler.processData) WARNING: invalid MAC from " + sm.getSender());
+                    logger.info("(MessageHandler.processData) WARNING: invalid MAC from " + sm.getSender());
                     System.out.println("(MessageHandler.processData) WARNING: invalid MAC from " + sm.getSender());
                 }
             } else {
                 System.out.println("(MessageHandler.processData) Discarding unauthenticated message from " + sm.getSender());
-                Logger.println("(MessageHandler.processData) Discarding unauthenticated message from " + sm.getSender());
+                logger.info("(MessageHandler.processData) Discarding unauthenticated message from " + sm.getSender());
             }
 
         } else {

@@ -1,8 +1,11 @@
 package rmf;
 
+import com.google.protobuf.ByteString;
 import config.Node;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
+import proto.Data;
+import proto.Meta;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -10,12 +13,15 @@ import java.util.ArrayList;
 public class RmfNode extends Node{
     private RmfService rmfService;
     private Server rmfServer;
-    public RmfNode(String addr, int port, int id, int f, int tmoInterval, int tmo, ArrayList<Node> nodes) {
+    int height;
+    public RmfNode(int id, String addr, int port, int f, int tmoInterval, int tmo, ArrayList<Node> nodes, String bbcConfig) {
         super(addr, port, id);
-        rmfService = new RmfService(id, f, tmoInterval, tmo, nodes);
+        rmfService = new RmfService(id, f, tmoInterval, tmo, nodes, bbcConfig);
+        start();
+//        height = 0;
     }
 
-    public void start() {
+    private void start() {
         try {
             rmfServer = ServerBuilder.
                     forPort(getPort()).
@@ -45,6 +51,31 @@ public class RmfNode extends Node{
         if (rmfServer != null) {
             rmfServer.awaitTermination();
         }
+        rmfService.shutdown();
+    }
+
+    // This should be called only after all servers are running (as this object contains also the client logic)
+    public void startService() {
+        rmfService.start();
+    }
+
+    public void broadcast(byte[] msg, int height) {
+        Meta metaMsg = Meta.
+                newBuilder().
+                setSender(getID()).
+                setHeight(height).
+                build();
+        Data dataMsg = Data.
+                newBuilder().
+                setData(ByteString.copyFrom(msg)).
+                setMeta(metaMsg).
+                build();
+        rmfService.rmfBroadcast(dataMsg);
+    }
+
+    public byte[] deliver(int height) {
+        byte[] msg = rmfService.deliver(height);
+        return msg;
     }
 
 

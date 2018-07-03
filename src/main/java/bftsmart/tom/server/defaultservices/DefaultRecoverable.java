@@ -22,7 +22,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.logging.Level;
+//import java.util.logging.Level;
 
 import bftsmart.reconfiguration.ServerViewController;
 import bftsmart.reconfiguration.util.TOMConfiguration;
@@ -33,7 +33,7 @@ import bftsmart.tom.MessageContext;
 import bftsmart.tom.ReplicaContext;
 import bftsmart.tom.server.BatchExecutable;
 import bftsmart.tom.server.Recoverable;
-import bftsmart.tom.util.Logger;
+//import bftsmart.tom.util.Logger;
 
 /**
  *
@@ -43,7 +43,7 @@ import bftsmart.tom.util.Logger;
  * @author Joao Sousa
  */
 public abstract class DefaultRecoverable implements Recoverable, BatchExecutable {
-
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(DefaultRecoverable.class);
     private int checkpointPeriod;
     private ReentrantLock logLock = new ReentrantLock();
     private ReentrantLock hashLock = new ReentrantLock();
@@ -59,7 +59,7 @@ public abstract class DefaultRecoverable implements Recoverable, BatchExecutable
         try {
             md = MessageDigest.getInstance("MD5"); // TODO: shouldn't it be SHA?
         } catch (NoSuchAlgorithmException ex) {
-            java.util.logging.Logger.getLogger(DefaultRecoverable.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error("", ex);
         }
     }
 
@@ -141,7 +141,7 @@ public abstract class DefaultRecoverable implements Recoverable, BatchExecutable
                     stateLock.unlock();
                 }
 
-                Logger.println("(DefaultRecoverable.executeBatch) Storing message batch in the state log for consensus " + cid);
+                logger.info("(DefaultRecoverable.executeBatch) Storing message batch in the state log for consensus " + cid);
                 saveCommands(secondHalf, secondHalfMsgCtx);
 
                 System.arraycopy(secondHalfReplies, 0, replies, firstHalfReplies.length, secondHalfReplies.length);
@@ -175,14 +175,14 @@ public abstract class DefaultRecoverable implements Recoverable, BatchExecutable
 
         logLock.lock();
 
-        Logger.println("(TOMLayer.saveState) Saving state of CID " + lastCID);
+        logger.info("(TOMLayer.saveState) Saving state of CID " + lastCID);
 
         thisLog.newCheckpoint(snapshot, computeHash(snapshot), lastCID);
         thisLog.setLastCID(lastCID);
         thisLog.setLastCheckpointCID(lastCID);
 
         logLock.unlock();
-        Logger.println("(TOMLayer.saveState) Finished saving state of CID " + lastCID);
+        logger.info("(TOMLayer.saveState) Finished saving state of CID " + lastCID);
     }
 
     /**
@@ -247,8 +247,8 @@ public abstract class DefaultRecoverable implements Recoverable, BatchExecutable
 
             System.out.println("(DefaultRecoverable.setState) I'm going to update myself from CID "
                     + lastCheckpointCID + " to CID " + lastCID);
-            
-            bftsmart.tom.util.Logger.println("(DefaultRecoverable.setState) I'm going to update myself from CID "
+
+            logger.info("(DefaultRecoverable.setState) I'm going to update myself from CID "
                     + lastCheckpointCID + " to CID " + lastCID);
 
             stateLock.lock();
@@ -262,7 +262,7 @@ public abstract class DefaultRecoverable implements Recoverable, BatchExecutable
             for (int cid = lastCheckpointCID + 1; cid <= lastCID; cid++) {
                 try {
 
-                    bftsmart.tom.util.Logger.println("(DefaultRecoverable.setState) interpreting and verifying batched requests for cid " + cid);
+                    logger.info("(DefaultRecoverable.setState) interpreting and verifying batched requests for cid " + cid);
                     if (state.getMessageBatch(cid) == null) {
                         System.out.println("(DefaultRecoverable.setState) " + cid + " NULO!!!");
                     }
@@ -319,7 +319,7 @@ public abstract class DefaultRecoverable implements Recoverable, BatchExecutable
      * commands, it is necessary to identify if the batch contains checkpoint
      * indexes.
      *
-     * @param msgCtxs the contexts of the consensus where the messages where
+     * @param @msgCtxs the contexts of the consensus where the messages where
      * executed. There is one msgCtx message for each command to be executed
      *
      * @return the index in which a replica is supposed to take a checkpoint. If
@@ -351,7 +351,7 @@ public abstract class DefaultRecoverable implements Recoverable, BatchExecutable
      * transfer protocol to find the position of the log commands in the log
      * file.
      *
-     * @param msgCtx the message context of the commands executed by the
+     * @param @msgCtx the message context of the commands executed by the
      * replica. There is one message context for each command
      * @param cid the CID of the consensus where a replica took a checkpoint
      * @return the higher position where the CID appears

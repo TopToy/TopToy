@@ -51,7 +51,7 @@ import javax.crypto.SecretKey;
  * @author Joao Sousa
  */
 public class LCManager {
-
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(LCManager.class);
     //timestamp info
     private int lastreg;
     private int nextreg;
@@ -385,7 +385,7 @@ public class LCManager {
      */
     public boolean sound(HashSet<CollectData> collects) {
 
-        bftsmart.tom.util.Logger.println("(LCManager.sound) I collected the context from " + collects.size() + " replicas");
+        logger.info("(LCManager.sound) I collected the context from " + collects.size() + " replicas");
         
         if (collects == null) return false;
         
@@ -393,8 +393,8 @@ public class LCManager {
         HashSet<byte[]> values = new HashSet<byte[]>();
 
         for (CollectData c : collects) { // organize all existing timestamps and values separately
-            
-            bftsmart.tom.util.Logger.println("(LCManager.sound) Context for replica "+c.getPid()+": CID["+c.getCid()+"] WRITESET["+c.getWriteSet()+"] (VALTS,VAL)[" + c.getQuorumWrites() +"]");
+
+            logger.info("(LCManager.sound) Context for replica "+c.getPid()+": CID["+c.getCid()+"] WRITESET["+c.getWriteSet()+"] (VALTS,VAL)[" + c.getQuorumWrites() +"]");
             
             timestamps.add(c.getQuorumWrites().getTimestamp()); //store timestamp received from a Byzatine quorum of WRITES
             
@@ -426,30 +426,30 @@ public class LCManager {
 
         }
 
-        bftsmart.tom.util.Logger.println("(LCManager.sound) number of timestamps: "+timestamps.size());
-        bftsmart.tom.util.Logger.println("(LCManager.sound) number of values: "+values.size());
+        logger.info("(LCManager.sound) number of timestamps: "+timestamps.size());
+        logger.info("(LCManager.sound) number of values: "+values.size());
 
         // after having organized all timestamps and values, properly apply the predicate
         for (int r : timestamps) {
             for (byte[] v : values) {
 
-                bftsmart.tom.util.Logger.println("(LCManager.sound) testing predicate BIND for timestamp/value pair (" + r + " , " + Arrays.toString(v) + ")");
+                logger.info("(LCManager.sound) testing predicate BIND for timestamp/value pair (" + r + " , " + Arrays.toString(v) + ")");
                 if (binds(r, v, collects)) {
 
-                    bftsmart.tom.util.Logger.println("(LCManager.sound) Predicate BIND is true for timestamp/value pair (" + r + " , " + Arrays.toString(v) + ")");
-                    bftsmart.tom.util.Logger.println("(LCManager.sound) Predicate SOUND is true for the for context collected from N-F replicas");
+                    logger.info("(LCManager.sound) Predicate BIND is true for timestamp/value pair (" + r + " , " + Arrays.toString(v) + ")");
+                    logger.info("(LCManager.sound) Predicate SOUND is true for the for context collected from N-F replicas");
                     return true;
                 }
             }
         }
 
-        bftsmart.tom.util.Logger.println("(LCManager.sound) No timestamp/value pair passed on the BIND predicate");
+        logger.info("(LCManager.sound) No timestamp/value pair passed on the BIND predicate");
         
         boolean unbound = unbound(collects);
         
         if (unbound) {
-            bftsmart.tom.util.Logger.println("(LCManager.sound) Predicate UNBOUND is true for N-F replicas");
-            bftsmart.tom.util.Logger.println("(LCManager.sound) Predicate SOUND is true for the for context collected from N-F replicas");
+            logger.info("(LCManager.sound) Predicate UNBOUND is true for N-F replicas");
+            logger.info("(LCManager.sound) Predicate SOUND is true for the for context collected from N-F replicas");
         }
 
         return unbound;
@@ -469,12 +469,12 @@ public class LCManager {
     public boolean binds(int timestamp, byte[] value, HashSet<CollectData> collects) {
 
         if (value == null || collects == null) {
-            bftsmart.tom.util.Logger.println("(LCManager.binds) Received null objects, returning false");
+            logger.info("(LCManager.binds) Received null objects, returning false");
             return false;
         }
         
         if (!(collects.size() >= (SVController.getCurrentViewN() - SVController.getCurrentViewF()))) {
-            bftsmart.tom.util.Logger.println("(LCManager.binds) Less than N-F contexts collected from replicas, returning false");
+            logger.info("(LCManager.binds) Less than N-F contexts collected from replicas, returning false");
             return false;
         }
 
@@ -618,13 +618,13 @@ public class LCManager {
             }
         }
 
-        if (appears) bftsmart.tom.util.Logger.println("(LCManager.quorumHighest) timestamp/value pair (" + timestamp + " , " + Arrays.toString(value) + ") appears in at least one replica context");
+        if (appears) logger.info("(LCManager.quorumHighest) timestamp/value pair (" + timestamp + " , " + Arrays.toString(value) + ") appears in at least one replica context");
         
         int count = 0;
         for (CollectData c : collects) {
 
-            //bftsmart.tom.util.Logger.println("\t\t[QUORUM HIGHEST] ts' < ts : " + (c.getQuorumWrites().getTimestamp() < timestamp));
-            //bftsmart.tom.util.Logger.println("\t\t[QUORUM HIGHEST] ts' = ts && val' = val : " + (c.getQuorumWrites().getTimestamp() == timestamp && Arrays.equals(value, c.getQuorumWrites().getValue())));
+            //logger.info("\t\t[QUORUM HIGHEST] ts' < ts : " + (c.getQuorumWrites().getTimestamp() < timestamp));
+            //logger.info("\t\t[QUORUM HIGHEST] ts' = ts && val' = val : " + (c.getQuorumWrites().getTimestamp() == timestamp && Arrays.equals(value, c.getQuorumWrites().getValue())));
             
             if ((c.getQuorumWrites().getTimestamp() < timestamp)
                     || (c.getQuorumWrites().getTimestamp() == timestamp && Arrays.equals(value, c.getQuorumWrites().getValue())))
@@ -638,7 +638,7 @@ public class LCManager {
         else {
             quorum = count > ((SVController.getCurrentViewN())/2);
         }
-        if (quorum) bftsmart.tom.util.Logger.println("(LCManager.quorumHighest) timestamp/value pair (" + timestamp + " , " + Arrays.toString(value) +
+        if (quorum) logger.info("(LCManager.quorumHighest) timestamp/value pair (" + timestamp + " , " + Arrays.toString(value) +
                 ") has the highest timestamp among a " + (SVController.getStaticConf().isBFT() ? "Byzantine" : "simple") + " quorum of replica contexts");
         return appears && quorum;
     }
@@ -665,8 +665,8 @@ public class LCManager {
 
             for (TimestampValuePair pv : c.getWriteSet()) {
 
-//                bftsmart.tom.util.Logger.println("\t\t[CERTIFIED VALUE] " + pv.getTimestamp() + "  >= " + timestamp);
-//                bftsmart.tom.util.Logger.println("\t\t[CERTIFIED VALUE] " + Arrays.toString(value) + "  == " + Arrays.toString(pv.getValue()));
+//                logger.info("\t\t[CERTIFIED VALUE] " + pv.getTimestamp() + "  >= " + timestamp);
+//                logger.info("\t\t[CERTIFIED VALUE] " + Arrays.toString(value) + "  == " + Arrays.toString(pv.getValue()));
                 if (pv.getTimestamp() >= timestamp && Arrays.equals(value, pv.getHashedValue()))
                     count++;
             }
@@ -678,7 +678,7 @@ public class LCManager {
         } else {
             certified = count > 0;
         }
-        if (certified) bftsmart.tom.util.Logger.println("(LCManager.certifiedValue) timestamp/value pair (" + timestamp + " , " + Arrays.toString(value) +
+        if (certified) logger.info("(LCManager.certifiedValue) timestamp/value pair (" + timestamp + " , " + Arrays.toString(value) +
                 ") has been written by at least " + count + " replica(s)");
 
         return certified;
@@ -729,10 +729,8 @@ public class LCManager {
                 if (tomLayer.verifySignature(so, sender)) {
                     colls.add(c);
                 }
-            } catch (IOException ex) {
-                Logger.getLogger(LCManager.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (ClassNotFoundException ex) {
-                Logger.getLogger(LCManager.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException | ClassNotFoundException ex) {
+                logger.error("", ex);
             }
         }
 
@@ -835,7 +833,7 @@ public class LCManager {
 
             if (consMsg.getProof() instanceof HashMap) { // Certificate is made of MAC vector
                 
-                bftsmart.tom.util.Logger.println("(LCManager.hasValidProof) Proof made of MAC vector");
+                logger.info("(LCManager.hasValidProof) Proof made of MAC vector");
             
                 HashMap<Integer, byte[]> macVector = (HashMap<Integer, byte[]>) consMsg.getProof();
                                
@@ -860,7 +858,7 @@ public class LCManager {
                 }
             } else if (consMsg.getProof() instanceof byte[]) { // certificate is made of signatures
                 
-                bftsmart.tom.util.Logger.println("(LCManager.hasValidProof) Proof made of Signatures");
+                logger.info("(LCManager.hasValidProof) Proof made of Signatures");
                 pubRSAKey = SVController.getStaticConf().getRSAPublicKey(consMsg.getSender());
                    
                 byte[] signature = (byte[]) consMsg.getProof();
@@ -872,7 +870,7 @@ public class LCManager {
                 }
    
             } else {
-                bftsmart.tom.util.Logger.println("(LCManager.hasValidProof) Proof is message is invalid");
+                logger.info("(LCManager.hasValidProof) Proof is message is invalid");
             }
         }
         
@@ -881,7 +879,7 @@ public class LCManager {
         // To understand why this is important, check the comments in Acceptor.computeWrite()
                 
         if (certificateLastView != -1 && pubRSAKey != null)
-            bftsmart.tom.util.Logger.println("(LCManager.hasValidProof) Computing certificate based on previous view");
+            logger.info("(LCManager.hasValidProof) Computing certificate based on previous view");
         
         //return countValid >= certificateCurrentView;
         return countValid >=  (certificateLastView != -1 && pubRSAKey != null ? certificateLastView : certificateCurrentView);

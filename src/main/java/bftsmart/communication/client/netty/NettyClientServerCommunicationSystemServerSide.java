@@ -41,17 +41,18 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.ArrayList;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.logging.Level;
+//import java.util.logging.Level;
 
 import javax.crypto.Mac;
 
+import org.apache.log4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import bftsmart.communication.client.CommunicationSystemServerSide;
 import bftsmart.communication.client.RequestReceiver;
 import bftsmart.reconfiguration.ServerViewController;
 import bftsmart.tom.core.messages.TOMMessage;
-import bftsmart.tom.util.Logger;
+//import bftsmart.tom.util.Logger;
 import bftsmart.tom.util.TOMUtil;
 
 /**
@@ -60,7 +61,7 @@ import bftsmart.tom.util.TOMUtil;
  */
 @Sharable
 public class NettyClientServerCommunicationSystemServerSide extends SimpleChannelInboundHandler<TOMMessage> implements CommunicationSystemServerSide {
-
+	private final static Logger logger = Logger.getLogger(NettyClientServerCommunicationSystemServerSide.class);
 	private RequestReceiver requestReceiver;
 	private HashMap sessionTable;
 	private ReentrantReadWriteLock rl;
@@ -71,7 +72,7 @@ public class NettyClientServerCommunicationSystemServerSide extends SimpleChanne
         // This locked seems to introduce a bottleneck and seems useless, but I cannot recall why I added it
 	//private ReentrantLock sendLock = new ReentrantLock();
 	private NettyServerPipelineFactory serverPipelineFactory;
-    private org.slf4j.Logger logger = LoggerFactory.getLogger(NettyClientServerCommunicationSystemServerSide.class);
+//    private org.slf4j.Logger logger = LoggerFactory.getLogger(NettyClientServerCommunicationSystemServerSide.class);
 
 	public NettyClientServerCommunicationSystemServerSide(ServerViewController controller) {
 		try {
@@ -154,7 +155,7 @@ public class NettyClientServerCommunicationSystemServerSide extends SimpleChanne
 
             }
             
-            java.util.logging.Logger.getLogger(NettyClientServerCommunicationSystemServerSide.class.getName()).log(Level.INFO, "NettyClientServerCommunicationSystemServerSide is halting.");
+            logger.info("NettyClientServerCommunicationSystemServerSide is halting.");
 
         }
         
@@ -196,7 +197,7 @@ public class NettyClientServerCommunicationSystemServerSide extends SimpleChanne
                     closeChannelAndEventLoop(ctx.channel());
                     return;
                 }
-		Logger.println("Session Created, active clients=" + sessionTable.size());
+		logger.info("Session Created, active clients=" + sessionTable.size());
 		System.out.println("Session Created, active clients=" + sessionTable.size());
 	}
 
@@ -229,7 +230,7 @@ public class NettyClientServerCommunicationSystemServerSide extends SimpleChanne
 		} finally {
 			rl.writeLock().unlock();
 		}
-		Logger.println("Session Closed, active clients=" + sessionTable.size());
+		logger.info("Session Closed, active clients=" + sessionTable.size());
 	}
 
 	@Override
@@ -252,7 +253,7 @@ public class NettyClientServerCommunicationSystemServerSide extends SimpleChanne
 			data = baos.toByteArray();
 			sm.serializedMessage = data;
 		} catch (IOException ex) {
-			Logger.println("Error enconding message.");
+			logger.info("Error enconding message.");
 		} finally {
 			try {
 				dos.close();
@@ -302,7 +303,7 @@ public class NettyClientServerCommunicationSystemServerSide extends SimpleChanne
                                                     try {
                                                         Thread.sleep(1000);
                                                     } catch (InterruptedException ex) {
-                                                        java.util.logging.Logger.getLogger(NettyClientServerCommunicationSystemServerSide.class.getName()).log(Level.SEVERE, null, ex);
+                                                        logger.error("", ex);
                                                     }
                                                     
                                                     ncss = (NettyClientServerSession) sessionTable.get(id);

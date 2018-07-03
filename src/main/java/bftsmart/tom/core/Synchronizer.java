@@ -23,7 +23,7 @@ import bftsmart.tom.leaderchange.LCMessage;
 import bftsmart.tom.leaderchange.CertifiedDecision;
 import bftsmart.tom.util.BatchBuilder;
 import bftsmart.tom.util.BatchReader;
-import bftsmart.tom.util.Logger;
+//import bftsmart.tom.util.Logger;
 import bftsmart.tom.util.TOMUtil;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -50,7 +51,7 @@ import org.apache.commons.codec.binary.Base64;
  * @author joao
  */
 public class Synchronizer {
-
+    private final static Logger logger = Logger.getLogger(Synchronizer.class);
     // out of context messages related to the leader change are stored here
     private final HashSet<LCMessage> outOfContextLC;
 
@@ -170,14 +171,14 @@ public class Synchronizer {
 
             } catch (IOException ex) {
                 ex.printStackTrace();
-                java.util.logging.Logger.getLogger(TOMLayer.class.getName()).log(Level.SEVERE, null, ex);
+                logger.error("", ex);
             } finally {
                 try {
                     out.close();
                     bos.close();
                 } catch (IOException ex) {
                     ex.printStackTrace();
-                    java.util.logging.Logger.getLogger(TOMLayer.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.error("", ex);
                 }
             }
 
@@ -195,14 +196,14 @@ public class Synchronizer {
     // ahead of the replica's expected regency
     private void processOutOfContextSTOPs(int regency) {
 
-        Logger.println("(Synchronizer.processOutOfContextSTOPs) Checking if there are out of context STOPs for regency " + regency);
+        logger.info("(Synchronizer.processOutOfContextSTOPs) Checking if there are out of context STOPs for regency " + regency);
 
         Set<LCMessage> stops = getOutOfContextLC(TOMUtil.STOP, regency);
 
         if (stops.size() > 0) {
             System.out.println("(Synchronizer.processOutOfContextSTOPs) Processing " + stops.size() + " out of context STOPs for regency " + regency);
         } else {
-            Logger.println("(Synchronizer.processOutOfContextSTOPs) No out of context STOPs for regency " + regency);
+            logger.info("(Synchronizer.processOutOfContextSTOPs) No out of context STOPs for regency " + regency);
         }
 
         for (LCMessage m : stops) {
@@ -315,13 +316,9 @@ public class Synchronizer {
             ois.close();
             bis.close();
 
-        } catch (IOException ex) {
+        } catch (IOException | ClassNotFoundException ex) {
             ex.printStackTrace();
-            java.util.logging.Logger.getLogger(TOMLayer.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
-            ex.printStackTrace();
-            java.util.logging.Logger.getLogger(TOMLayer.class.getName()).log(Level.SEVERE, null, ex);
-
+            logger.error("", ex);
         }
     }
 
@@ -375,13 +372,9 @@ public class Synchronizer {
             ois.close();
             bis.close();
 
-        } catch (IOException ex) {
+        } catch (IOException | ClassNotFoundException ex) {
             ex.printStackTrace();
-            java.util.logging.Logger.getLogger(TOMLayer.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
-            ex.printStackTrace();
-            java.util.logging.Logger.getLogger(TOMLayer.class.getName()).log(Level.SEVERE, null, ex);
-
+            logger.error("", ex);
         }
 
         return requests;
@@ -411,7 +404,7 @@ public class Synchronizer {
             }
         }
 
-        Logger.println("(Synchronizer.getRequestsToRelay) I need to relay " + messages.size() + " requests");
+        logger.info("(Synchronizer.getRequestsToRelay) I need to relay " + messages.size() + " requests");
 
         return messages;
     }
@@ -422,7 +415,7 @@ public class Synchronizer {
         List<TOMMessage> messagesFromSTOP = lcManager.getRequestsFromSTOP();
         if (messagesFromSTOP != null) {
 
-            Logger.println("(Synchronizer.addRequestsToClientManager) Adding to client manager the requests contained in STOP messages");
+            logger.info("(Synchronizer.addRequestsToClientManager) Adding to client manager the requests contained in STOP messages");
 
             for (TOMMessage m : messagesFromSTOP) {
                 tom.requestReceived(m);
@@ -462,7 +455,7 @@ public class Synchronizer {
         // Ask to start the synchronizations phase if enough messages have been received already
         if (condition && lcManager.getNextReg() == lcManager.getLastReg()) {
             
-            Logger.println("(Synchronizer.startSynchronization) initialize synch phase");
+            logger.info("(Synchronizer.startSynchronization) initialize synch phase");
             requestsTimer.Enabled(false);
             requestsTimer.stopTimer();
 
@@ -513,14 +506,14 @@ public class Synchronizer {
 
             } catch (IOException ex) {
                 ex.printStackTrace();
-                java.util.logging.Logger.getLogger(TOMLayer.class.getName()).log(Level.SEVERE, null, ex);
+                logger.error("", ex);
             } finally {
                 try {
                     out.close();
                     bos.close();
                 } catch (IOException ex) {
                     ex.printStackTrace();
-                    java.util.logging.Logger.getLogger(TOMLayer.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.error("", ex);
                 }
             }
         }
@@ -537,7 +530,7 @@ public class Synchronizer {
             
             if (!execManager.stopped()) execManager.stop(); // stop consensus execution if more than f replicas sent a STOP message
 
-            Logger.println("(Synchronizer.startSynchronization) installing regency " + lcManager.getNextReg());
+            logger.info("(Synchronizer.startSynchronization) installing regency " + lcManager.getNextReg());
             lcManager.setLastReg(lcManager.getNextReg()); // define last timestamp
 
             int regency = lcManager.getLastReg();
@@ -621,8 +614,8 @@ public class Synchronizer {
                         //int ets = cons.getEts();
                         //cons.createEpoch(ets, controller);
                         cons.createEpoch(regency, controller);
-                        //Logger.println("(Synchronizer.startSynchronization) incrementing ets of consensus " + cons.getId() + " to " + ets);
-                        Logger.println("(Synchronizer.startSynchronization) incrementing ets of consensus " + cons.getId() + " to " + regency);
+                        //logger.info("(Synchronizer.startSynchronization) incrementing ets of consensus " + cons.getId() + " to " + ets);
+                        logger.info("(Synchronizer.startSynchronization) incrementing ets of consensus " + cons.getId() + " to " + regency);
 
                         TimestampValuePair quorumWrites;
                         if (cons.getQuorumWrites() != null) {
@@ -653,8 +646,8 @@ public class Synchronizer {
                         //int ets = cons.getEts();
                         //cons.createEpoch(ets, controller);
                         cons.createEpoch(regency, controller);
-                        //Logger.println("(Synchronizer.startSynchronization) incrementing ets of consensus " + cons.getId() + " to " + ets);
-                        Logger.println("(Synchronizer.startSynchronization) incrementing ets of consensus " + cons.getId() + " to " + regency);
+                        //logger.info("(Synchronizer.startSynchronization) incrementing ets of consensus " + cons.getId() + " to " + ets);
+                        logger.info("(Synchronizer.startSynchronization) incrementing ets of consensus " + cons.getId() + " to " + regency);
 
                         //CollectData collect = new CollectData(this.controller.getStaticConf().getProcessId(), last + 1, ets, new TimestampValuePair(0, new byte[0]), new HashSet<TimestampValuePair>());
                         CollectData collect = new CollectData(this.controller.getStaticConf().getProcessId(), last + 1, regency, new TimestampValuePair(0, new byte[0]), new HashSet<TimestampValuePair>());
@@ -683,26 +676,26 @@ public class Synchronizer {
 		//TODO: Turn on timeout again?
                 } catch (IOException ex) {
                     ex.printStackTrace();
-                    java.util.logging.Logger.getLogger(TOMLayer.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.error("", ex);
                 } finally {
                     try {
                         out.close();
                         bos.close();
                     } catch (IOException ex) {
                         ex.printStackTrace();
-                        java.util.logging.Logger.getLogger(TOMLayer.class.getName()).log(Level.SEVERE, null, ex);
+                        logger.error("", ex);
                     }
                 }
 
                 // the replica might have received a SYNC that was out of context at the time it was received, but now can be processed
                 Set<LCMessage> sync = getOutOfContextLC(TOMUtil.SYNC, regency);
 
-                Logger.println("(Synchronizer.startSynchronization) Checking if there are out of context SYNC for regency " + regency);
+                logger.info("(Synchronizer.startSynchronization) Checking if there are out of context SYNC for regency " + regency);
 
                 if (sync.size() > 0) {
                     System.out.println("(Synchronizer.startSynchronization) Processing out of context SYNC for regency " + regency);
                 } else {
-                    Logger.println("(Synchronizer.startSynchronization) No out of context SYNC for regency " + regency);
+                    logger.info("(Synchronizer.startSynchronization) No out of context SYNC for regency " + regency);
                 }
 
                 for (LCMessage m : sync) {
@@ -714,7 +707,7 @@ public class Synchronizer {
 
             } else { // If leader, I will store information that I would send in a SYNC message
 
-                Logger.println("(Synchronizer.startSynchronization) I'm the leader for this new regency");
+                logger.info("(Synchronizer.startSynchronization) I'm the leader for this new regency");
                 CertifiedDecision lastDec = null;
                 CollectData collect = null;
 
@@ -769,8 +762,8 @@ public class Synchronizer {
                     //int ets = cons.getEts();
                     //cons.createEpoch(ets, controller);
                     cons.createEpoch(regency, controller);
-                    //Logger.println("(Synchronizer.startSynchronization) incrementing ets of consensus " + cons.getId() + " to " + ets);
-                    Logger.println("(Synchronizer.startSynchronization) incrementing ets of consensus " + cons.getId() + " to " + regency);
+                    //logger.info("(Synchronizer.startSynchronization) incrementing ets of consensus " + cons.getId() + " to " + ets);
+                    logger.info("(Synchronizer.startSynchronization) incrementing ets of consensus " + cons.getId() + " to " + regency);
 
                     TimestampValuePair quorumWrites;
 
@@ -796,8 +789,8 @@ public class Synchronizer {
                     //int ets = cons.getEts();
                     //cons.createEpoch(ets, controller);
                     cons.createEpoch(regency, controller);
-                    //Logger.println("(Synchronizer.startSynchronization) incrementing ets of consensus " + cons.getId() + " to " + ets);
-                    Logger.println("(Synchronizer.startSynchronization) incrementing ets of consensus " + cons.getId() + " to " + regency);
+                    //logger.info("(Synchronizer.startSynchronization) incrementing ets of consensus " + cons.getId() + " to " + ets);
+                    logger.info("(Synchronizer.startSynchronization) incrementing ets of consensus " + cons.getId() + " to " + regency);
 
                     //collect = new CollectData(this.controller.getStaticConf().getProcessId(), last + 1, ets, new TimestampValuePair(0, new byte[0]), new HashSet<TimestampValuePair>());
                     collect = new CollectData(this.controller.getStaticConf().getProcessId(), last + 1, regency, new TimestampValuePair(0, new byte[0]), new HashSet<TimestampValuePair>());
@@ -810,11 +803,11 @@ public class Synchronizer {
                 // the replica might have received STOPDATAs that were out of context at the time they were received, but now can be processed
                 Set<LCMessage> stopdatas = getOutOfContextLC(TOMUtil.STOPDATA, regency);
 
-                Logger.println("(Synchronizer.startSynchronization) Checking if there are out of context STOPDATAs for regency " + regency);
+                logger.info("(Synchronizer.startSynchronization) Checking if there are out of context STOPDATAs for regency " + regency);
                 if (stopdatas.size() > 0) {
                     System.out.println("(Synchronizer.startSynchronization) Processing " + stopdatas.size() + " out of context STOPDATAs for regency " + regency);
                 } else {
-                    Logger.println("(Synchronizer.startSynchronization) No out of context STOPDATAs for regency " + regency);
+                    logger.info("(Synchronizer.startSynchronization) No out of context STOPDATAs for regency " + regency);
                 }
 
                 for (LCMessage m : stopdatas) {
@@ -842,7 +835,7 @@ public class Synchronizer {
                 // this message is for the next leader change?
                 if (msg.getReg() == lcManager.getLastReg() + 1) {
 
-                    Logger.println("(Synchronizer.deliverTimeoutRequest) received regency change request");
+                    logger.info("(Synchronizer.deliverTimeoutRequest) received regency change request");
 
                     TOMMessage[] requests = deserializeTOMMessages(msg.getPayload());
 
@@ -878,7 +871,7 @@ public class Synchronizer {
                 if (regency == lcManager.getLastReg()
                         && this.controller.getStaticConf().getProcessId() == execManager.getCurrentLeader()/*(regency % this.reconfManager.getCurrentViewN())*/) {
 
-                    Logger.println("(Synchronizer.deliverTimeoutRequest) I'm the new leader and I received a STOPDATA");
+                    logger.info("(Synchronizer.deliverTimeoutRequest) I'm the new leader and I received a STOPDATA");
                     processSTOPDATA(msg, regency);
                 } else if (msg.getReg() > lcManager.getLastReg()) { // send STOPDATA to out of context if
                                                                     // it is for a future regency
@@ -936,7 +929,7 @@ public class Synchronizer {
     // and also sends the message
     private void catch_up(int regency) {
 
-        Logger.println("(Synchronizer.catch_up) verify STOPDATA info");
+        logger.info("(Synchronizer.catch_up) verify STOPDATA info");
         ObjectOutputStream out = null;
         ByteArrayOutputStream bos = null;
 
@@ -950,7 +943,7 @@ public class Synchronizer {
         // normalize the collects and apply to them the predicate "sound"
         if (lcManager.sound(lcManager.selectCollects(regency, currentCID))) {
 
-            Logger.println("(Synchronizer.catch_up) sound predicate is true");
+            logger.info("(Synchronizer.catch_up) sound predicate is true");
 
             signedCollects = lcManager.getCollects(regency); // all original collects that the replica has received
 
@@ -988,14 +981,14 @@ public class Synchronizer {
 
             } catch (IOException ex) {
                 ex.printStackTrace();
-                java.util.logging.Logger.getLogger(TOMLayer.class.getName()).log(Level.SEVERE, null, ex);
+                logger.error("", ex);
             } finally {
                 try {
                     out.close();
                     bos.close();
                 } catch (IOException ex) {
                     ex.printStackTrace();
-                    java.util.logging.Logger.getLogger(TOMLayer.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.error("", ex);
                 }
             }
         }
@@ -1033,7 +1026,7 @@ public class Synchronizer {
             HashSet<SignedObject> signedCollects, byte[] propose, int batchSize, boolean iAmLeader) {
 
         int currentCID = lastHighestCID.getCID() + 1;
-        Logger.println("(Synchronizer.finalise) final stage of LC protocol");
+        logger.info("(Synchronizer.finalise) final stage of LC protocol");
         int me = this.controller.getStaticConf().getProcessId();
         Consensus cons = null;
         Epoch e = null;
@@ -1134,19 +1127,19 @@ public class Synchronizer {
         HashSet<CollectData> selectedColls = lcManager.selectCollects(signedCollects, currentCID, regency);
 
         tmpval = lcManager.getBindValue(selectedColls);
-        Logger.println("(Synchronizer.finalise) Trying to find a binded value");
+        logger.info("(Synchronizer.finalise) Trying to find a binded value");
 
         // If such value does not exist, obtain the value written by the new leader
         if (tmpval == null && lcManager.unbound(selectedColls)) {
-            Logger.println("(Synchronizer.finalise) did not found a value that might have already been decided");
+            logger.info("(Synchronizer.finalise) did not found a value that might have already been decided");
             tmpval = propose;
         } else {
-            Logger.println("(Synchronizer.finalise) found a value that might have been decided");
+            logger.info("(Synchronizer.finalise) found a value that might have been decided");
         }
 
         if (tmpval != null) { // did I manage to get some value?
 
-            Logger.println("(Synchronizer.finalise) resuming normal phase");
+            logger.info("(Synchronizer.finalise) resuming normal phase");
             lcManager.removeCollects(regency); // avoid memory leaks
 
             // stop the re-transmission of the STOP message for all regencies up to this one
@@ -1217,7 +1210,7 @@ public class Synchronizer {
                 e.setAccept(me, hash);
 
                 /********* LEADER CHANGE CODE ********/
-                Logger.println("(Synchronizer.finalise) [CFT Mode] Setting consensus " + currentCID + " QuorumWrite tiemstamp to " + e.getConsensus().getEts() + " and value " + Arrays.toString(hash));
+                logger.info("(Synchronizer.finalise) [CFT Mode] Setting consensus " + currentCID + " QuorumWrite tiemstamp to " + e.getConsensus().getEts() + " and value " + Arrays.toString(hash));
  	        e.getConsensus().setQuorumWrites(hash);
                 /*************************************/
 
@@ -1228,7 +1221,7 @@ public class Synchronizer {
             //leaderChanged = true;
             tom.setInExec(currentCID);
             if (iAmLeader) {
-                Logger.println("(Synchronizer.finalise) wake up proposer thread");
+                logger.info("(Synchronizer.finalise) wake up proposer thread");
                 tom.imAmTheLeader();
             } // waik up the thread that propose values in normal operation
 
@@ -1243,7 +1236,7 @@ public class Synchronizer {
                         acceptor.getFactory().createAccept(currentCID, e.getTimestamp(), e.propValueHash));
             }
         } else {
-            Logger.println("(Synchronizer.finalise) sync phase failed for regency" + regency);
+            logger.info("(Synchronizer.finalise) sync phase failed for regency" + regency);
         }
     }
 

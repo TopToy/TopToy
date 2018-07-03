@@ -109,8 +109,8 @@ public class Storage {
             quad = quad + values[i]*values[i]; //Math.pow(values[i],2);
         }
         double var = (quad - (num*(med*med)))/(num-1);
-        ////br.ufsc.das.util.Logger.println("mim: "+values[limit]);
-        ////br.ufsc.das.util.Logger.println("max: "+values[values.length-limit-1]);
+        ////br.ufsc.das.util.logger.info("mim: "+values[limit]);
+        ////br.ufsc.das.util.logger.info("max: "+values[values.length-limit-1]);
         return Math.sqrt(var);
     }
     
