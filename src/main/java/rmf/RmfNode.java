@@ -8,8 +8,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class RmfNode extends Node{
-    RmfService rmfService;
-    Server rmfServer;
+    private RmfService rmfService;
+    private Server rmfServer;
     public RmfNode(String addr, int port, int id, int f, int tmoInterval, int tmo, ArrayList<Node> nodes) {
         super(addr, port, id);
         rmfService = new RmfService(id, f, tmoInterval, tmo, nodes);
