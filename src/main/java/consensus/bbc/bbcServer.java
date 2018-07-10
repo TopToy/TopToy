@@ -28,22 +28,41 @@ public class bbcServer extends DefaultSingleRecoverable {
     private Condition consEnd;
     private int quorumSize;
     private String configHome;
+    ServiceReplica sr;
 
     public bbcServer(int id, int quorumSize, String configHome) {
         this.id = id;
         rec = new TreeMap<>();
-//        done = new ArrayList<>();
         lock = new ReentrantLock();
         consEnd = lock.newCondition();
+        sr = null;
         this.quorumSize = quorumSize;
         this.configHome = configHome;
 
     }
 
     public void start() {
-        new ServiceReplica(id, this, this, configHome);
+         sr = new ServiceReplica(id, this, this, configHome);
+         Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                // Use stderr here since the logger may have been reset by its JVM shutdown hook.
+                if (sr != null) {
+                    logger.warn("*** shutting down bbc server since JVM is shutting down");
+                    sr.kill();
+                    logger.warn("*** server shut down");
+                }
+            }
+        });
     }
-
+    public void shutdown() {
+        logger.info("shutting down bbc server [id:" + id + "]");
+        if (sr != null) {
+            sr.kill();
+            logger.info("bbc server has been shutting down successfully [id:" + id + "]");
+            sr = null;
+        }
+    }
     @Override
     public void installSnapshot(byte[] state) {
         logger.info("installSnapshot called");

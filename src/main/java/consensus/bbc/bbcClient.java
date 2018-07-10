@@ -10,11 +10,11 @@ import proto.BbcProtos;
 
 public class bbcClient {
     int id;
-    AsynchServiceProxy vpbcProxy;
+    AsynchServiceProxy bbcProxy;
 
     public bbcClient(int id, String configHome) {
         this.id = id;
-        vpbcProxy = new AsynchServiceProxy(id, configHome);
+        bbcProxy = new AsynchServiceProxy(id, configHome);
     }
 
     public int propose(int vote, int consID) {
@@ -24,7 +24,7 @@ public class bbcClient {
         b.setVote(vote);
         BbcProtos.BbcMsg msg= b.build();
         byte[] data = msg.toByteArray();
-        vpbcProxy.invokeAsynchRequest(data, new ReplyListener() {
+        bbcProxy.invokeAsynchRequest(data, new ReplyListener() {
             @Override
             public void reset() {
 
@@ -44,6 +44,6 @@ public class bbcClient {
     }
 
     public void close() {
-        vpbcProxy.close();
+        bbcProxy.close();
     }
 }

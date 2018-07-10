@@ -47,6 +47,7 @@ public class RmfNode extends Node{
 
     public void stop() {
         rmfServer.shutdown();
+        rmfService.shutdown();
     }
 
     public void blockUntilShutdown() throws InterruptedException {

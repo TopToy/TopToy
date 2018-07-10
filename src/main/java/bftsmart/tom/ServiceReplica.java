@@ -238,12 +238,16 @@ public class ServiceReplica {
 
             @Override
             public void run() {
-                if (tomLayer != null) {   
+                if (tomLayer != null) {
                     tomLayer.shutdown();
-                }     
+                }
             }
         };
         t.start();
+//        if (tomLayer != null) {
+//            tomLayer.shutdown();
+//        }
+        logger.info("Service replica as been shutdown");
     }
         
     public void restart() {        
