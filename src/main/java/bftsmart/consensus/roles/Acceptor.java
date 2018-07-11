@@ -76,7 +76,7 @@ public final class Acceptor {
             //this.cipher = Cipher.getInstance(ServerConnection.MAC_ALGORITHM);
             this.mac = Mac.getInstance(ServerConnection.MAC_ALGORITHM);
         } catch (NoSuchAlgorithmException /*| NoSuchPaddingException*/ ex) {
-            ex.printStackTrace();
+            logger.error("", ex);
         }
     }
 
@@ -314,7 +314,7 @@ public final class Acceptor {
         try {
             new ObjectOutputStream(bOut).writeObject(cm);
         } catch (IOException ex) {
-            ex.printStackTrace();
+            logger.error("", ex);
         }
 
         byte[] data = bOut.toByteArray();
@@ -367,11 +367,11 @@ public final class Acceptor {
                     this.mac.init(key);
                     macVector.put(id, this.mac.doFinal(data));
                 } catch (InterruptedException ex) {
-                    ex.printStackTrace();
+                    logger.error("", ex);
                 } catch (InvalidKeyException ex) {
 
                     logger.info("Problem with secret key from " + id);
-                    ex.printStackTrace();
+                    logger.error("", ex);
                 }
             }
 

@@ -31,7 +31,7 @@ import java.util.Arrays;
 import bftsmart.reconfiguration.ViewController;
 
 public class TOMUtil {
-
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(TOMUtil.class);
     //private static final int BENCHMARK_PERIOD = 10000;
 
     //some message types
@@ -78,7 +78,7 @@ public class TOMUtil {
             obOut.close();
             bOut.close();
         } catch (IOException ex) {
-            ex.printStackTrace();
+            logger.error("", ex);
             return null;
         }
 
@@ -122,7 +122,7 @@ public class TOMUtil {
 
             result = signatureEngine.sign();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("", e);
         }
 
         return result;
@@ -147,7 +147,7 @@ public class TOMUtil {
 
             result = verifySignature(signatureEngine, message, signature);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("", e);
         }
 
         return result;
@@ -190,7 +190,7 @@ public class TOMUtil {
             result = md.digest(data);
             
         } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
+            logger.error("", e);
         } // TODO: shouldn't it be SHA?
                 
         return result;

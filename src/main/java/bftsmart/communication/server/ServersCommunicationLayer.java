@@ -169,7 +169,7 @@ public class ServersCommunicationLayer extends Thread {
                     //******* EDUARDO END **************//
                 }
             } catch (InterruptedException ex) {
-                ex.printStackTrace();
+                logger.error("", ex);
             }
         }
     }
@@ -184,9 +184,9 @@ public class ServersCommunicationLayer extends Thread {
         int[] activeServers = controller.getCurrentViewAcceptors();
 
         for (int i = 0; i < activeServers.length; i++) {
-            //if (connections[i] != null) {
-            //  connections[i].shutdown();
-            //}
+//            if (connections[i] != null) {
+//              connections[i].shutdown();
+//            }
             if (me != activeServers[i]) {
                 getConnection(activeServers[i]).shutdown();
             }
@@ -201,7 +201,7 @@ public class ServersCommunicationLayer extends Thread {
             try {
                 establishConnection(pc.s, pc.remoteId);
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error("", e);
             }
         }
 

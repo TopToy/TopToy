@@ -234,20 +234,20 @@ public class ServiceReplica {
         
     public void kill() {        
         
-        Thread t = new Thread() {
-
-            @Override
-            public void run() {
-                if (tomLayer != null) {
-                    tomLayer.shutdown();
-                }
-            }
-        };
-        t.start();
-//        if (tomLayer != null) {
-//            tomLayer.shutdown();
-//        }
-        logger.info("Service replica as been shutdown");
+//        Thread t = new Thread() {
+//
+//            @Override
+//            public void run() {
+//                if (tomLayer != null) {
+//                    tomLayer.shutdown();
+//                }
+//            }
+//        };
+//        t.start();
+        if (tomLayer != null) {
+            tomLayer.shutdown();
+        }
+        logger.info("Service replica has been shutdown");
     }
         
     public void restart() {        

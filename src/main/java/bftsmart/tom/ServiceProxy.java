@@ -222,7 +222,7 @@ public class ServiceProxy extends TOMSender {
 				}
 			}
 		} catch (InterruptedException ex) {
-			ex.printStackTrace();
+			logger.error("", ex);
 		}
 
 		logger.info("Response extracted = " + response);
@@ -392,7 +392,7 @@ public class ServiceProxy extends TOMSender {
 			canReceiveLock.unlock();
 		} catch (Exception ex) {
 			logger.info("Problem at ServiceProxy.ReplyReceived()");
-			ex.printStackTrace();
+			logger.error("", ex);
 			canReceiveLock.unlock();
 		}
 	}

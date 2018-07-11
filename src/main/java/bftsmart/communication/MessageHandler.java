@@ -54,7 +54,7 @@ public class MessageHandler {
             //this.cipher = Cipher.getInstance("DES/ECB/PKCS5Padding");
             this.mac = Mac.getInstance(ServerConnection.MAC_ALGORITHM);
         } catch (NoSuchAlgorithmException /*| NoSuchPaddingException*/ ex) {
-            ex.printStackTrace();
+            logger.error("", ex);
         }
     }
     public void setAcceptor(Acceptor acceptor) {
@@ -88,7 +88,7 @@ public class MessageHandler {
                 try {
                     new ObjectOutputStream(bOut).writeObject(cm);
                 } catch (IOException ex) {
-                    ex.printStackTrace();
+                    logger.error("", ex);
                 }
 
                 byte[] data = bOut.toByteArray();
@@ -105,7 +105,7 @@ public class MessageHandler {
                     this.mac.init(key);                   
                     myMAC = this.mac.doFinal(data);
                 } catch (/*IllegalBlockSizeException | BadPaddingException |*/ InvalidKeyException ex) {
-                    ex.printStackTrace();
+                    logger.error("", ex);
                 }
                 
                 if (recvMAC != null && myMAC != null && Arrays.equals(recvMAC, myMAC))

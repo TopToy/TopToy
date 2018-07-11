@@ -124,9 +124,9 @@ public class NettyClientServerCommunicationSystemServerSide extends SimpleChanne
                         mainChannel = f.channel();
 
 		} catch (NoSuchAlgorithmException ex) {
-			ex.printStackTrace();
+			logger.error("", ex);
 		} catch (InterruptedException ex) {
-			ex.printStackTrace();
+			logger.error("", ex);
 		}
 	}
 

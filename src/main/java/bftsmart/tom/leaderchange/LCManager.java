@@ -100,7 +100,7 @@ public class LCManager {
             //this.cipher = Cipher.getInstance(ServerConnection.MAC_ALGORITHM);
             this.mac = Mac.getInstance(ServerConnection.MAC_ALGORITHM);
         } catch (NoSuchAlgorithmException /*| NoSuchPaddingException*/ ex) {
-            ex.printStackTrace();
+            logger.error("", ex);
         }
 
     }
@@ -826,7 +826,7 @@ public class LCManager {
             try {
                 new ObjectOutputStream(bOut).writeObject(cm);
             } catch (IOException ex) {
-                ex.printStackTrace();
+                logger.error("", ex);
             }
 
             byte[] data = bOut.toByteArray();
@@ -846,7 +846,7 @@ public class LCManager {
                     this.mac.init(secretKey);                   
                    myMAC = this.mac.doFinal(data);
                 } catch (InvalidKeyException ex) {
-                    ex.printStackTrace();
+                    logger.error("", ex);
                 }
             
                 if (recvMAC != null && myMAC != null && Arrays.equals(recvMAC, myMAC) &&

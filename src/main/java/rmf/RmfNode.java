@@ -12,18 +12,18 @@ import java.util.ArrayList;
 
 public class RmfNode extends Node{
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(RmfNode.class);
-
+    private boolean stopped = false;
     private RmfService rmfService;
     private Server rmfServer;
     int height;
     public RmfNode(int id, String addr, int port, int f, int tmoInterval, int tmo, ArrayList<Node> nodes, String bbcConfig) {
         super(addr, port, id);
         rmfService = new RmfService(id, f, tmoInterval, tmo, nodes, bbcConfig);
-        start();
+        startGrpcServer();
 //        height = 0;
     }
 
-    private void start() {
+    private void startGrpcServer() {
         try {
             rmfServer = ServerBuilder.
                     forPort(getPort()).
@@ -31,12 +31,13 @@ public class RmfNode extends Node{
                     build().
                     start();
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("", e);
         }
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
+                if (stopped) return;
                 // Use stderr here since the logger may have been reset by its JVM shutdown hook.
                 logger.warn("*** shutting down gRPC server since JVM is shutting down");
                 RmfNode.this.stop();
@@ -48,6 +49,7 @@ public class RmfNode extends Node{
     public void stop() {
         rmfServer.shutdown();
         rmfService.shutdown();
+        stopped = true;
     }
 
     public void blockUntilShutdown() throws InterruptedException {
@@ -58,7 +60,7 @@ public class RmfNode extends Node{
     }
 
     // This should be called only after all servers are running (as this object contains also the client logic)
-    public void startService() {
+    public void start() {
         rmfService.start();
     }
 
@@ -76,9 +78,8 @@ public class RmfNode extends Node{
         rmfService.rmfBroadcast(dataMsg);
     }
 
-    public byte[] deliver(int height) {
-        byte[] msg = rmfService.deliver(height);
-        return msg;
+    public byte[] deliver(int height, int sender) {
+        return rmfService.deliver(height, sender);
     }
 
 

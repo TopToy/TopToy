@@ -16,7 +16,8 @@ import java.util.concurrent.TimeUnit;
  * @author snake
  */
 public class ReplyManager {
-    
+
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ReplyManager.class);
     private LinkedList<ReplyThread> threads;
     private int iteration;
     
@@ -41,7 +42,8 @@ public class ReplyManager {
     }
 }
 class ReplyThread extends Thread {
-    
+
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ReplyThread.class);
     private static final long POOL_TIME = 5000;
     
     private LinkedBlockingQueue<TOMMessage> replies;
@@ -70,7 +72,7 @@ class ReplyThread extends Thread {
                 }
                 cs.getClientsConn().send(new int[] {msg.getSender()}, msg.reply, false);
             } catch (InterruptedException ex) {
-                ex.printStackTrace();
+                logger.error("", ex);
             }
 
         }

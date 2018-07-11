@@ -170,14 +170,14 @@ public class Synchronizer {
                 communication.send(this.controller.getCurrentViewOtherAcceptors(), stop);
 
             } catch (IOException ex) {
-                ex.printStackTrace();
+                logger.error("", ex);
                 logger.error("", ex);
             } finally {
                 try {
                     out.close();
                     bos.close();
                 } catch (IOException ex) {
-                    ex.printStackTrace();
+                    logger.error("", ex);
                     logger.error("", ex);
                 }
             }
@@ -317,7 +317,7 @@ public class Synchronizer {
             bis.close();
 
         } catch (IOException | ClassNotFoundException ex) {
-            ex.printStackTrace();
+            logger.error("", ex);
             logger.error("", ex);
         }
     }
@@ -373,7 +373,7 @@ public class Synchronizer {
             bis.close();
 
         } catch (IOException | ClassNotFoundException ex) {
-            ex.printStackTrace();
+            logger.error("", ex);
             logger.error("", ex);
         }
 
@@ -505,14 +505,14 @@ public class Synchronizer {
                 communication.send(this.controller.getCurrentViewOtherAcceptors(), stop);
 
             } catch (IOException ex) {
-                ex.printStackTrace();
+                logger.error("", ex);
                 logger.error("", ex);
             } finally {
                 try {
                     out.close();
                     bos.close();
                 } catch (IOException ex) {
-                    ex.printStackTrace();
+                    logger.error("", ex);
                     logger.error("", ex);
                 }
             }
@@ -675,14 +675,14 @@ public class Synchronizer {
 
 		//TODO: Turn on timeout again?
                 } catch (IOException ex) {
-                    ex.printStackTrace();
+                    logger.error("", ex);
                     logger.error("", ex);
                 } finally {
                     try {
                         out.close();
                         bos.close();
                     } catch (IOException ex) {
-                        ex.printStackTrace();
+                        logger.error("", ex);
                         logger.error("", ex);
                     }
                 }
@@ -980,14 +980,14 @@ public class Synchronizer {
                 finalise(regency, lastHighestCID, signedCollects, propose, batchSize, true);
 
             } catch (IOException ex) {
-                ex.printStackTrace();
+                logger.error("", ex);
                 logger.error("", ex);
             } finally {
                 try {
                     out.close();
                     bos.close();
                 } catch (IOException ex) {
-                    ex.printStackTrace();
+                    logger.error("", ex);
                     logger.error("", ex);
                 }
             }

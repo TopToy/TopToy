@@ -9,6 +9,7 @@ import proto.FastBbcVote;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.concurrent.CountDownLatch;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -20,12 +21,14 @@ public class bbcTest {
     interface clientDoing {
         void act(bbcClient c);
     }
-    int timeToWaitBetweenTest = 10 * 1000;
+    private CountDownLatch latch;
+    private int timeToWaitBetweenTest = 15 * 1000;
     static Config conf = new Config();
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(bbcTest.class);
     private static Path SingleServerconfigHome = Paths.get("config", "bbcConfig", "bbcSingleServer");
     private static Path FourServerconfigHome = Paths.get("config", "bbcConfig", "bbcFourServers");
-
+//    private Integer serversUp = 0;
+//    private final Object serverLock = new Object();
     private static void deleteViewIfExist(String configHome){
         File file2 = new File(Paths.get(configHome, "currentView").toString());
         if (file2.exists()) {
@@ -37,26 +40,43 @@ public class bbcTest {
             }
         }
     }
+//    void updateServersUp(int sNum) {
+//        synchronized (serverLock) {
+//            serversUp++;
+//            if (serversUp == sNum) {
+//                serverLock.notify();
+//            }
+//        }
+//    }
+//
+//    void waitForServersUp(int num) throws InterruptedException {
+//        synchronized (serverLock) {
+//            while (serversUp < num) {
+//                serverLock.wait();
+//            }
+//        }
+//    }
     @Test
     void initServerTest() throws InterruptedException {
+        Thread.sleep(timeToWaitBetweenTest);
         logger.info("Testing initServerTest...");
+//        serversUp = 0;
+        latch = new CountDownLatch(1);
         deleteViewIfExist(SingleServerconfigHome.toString());
         bbcServer s = new bbcServer(0, 1, SingleServerconfigHome.toString());
-        serverDoing sDoing = bbcServer::start;
-        Thread t = new Thread(()->sDoing.act(s));
+        Thread t = new Thread(()-> {
+            s.start();
+            latch.countDown();
+        });
         t.start();
-        Thread.sleep(5 * 1000);
+        latch.await();
         s.shutdown();
-//        Thread.sleep(timeToWaitBetweenTest);
-        try {
-            t.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        t.join();
 
     }
     @Test
     void initClientTets() throws InterruptedException {
+        Thread.sleep(timeToWaitBetweenTest);
         logger.info("Testing initClientTets...");
         deleteViewIfExist(SingleServerconfigHome.toString());
         bbcServer s = new bbcServer(0, 1, SingleServerconfigHome.toString());
@@ -66,13 +86,21 @@ public class bbcTest {
     }
     @Test
     void testSingleDecision() throws InterruptedException {
+        Thread.sleep(timeToWaitBetweenTest);
         logger.info("Testing testSingleDecision...");
+//        serversUp = 0;
+        latch = new CountDownLatch(1);
         deleteViewIfExist(SingleServerconfigHome.toString());
         bbcServer s = new bbcServer(0, 1, SingleServerconfigHome.toString());
         serverDoing sDo = bbcServer::start;
-        Thread t1 = new Thread(()->sDo.act(s));
+        Thread t1 = new Thread(()-> {
+            sDo.act(s);
+//            updateServersUp(1);
+            latch.countDown();
+        });
         t1.start();
-        Thread.sleep(5 * 1000);
+//        waitForServersUp(1);
+        latch.await();
         clientDoing cDo = c -> {
             c.propose(1, 0);
             c.propose(0,1);
@@ -82,6 +110,9 @@ public class bbcTest {
         Thread t2 = new Thread(()->cDo.act(c));
         t2.start();
 
+        /*
+         Asserts is being doing in the main thread which is OK.
+         */
         serverDoing sDo2 = s1 -> {
             assertEquals(1, s1.decide(0));
             assertEquals(0, s1.decide(1));
@@ -92,29 +123,30 @@ public class bbcTest {
         c.close();
         s.shutdown();
 //        Thread.sleep(timeToWaitBetweenTest);
-        try {
-            t1.join();
-            t2.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        t1.join();
+        t2.join();
 
     }
     @Test
     void testFourServersAllCorrect1() throws InterruptedException {
+        Thread.sleep(timeToWaitBetweenTest);
         logger.info("Testing testFourServersAllCorrect1...");
         deleteViewIfExist(FourServerconfigHome.toString());
         int consID = 0;
-
+        latch = new CountDownLatch(4);
         Thread[] serversThread = new Thread[4];
         bbcServer[] servers = new bbcServer[4];
         for (int i = 0 ; i < 4 ; i++) {
             servers[i] = new bbcServer(i, 3, FourServerconfigHome.toString());
             int finalI = i;
-            serversThread[i] = new Thread(() -> servers[finalI].start());
+            serversThread[i] = new Thread(() -> { servers[finalI].start();
+//            updateServersUp(4);
+                latch.countDown();
+            });
             serversThread[i].start();
         }
-        Thread.sleep(5 * 1000);
+//        waitForServersUp(4);
+        latch.await();
         bbcClient[] clients = new bbcClient[4];
         for (int i = 0 ; i < 4 ; i++) {
             clients[i] = new bbcClient(i, FourServerconfigHome.toString());
@@ -140,27 +172,32 @@ public class bbcTest {
             servers[i].shutdown();
         }
 //        Thread.sleep(timeToWaitBetweenTest);
-//        for (int i = 0 ; i < 4 ; i++) {
-//            serversThread[i].join();
-//        }
+        for (int i = 0 ; i < 4 ; i++) {
+            serversThread[i].join();
+        }
         logger.info("End of testFourServersAllCorrect1");
 
     }
     @Test
     void testFourServersBasicFault1() throws InterruptedException {
+        Thread.sleep(timeToWaitBetweenTest);
         logger.info("Testing testFourServersBasicFault1...");
         deleteViewIfExist(FourServerconfigHome.toString());
         int consID = 0;
-
+        latch = new CountDownLatch(4);
         Thread[] serversThread = new Thread[4];
         bbcServer[] servers = new bbcServer[4];
         for (int i = 0 ; i < 4 ; i++) {
             servers[i] = new bbcServer(i, 3, FourServerconfigHome.toString());
             int finalI = i;
-            serversThread[i] = new Thread(() -> servers[finalI].start());
+            serversThread[i] = new Thread(() -> {servers[finalI].start();
+//                updateServersUp(4);
+                latch.countDown();
+            });
             serversThread[i].start();
         }
-        Thread.sleep(5 * 1000);
+//        waitForServersUp(4);
+        latch.await();
         bbcClient[] clients = new bbcClient[4];
         for (int i = 0 ; i < 4 ; i++) {
             clients[i] = new bbcClient(i, FourServerconfigHome.toString());
@@ -185,27 +222,32 @@ public class bbcTest {
             servers[i].shutdown();
         }
 //        Thread.sleep(timeToWaitBetweenTest);
-//        for (int i = 0 ; i < 4 ; i++) {
-//            serversThread[i].join();
-//        }
+        for (int i = 0 ; i < 4 ; i++) {
+            serversThread[i].join();
+        }
 
     }
 
     @Test
     void stressTestFourServersAllCorrect() throws InterruptedException {
+        Thread.sleep(timeToWaitBetweenTest);
         logger.info("Testing testFourServersAllCorrect1...");
         deleteViewIfExist(FourServerconfigHome.toString());
         int consID = 0;
-
+        latch = new CountDownLatch(4);
         Thread[] serversThread = new Thread[4];
         bbcServer[] servers = new bbcServer[4];
         for (int i = 0 ; i < 4 ; i++) {
             servers[i] = new bbcServer(i, 3, FourServerconfigHome.toString());
             int finalI = i;
-            serversThread[i] = new Thread(() -> servers[finalI].start());
+            serversThread[i] = new Thread(() -> {servers[finalI].start();
+//                updateServersUp(4);
+                latch.countDown();
+            });
             serversThread[i].start();
         }
-        Thread.sleep(5 * 1000);
+//        waitForServersUp(4);
+        latch.await();
         bbcClient[] clients = new bbcClient[4];
         for (int i = 0 ; i < 4 ; i++) {
             clients[i] = new bbcClient(i, FourServerconfigHome.toString());
@@ -229,9 +271,9 @@ public class bbcTest {
             servers[i].shutdown();
         }
 
-//        for (int i = 0 ; i < 4 ; i++) {
-//            serversThread[i].join();
-//        }
+        for (int i = 0 ; i < 4 ; i++) {
+            serversThread[i].join();
+        }
         logger.info("End of stressTestFourServersAllCorrect");
 //        Thread.sleep(timeToWaitBetweenTest);
     }

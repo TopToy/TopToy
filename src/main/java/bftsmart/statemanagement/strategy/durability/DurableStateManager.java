@@ -222,13 +222,13 @@ public class DurableStateManager extends BaseStateManager {
 					stateReceived = (ApplicationState) in.readObject();
 				} catch (UnknownHostException e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
+					logger.error("", e);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
+					logger.error("", e);
 				} catch (ClassNotFoundException e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
+					logger.error("", e);
 				}
 
 				if (stateReceived instanceof CSTState) {

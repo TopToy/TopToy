@@ -65,7 +65,7 @@ public class FileRecoverer {
 			try {
 				log.close();
 			} catch (IOException e) {
-				e.printStackTrace();
+				logger.error("", e);
 			}
 
 			return logState;
@@ -91,7 +91,7 @@ public class FileRecoverer {
 			try {
 				log.close();
 			} catch (IOException e) {
-				e.printStackTrace();
+				logger.error("", e);
 			}
 
 			return logState;
@@ -111,7 +111,7 @@ public class FileRecoverer {
 			try {
 				ckp.close();
 			} catch (IOException e) {
-				e.printStackTrace();
+				logger.error("", e);
 			}
 
 			return ckpState;
@@ -134,7 +134,7 @@ public class FileRecoverer {
 				ckp.read(ckpHash);
 				logger.info("--- Last ckp size: " + ckpSize + " Last ckp hash: " + Arrays.toString(ckpHash));
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger.error("", e);
 				System.err
 				.println("State recover was aborted due to an unexpected exception");
 			}
@@ -177,7 +177,7 @@ public class FileRecoverer {
 						mayRead = false;
 					}
 				} catch (Exception e) {
-					e.printStackTrace();
+					logger.error("", e);
 					ckp = null;
 					mayRead = false;
 				}
@@ -187,7 +187,7 @@ public class FileRecoverer {
 				logger.info("LAST CKP read from file: " + ckpLastConsensusId);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("", e);
 			System.err
 			.println("State recover was aborted due to an unexpected exception");
 		}
@@ -223,7 +223,7 @@ public class FileRecoverer {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("", e);
 			System.err
 			.println("State recover was aborted due to an unexpected exception");
 		}
@@ -240,7 +240,7 @@ public class FileRecoverer {
 			try {
 				ckp.close();
 			} catch (IOException e) {
-				e.printStackTrace();
+				logger.error("", e);
 			}
 		}
 	}
@@ -267,7 +267,7 @@ public class FileRecoverer {
 			logger.info("---Took " + (System.currentTimeMillis() - milliInit) + " milliseconds to transfer the checkpoint");
 			fileChannel.close();
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("", e);
 			System.err
 			.println("State recover was aborted due to an unexpected exception");
 		}
@@ -289,7 +289,7 @@ public class FileRecoverer {
 		try {
 			return new RandomAccessFile(file, "r");
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("", e);
 		}
 		return null;
 	}
@@ -334,13 +334,13 @@ public class FileRecoverer {
 						mayRead = false;
 					}
 				} catch (Exception e) {
-					e.printStackTrace();
+					logger.error("", e);
 					state.clear();
 					mayRead = false;
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("", e);
 			System.err
 			.println("State recover was aborted due to an unexpected exception");
 		}
@@ -406,13 +406,13 @@ public class FileRecoverer {
 						mayRead = false;
 					}
 				} catch (Exception e) {
-					e.printStackTrace();
+					logger.error("", e);
 					state.clear();
 					mayRead = false;
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("", e);
 			System.err
 			.println("State recover was aborted due to an unexpected exception");
 		}

@@ -62,7 +62,7 @@ public class ClientData {
                 signatureVerificator.initVerify(publicKey);
                 logger.info("Signature verifier initialized for client "+clientId);
             } catch (Exception ex) {
-                ex.printStackTrace();
+                logger.error("", ex);
             }
         }
     }

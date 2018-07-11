@@ -24,7 +24,7 @@ import bftsmart.tom.server.Recoverable;
 import bftsmart.tom.server.defaultservices.durability.DurabilityCoordinator;
 
 public class StateSenderServer implements Runnable {
-
+	private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(StateSenderServer.class);
 	private ServerSocket server;
 	private ApplicationState state;
 	private Recoverable recoverable;
@@ -49,7 +49,7 @@ public class StateSenderServer implements Runnable {
 			server = new ServerSocket(port);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("", e);
 		}
 	}
 
@@ -62,7 +62,7 @@ public class StateSenderServer implements Runnable {
 			sender.setState(state);
 			new Thread(sender).start();
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("", e);
 		}
 	}
 

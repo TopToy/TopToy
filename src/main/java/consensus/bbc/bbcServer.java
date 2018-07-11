@@ -14,6 +14,8 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
+import static java.lang.String.format;
+
 /*
     TODO:
     1. Truncate the executed consensuses (or swap them to db)
@@ -42,41 +44,47 @@ public class bbcServer extends DefaultSingleRecoverable {
     }
 
     public void start() {
-         sr = new ServiceReplica(id, this, this, configHome);
+        try {
+            sr = new ServiceReplica(id, this, this, configHome);
+        } catch (Exception ex) {
+            logger.error("", ex);
+        }
+
          Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
                 // Use stderr here since the logger may have been reset by its JVM shutdown hook.
                 if (sr != null) {
-                    logger.warn("*** shutting down bbc server since JVM is shutting down");
+                    logger.warn(format("[#%d] shutting down bbc server since JVM is shutting down", id));
                     sr.kill();
-                    logger.warn("*** server shut down");
+                    logger.warn(format("[#%d] server shut down", id));
                 }
             }
         });
     }
     public void shutdown() {
-        logger.info("shutting down bbc server [id:" + id + "]");
+        logger.info(format("[#%d] shutting down bbc server", id));
         if (sr != null) {
             sr.kill();
-            logger.info("bbc server has been shutting down successfully [id:" + id + "]");
+            logger.info(format("[#%d] bbc server has been shutting down successfully", id));
             sr = null;
         }
     }
     @Override
     public void installSnapshot(byte[] state) {
-        logger.info("installSnapshot called");
-        state newState = (consensus.bbc.state) SerializationUtils.deserialize(state);
-        quorumSize = newState.quorumSize;
-        rec = newState.rec;
+        logger.info(format("[#%d] installSnapshot called", id));
+//        state newState = (consensus.bbc.state) SerializationUtils.deserialize(state);
+//        quorumSize = newState.quorumSize;
+//        rec = newState.rec;
     }
 
     @Override
     public byte[] getSnapshot() {
-        logger.info("getSnapshot called");
-        state newState = new state(rec, quorumSize);
-        byte[] data = SerializationUtils.serialize(newState);
-        return data;
+        logger.info(format("[#%d] getSnapshot called", id));
+//        state newState = new state(rec, quorumSize);
+//        byte[] data = SerializationUtils.serialize(newState);
+//        return data;
+        return new byte[1];
     }
 
     @Override
@@ -102,7 +110,7 @@ public class bbcServer extends DefaultSingleRecoverable {
                 consEnd.signal();
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("", e);
         }
         lock.unlock();
         return new byte[0];
@@ -116,7 +124,7 @@ public class bbcServer extends DefaultSingleRecoverable {
             try {
                 consEnd.await();
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                logger.error("", e);
             }
         }
         int ret = calcMaj(rec.get(consID));
@@ -152,7 +160,7 @@ public class bbcServer extends DefaultSingleRecoverable {
             try {
                 consEnd.await();
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                logger.error("", e);
             }
         }
         int ret = calcMaj(rec.get(consID));

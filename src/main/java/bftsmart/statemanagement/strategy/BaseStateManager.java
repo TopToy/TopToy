@@ -212,7 +212,7 @@ public abstract class BaseStateManager implements StateManager {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                logger.error("", e);
             }
         }
     }

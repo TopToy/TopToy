@@ -68,7 +68,7 @@ public class DiskStateLog extends StateLog {
 			 * log.setLength(TEN_MB); log.seek(0);
 			 */
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			logger.error("", e);
 		}
 	}
 
@@ -113,7 +113,7 @@ public class DiskStateLog extends StateLog {
 													// the EOF mark
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("", e);
 	    }
 	}
 
@@ -149,10 +149,10 @@ public class DiskStateLog extends StateLog {
 			
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("", e);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("", e);
 		} finally {
 			checkpointLock.unlock();
 		}
@@ -175,7 +175,7 @@ public class DiskStateLog extends StateLog {
 				log.close();
 			new File(logPath).delete();
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("", e);
 		}
 	}
 
@@ -248,7 +248,7 @@ public class DiskStateLog extends StateLog {
 				logger.info(" --- Replica " + ckpReplicaIndex + " took checkpoint. My current log pointer is " + log.getFilePointer());
 				logPointers.put(ckpReplicaIndex, log.getFilePointer());
 			} catch (IOException e) {
-				e.printStackTrace();
+				logger.error("", e);
 			}
 		}
 	}

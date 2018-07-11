@@ -23,7 +23,7 @@ import java.net.Socket;
 import bftsmart.statemanagement.ApplicationState;
 
 public class StateSender implements Runnable {
-
+	private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(StateSender.class);
 	private final Socket socket;
 	private ApplicationState state;
 	
@@ -47,7 +47,7 @@ public class StateSender implements Runnable {
 			socket.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("", e);
 		}
 	}
 

@@ -195,7 +195,7 @@ public final class TOMLayer extends Thread implements RequestReceiver {
         try {
             return so.verify(controller.getStaticConf().getRSAPublicKey(sender), engine);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("", e);
         }
         return false;
     }
@@ -476,7 +476,7 @@ public final class TOMLayer extends Thread implements RequestReceiver {
         
         } catch (Exception e) {
             logger.info("(TOMLayer.isProposedValueValid) finished, return=false");
-            e.printStackTrace();
+            logger.error("", e);
             if (Thread.holdsLock(clientsManager.getClientsLock())) clientsManager.getClientsLock().unlock();
 
             return null;

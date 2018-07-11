@@ -72,7 +72,7 @@ public class DurableStateLog extends StateLog {
 		try {
 			log = new RandomAccessFile(logPath, (syncLog ? "rwd" : "rw"));
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			logger.error("", e);
 		}
 	}
 
@@ -117,7 +117,7 @@ public class DurableStateLog extends StateLog {
 													// the EOF mark
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("", e);
 	    }
 	}
 	
@@ -153,10 +153,10 @@ public class DurableStateLog extends StateLog {
 			
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("", e);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("", e);
 		} finally {
 			checkpointLock.unlock();
 		}
@@ -179,7 +179,7 @@ public class DurableStateLog extends StateLog {
 				log.close();
 			new File(logPath).delete();
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("", e);
 		}
 	}
 
@@ -275,7 +275,7 @@ public class DurableStateLog extends StateLog {
 				logger.info(" --- Replica " + ckpReplicaIndex + " took checkpoint. My current log pointer is " + log.getFilePointer());
 				logPointers.put(ckpReplicaIndex, log.getFilePointer());
 			} catch (IOException e) {
-				e.printStackTrace();
+				logger.error("", e);
 			}
 		}
 	}

@@ -143,7 +143,7 @@ public class ViewManager {
                     getConnection(i.intValue()).send(data, true);
                 }
             } catch (InterruptedException ex) {
-               // ex.printStackTrace();
+               // logger.error("", ex);
                 logger.warn(ex);
             }
         }

@@ -215,9 +215,9 @@ public class NettyClientServerCommunicationSystemClientSide extends SimpleChanne
                         }
 
                     } catch (InvalidKeyException ex) {
-                        ex.printStackTrace();
+                        logger.error("", ex);
                     } catch (InvalidKeySpecException ex) {
-                        ex.printStackTrace();
+                        logger.error("", ex);
                     }
                     rl.writeLock().unlock();
                 } else {
@@ -225,7 +225,7 @@ public class NettyClientServerCommunicationSystemClientSide extends SimpleChanne
                 }
             }
         } catch (NoSuchAlgorithmException ex) {
-                ex.printStackTrace();
+                logger.error("", ex);
         }
     }
 
@@ -310,7 +310,7 @@ public class NettyClientServerCommunicationSystemClientSide extends SimpleChanne
                         sessionTable.remove(ncss.getReplicaId());
                     }
                 } catch (NoSuchAlgorithmException ex) {
-                    ex.printStackTrace();
+                    logger.error("", ex);
                 }
             }
         }
@@ -360,7 +360,7 @@ public class NettyClientServerCommunicationSystemClientSide extends SimpleChanne
                 try {
                     dos.close();
                 } catch (IOException ex) {
-                    ex.printStackTrace();
+                    logger.error("", ex);
                 }
             }
         }
@@ -394,7 +394,7 @@ public class NettyClientServerCommunicationSystemClientSide extends SimpleChanne
             try {
                 sm = (TOMMessage) sm.clone();
             } catch (CloneNotSupportedException e) {
-                e.printStackTrace();
+                logger.error("", e);
             }
         }
 
@@ -422,7 +422,7 @@ public class NettyClientServerCommunicationSystemClientSide extends SimpleChanne
             try {
                 dos.close();
             } catch (IOException ex) {
-                ex.printStackTrace();
+                logger.error("", ex);
             }
         }
 
@@ -449,7 +449,7 @@ public class NettyClientServerCommunicationSystemClientSide extends SimpleChanne
             //st.store(System.nanoTime() - startTime);
             return result;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("", e);
             return null;
         }
     }

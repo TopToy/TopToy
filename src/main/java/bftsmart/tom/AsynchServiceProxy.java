@@ -190,7 +190,7 @@ public class AsynchServiceProxy extends ServiceProxy {
                 }
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            logger.error("", ex);
         } finally {
             canReceiveLock.unlock();
         }

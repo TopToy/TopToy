@@ -205,7 +205,7 @@ public class NettyTOMMessageDecoder extends ByteToMessageDecoder {
         } catch (Exception ex) {
             logger.info("Impossible to decode message: "+
                     ex.getMessage());
-            ex.printStackTrace();
+            logger.error("", ex);
         }
         return;
     }

@@ -100,10 +100,8 @@ public class ServerConnection {
                 ServersCommunicationLayer.setSocketOptions(this.socket);
                 new DataOutputStream(this.socket.getOutputStream()).writeInt(this.controller.getStaticConf().getProcessId());
 
-            } catch (UnknownHostException ex) {
-                ex.printStackTrace();
             } catch (IOException ex) {
-                ex.printStackTrace();
+               logger.error("", ex);
             }
         }
         //else I have to wait a connection from the remote server
@@ -114,7 +112,7 @@ public class ServerConnection {
                 socketInStream = new DataInputStream(this.socket.getInputStream());
             } catch (IOException ex) {
                 logger.info("Error creating connection to "+remoteId);
-                ex.printStackTrace();
+                logger.error("", ex);
             }
         }
                
@@ -291,11 +289,11 @@ public class ServerConnection {
                     socket = newSocket;
                 }
             } catch (UnknownHostException ex) {
-                ex.printStackTrace();
+                logger.error("", ex);
             } catch (IOException ex) {
                 
                 logger.info("Impossible to reconnect to replica " + remoteId);
-                //ex.printStackTrace();
+                //logger.error("", ex);
             }
 
             if (socket != null) {
@@ -306,7 +304,7 @@ public class ServerConnection {
                     authKey = null;
                     authenticateAndEstablishAuthKey();
                 } catch (IOException ex) {
-                    ex.printStackTrace();
+                    logger.error("", ex);
                 }
             }
         }
@@ -402,7 +400,7 @@ public class ServerConnection {
             macReceive.init(authKey);
             macSize = macSend.getMacLength();
         } catch (Exception ex) {
-            ex.printStackTrace();
+            logger.error("", ex);
         }
     }
 
@@ -483,7 +481,7 @@ public class ServerConnection {
             try {
                 receivedMac = new byte[Mac.getInstance(MAC_ALGORITHM).getMacLength()];
             } catch (NoSuchAlgorithmException ex) {
-                ex.printStackTrace();
+                logger.error("", ex);
             }
 
             while (doWork) {
@@ -612,9 +610,9 @@ public class ServerConnection {
                             logger.info("WARNING: Violation of authentication in message received from " + remoteId);
                         }
                     } catch (ClassNotFoundException ex) {
-                        ex.printStackTrace();
+                        logger.error("", ex);
                     } catch (IOException ex) {
-                        //ex.printStackTrace();
+                        //logger.error("", ex);
                         if (doWork) {
                             closeSocket();
                             waitAndConnect();
