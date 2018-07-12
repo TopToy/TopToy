@@ -32,11 +32,6 @@ public final class BbcProtos {
      * <code>int32 vote = 3;</code>
      */
     int getVote();
-
-    /**
-     * <code>int32 a = 4;</code>
-     */
-    int getA();
   }
   /**
    * Protobuf type {@code proto.BbcMsg}
@@ -54,7 +49,6 @@ public final class BbcProtos {
       clientID_ = 0;
       consID_ = 0;
       vote_ = 0;
-      a_ = 0;
     }
 
     @java.lang.Override
@@ -101,11 +95,6 @@ public final class BbcProtos {
             case 24: {
 
               vote_ = input.readInt32();
-              break;
-            }
-            case 32: {
-
-              a_ = input.readInt32();
               break;
             }
           }
@@ -159,15 +148,6 @@ public final class BbcProtos {
       return vote_;
     }
 
-    public static final int A_FIELD_NUMBER = 4;
-    private int a_;
-    /**
-     * <code>int32 a = 4;</code>
-     */
-    public int getA() {
-      return a_;
-    }
-
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -189,9 +169,6 @@ public final class BbcProtos {
       if (vote_ != 0) {
         output.writeInt32(3, vote_);
       }
-      if (a_ != 0) {
-        output.writeInt32(4, a_);
-      }
       unknownFields.writeTo(output);
     }
 
@@ -211,10 +188,6 @@ public final class BbcProtos {
       if (vote_ != 0) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(3, vote_);
-      }
-      if (a_ != 0) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(4, a_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -238,8 +211,6 @@ public final class BbcProtos {
           == other.getConsID());
       result = result && (getVote()
           == other.getVote());
-      result = result && (getA()
-          == other.getA());
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -257,8 +228,6 @@ public final class BbcProtos {
       hash = (53 * hash) + getConsID();
       hash = (37 * hash) + VOTE_FIELD_NUMBER;
       hash = (53 * hash) + getVote();
-      hash = (37 * hash) + A_FIELD_NUMBER;
-      hash = (53 * hash) + getA();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -394,8 +363,6 @@ public final class BbcProtos {
 
         vote_ = 0;
 
-        a_ = 0;
-
         return this;
       }
 
@@ -421,7 +388,6 @@ public final class BbcProtos {
         result.clientID_ = clientID_;
         result.consID_ = consID_;
         result.vote_ = vote_;
-        result.a_ = a_;
         onBuilt();
         return result;
       }
@@ -471,9 +437,6 @@ public final class BbcProtos {
         }
         if (other.getVote() != 0) {
           setVote(other.getVote());
-        }
-        if (other.getA() != 0) {
-          setA(other.getA());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -579,32 +542,6 @@ public final class BbcProtos {
         onChanged();
         return this;
       }
-
-      private int a_ ;
-      /**
-       * <code>int32 a = 4;</code>
-       */
-      public int getA() {
-        return a_;
-      }
-      /**
-       * <code>int32 a = 4;</code>
-       */
-      public Builder setA(int value) {
-        
-        a_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>int32 a = 4;</code>
-       */
-      public Builder clearA() {
-        
-        a_ = 0;
-        onChanged();
-        return this;
-      }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFieldsProto3(unknownFields);
@@ -668,9 +605,9 @@ public final class BbcProtos {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\017bbcProtos.proto\022\005proto\"C\n\006BbcMsg\022\020\n\010cl" +
+      "\n\017bbcProtos.proto\022\005proto\"8\n\006BbcMsg\022\020\n\010cl" +
       "ientID\030\001 \001(\005\022\016\n\006consID\030\002 \001(\005\022\014\n\004vote\030\003 \001" +
-      "(\005\022\t\n\001a\030\004 \001(\005B\007\n\005protob\006proto3"
+      "(\005B\007\n\005protob\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -689,7 +626,7 @@ public final class BbcProtos {
     internal_static_proto_BbcMsg_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_BbcMsg_descriptor,
-        new java.lang.String[] { "ClientID", "ConsID", "Vote", "A", });
+        new java.lang.String[] { "ClientID", "ConsID", "Vote", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

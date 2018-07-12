@@ -9,6 +9,7 @@ import proto.BbcProtos;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.util.*;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -24,23 +25,23 @@ public class bbcServer extends DefaultSingleRecoverable {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(bbcServer.class);
 
     private int id;
-    private TreeMap<Integer, ArrayList<BbcProtos.BbcMsg>> rec;
+    private final TreeMap<Integer, ArrayList<BbcProtos.BbcMsg>> rec;
 //    private List<Integer> done;
-    private Lock lock;
-    private Condition consEnd;
+//    private Lock lock;
+//    private Condition consEnd;
     private int quorumSize;
     private String configHome;
-    ServiceReplica sr;
-
+    private ServiceReplica sr;
+    private final List<Integer> consNotify;
     public bbcServer(int id, int quorumSize, String configHome) {
         this.id = id;
         rec = new TreeMap<>();
-        lock = new ReentrantLock();
-        consEnd = lock.newCondition();
+//        lock = new ReentrantLock();
+//        consEnd = lock.newCondition();
         sr = null;
         this.quorumSize = quorumSize;
         this.configHome = configHome;
-
+        consNotify = new ArrayList<>();
     }
 
     public void start() {
@@ -89,45 +90,49 @@ public class bbcServer extends DefaultSingleRecoverable {
 
     @Override
     public byte[] appExecuteOrdered(byte[] command, MessageContext msgCtx) {
-        lock.lock();
         try {
             BbcProtos.BbcMsg msg = BbcProtos.BbcMsg.parseFrom(command);
             int key = msg.getConsID();
-            if (rec.containsKey(key)) {
-                if (rec.get(key).size() < quorumSize) {
-                    rec.get(key).add(msg);
+            synchronized (consNotify) {
+                consNotify.add(key);
+            }
+            synchronized (rec) {
+                if (rec.containsKey(key)) {
+                    if (rec.get(key).size() < quorumSize) {
+                        rec.get(key).add(msg);
+                    }
+                } else {
+                    ArrayList<BbcProtos.BbcMsg> newList = new ArrayList<>();
+                    newList.add(msg);
+                    rec.put(key, newList);
                 }
-            } else {
-                ArrayList<BbcProtos.BbcMsg> newList = new ArrayList<>();
-                newList.add(msg);
-                rec.put(key, newList);
+                if (rec.get(key).size() == quorumSize) {
+                    rec.notify();
+                }
             }
-            if (rec.get(key).size() == quorumSize) {
-                consEnd.signal();
-            }
+
         } catch (Exception e) {
             logger.error("", e);
         }
-        lock.unlock();
         return new byte[0];
     }
 
     @Override
     public byte[] appExecuteUnordered(byte[] command, MessageContext msgCtx) {
         int consID = ByteBuffer.wrap(command).getInt();
-        lock.lock();
-        while (!rec.containsKey(consID) ||  rec.get(consID).size() < quorumSize) {
-            try {
-                consEnd.await();
-            } catch (InterruptedException e) {
-                logger.error("", e);
+        synchronized (rec) {
+            while (!rec.containsKey(consID) ||  rec.get(consID).size() < quorumSize) {
+                try {
+                    rec.wait();
+                } catch (InterruptedException e) {
+                    logger.error("", e);
+                }
             }
-        }
-        int ret = calcMaj(rec.get(consID));
+            int ret = calcMaj(rec.get(consID));
 //        done.add(consID);
-        rec.remove(consID);
-        lock.unlock();
-        return ByteBuffer.allocate(Integer.SIZE/Byte.SIZE).putInt(ret).array();
+            rec.remove(consID);
+            return ByteBuffer.allocate(Integer.SIZE/Byte.SIZE).putInt(ret).array();
+        }
     }
 
     private int calcMaj(ArrayList<BbcProtos.BbcMsg> rec) {
@@ -151,29 +156,45 @@ public class bbcServer extends DefaultSingleRecoverable {
     }
 
     public int decide(int consID) {
-        lock.lock();
-        while (!rec.containsKey(consID) ||  rec.get(consID).size() < quorumSize) {
-            try {
-                consEnd.await();
-            } catch (InterruptedException e) {
-                logger.error("", e);
+        synchronized (rec) {
+            while (!rec.containsKey(consID) ||  rec.get(consID).size() < quorumSize) {
+                try {
+                    rec.wait();
+                } catch (InterruptedException e) {
+                    logger.error("", e);
+                }
             }
-        }
-        int ret = calcMaj(rec.get(consID));
+            int ret = calcMaj(rec.get(consID));
 //        done.add(consID);
-        rec.remove(consID);
-        lock.unlock();
+            rec.remove(consID);
+            return ret;
+        }
+    }
+
+    public ArrayList<Integer> notifyOnConsensusInstance() {
+        ArrayList<Integer> ret;
+        synchronized (consNotify) {
+            while (consNotify.isEmpty()) {
+                try {
+                    consNotify.wait();
+                } catch (InterruptedException e) {
+                    logger.warn("", e);
+                }
+            }
+            ret = new ArrayList<>(consNotify);
+            consNotify.clear();
+        }
         return ret;
     }
 
 }
 
-class state implements Serializable{
-    public TreeMap<Integer, ArrayList<BbcProtos.BbcMsg>> rec;
-    public int quorumSize;
-
-    public state(TreeMap<Integer, ArrayList<BbcProtos.BbcMsg>> rec, int quorumSize) {
-        this.rec = rec;
-        this.quorumSize = quorumSize;
-    }
-}
+//class state implements Serializable{
+//    public TreeMap<Integer, ArrayList<BbcProtos.BbcMsg>> rec;
+//    public int quorumSize;
+//
+//    public state(TreeMap<Integer, ArrayList<BbcProtos.BbcMsg>> rec, int quorumSize) {
+//        this.rec = rec;
+//        this.quorumSize = quorumSize;
+//    }
+//}
