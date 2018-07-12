@@ -93,10 +93,6 @@ public class bbcServer extends DefaultSingleRecoverable {
         try {
             BbcProtos.BbcMsg msg = BbcProtos.BbcMsg.parseFrom(command);
             int key = msg.getConsID();
-//            if (done.contains(key)) {
-//                lock.unlock();
-//                return new byte[0];
-//            }
             if (rec.containsKey(key)) {
                 if (rec.get(key).size() < quorumSize) {
                     rec.get(key).add(msg);

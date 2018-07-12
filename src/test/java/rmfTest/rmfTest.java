@@ -13,6 +13,7 @@ import java.io.File;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 
 import static java.lang.String.format;
@@ -351,6 +352,76 @@ public class rmfTest {
             ((RmfNode) allNodes[i]).stop();
         }
 
+    }
+
+    void asyncServerAction(RmfNode node, String[] res) throws InterruptedException {
+        for (int i = 0 ; i < 100 ; i++) {
+            Random rand = new Random();
+            int  n = rand.nextInt(1000);
+            if (n > 0) {
+                logger.info(format("[#%d] sleeps for [%d] ms", node.getID(), n));
+                Thread.sleep(n);
+            }
+            if (i % 4 == node.getID()) {
+                String msg = "hello" + i;
+                node.broadcast(msg.getBytes(), i);
+            }
+            byte[] ret = node.deliver(i, i % 4);
+            res[i] = (ret == null ? null : new String(ret));
+            if (i == 99) {
+                logger.info(format("[#%d] i=99", node.getID()));
+            }
+        }
+    }
+
+    @Test
+    void TestAsyncNetwork1() throws InterruptedException {
+        Thread.sleep(timeToWaitBetweenTests);
+        Thread[] servers = new Thread[4];
+        int nnodes = 4;
+        String fourServersConfig = Paths.get("config", "bbcConfig", "bbcFourServers").toString();
+        logger.info("start TestFourServersSenderMuteFailure");
+
+        Node[] allNodes = initLocalRmfNodes(nnodes,1,fourServersConfig, null);
+        for (int i = 0 ; i < nnodes ; i++) {
+            int finalI = i;
+            servers[i]  = new Thread(() ->((RmfNode) allNodes[finalI]).start());
+            servers[i].start();
+        }
+        for (int i = 0 ; i < nnodes ; i++) {
+            servers[i].join();
+        }
+        String[][] allRes = new String[4][100];
+        Thread[] tasks = new Thread[4];
+
+        for (int i = 0 ; i < 4; i++) {
+            int finalI = i;
+            tasks[i] = new Thread(() -> {
+                try {
+                    asyncServerAction((RmfNode) allNodes[finalI], allRes[finalI]);
+                } catch (InterruptedException e) {
+                    logger.warn("",e);
+                }
+            });
+            tasks[i].start();
+        }
+        for (int i = 0 ; i < 4 ;i++) {
+            tasks[i].join();
+        }
+
+        for (int i = 0 ; i < 100 ; i++) {
+            if (allRes[0][i] == null) {
+                logger.info(format("null message detected at round [%d]", i));
+            }
+            for (int j = 0 ; j < 4 ; j++) {
+
+                assertEquals(allRes[0][i], allRes[j][i]);
+            }
+        }
+
+        for (int i = 0 ; i < 4 ; i++) {
+            ((RmfNode) allNodes[i]).stop();
+        }
     }
 
 }

@@ -10,6 +10,8 @@ import proto.Meta;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import static java.lang.String.format;
+
 public class RmfNode extends Node{
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(RmfNode.class);
     private boolean stopped = false;
@@ -65,6 +67,7 @@ public class RmfNode extends Node{
     }
 
     public void broadcast(byte[] msg, int height) {
+        logger.info(format("[#%d] broadcast data message with [height=%d]", getID(), height));
         Meta metaMsg = Meta.
                 newBuilder().
                 setSender(getID()).

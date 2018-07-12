@@ -273,7 +273,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             votes.get(height).ones++;
             int nVotes = votes.get(height).ones;
             if (nVotes == n) {
-                logger.info(format("[#%d] fast vote has been detected", id));
+                logger.info(format("[#%d] fastVote has been detected", id));
                 votes.notify();
             }
         }
@@ -336,6 +336,9 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             handlePositiveDec(height, sender);
         }
 
+        if (fVotes == n) {
+            logger.info(format("[#%d] deliver by fast vote [height=%d]", id, height));
+        }
         Data msg;
         synchronized (pendingMsg) {
             synchronized (recMsg) {
@@ -351,7 +354,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
 
         return msg.getData().toByteArray();
     }
-
+    // TODO: We have a little bug here... note that if a process wish to perform a bbc it doesn't mean that other processes know about it.
     protected int fullBbcConsensus(int height) {
         int vote = 0;
         synchronized (pendingMsg) {
