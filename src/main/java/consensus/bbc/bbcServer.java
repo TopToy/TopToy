@@ -65,10 +65,20 @@ public class bbcServer extends DefaultSingleRecoverable {
     }
     public void shutdown() {
         logger.info(format("[#%d] shutting down bbc server", id));
+        releaseWaiting();
         if (sr != null) {
             sr.kill();
             logger.info(format("[#%d] bbc server has been shutting down successfully", id));
             sr = null;
+        }
+    }
+
+    void releaseWaiting() {
+        synchronized (rec) {
+            rec.notify();
+        }
+        synchronized (consNotify) {
+            consNotify.notify();
         }
     }
     @Override
@@ -95,6 +105,7 @@ public class bbcServer extends DefaultSingleRecoverable {
             int key = msg.getConsID();
             synchronized (consNotify) {
                 consNotify.add(key);
+                consNotify.notify();
             }
             synchronized (rec) {
                 if (rec.containsKey(key)) {

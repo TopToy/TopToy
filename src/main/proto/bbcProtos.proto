@@ -8,3 +8,8 @@ message BbcMsg {
     int32 consID = 2;
     int32 vote = 3;
 }
+
+message BbcDecision {
+    int32 consID = 1;
+    int32 decosion = 2;
+}

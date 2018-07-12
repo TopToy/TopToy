@@ -591,11 +591,530 @@ public final class BbcProtos {
 
   }
 
+  public interface BbcDecisionOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:proto.BbcDecision)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>int32 consID = 1;</code>
+     */
+    int getConsID();
+
+    /**
+     * <code>int32 decosion = 2;</code>
+     */
+    int getDecosion();
+  }
+  /**
+   * Protobuf type {@code proto.BbcDecision}
+   */
+  public  static final class BbcDecision extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:proto.BbcDecision)
+      BbcDecisionOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use BbcDecision.newBuilder() to construct.
+    private BbcDecision(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private BbcDecision() {
+      consID_ = 0;
+      decosion_ = 0;
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private BbcDecision(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownFieldProto3(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 8: {
+
+              consID_ = input.readInt32();
+              break;
+            }
+            case 16: {
+
+              decosion_ = input.readInt32();
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return proto.BbcProtos.internal_static_proto_BbcDecision_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return proto.BbcProtos.internal_static_proto_BbcDecision_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              proto.BbcProtos.BbcDecision.class, proto.BbcProtos.BbcDecision.Builder.class);
+    }
+
+    public static final int CONSID_FIELD_NUMBER = 1;
+    private int consID_;
+    /**
+     * <code>int32 consID = 1;</code>
+     */
+    public int getConsID() {
+      return consID_;
+    }
+
+    public static final int DECOSION_FIELD_NUMBER = 2;
+    private int decosion_;
+    /**
+     * <code>int32 decosion = 2;</code>
+     */
+    public int getDecosion() {
+      return decosion_;
+    }
+
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (consID_ != 0) {
+        output.writeInt32(1, consID_);
+      }
+      if (decosion_ != 0) {
+        output.writeInt32(2, decosion_);
+      }
+      unknownFields.writeTo(output);
+    }
+
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (consID_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(1, consID_);
+      }
+      if (decosion_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(2, decosion_);
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof proto.BbcProtos.BbcDecision)) {
+        return super.equals(obj);
+      }
+      proto.BbcProtos.BbcDecision other = (proto.BbcProtos.BbcDecision) obj;
+
+      boolean result = true;
+      result = result && (getConsID()
+          == other.getConsID());
+      result = result && (getDecosion()
+          == other.getDecosion());
+      result = result && unknownFields.equals(other.unknownFields);
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + CONSID_FIELD_NUMBER;
+      hash = (53 * hash) + getConsID();
+      hash = (37 * hash) + DECOSION_FIELD_NUMBER;
+      hash = (53 * hash) + getDecosion();
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static proto.BbcProtos.BbcDecision parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static proto.BbcProtos.BbcDecision parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static proto.BbcProtos.BbcDecision parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static proto.BbcProtos.BbcDecision parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static proto.BbcProtos.BbcDecision parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static proto.BbcProtos.BbcDecision parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static proto.BbcProtos.BbcDecision parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static proto.BbcProtos.BbcDecision parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static proto.BbcProtos.BbcDecision parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static proto.BbcProtos.BbcDecision parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static proto.BbcProtos.BbcDecision parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static proto.BbcProtos.BbcDecision parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(proto.BbcProtos.BbcDecision prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code proto.BbcDecision}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:proto.BbcDecision)
+        proto.BbcProtos.BbcDecisionOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return proto.BbcProtos.internal_static_proto_BbcDecision_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return proto.BbcProtos.internal_static_proto_BbcDecision_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                proto.BbcProtos.BbcDecision.class, proto.BbcProtos.BbcDecision.Builder.class);
+      }
+
+      // Construct using proto.BbcProtos.BbcDecision.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      public Builder clear() {
+        super.clear();
+        consID_ = 0;
+
+        decosion_ = 0;
+
+        return this;
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return proto.BbcProtos.internal_static_proto_BbcDecision_descriptor;
+      }
+
+      public proto.BbcProtos.BbcDecision getDefaultInstanceForType() {
+        return proto.BbcProtos.BbcDecision.getDefaultInstance();
+      }
+
+      public proto.BbcProtos.BbcDecision build() {
+        proto.BbcProtos.BbcDecision result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public proto.BbcProtos.BbcDecision buildPartial() {
+        proto.BbcProtos.BbcDecision result = new proto.BbcProtos.BbcDecision(this);
+        result.consID_ = consID_;
+        result.decosion_ = decosion_;
+        onBuilt();
+        return result;
+      }
+
+      public Builder clone() {
+        return (Builder) super.clone();
+      }
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return (Builder) super.setField(field, value);
+      }
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return (Builder) super.clearField(field);
+      }
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return (Builder) super.clearOneof(oneof);
+      }
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return (Builder) super.setRepeatedField(field, index, value);
+      }
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return (Builder) super.addRepeatedField(field, value);
+      }
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof proto.BbcProtos.BbcDecision) {
+          return mergeFrom((proto.BbcProtos.BbcDecision)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(proto.BbcProtos.BbcDecision other) {
+        if (other == proto.BbcProtos.BbcDecision.getDefaultInstance()) return this;
+        if (other.getConsID() != 0) {
+          setConsID(other.getConsID());
+        }
+        if (other.getDecosion() != 0) {
+          setDecosion(other.getDecosion());
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        proto.BbcProtos.BbcDecision parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (proto.BbcProtos.BbcDecision) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      private int consID_ ;
+      /**
+       * <code>int32 consID = 1;</code>
+       */
+      public int getConsID() {
+        return consID_;
+      }
+      /**
+       * <code>int32 consID = 1;</code>
+       */
+      public Builder setConsID(int value) {
+        
+        consID_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int32 consID = 1;</code>
+       */
+      public Builder clearConsID() {
+        
+        consID_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private int decosion_ ;
+      /**
+       * <code>int32 decosion = 2;</code>
+       */
+      public int getDecosion() {
+        return decosion_;
+      }
+      /**
+       * <code>int32 decosion = 2;</code>
+       */
+      public Builder setDecosion(int value) {
+        
+        decosion_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int32 decosion = 2;</code>
+       */
+      public Builder clearDecosion() {
+        
+        decosion_ = 0;
+        onChanged();
+        return this;
+      }
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFieldsProto3(unknownFields);
+      }
+
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:proto.BbcDecision)
+    }
+
+    // @@protoc_insertion_point(class_scope:proto.BbcDecision)
+    private static final proto.BbcProtos.BbcDecision DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new proto.BbcProtos.BbcDecision();
+    }
+
+    public static proto.BbcProtos.BbcDecision getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<BbcDecision>
+        PARSER = new com.google.protobuf.AbstractParser<BbcDecision>() {
+      public BbcDecision parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new BbcDecision(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<BbcDecision> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<BbcDecision> getParserForType() {
+      return PARSER;
+    }
+
+    public proto.BbcProtos.BbcDecision getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_proto_BbcMsg_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_proto_BbcMsg_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_proto_BbcDecision_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_proto_BbcDecision_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -607,7 +1126,8 @@ public final class BbcProtos {
     java.lang.String[] descriptorData = {
       "\n\017bbcProtos.proto\022\005proto\"8\n\006BbcMsg\022\020\n\010cl" +
       "ientID\030\001 \001(\005\022\016\n\006consID\030\002 \001(\005\022\014\n\004vote\030\003 \001" +
-      "(\005B\007\n\005protob\006proto3"
+      "(\005\"/\n\013BbcDecision\022\016\n\006consID\030\001 \001(\005\022\020\n\010dec" +
+      "osion\030\002 \001(\005B\007\n\005protob\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -627,6 +1147,12 @@ public final class BbcProtos {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_BbcMsg_descriptor,
         new java.lang.String[] { "ClientID", "ConsID", "Vote", });
+    internal_static_proto_BbcDecision_descriptor =
+      getDescriptor().getMessageTypes().get(1);
+    internal_static_proto_BbcDecision_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_proto_BbcDecision_descriptor,
+        new java.lang.String[] { "ConsID", "Decosion", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

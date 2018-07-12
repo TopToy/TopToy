@@ -7,6 +7,7 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.Server;
 import io.grpc.stub.StreamObserver;
+import org.omg.PortableInterceptor.INACTIVE;
 import proto.*;
 
 import java.nio.file.Paths;
@@ -19,6 +20,7 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
@@ -80,9 +82,14 @@ public class RmfService extends RmfGrpc.RmfImplBase {
     final protected Map<Integer, Data> recMsg;
     protected Map<Integer, peer> peers;
     protected List<Node> nodes;
+
     private Thread bbcServerThread;
+    private Thread bbcMissedConsensusThread;
     protected Server server;
     private String bbcConfig;
+    private final Map<Integer, BbcProtos.BbcDecision> prevBbcCons;
+    boolean stopped = false;
+    final Object dataMsgLock = new Object();
 
     public RmfService(int id, int f, int tmoInterval, int tmo, ArrayList<Node> nodes, String bbcConfig) {
         this.bbcConfig = bbcConfig;
@@ -99,6 +106,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         this.timeoutMs = tmo;
         this.id = id;
         this.nodes = nodes;
+        this.prevBbcCons = new  HashMap<>();
     }
 
     public void start() {
@@ -114,6 +122,8 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         }
         );
         bbcServerThread.start();
+        bbcMissedConsensusThread = new Thread(this::bbcMissedConsensus);
+        bbcMissedConsensusThread.start();
         try {
             latch.await();
         } catch (InterruptedException e) {
@@ -125,7 +135,26 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             peers.put(n.getID(), new peer(n));
         }
     }
+    // TODO: Bug alert!!
+    private void bbcMissedConsensus() {
+        while (!stopped) {
+            ArrayList<Integer> last = bbcServer.notifyOnConsensusInstance();
+            synchronized (prevBbcCons) {
+                last.removeAll(new ArrayList<>(prevBbcCons.keySet()));
+            }
+            for(Integer height : last) {
+                try {
+                    Thread.sleep(timeoutMs); // Sleep for a moment to ensure that there is enough time.
+                } catch (InterruptedException e) {
+                    logger.warn("", e);
+                }
+                logger.info(format("[#%d] has found missed bbc consensus [height=%d]", id, height));
+                fullBbcConsensus(height);
+            }
+        }
+    }
     public void shutdown() {
+        stopped = true;
         for (peer p : peers.values()) {
             p.shutdown();
         }
@@ -135,6 +164,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         bbcServer.shutdown();
         try {
             bbcServerThread.join();
+            bbcMissedConsensusThread.join();
         } catch (InterruptedException e) {
             logger.error("", e);
         }
@@ -191,16 +221,13 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             public void onNext(Res res) {
                 // TODO: We should validate the answer
                 if (res.getData().getMeta().getHeight() == cHeight && res.getData().getMeta().getSender() == sender) {
-                    synchronized (pendingMsg) {
-                        synchronized (recMsg) {
-                            if (!pendingMsg.containsKey(cHeight) && !recMsg.containsKey(cHeight)) {
-                                logger.info(format("[#%d] has received response message from [#%d] of [height:%d, orig:%d]",
-                                        id, res.getMeta().getSender(), sender, res.getMeta().getHeight()));
-                                pendingMsg.put(cHeight, res.getData());
-                                receivedSem.release();
-                            }
+                    synchronized (dataMsgLock) {
+                        if (!pendingMsg.containsKey(cHeight) && !recMsg.containsKey(cHeight)) {
+                            logger.info(format("[#%d] has received response message from [#%d] of [height:%d, orig:%d]",
+                                    id, res.getMeta().getSender(), sender, res.getMeta().getHeight()));
+                            pendingMsg.put(cHeight, res.getData());
+                            receivedSem.release();
                         }
-
                     }
                 }
             }
@@ -243,7 +270,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         if (request.getMeta().getSender() != request.getMeta().getHeight() % n) {
             return;
         }
-        synchronized (pendingMsg) {
+        synchronized (dataMsgLock) {
             pendingMsg.put(request.getMeta().getHeight(), request);
         }
         logger.info(format("[#%d] received data message from [%d], [height:%d]", id,
@@ -282,14 +309,11 @@ public class RmfService extends RmfGrpc.RmfImplBase {
     @Override
     public void reqMessage(proto.Req request,  StreamObserver<proto.Res> responseObserver)  {
         Data msg;
-        synchronized (pendingMsg) {
-            synchronized (recMsg) {
-                msg = recMsg.get(request.getMeta().getHeight());
-                if (msg == null) {
-                    msg = pendingMsg.get(request.getMeta().getHeight());
-                }
+        synchronized (dataMsgLock) {
+            msg = recMsg.get(request.getMeta().getHeight());
+            if (msg == null) {
+                msg = pendingMsg.get(request.getMeta().getHeight());
             }
-
         }
         if (msg != null) {
             logger.info(format("[#%d] has received request message from [#%d] of [height:%d]",
@@ -340,12 +364,10 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             logger.info(format("[#%d] deliver by fast vote [height=%d]", id, height));
         }
         Data msg;
-        synchronized (pendingMsg) {
-            synchronized (recMsg) {
-                msg = pendingMsg.get(height);
-                recMsg.put(height, msg);
-                pendingMsg.remove(height);
-            }
+        synchronized (dataMsgLock) {
+            msg = pendingMsg.get(height);
+            recMsg.put(height, msg);
+            pendingMsg.remove(height);
         }
 
         synchronized (votes) {
@@ -354,22 +376,29 @@ public class RmfService extends RmfGrpc.RmfImplBase {
 
         return msg.getData().toByteArray();
     }
-    // TODO: We have a little bug here... note that if a process wish to perform a bbc it doesn't mean that other processes know about it.
+    // TODO: We have a little bug here... note that if a process wish to perform a bbc it doesn't mean that other processes know about it. [solved??]
     protected int fullBbcConsensus(int height) {
-        int vote = 0;
-        synchronized (pendingMsg) {
-            if (pendingMsg.containsKey(height)) {
-                vote = 1;
+        synchronized (prevBbcCons) {
+            if (prevBbcCons.keySet().contains(height)) {
+                return prevBbcCons.get(height).getDecosion();
             }
+            int vote = 0;
+            synchronized (dataMsgLock) {
+                if (pendingMsg.containsKey(height) || recMsg.containsKey(height)) {
+                    vote = 1;
+                }
+            }
+            logger.info(format("[#%d] Initiates full bbc instance [height:%d], [vote:%d]", id, height, vote));
+            bbcClient.propose(vote, height);
+            int dec = bbcServer.decide(height);
+            prevBbcCons.put(height, BbcProtos.BbcDecision.newBuilder().setConsID(height).setDecosion(dec).build());
+            return dec;
         }
-        logger.info(format("[#%d] Initiates full bbc instance [height:%d], [vote:%d]", id, height, vote));
-        bbcClient.propose(vote, height);
-        return bbcServer.decide(height);
     }
 
     protected void handlePositiveDec(int height, int sender) {
-        synchronized (pendingMsg) {
-            if (pendingMsg.containsKey(height)) {
+        synchronized (dataMsgLock) {
+            if (pendingMsg.containsKey(height) || recMsg.containsKey(height)) {
                 return;
             }
         }
