@@ -421,6 +421,7 @@ public class rmfTest {
 
         for (int i = 0 ; i < 4 ; i++) {
             ((RmfNode) allNodes[i]).stop();
+            logger.info(format("[#%d] stopped", i));
         }
     }
 

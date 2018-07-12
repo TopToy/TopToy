@@ -49,16 +49,17 @@ public class RmfNode extends Node{
     }
 
     public void stop() {
-        rmfServer.shutdown();
-        rmfService.shutdown();
         stopped = true;
+        rmfService.shutdown();
+        rmfServer.shutdown();
     }
 
     public void blockUntilShutdown() throws InterruptedException {
+        rmfService.shutdown();
         if (rmfServer != null) {
             rmfServer.awaitTermination();
         }
-        rmfService.shutdown();
+
     }
 
     // This should be called only after all servers are running (as this object contains also the client logic)

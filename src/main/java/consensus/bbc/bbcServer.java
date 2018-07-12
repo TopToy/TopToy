@@ -45,11 +45,11 @@ public class bbcServer extends DefaultSingleRecoverable {
     }
 
     public void start() {
-        try {
+//        try {
             sr = new ServiceReplica(id, this, this, configHome);
-        } catch (Exception ex) {
-            logger.error("", ex);
-        }
+//        } catch (Exception ex) {
+//            logger.error("", ex);
+//        }
 
          Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
@@ -182,15 +182,11 @@ public class bbcServer extends DefaultSingleRecoverable {
         }
     }
 
-    public ArrayList<Integer> notifyOnConsensusInstance() {
+    public ArrayList<Integer> notifyOnConsensusInstance() throws InterruptedException {
         ArrayList<Integer> ret;
         synchronized (consNotify) {
             while (consNotify.isEmpty()) {
-                try {
-                    consNotify.wait();
-                } catch (InterruptedException e) {
-                    logger.warn("", e);
-                }
+                consNotify.wait();
             }
             ret = new ArrayList<>(consNotify);
             consNotify.clear();

@@ -29,6 +29,7 @@ TODO:
 1. the recMsg can grow infinitely.
 2. Do need to validate the sender identity?? (currently not)
 3. When to reset the timer
+4. prevBbcConsensus can grow infinitely (and some more, analyze it!!)
  */
 public class RmfService extends RmfGrpc.RmfImplBase {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(RmfService.class);
@@ -88,8 +89,9 @@ public class RmfService extends RmfGrpc.RmfImplBase {
     protected Server server;
     private String bbcConfig;
     private final Map<Integer, BbcProtos.BbcDecision> prevBbcCons;
-    boolean stopped = false;
-    final Object dataMsgLock = new Object();
+    private boolean stopped = false;
+    private final Object dataMsgLock = new Object();
+    private final Object wayToRecMsgLock = new Object();
 
     public RmfService(int id, int f, int tmoInterval, int tmo, ArrayList<Node> nodes, String bbcConfig) {
         this.bbcConfig = bbcConfig;
@@ -122,7 +124,14 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         }
         );
         bbcServerThread.start();
-        bbcMissedConsensusThread = new Thread(this::bbcMissedConsensus);
+        bbcMissedConsensusThread = new Thread(() ->
+        {
+            try {
+                bbcMissedConsensus();
+            } catch (InterruptedException e) {
+                logger.warn("", e);
+            }
+        });
         bbcMissedConsensusThread.start();
         try {
             latch.await();
@@ -136,22 +145,19 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         }
     }
     // TODO: Bug alert!!
-    private void bbcMissedConsensus() {
+    private void bbcMissedConsensus() throws InterruptedException {
         while (!stopped) {
             ArrayList<Integer> last = bbcServer.notifyOnConsensusInstance();
+            Thread.sleep(timeoutMs); // Sleep for a moment to ensure that there is enough time.
             synchronized (prevBbcCons) {
                 last.removeAll(new ArrayList<>(prevBbcCons.keySet()));
             }
             for(Integer height : last) {
-                try {
-                    Thread.sleep(timeoutMs); // Sleep for a moment to ensure that there is enough time.
-                } catch (InterruptedException e) {
-                    logger.warn("", e);
-                }
                 logger.info(format("[#%d] has found missed bbc consensus [height=%d]", id, height));
                 fullBbcConsensus(height);
             }
         }
+        logger.info(format("[#%d] bbcMissedConsensus shutdown", id));
     }
     public void shutdown() {
         stopped = true;
@@ -162,8 +168,12 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         bbcClient.close();
         logger.info(format("[#%d] bbc client has been shutdown", id));
         bbcServer.shutdown();
+        bbcMissedConsensusThread.interrupt();
         try {
+            // TODO: Do we really have to interrupt the threads?
+//            bbcServerThread.interrupt();
             bbcServerThread.join();
+//            bbcMissedConsensusThread.interrupt();
             bbcMissedConsensusThread.join();
         } catch (InterruptedException e) {
             logger.error("", e);
@@ -223,7 +233,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                 if (res.getData().getMeta().getHeight() == cHeight && res.getData().getMeta().getSender() == sender) {
                     synchronized (dataMsgLock) {
                         if (!pendingMsg.containsKey(cHeight) && !recMsg.containsKey(cHeight)) {
-                            logger.info(format("[#%d] has received response message from [#%d] of [height:%d, orig:%d]",
+                            logger.info(format("[#%d] has received response message from [#%d] of [height=%d, orig:%d]",
                                     id, res.getMeta().getSender(), sender, res.getMeta().getHeight()));
                             pendingMsg.put(cHeight, res.getData());
                             receivedSem.release();
@@ -244,7 +254,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         });
     }
     protected void broadcastReqMsg(Req req, int height, int sender) {
-        logger.info(format("[#%d] broadcast request message [height:%d]", id, height));
+        logger.info(format("[#%d] broadcast request message [height=%d]", id, height));
         for (peer p : peers.values()) {
             sendReqMessage(p.stub, req, height, sender);
         }
@@ -270,24 +280,30 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         if (request.getMeta().getSender() != request.getMeta().getHeight() % n) {
             return;
         }
-        synchronized (dataMsgLock) {
-            pendingMsg.put(request.getMeta().getHeight(), request);
+        int height = request.getMeta().getHeight();
+        synchronized (wayToRecMsgLock) {
+            synchronized (dataMsgLock) {
+                if (pendingMsg.containsKey(height) || recMsg.containsKey(height)) return;
+                pendingMsg.put(height, request);
+            }
+            synchronized (prevBbcCons) {
+                if (prevBbcCons.containsKey(height)) return;
+            }
+            logger.info(format("[#%d] received data message from [%d], [height=%d]", id,
+                    request.getMeta().getSender(), height));
+            timeoutMs = initTO;
+            Meta meta = Meta.
+                    newBuilder().
+                    setHeight(height)
+                    .setSender(id)
+                    .build();
+            FastBbcVote v = FastBbcVote
+                    .newBuilder()
+                    .setMeta(meta).setVote(1)
+                    .build();
+            broadcastFastVoteMessage(v);
         }
-        logger.info(format("[#%d] received data message from [%d], [height:%d]", id,
-                request.getMeta().getSender(), request.getMeta().getHeight()));
-        timeoutMs = initTO;
-        Meta meta = Meta.
-                newBuilder().
-                setHeight(request.
-                        getMeta().
-                        getHeight())
-                .setSender(id)
-                .build();
-        FastBbcVote v = FastBbcVote
-                .newBuilder()
-                .setMeta(meta).setVote(1)
-                .build();
-        broadcastFastVoteMessage(v);
+
     }
 
     @Override
@@ -316,7 +332,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             }
         }
         if (msg != null) {
-            logger.info(format("[#%d] has received request message from [#%d] of [height:%d]",
+            logger.info(format("[#%d] has received request message from [#%d] of [height=%d]",
                     id, request.getMeta().getSender(), request.getMeta().getHeight()));
             Meta meta = Meta.newBuilder().
                     setSender(id).
@@ -349,20 +365,23 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                fVotes = votes.get(height).ones;
            }
        }
-        if (fVotes < 3*f + 1) {
-            int dec = fullBbcConsensus(height);
-            logger.info(format("[#%d] bbc returned [%d] for [height: %d]", id, dec, height));
-            if (dec == 0) {
-                timeoutMs += timeoutInterval;
-                logger.info(format("[#%d] timeout increased to %d", id, timeoutMs));
-                return null;
-            }
-            handlePositiveDec(height, sender);
-        }
+       synchronized (wayToRecMsgLock) {
+           if (fVotes < 3*f + 1) {
+               int dec = fullBbcConsensus(height);
+               logger.info(format("[#%d] bbc returned [%d] for [height= %d]", id, dec, height));
+               if (dec == 0) {
+                   timeoutMs += timeoutInterval;
+                   logger.info(format("[#%d] timeout increased to %d", id, timeoutMs));
+                   return null;
+               }
+               handlePositiveDec(height, sender);
+           }
 
-        if (fVotes == n) {
-            logger.info(format("[#%d] deliver by fast vote [height=%d]", id, height));
-        }
+           if (fVotes == n) {
+               logger.info(format("[#%d] deliver by fast vote [height=%d]", id, height));
+           }
+       }
+
         Data msg;
         synchronized (dataMsgLock) {
             msg = pendingMsg.get(height);
@@ -388,7 +407,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                     vote = 1;
                 }
             }
-            logger.info(format("[#%d] Initiates full bbc instance [height:%d], [vote:%d]", id, height, vote));
+            logger.info(format("[#%d] Initiates full bbc instance [height=%d], [vote:%d]", id, height, vote));
             bbcClient.propose(vote, height);
             int dec = bbcServer.decide(height);
             prevBbcCons.put(height, BbcProtos.BbcDecision.newBuilder().setConsID(height).setDecosion(dec).build());
