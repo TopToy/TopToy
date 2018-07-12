@@ -1,15 +1,15 @@
 package blockchain;
 
-import proto.Blockchain;
+import proto.Transaction;
 
 public class basicBlock extends abstractBlock {
 
-    public basicBlock(int creatorID, int prevHash) {
-        super(creatorID, prevHash);
+    public basicBlock(int height, int creatorID, int prevHash) {
+        super(height, creatorID, prevHash);
     }
 
     @Override
-    boolean validateTransaction(Blockchain.Transaction t) {
+    boolean validateTransaction(Transaction t) {
         return true;
     }
 }

@@ -1,17 +1,28 @@
 syntax = "proto3";
 option java_package = "proto";
 package proto;
-//option objc_class_prefix = "RTG";
+option java_multiple_files = true;
 
 // Adding crypto data??
 message Block {
     int32 creatorID = 1;
-    int32 prevHash = 2; // Currently an index only
-    repeated Transaction data = 3;
+    int32 height = 2;
+    int32 prevHash = 3; // Currently an index only
+    repeated Transaction data = 4;
 }
 
 //TODO: Adding: client signature, client public key etc.
 message Transaction {
     int32 clientID = 1;
     bytes data = 2; // generic type of data
+}
+
+message accepted {
+    bool accepted = 1;
+}
+service blockchainService {
+    // BLocking call for client!
+    rpc addTransaction(Transaction) returns (accepted) {};
+    // synchronized between servers!
+    rpc synchronzieOnError(stream Block) returns (stream Block) {}
 }

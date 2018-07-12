@@ -30,6 +30,7 @@ TODO:
 2. Do need to validate the sender identity?? (currently not)
 3. When to reset the timer
 4. prevBbcConsensus can grow infinitely (and some more, analyze it!!)
+5. change maps to list
  */
 public class RmfService extends RmfGrpc.RmfImplBase {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(RmfService.class);

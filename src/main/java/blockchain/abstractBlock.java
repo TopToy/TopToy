@@ -1,30 +1,31 @@
 package blockchain;
 
-import proto.Blockchain;
+import proto.Block;
+import proto.Transaction;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public abstract class abstractBlock {
-    Blockchain.Block.Builder blockBuilder;
+    Block.Builder blockBuilder;
 
-    public abstractBlock(int creatorID, int prevHash) {
-        blockBuilder = Blockchain.Block.newBuilder();
-        blockBuilder.setCreatorID(creatorID).setPrevHash(prevHash);
+    public abstractBlock(int height, int creatorID, int prevHash) {
+        blockBuilder = Block.newBuilder();
+        blockBuilder.setCreatorID(creatorID).setPrevHash(prevHash).setHeight(height);
     }
 
-    abstract boolean validateTransaction(Blockchain.Transaction t);
+    abstract boolean validateTransaction(Transaction t);
 
     public int getPrevHash() {
         return blockBuilder.getPrevHash();
     }
 
-    public Blockchain.Transaction getTransaction(int index) {
+    public Transaction getTransaction(int index) {
         return blockBuilder.getData(index);
     }
 
-    public ArrayList<Blockchain.Transaction> getAllTransactions() {
-        ArrayList<Blockchain.Transaction> ret = new ArrayList<>();
+    public ArrayList<Transaction> getAllTransactions() {
+        ArrayList<Transaction> ret = new ArrayList<>();
         blockBuilder.addAllData(ret);
         return ret;
     }
@@ -33,7 +34,7 @@ public abstract class abstractBlock {
         return blockBuilder.getCreatorID();
     }
 
-    public void addTransaction(Blockchain.Transaction t) throws Exception {
+    public void addTransaction(Transaction t) throws Exception {
         if (validateTransaction(t)) {
             blockBuilder.addData(t);
         } else {
@@ -50,7 +51,8 @@ public abstract class abstractBlock {
         return blockBuilder.hashCode();
     }
 
-    public Blockchain.Block getBlock() {
+    public Block construct() {
+
         return blockBuilder.build();
     }
 
