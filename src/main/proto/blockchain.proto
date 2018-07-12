@@ -1,0 +1,17 @@
+syntax = "proto3";
+option java_package = "proto";
+package proto;
+//option objc_class_prefix = "RTG";
+
+// Adding crypto data??
+message Block {
+    int32 creatorID = 1;
+    int32 prevHash = 2; // Currently an index only
+    repeated Transaction data = 3;
+}
+
+//TODO: Adding: client signature, client public key etc.
+message Transaction {
+    int32 clientID = 1;
+    bytes data = 2; // generic type of data
+}
