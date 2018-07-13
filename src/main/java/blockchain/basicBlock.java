@@ -2,10 +2,10 @@ package blockchain;
 
 import proto.Transaction;
 
-public class basicBlock extends abstractBlock {
+public class basicBlock extends block {
 
-    public basicBlock(int height, int creatorID, int prevHash) {
-        super(height, creatorID, prevHash);
+    public basicBlock(int creatorID) {
+        super(creatorID);
     }
 
     @Override

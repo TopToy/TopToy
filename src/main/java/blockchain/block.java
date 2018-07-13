@@ -6,12 +6,12 @@ import proto.Transaction;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class abstractBlock {
+public abstract class block {
     Block.Builder blockBuilder;
 
-    public abstractBlock(int height, int creatorID, int prevHash) {
+    public block(int creatorID) {
         blockBuilder = Block.newBuilder();
-        blockBuilder.setCreatorID(creatorID).setPrevHash(prevHash).setHeight(height);
+        blockBuilder.setCreatorID(creatorID);
     }
 
     abstract boolean validateTransaction(Transaction t);
@@ -34,12 +34,8 @@ public abstract class abstractBlock {
         return blockBuilder.getCreatorID();
     }
 
-    public void addTransaction(Transaction t) throws Exception {
-        if (validateTransaction(t)) {
+    public void addTransaction(Transaction t) {
             blockBuilder.addData(t);
-        } else {
-            throw new Exception("Invalid Transaction");
-        }
     }
 
     public void removeTransaction(int index) {
@@ -51,9 +47,13 @@ public abstract class abstractBlock {
         return blockBuilder.hashCode();
     }
 
-    public Block construct() {
+    public Block construct(int height, int prevHash) {
 
-        return blockBuilder.build();
+        return blockBuilder.setHeight(height).setPrevHash(prevHash).build();
+    }
+
+    public int getSize() {
+        return blockBuilder.getDataCount();
     }
 
 

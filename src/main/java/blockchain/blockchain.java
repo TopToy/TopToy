@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class blockchain {
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(blockchain.class);
     private List<Block> blocks = new ArrayList<>();
     private int creatorID;
 
@@ -13,16 +14,19 @@ public abstract class blockchain {
         this.creatorID = creatorID;
         createGenesis();
     }
-    private boolean validateBlock(Block b) {
-        return (b.getPrevHash() == blocks.get(b.getHeight() - 1).hashCode());
-    }
-
-    abstract abstractBlock createNewBLock();
+    abstract block createNewBLock();
 
     abstract void createGenesis();
 
-    public void addBlock(abstractBlock b) {
-        blocks.add(b.construct());
+    abstract boolean validateBlockData(Block b);
+
+    boolean validateBlockHash(Block b) {
+        return b.getPrevHash() == blocks.get(b.getHeight() - 1).hashCode();
+    }
+
+    public void addBlock(Block b) {
+        logger.info(String.format("[#%d] adds a new block of [height=%d]", creatorID, b.getHeight()));
+        blocks.add(b);
     }
 
     public Block getBlock(int index) {

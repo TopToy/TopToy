@@ -1,21 +1,28 @@
 package blockchain;
 
-public class basicBlockchain extends blockchain {
-    basicBlock current;
+import proto.Block;
 
+public class basicBlockchain extends blockchain {
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(basicBlockchain.class);
     public basicBlockchain(int creatorID) {
         super(creatorID);
     }
 
     @Override
-    abstractBlock createNewBLock() {
-        return new basicBlock(getHeight(), getCreatorID(), getBlock(getHeight() - 1).hashCode());
+    block createNewBLock() {
+        return new basicBlock(getCreatorID());
     }
 
     @Override
     void createGenesis() {
-        addBlock(new basicBlock(0, -1, 0));
+        addBlock(new basicBlock( -1).construct(0, 0));
     }
+
+    @Override
+    boolean validateBlockData(Block b) {
+        return true;
+    }
+
 
 
 }

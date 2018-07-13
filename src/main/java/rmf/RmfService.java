@@ -234,8 +234,8 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                 if (res.getData().getMeta().getHeight() == cHeight && res.getData().getMeta().getSender() == sender) {
                     synchronized (dataMsgLock) {
                         if (!pendingMsg.containsKey(cHeight) && !recMsg.containsKey(cHeight)) {
-                            logger.info(format("[#%d] has received response message from [#%d] of [height=%d, orig:%d]",
-                                    id, res.getMeta().getSender(), sender, res.getMeta().getHeight()));
+                            logger.info(format("[#%d] has received response message from [#%d] of [height=%d, origSender:%d]",
+                                    id, res.getMeta().getHeight(), sender, res.getMeta().getSender()));
                             pendingMsg.put(cHeight, res.getData());
                             receivedSem.release();
                         }
