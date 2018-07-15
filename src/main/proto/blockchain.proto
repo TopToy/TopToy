@@ -3,12 +3,19 @@ option java_package = "proto";
 package proto;
 option java_multiple_files = true;
 
+import "crypto.proto";
 // Adding crypto data??
+
+message BlockHeader {
+    Digest prev= 1;
+    int32 creatorID = 2;
+    int32 height = 3;
+//    MerkleTree mt = 4;
+}
+
 message Block {
-    int32 creatorID = 1;
-    int32 height = 2;
-    int32 prevHash = 3; // Currently an index only
-    repeated Transaction data = 4;
+    BlockHeader header = 1;
+    repeated Transaction data = 2;
 }
 
 //TODO: Adding: client signature, client public key etc.

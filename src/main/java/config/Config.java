@@ -1,10 +1,7 @@
 package config;
 
-import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import static config.stdErr.createLoggingProxy;
 
 public class Config {
     static{

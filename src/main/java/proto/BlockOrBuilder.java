@@ -8,44 +8,38 @@ public interface BlockOrBuilder extends
     com.google.protobuf.MessageOrBuilder {
 
   /**
-   * <code>int32 creatorID = 1;</code>
+   * <code>.proto.BlockHeader header = 1;</code>
    */
-  int getCreatorID();
+  boolean hasHeader();
+  /**
+   * <code>.proto.BlockHeader header = 1;</code>
+   */
+  proto.BlockHeader getHeader();
+  /**
+   * <code>.proto.BlockHeader header = 1;</code>
+   */
+  proto.BlockHeaderOrBuilder getHeaderOrBuilder();
 
   /**
-   * <code>int32 height = 2;</code>
-   */
-  int getHeight();
-
-  /**
-   * <pre>
-   * Currently an index only
-   * </pre>
-   *
-   * <code>int32 prevHash = 3;</code>
-   */
-  int getPrevHash();
-
-  /**
-   * <code>repeated .proto.Transaction data = 4;</code>
+   * <code>repeated .proto.Transaction data = 2;</code>
    */
   java.util.List<proto.Transaction> 
       getDataList();
   /**
-   * <code>repeated .proto.Transaction data = 4;</code>
+   * <code>repeated .proto.Transaction data = 2;</code>
    */
   proto.Transaction getData(int index);
   /**
-   * <code>repeated .proto.Transaction data = 4;</code>
+   * <code>repeated .proto.Transaction data = 2;</code>
    */
   int getDataCount();
   /**
-   * <code>repeated .proto.Transaction data = 4;</code>
+   * <code>repeated .proto.Transaction data = 2;</code>
    */
   java.util.List<? extends proto.TransactionOrBuilder> 
       getDataOrBuilderList();
   /**
-   * <code>repeated .proto.Transaction data = 4;</code>
+   * <code>repeated .proto.Transaction data = 2;</code>
    */
   proto.TransactionOrBuilder getDataOrBuilder(
       int index);

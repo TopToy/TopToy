@@ -1,24 +1,22 @@
 package blockchain;
 
+import crypto.DigestMethod;
 import proto.Block;
+import proto.BlockHeader;
+import proto.Crypto;
 import proto.Transaction;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public abstract class block {
-    Block.Builder blockBuilder;
-
-    public block(int creatorID) {
-        blockBuilder = Block.newBuilder();
-        blockBuilder.setCreatorID(creatorID);
-    }
+    private Block.Builder blockBuilder = Block.newBuilder();
 
     abstract boolean validateTransaction(Transaction t);
 
-    public int getPrevHash() {
-        return blockBuilder.getPrevHash();
-    }
+//    public Crypto.Digest getPrevHash() {
+//        return blockBuilder.getHeader().getPrev();
+//    }
 
     public Transaction getTransaction(int index) {
         return blockBuilder.getData(index);
@@ -30,9 +28,9 @@ public abstract class block {
         return ret;
     }
 
-    public int getCreatorID() {
-        return blockBuilder.getCreatorID();
-    }
+//    public int getCreatorID() {
+//        return blockBuilder.getHeader().getCreatorID();
+//    }
 
     public void addTransaction(Transaction t) {
             blockBuilder.addData(t);
@@ -42,17 +40,17 @@ public abstract class block {
         blockBuilder.removeData(index);
     }
 
-    // TODO: Is it enough for hashing??
-    public int getBlockHash() {
-        return blockBuilder.hashCode();
+    public Block construct(int creatorID, int height, Crypto.Digest prevHash) {
+
+        return blockBuilder.setHeader(blockBuilder.
+                getHeaderBuilder().
+                setCreatorID(creatorID).
+                setHeight(height).
+                setPrev(prevHash)).
+                build();
     }
 
-    public Block construct(int height, int prevHash) {
-
-        return blockBuilder.setHeight(height).setPrevHash(prevHash).build();
-    }
-
-    public int getSize() {
+    public int getTransactionCount() {
         return blockBuilder.getDataCount();
     }
 

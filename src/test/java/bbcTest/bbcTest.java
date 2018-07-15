@@ -253,16 +253,19 @@ public class bbcTest {
             clients[i] = new bbcClient(i, FourServerconfigHome.toString());
 
         }
+        logger.info("***************START OF CONSENSUSES *******************");
         for (int i = 0 ; i < 100 ; i++) {
             for (int k = 0 ; k < 4 ; k++) {
+//                logger.info("*************** *******************");
                 clients[k].propose(consID % 2, consID);
             }
             for (int k = 0 ; k < 4 ; k++) {
                 assertEquals(consID % 2, servers[k].decide(consID));
             }
             consID++;
-        }
 
+        }
+        logger.info("***************END OF CONSENSUSES *******************");
         for (int i = 0 ; i < 4 ; i++) {
             clients[i].close();
         }

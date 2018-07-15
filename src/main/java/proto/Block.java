@@ -4,10 +4,6 @@
 package proto;
 
 /**
- * <pre>
- * Adding crypto data??
- * </pre>
- *
  * Protobuf type {@code proto.Block}
  */
 public  final class Block extends
@@ -20,9 +16,6 @@ private static final long serialVersionUID = 0L;
     super(builder);
   }
   private Block() {
-    creatorID_ = 0;
-    height_ = 0;
-    prevHash_ = 0;
     data_ = java.util.Collections.emptyList();
   }
 
@@ -57,25 +50,23 @@ private static final long serialVersionUID = 0L;
             }
             break;
           }
-          case 8: {
+          case 10: {
+            proto.BlockHeader.Builder subBuilder = null;
+            if (header_ != null) {
+              subBuilder = header_.toBuilder();
+            }
+            header_ = input.readMessage(proto.BlockHeader.parser(), extensionRegistry);
+            if (subBuilder != null) {
+              subBuilder.mergeFrom(header_);
+              header_ = subBuilder.buildPartial();
+            }
 
-            creatorID_ = input.readInt32();
             break;
           }
-          case 16: {
-
-            height_ = input.readInt32();
-            break;
-          }
-          case 24: {
-
-            prevHash_ = input.readInt32();
-            break;
-          }
-          case 34: {
-            if (!((mutable_bitField0_ & 0x00000008) == 0x00000008)) {
+          case 18: {
+            if (!((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
               data_ = new java.util.ArrayList<proto.Transaction>();
-              mutable_bitField0_ |= 0x00000008;
+              mutable_bitField0_ |= 0x00000002;
             }
             data_.add(
                 input.readMessage(proto.Transaction.parser(), extensionRegistry));
@@ -89,7 +80,7 @@ private static final long serialVersionUID = 0L;
       throw new com.google.protobuf.InvalidProtocolBufferException(
           e).setUnfinishedMessage(this);
     } finally {
-      if (((mutable_bitField0_ & 0x00000008) == 0x00000008)) {
+      if (((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
         data_ = java.util.Collections.unmodifiableList(data_);
       }
       this.unknownFields = unknownFields.build();
@@ -109,66 +100,56 @@ private static final long serialVersionUID = 0L;
   }
 
   private int bitField0_;
-  public static final int CREATORID_FIELD_NUMBER = 1;
-  private int creatorID_;
+  public static final int HEADER_FIELD_NUMBER = 1;
+  private proto.BlockHeader header_;
   /**
-   * <code>int32 creatorID = 1;</code>
+   * <code>.proto.BlockHeader header = 1;</code>
    */
-  public int getCreatorID() {
-    return creatorID_;
+  public boolean hasHeader() {
+    return header_ != null;
+  }
+  /**
+   * <code>.proto.BlockHeader header = 1;</code>
+   */
+  public proto.BlockHeader getHeader() {
+    return header_ == null ? proto.BlockHeader.getDefaultInstance() : header_;
+  }
+  /**
+   * <code>.proto.BlockHeader header = 1;</code>
+   */
+  public proto.BlockHeaderOrBuilder getHeaderOrBuilder() {
+    return getHeader();
   }
 
-  public static final int HEIGHT_FIELD_NUMBER = 2;
-  private int height_;
-  /**
-   * <code>int32 height = 2;</code>
-   */
-  public int getHeight() {
-    return height_;
-  }
-
-  public static final int PREVHASH_FIELD_NUMBER = 3;
-  private int prevHash_;
-  /**
-   * <pre>
-   * Currently an index only
-   * </pre>
-   *
-   * <code>int32 prevHash = 3;</code>
-   */
-  public int getPrevHash() {
-    return prevHash_;
-  }
-
-  public static final int DATA_FIELD_NUMBER = 4;
+  public static final int DATA_FIELD_NUMBER = 2;
   private java.util.List<proto.Transaction> data_;
   /**
-   * <code>repeated .proto.Transaction data = 4;</code>
+   * <code>repeated .proto.Transaction data = 2;</code>
    */
   public java.util.List<proto.Transaction> getDataList() {
     return data_;
   }
   /**
-   * <code>repeated .proto.Transaction data = 4;</code>
+   * <code>repeated .proto.Transaction data = 2;</code>
    */
   public java.util.List<? extends proto.TransactionOrBuilder> 
       getDataOrBuilderList() {
     return data_;
   }
   /**
-   * <code>repeated .proto.Transaction data = 4;</code>
+   * <code>repeated .proto.Transaction data = 2;</code>
    */
   public int getDataCount() {
     return data_.size();
   }
   /**
-   * <code>repeated .proto.Transaction data = 4;</code>
+   * <code>repeated .proto.Transaction data = 2;</code>
    */
   public proto.Transaction getData(int index) {
     return data_.get(index);
   }
   /**
-   * <code>repeated .proto.Transaction data = 4;</code>
+   * <code>repeated .proto.Transaction data = 2;</code>
    */
   public proto.TransactionOrBuilder getDataOrBuilder(
       int index) {
@@ -187,17 +168,11 @@ private static final long serialVersionUID = 0L;
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    if (creatorID_ != 0) {
-      output.writeInt32(1, creatorID_);
-    }
-    if (height_ != 0) {
-      output.writeInt32(2, height_);
-    }
-    if (prevHash_ != 0) {
-      output.writeInt32(3, prevHash_);
+    if (header_ != null) {
+      output.writeMessage(1, getHeader());
     }
     for (int i = 0; i < data_.size(); i++) {
-      output.writeMessage(4, data_.get(i));
+      output.writeMessage(2, data_.get(i));
     }
     unknownFields.writeTo(output);
   }
@@ -207,21 +182,13 @@ private static final long serialVersionUID = 0L;
     if (size != -1) return size;
 
     size = 0;
-    if (creatorID_ != 0) {
+    if (header_ != null) {
       size += com.google.protobuf.CodedOutputStream
-        .computeInt32Size(1, creatorID_);
-    }
-    if (height_ != 0) {
-      size += com.google.protobuf.CodedOutputStream
-        .computeInt32Size(2, height_);
-    }
-    if (prevHash_ != 0) {
-      size += com.google.protobuf.CodedOutputStream
-        .computeInt32Size(3, prevHash_);
+        .computeMessageSize(1, getHeader());
     }
     for (int i = 0; i < data_.size(); i++) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(4, data_.get(i));
+        .computeMessageSize(2, data_.get(i));
     }
     size += unknownFields.getSerializedSize();
     memoizedSize = size;
@@ -239,12 +206,11 @@ private static final long serialVersionUID = 0L;
     proto.Block other = (proto.Block) obj;
 
     boolean result = true;
-    result = result && (getCreatorID()
-        == other.getCreatorID());
-    result = result && (getHeight()
-        == other.getHeight());
-    result = result && (getPrevHash()
-        == other.getPrevHash());
+    result = result && (hasHeader() == other.hasHeader());
+    if (hasHeader()) {
+      result = result && getHeader()
+          .equals(other.getHeader());
+    }
     result = result && getDataList()
         .equals(other.getDataList());
     result = result && unknownFields.equals(other.unknownFields);
@@ -258,12 +224,10 @@ private static final long serialVersionUID = 0L;
     }
     int hash = 41;
     hash = (19 * hash) + getDescriptor().hashCode();
-    hash = (37 * hash) + CREATORID_FIELD_NUMBER;
-    hash = (53 * hash) + getCreatorID();
-    hash = (37 * hash) + HEIGHT_FIELD_NUMBER;
-    hash = (53 * hash) + getHeight();
-    hash = (37 * hash) + PREVHASH_FIELD_NUMBER;
-    hash = (53 * hash) + getPrevHash();
+    if (hasHeader()) {
+      hash = (37 * hash) + HEADER_FIELD_NUMBER;
+      hash = (53 * hash) + getHeader().hashCode();
+    }
     if (getDataCount() > 0) {
       hash = (37 * hash) + DATA_FIELD_NUMBER;
       hash = (53 * hash) + getDataList().hashCode();
@@ -362,10 +326,6 @@ private static final long serialVersionUID = 0L;
     return builder;
   }
   /**
-   * <pre>
-   * Adding crypto data??
-   * </pre>
-   *
    * Protobuf type {@code proto.Block}
    */
   public static final class Builder extends
@@ -402,15 +362,15 @@ private static final long serialVersionUID = 0L;
     }
     public Builder clear() {
       super.clear();
-      creatorID_ = 0;
-
-      height_ = 0;
-
-      prevHash_ = 0;
-
+      if (headerBuilder_ == null) {
+        header_ = null;
+      } else {
+        header_ = null;
+        headerBuilder_ = null;
+      }
       if (dataBuilder_ == null) {
         data_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00000008);
+        bitField0_ = (bitField0_ & ~0x00000002);
       } else {
         dataBuilder_.clear();
       }
@@ -438,13 +398,15 @@ private static final long serialVersionUID = 0L;
       proto.Block result = new proto.Block(this);
       int from_bitField0_ = bitField0_;
       int to_bitField0_ = 0;
-      result.creatorID_ = creatorID_;
-      result.height_ = height_;
-      result.prevHash_ = prevHash_;
+      if (headerBuilder_ == null) {
+        result.header_ = header_;
+      } else {
+        result.header_ = headerBuilder_.build();
+      }
       if (dataBuilder_ == null) {
-        if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        if (((bitField0_ & 0x00000002) == 0x00000002)) {
           data_ = java.util.Collections.unmodifiableList(data_);
-          bitField0_ = (bitField0_ & ~0x00000008);
+          bitField0_ = (bitField0_ & ~0x00000002);
         }
         result.data_ = data_;
       } else {
@@ -492,20 +454,14 @@ private static final long serialVersionUID = 0L;
 
     public Builder mergeFrom(proto.Block other) {
       if (other == proto.Block.getDefaultInstance()) return this;
-      if (other.getCreatorID() != 0) {
-        setCreatorID(other.getCreatorID());
-      }
-      if (other.getHeight() != 0) {
-        setHeight(other.getHeight());
-      }
-      if (other.getPrevHash() != 0) {
-        setPrevHash(other.getPrevHash());
+      if (other.hasHeader()) {
+        mergeHeader(other.getHeader());
       }
       if (dataBuilder_ == null) {
         if (!other.data_.isEmpty()) {
           if (data_.isEmpty()) {
             data_ = other.data_;
-            bitField0_ = (bitField0_ & ~0x00000008);
+            bitField0_ = (bitField0_ & ~0x00000002);
           } else {
             ensureDataIsMutable();
             data_.addAll(other.data_);
@@ -518,7 +474,7 @@ private static final long serialVersionUID = 0L;
             dataBuilder_.dispose();
             dataBuilder_ = null;
             data_ = other.data_;
-            bitField0_ = (bitField0_ & ~0x00000008);
+            bitField0_ = (bitField0_ & ~0x00000002);
             dataBuilder_ = 
               com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
                  getDataFieldBuilder() : null;
@@ -555,102 +511,129 @@ private static final long serialVersionUID = 0L;
     }
     private int bitField0_;
 
-    private int creatorID_ ;
+    private proto.BlockHeader header_ = null;
+    private com.google.protobuf.SingleFieldBuilderV3<
+        proto.BlockHeader, proto.BlockHeader.Builder, proto.BlockHeaderOrBuilder> headerBuilder_;
     /**
-     * <code>int32 creatorID = 1;</code>
+     * <code>.proto.BlockHeader header = 1;</code>
      */
-    public int getCreatorID() {
-      return creatorID_;
+    public boolean hasHeader() {
+      return headerBuilder_ != null || header_ != null;
     }
     /**
-     * <code>int32 creatorID = 1;</code>
+     * <code>.proto.BlockHeader header = 1;</code>
      */
-    public Builder setCreatorID(int value) {
-      
-      creatorID_ = value;
-      onChanged();
-      return this;
+    public proto.BlockHeader getHeader() {
+      if (headerBuilder_ == null) {
+        return header_ == null ? proto.BlockHeader.getDefaultInstance() : header_;
+      } else {
+        return headerBuilder_.getMessage();
+      }
     }
     /**
-     * <code>int32 creatorID = 1;</code>
+     * <code>.proto.BlockHeader header = 1;</code>
      */
-    public Builder clearCreatorID() {
-      
-      creatorID_ = 0;
-      onChanged();
-      return this;
-    }
+    public Builder setHeader(proto.BlockHeader value) {
+      if (headerBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        header_ = value;
+        onChanged();
+      } else {
+        headerBuilder_.setMessage(value);
+      }
 
-    private int height_ ;
-    /**
-     * <code>int32 height = 2;</code>
-     */
-    public int getHeight() {
-      return height_;
-    }
-    /**
-     * <code>int32 height = 2;</code>
-     */
-    public Builder setHeight(int value) {
-      
-      height_ = value;
-      onChanged();
       return this;
     }
     /**
-     * <code>int32 height = 2;</code>
+     * <code>.proto.BlockHeader header = 1;</code>
      */
-    public Builder clearHeight() {
-      
-      height_ = 0;
-      onChanged();
-      return this;
-    }
+    public Builder setHeader(
+        proto.BlockHeader.Builder builderForValue) {
+      if (headerBuilder_ == null) {
+        header_ = builderForValue.build();
+        onChanged();
+      } else {
+        headerBuilder_.setMessage(builderForValue.build());
+      }
 
-    private int prevHash_ ;
-    /**
-     * <pre>
-     * Currently an index only
-     * </pre>
-     *
-     * <code>int32 prevHash = 3;</code>
-     */
-    public int getPrevHash() {
-      return prevHash_;
-    }
-    /**
-     * <pre>
-     * Currently an index only
-     * </pre>
-     *
-     * <code>int32 prevHash = 3;</code>
-     */
-    public Builder setPrevHash(int value) {
-      
-      prevHash_ = value;
-      onChanged();
       return this;
     }
     /**
-     * <pre>
-     * Currently an index only
-     * </pre>
-     *
-     * <code>int32 prevHash = 3;</code>
+     * <code>.proto.BlockHeader header = 1;</code>
      */
-    public Builder clearPrevHash() {
-      
-      prevHash_ = 0;
-      onChanged();
+    public Builder mergeHeader(proto.BlockHeader value) {
+      if (headerBuilder_ == null) {
+        if (header_ != null) {
+          header_ =
+            proto.BlockHeader.newBuilder(header_).mergeFrom(value).buildPartial();
+        } else {
+          header_ = value;
+        }
+        onChanged();
+      } else {
+        headerBuilder_.mergeFrom(value);
+      }
+
       return this;
+    }
+    /**
+     * <code>.proto.BlockHeader header = 1;</code>
+     */
+    public Builder clearHeader() {
+      if (headerBuilder_ == null) {
+        header_ = null;
+        onChanged();
+      } else {
+        header_ = null;
+        headerBuilder_ = null;
+      }
+
+      return this;
+    }
+    /**
+     * <code>.proto.BlockHeader header = 1;</code>
+     */
+    public proto.BlockHeader.Builder getHeaderBuilder() {
+      
+      onChanged();
+      return getHeaderFieldBuilder().getBuilder();
+    }
+    /**
+     * <code>.proto.BlockHeader header = 1;</code>
+     */
+    public proto.BlockHeaderOrBuilder getHeaderOrBuilder() {
+      if (headerBuilder_ != null) {
+        return headerBuilder_.getMessageOrBuilder();
+      } else {
+        return header_ == null ?
+            proto.BlockHeader.getDefaultInstance() : header_;
+      }
+    }
+    /**
+     * <code>.proto.BlockHeader header = 1;</code>
+     */
+    private com.google.protobuf.SingleFieldBuilderV3<
+        proto.BlockHeader, proto.BlockHeader.Builder, proto.BlockHeaderOrBuilder> 
+        getHeaderFieldBuilder() {
+      if (headerBuilder_ == null) {
+        headerBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+            proto.BlockHeader, proto.BlockHeader.Builder, proto.BlockHeaderOrBuilder>(
+                getHeader(),
+                getParentForChildren(),
+                isClean());
+        header_ = null;
+      }
+      return headerBuilder_;
     }
 
     private java.util.List<proto.Transaction> data_ =
       java.util.Collections.emptyList();
     private void ensureDataIsMutable() {
-      if (!((bitField0_ & 0x00000008) == 0x00000008)) {
+      if (!((bitField0_ & 0x00000002) == 0x00000002)) {
         data_ = new java.util.ArrayList<proto.Transaction>(data_);
-        bitField0_ |= 0x00000008;
+        bitField0_ |= 0x00000002;
        }
     }
 
@@ -658,7 +641,7 @@ private static final long serialVersionUID = 0L;
         proto.Transaction, proto.Transaction.Builder, proto.TransactionOrBuilder> dataBuilder_;
 
     /**
-     * <code>repeated .proto.Transaction data = 4;</code>
+     * <code>repeated .proto.Transaction data = 2;</code>
      */
     public java.util.List<proto.Transaction> getDataList() {
       if (dataBuilder_ == null) {
@@ -668,7 +651,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>repeated .proto.Transaction data = 4;</code>
+     * <code>repeated .proto.Transaction data = 2;</code>
      */
     public int getDataCount() {
       if (dataBuilder_ == null) {
@@ -678,7 +661,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>repeated .proto.Transaction data = 4;</code>
+     * <code>repeated .proto.Transaction data = 2;</code>
      */
     public proto.Transaction getData(int index) {
       if (dataBuilder_ == null) {
@@ -688,7 +671,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>repeated .proto.Transaction data = 4;</code>
+     * <code>repeated .proto.Transaction data = 2;</code>
      */
     public Builder setData(
         int index, proto.Transaction value) {
@@ -705,7 +688,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated .proto.Transaction data = 4;</code>
+     * <code>repeated .proto.Transaction data = 2;</code>
      */
     public Builder setData(
         int index, proto.Transaction.Builder builderForValue) {
@@ -719,7 +702,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated .proto.Transaction data = 4;</code>
+     * <code>repeated .proto.Transaction data = 2;</code>
      */
     public Builder addData(proto.Transaction value) {
       if (dataBuilder_ == null) {
@@ -735,7 +718,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated .proto.Transaction data = 4;</code>
+     * <code>repeated .proto.Transaction data = 2;</code>
      */
     public Builder addData(
         int index, proto.Transaction value) {
@@ -752,7 +735,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated .proto.Transaction data = 4;</code>
+     * <code>repeated .proto.Transaction data = 2;</code>
      */
     public Builder addData(
         proto.Transaction.Builder builderForValue) {
@@ -766,7 +749,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated .proto.Transaction data = 4;</code>
+     * <code>repeated .proto.Transaction data = 2;</code>
      */
     public Builder addData(
         int index, proto.Transaction.Builder builderForValue) {
@@ -780,7 +763,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated .proto.Transaction data = 4;</code>
+     * <code>repeated .proto.Transaction data = 2;</code>
      */
     public Builder addAllData(
         java.lang.Iterable<? extends proto.Transaction> values) {
@@ -795,12 +778,12 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated .proto.Transaction data = 4;</code>
+     * <code>repeated .proto.Transaction data = 2;</code>
      */
     public Builder clearData() {
       if (dataBuilder_ == null) {
         data_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00000008);
+        bitField0_ = (bitField0_ & ~0x00000002);
         onChanged();
       } else {
         dataBuilder_.clear();
@@ -808,7 +791,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated .proto.Transaction data = 4;</code>
+     * <code>repeated .proto.Transaction data = 2;</code>
      */
     public Builder removeData(int index) {
       if (dataBuilder_ == null) {
@@ -821,14 +804,14 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated .proto.Transaction data = 4;</code>
+     * <code>repeated .proto.Transaction data = 2;</code>
      */
     public proto.Transaction.Builder getDataBuilder(
         int index) {
       return getDataFieldBuilder().getBuilder(index);
     }
     /**
-     * <code>repeated .proto.Transaction data = 4;</code>
+     * <code>repeated .proto.Transaction data = 2;</code>
      */
     public proto.TransactionOrBuilder getDataOrBuilder(
         int index) {
@@ -838,7 +821,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>repeated .proto.Transaction data = 4;</code>
+     * <code>repeated .proto.Transaction data = 2;</code>
      */
     public java.util.List<? extends proto.TransactionOrBuilder> 
          getDataOrBuilderList() {
@@ -849,14 +832,14 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>repeated .proto.Transaction data = 4;</code>
+     * <code>repeated .proto.Transaction data = 2;</code>
      */
     public proto.Transaction.Builder addDataBuilder() {
       return getDataFieldBuilder().addBuilder(
           proto.Transaction.getDefaultInstance());
     }
     /**
-     * <code>repeated .proto.Transaction data = 4;</code>
+     * <code>repeated .proto.Transaction data = 2;</code>
      */
     public proto.Transaction.Builder addDataBuilder(
         int index) {
@@ -864,7 +847,7 @@ private static final long serialVersionUID = 0L;
           index, proto.Transaction.getDefaultInstance());
     }
     /**
-     * <code>repeated .proto.Transaction data = 4;</code>
+     * <code>repeated .proto.Transaction data = 2;</code>
      */
     public java.util.List<proto.Transaction.Builder> 
          getDataBuilderList() {
@@ -877,7 +860,7 @@ private static final long serialVersionUID = 0L;
         dataBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
             proto.Transaction, proto.Transaction.Builder, proto.TransactionOrBuilder>(
                 data_,
-                ((bitField0_ & 0x00000008) == 0x00000008),
+                ((bitField0_ & 0x00000002) == 0x00000002),
                 getParentForChildren(),
                 isClean());
         data_ = null;

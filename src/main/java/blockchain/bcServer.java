@@ -2,12 +2,14 @@ package blockchain;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import config.Node;
+import crypto.DigestMethod;
 import proto.Block;
+import proto.BlockHeader;
 import proto.Transaction;
 import rmf.RmfNode;
 
 import java.util.ArrayList;
-import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Semaphore;
 
 import static java.lang.String.format;
 
@@ -22,6 +24,8 @@ public class bcServer extends Node {
     private boolean stopped;
 //    final Object leaderLock = new Object();
     private final Object blockLock = new Object();
+    private Semaphore newBlockNotifyer = new Semaphore(0);
+    private final Object latencyNotifyer = new Object();
 //    final Object heightLock = new Object();
     private block currBlock; // TODO: As any server should disseminates its block once in an epoch, currently a block is shipped as soon the server turn is coming.
 
@@ -48,12 +52,12 @@ public class bcServer extends Node {
     }
 
     private void startServices() {
-      rmfServer.start();
-        try {
-            Thread.sleep(1000 * 5); // TODO: Do we really need this out of tests??
-        } catch (InterruptedException e) {
-            logger.error("", e);
-        }
+      rmfServer.start(); // TODO: Note that if more than one server is running then this call blocks until all bbc servers are up.
+//        try {
+//            Thread.sleep(1000 * 5); // TODO: Do we really need this out of tests??
+//        } catch (InterruptedException e) {
+//            logger.error("", e);
+//        }
         mainThread = new Thread(this::mainLoop); // TODO: did a problem might occur if not all servers starts at once?
       mainThread.start();
 
@@ -61,9 +65,7 @@ public class bcServer extends Node {
     public void shutdown() {
         stopped =  true;
         mainThread.interrupt();
-//        rmfThread.interrupt();
         try {
-//            rmfThread.join();
             mainThread.join();
         } catch (InterruptedException e) {
             logger.error("", e);
@@ -76,6 +78,7 @@ public class bcServer extends Node {
 
     private void mainLoop() {
         while (!stopped) {
+            leaderImpl();
             byte[] recData = rmfServer.deliver(currHeight, currLeader);
             if (recData == null) {
                 updateLeader();
@@ -97,18 +100,27 @@ public class bcServer extends Node {
             if (!bc.validateBlockData(recBlock)) {
                 logger.warn(format("[#%d] received an invalid data in a valid block, creating an empty block [height=%d]", getID(), currHeight));
                 recBlock = Block.newBuilder(). // creates emptyBlock
+                        setHeader(BlockHeader.
+                        newBuilder().
                         setCreatorID(currLeader).
                         setHeight(currHeight).
-                        setPrevHash(bc.getBlock(currHeight - 1).hashCode())
-                        .build();
+                        setPrev(DigestMethod.
+                                hash(bc.getBlock(currHeight - 1)))).
+                        build();
             }
             bc.addBlock(recBlock);
-
-//            synchronized (heightLock) {
-                currHeight++;
-//            }
+            currHeight++;
             updateLeader();
-            leaderImpl();
+            synchronized (latencyNotifyer) {
+                if (bc.getHeight() <= f) {
+                    continue;
+                }
+                if (bc.getHeight() == f + 1) {
+                    latencyNotifyer.notify();
+                }
+            }
+
+            newBlockNotifyer.release();
 
         }
     }
@@ -120,7 +132,7 @@ public class bcServer extends Node {
         logger.info(format("[#%d] prepare to disseminate a new block of [height=%d]", getID(), currHeight));
 
         synchronized (blockLock) {
-            Block sealedBlock = currBlock.construct(currHeight, bc.getBlock(currHeight - 1).hashCode());
+            Block sealedBlock = currBlock.construct(getID(), currHeight, DigestMethod.hash(bc.getBlock(currHeight - 1)));
             currBlock = bc.createNewBLock();
             rmfServer.broadcast(sealedBlock.toByteArray(), currHeight);
         }
@@ -130,7 +142,7 @@ public class bcServer extends Node {
 
     public boolean addTransaction(Transaction t) {
         synchronized (blockLock) {
-            if (currBlock.getSize() >= maxTransactionInBlock) {
+            if (currBlock.getTransactionCount() >= maxTransactionInBlock) {
                 logger.info(format("[#%d] can't add new transaction from [client=%d], due to lack of space", getID(), t.getClientID()));
                 return false;
             }
@@ -146,5 +158,24 @@ public class bcServer extends Node {
 
     private void handlePossibleFork() {
         logger.fatal("Possible fork has been detected, currently the synchronization service is not yet implemented");
+    }
+
+    public Block deliver() {
+        synchronized (latencyNotifyer) {
+            while (bc.getHeight() <= f) {
+                try {
+                    latencyNotifyer.wait();
+                } catch (InterruptedException e) {
+                    logger.error("Servers returned tentative block", e);
+                }
+            }
+
+            try {
+                newBlockNotifyer.acquire();
+            } catch (InterruptedException e) {
+                logger.error("Server released before receiving a new block", e);
+            }
+            return bc.getBlock(bc.getHeight() - f);
+        }
     }
 }
