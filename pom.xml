@@ -184,6 +184,14 @@
             <version>1.2.17</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>25.1-jre</version>
+        </dependency>
+
+
         <!--&lt;!&ndash; https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-iostreams &ndash;&gt;-->
         <!--<dependency>-->
             <!--<groupId>org.apache.logging.log4j</groupId>-->

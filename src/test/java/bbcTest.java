@@ -1,10 +1,7 @@
-package bbcTest;
-
 import config.Config;
 import consensus.bbc.bbcClient;
 import consensus.bbc.bbcServer;
 import org.junit.jupiter.api.Test;
-import proto.FastBbcVote;
 
 import java.io.File;
 import java.nio.file.Path;

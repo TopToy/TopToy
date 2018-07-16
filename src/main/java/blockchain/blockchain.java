@@ -22,7 +22,8 @@ public abstract class blockchain {
     abstract boolean validateBlockData(Block b);
 
     boolean validateBlockHash(Block b) {
-        return DigestMethod.validate(b.getHeader().getPrev(), Objects.requireNonNull(DigestMethod.hash(blocks.get(b.getHeader().getHeight() - 1))));
+        return DigestMethod.validate(b.getHeader().getPrev(),
+                Objects.requireNonNull(DigestMethod.hash(blocks.get(b.getHeader().getHeight() - 1)))); // TODO: Note that currentky we hash the whole block
     }
 
     public void addBlock(Block b) {
@@ -46,7 +47,7 @@ public abstract class blockchain {
 
     public int getHeight() {
         synchronized (blocks) {
-            return blocks.size();
+            return blocks.size() - 1;
         }
     }
 

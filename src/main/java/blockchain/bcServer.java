@@ -1,5 +1,6 @@
 package blockchain;
 
+import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import config.Node;
 import crypto.DigestMethod;
@@ -46,22 +47,60 @@ public class bcServer extends Node {
         currHeight = 1; // starts from 1 due to the genesis block
         currLeader = 0;
         this.maxTransactionInBlock = maxTransactionInBlock;
-        startServices();
-
-
     }
 
-    private void startServices() {
+    public void start() {
+        startServices();
+        logger.info(format("[#%d] has been initialized successfully", getID()));
+    }
+     private void startServices() {
       rmfServer.start(); // TODO: Note that if more than one server is running then this call blocks until all bbc servers are up.
 //        try {
 //            Thread.sleep(1000 * 5); // TODO: Do we really need this out of tests??
 //        } catch (InterruptedException e) {
 //            logger.error("", e);
 //        }
-        mainThread = new Thread(this::mainLoop); // TODO: did a problem might occur if not all servers starts at once?
+
+//      waitForAll();
+//         try {
+//             Thread.sleep(10 * 1000);
+//         } catch (InterruptedException e) {
+//             e.printStackTrace();
+//         }
+         mainThread = new Thread(this::mainLoop); // TODO: did a problem might occur if not all servers starts at once?
       mainThread.start();
 
     }
+
+//    /*
+//    Currently the system is unable to run unless all servers are up (not only 2f + 1)? we now tries to connect them all.
+//     */
+//    private void waitForAll() {
+//        rmfServer.broadcast("ready".getBytes(), 0);
+//        Thread[] allUp = new Thread[n];
+//        for (int i = 0 ; i < n ; i++) {
+//            int finalI = i;
+//            allUp[i] = new Thread(() -> {
+//                while (rmfServer.deliver(0, finalI) == null) {
+//                    try {
+//                        Thread.sleep(1000 * 1);
+//                    } catch (InterruptedException e) {
+//                        logger.error(format("[#%d] interrupted while waiting for [#%d]", getID(), finalI), e);
+//                    }
+//                    logger.info(format("[#%d] waits for [#%d] to be ready", getID(), finalI));
+//                }
+//                logger.info(format("[#%d] received ready from [#%d]", getID(), finalI));
+//            });
+//            allUp[i].start();
+//        }
+//        for (int i = 0 ; i < n ; i++) {
+//            try {
+//                allUp[i].join();
+//            } catch (InterruptedException e) {
+//                logger.error(format("[#%d] interrupted while waiting for [#%d] to join", getID(), i), e);
+//            }
+//        }
+//    }
     public void shutdown() {
         stopped =  true;
         mainThread.interrupt();
@@ -71,6 +110,7 @@ public class bcServer extends Node {
             logger.error("", e);
         }
         rmfServer.stop();
+        logger.info(format("[#%d] has been shutdown successfully", getID()));
     }
     private void updateLeader() {
             currLeader = (currLeader + 1) % n;
@@ -112,10 +152,10 @@ public class bcServer extends Node {
             currHeight++;
             updateLeader();
             synchronized (latencyNotifyer) {
-                if (bc.getHeight() <= f) {
+                if (bc.getHeight() < f) {
                     continue;
                 }
-                if (bc.getHeight() == f + 1) {
+                if (bc.getHeight() == f) {
                     latencyNotifyer.notify();
                 }
             }
@@ -140,7 +180,8 @@ public class bcServer extends Node {
 
     }
 
-    public boolean addTransaction(Transaction t) {
+    public boolean addTransaction(byte[] data, int clientID) {
+        Transaction t = Transaction.newBuilder().setClientID(clientID).setData(ByteString.copyFrom(data)).build();
         synchronized (blockLock) {
             if (currBlock.getTransactionCount() >= maxTransactionInBlock) {
                 logger.info(format("[#%d] can't add new transaction from [client=%d], due to lack of space", getID(), t.getClientID()));
@@ -162,20 +203,19 @@ public class bcServer extends Node {
 
     public Block deliver() {
         synchronized (latencyNotifyer) {
-            while (bc.getHeight() <= f) {
+            while (bc.getHeight() < f) {
                 try {
                     latencyNotifyer.wait();
                 } catch (InterruptedException e) {
                     logger.error("Servers returned tentative block", e);
                 }
             }
-
-            try {
-                newBlockNotifyer.acquire();
-            } catch (InterruptedException e) {
-                logger.error("Server released before receiving a new block", e);
-            }
-            return bc.getBlock(bc.getHeight() - f);
         }
+        try {
+            newBlockNotifyer.acquire();
+        } catch (InterruptedException e) {
+            logger.error("Server released before receiving a new block", e);
+        }
+        return bc.getBlock(bc.getHeight() - f);
     }
 }

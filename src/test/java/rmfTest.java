@@ -1,10 +1,6 @@
-package rmfTest;
-
 import config.Config;
 import config.Node;
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.ObjectUtils;
-import org.checkerframework.dataflow.qual.TerminatesExecution;
 import org.junit.jupiter.api.Test;
 import rmf.ByzantineRmfNode;
 import rmf.RmfNode;
@@ -12,9 +8,7 @@ import rmf.RmfNode;
 import java.io.File;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
-import java.util.concurrent.CountDownLatch;
 
 import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.assertEquals;
