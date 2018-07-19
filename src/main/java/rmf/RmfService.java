@@ -30,6 +30,7 @@ TODO:
 3. When to reset the timer
 4. prevBbcConsensus can grow infinitely (and some more, analyze it!!)
 5. change maps to list
+6. Handle the case in which byzantine node sends its message twice
  */
 public class RmfService extends RmfGrpc.RmfImplBase {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(RmfService.class);
@@ -511,7 +512,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
 //           synchronized (recMsg) {
                 msg = pendingMsg.get(height, sender);
                 recMsg.put(height, msg);
-                Set<Integer> senders = pendingMsg.row(height).keySet();
+                List<Integer> senders = new ArrayList<>(pendingMsg.row(height).keySet());
                 for (int k : senders) {
                     pendingMsg.remove(height, k);
                 }

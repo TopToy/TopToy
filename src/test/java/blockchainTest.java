@@ -1,4 +1,6 @@
+import blockchain.asyncBcServer;
 import blockchain.bcServer;
+import blockchain.byzantineBcServer;
 import com.google.protobuf.ByteString;
 import config.Config;
 import config.Node;
@@ -10,6 +12,8 @@ import proto.Transaction;
 import java.io.File;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
 
 import static java.lang.String.format;
@@ -18,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class blockchainTest {
 
-    private int timeToWaitBetweenTests = 1; //1000 * 15;
+    private int timeToWaitBetweenTests = 1000 * 60;
     static Config conf = new Config();
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(blockchainTest.class);
     private String localHost = "127.0.0.1";
@@ -48,16 +52,30 @@ public class blockchainTest {
         Node[] ret = new Node[nnodes];
         for (int id = 0 ; id < nnodes ; id++) {
             logger.info("init server #" + id);
-//            if (ArrayUtils.contains(byzIds, id)) {
-//                ret[id] = new ByzantineRmfNode(id, localHost, ports[id], f, 1, 1000 * 1, currentNodes, configHome);
-//                continue;
-//            }
+            if (ArrayUtils.contains(byzIds, id)) {
+                ret[id] = new byzantineBcServer(localHost, ports[id], id, f, currentNodes, configHome, 1);
+                continue;
+            }
             ret[id] =  new bcServer(localHost, ports[id], id, f, currentNodes, configHome, 1);
         }
         return ret;
         //        n.start();
 
     }
+
+    private Node[] initLocalAsyncRmfNodes(int nnodes, int f, String configHome, int[] byzIds) {
+        deleteViewIfExist(configHome);
+        ArrayList<Node> currentNodes = new ArrayList<>(nodes.subList(0, nnodes));
+        Node[] ret = new Node[nnodes];
+        for (int id = 0 ; id < nnodes ; id++) {
+            logger.info("init server #" + id);
+            ret[id] =  new asyncBcServer(localHost, ports[id], id, f, currentNodes, configHome, 1);
+        }
+        return ret;
+        //        n.start();
+
+    }
+
     @Test
     void TestSingleServer() throws InterruptedException {
         Thread.sleep(timeToWaitBetweenTests);
@@ -77,7 +95,7 @@ public class blockchainTest {
         ((bcServer) rn1[0]).start();
         ((bcServer) rn1[0]).serve();
         ((bcServer) rn1[0]).addTransaction(("hello").getBytes(), 100);
-        Block b = ((bcServer) rn1[0]).deliverLast();
+        Block b = ((bcServer) rn1[0]).deliver(1);
         assertEquals(1, b.getHeader().getHeight());
         assertEquals(0, b.getHeader().getCreatorID());
         assertEquals(100, b.getData(0).getClientID());
@@ -114,7 +132,7 @@ public class blockchainTest {
 //        }
 //        int height = 0;
 //        sender.act((RmfNode) allNodes[0]);
-        Thread.sleep(10 * 1000);
+//        Thread.sleep(10 * 1000);
         String[] ret = new String[4];
         Thread[] tasks = new Thread[4];
         for (int i = 0 ; i < nnodes ; i++) {
@@ -138,6 +156,16 @@ public class blockchainTest {
         }
     }
 //
+    void serverDoing(List<Block> res, bcServer s) {
+        for(int i = 0; i < 100 ; i++) {
+            String msg = "Hello" + i;
+            if (i % 4 == s.getID()) {
+                s.addTransaction(msg.getBytes(), 0);
+            }
+            res.add(s.deliver(i));
+        }
+//        logger.info("******************" + s.getID() + "****************************");
+    }
     @Test
     void TestStressFourServersNoFailures() throws InterruptedException {
         Thread.sleep(timeToWaitBetweenTests);
@@ -159,281 +187,278 @@ public class blockchainTest {
         for (int i = 0 ; i < nnodes ; i++) {
             ((bcServer) allNodes[i]).serve();
         }
-
-        for (int k = 0 ; k < 100 ; k++) {
-            String msg = "Hello" + k;
-            ((bcServer) allNodes[k % 4]).addTransaction(msg.getBytes(), 0);
+        HashMap<Integer, ArrayList<Block>> res = new HashMap<>();
+        for (int i = 0 ; i < nnodes ; i++) {
+            res.put(i, new ArrayList<Block>());
         }
-        Thread.sleep(1000 * 60);
-//        for (int k = 0 ; k < 100 ; k++) {
-//            String msg = "Hello" + k;
-//            ((bcServer) allNodes[k % 4]).addTransaction(msg.getBytes(), 0);
-////        sender.act((RmfNode) allNodes[0]);
-//            String[] ret = new String[4];
-//            Thread[] tasks = new Thread[4];
-//            for (int i = 0 ; i < nnodes ; i++) {
-//                int finalI = i;
-//                int finalK = k;
-//                tasks[i] = new Thread(()-> {
-//                    ret[finalI] = new String(((RmfNode) allNodes[finalI]).deliver(finalK, finalK % 4));
-//                });
-//                tasks[i].start();
-//            }
-//
-//            for (int i = 0 ; i < nnodes ; i++) {
-//                tasks[i].join();
-//            }
-//
-//            for (int i = 0 ; i < 4 ; i++) {
-////                logger.info(format("******** round [%d:%d], message is [%s:%s] *********", k, i,  msg, ret[i]));
-//                assertEquals(ret[0], ret[i]);
-//            }
-//        }
-//
-//        for (int i = 0 ; i < 4 ; i++) {
-//            ((RmfNode) allNodes[i]).stop();
-//        }
+        Thread[] tasks = new Thread[4];
+        for (int i = 0 ; i < 4 ;i++) {
+            int finalI = i;
+            tasks[i] = new Thread(() -> serverDoing(res.get(finalI), (bcServer) allNodes[finalI]));
+            tasks[i].start();
+        }
+        for (int i = 0 ; i < nnodes ; i++) {
+            tasks[i].join();
+        }
+
+        for (int i = 0 ; i < 100 ; i++) {
+            logger.info(format("***** Assert creator = %d", res.get(0).get(i).getHeader().getCreatorID()));
+            for (int k = 0 ; k < nnodes ;k++) {
+                assertEquals(res.get(0).get(i).getHeader().getCreatorID(), res.get(k).get(i).getHeader().getCreatorID());
+            }
+        }
+        for (int i = 0 ; i < 4 ; i++) {
+            ((bcServer) allNodes[i]).shutdown();
+        }
     }
 //
-//    @Test
-//    void TestFourServersSenderMuteFailure() throws InterruptedException {
-//        Thread.sleep(timeToWaitBetweenTests);
-//        Thread[] servers = new Thread[4];
-//        int nnodes = 4;
-//        String fourServersConfig = Paths.get("config", "bbcConfig", "bbcFourServers").toString();
-//        logger.info("start TestFourServersSenderMuteFailure");
-//
-//        Node[] allNodes = initLocalRmfNodes(nnodes,1,fourServersConfig, null);
-//        for (int i = 0 ; i < nnodes ; i++) {
-//            int finalI = i;
-//            servers[i]  = new Thread(() ->((RmfNode) allNodes[finalI]).start());
+@Test
+void TestStressFourServersMuteFault() throws InterruptedException {
+    Thread.sleep(timeToWaitBetweenTests);
+    Thread[] servers = new Thread[4];
+    int nnodes = 4;
+    String fourServersConfig = Paths.get("config", "bbcConfig", "bbcFourServers").toString();
+    logger.info("start TestStressFourServersNoFailures");
+
+    Node[] allNodes = initLocalRmfNodes(nnodes,1,fourServersConfig, null);
+    for (int i = 0 ; i < nnodes ; i++) {
+        int finalI = i;
+//        if (i == 0) {
+//            servers[i]  = new Thread(() ->((byzantineBcServer) allNodes[finalI]).start());
 //            servers[i].start();
+//            continue;
 //        }
-//        for (int i = 0 ; i < nnodes ; i++) {
-//            servers[i].join();
-//        }
-//        int height = 0;
-//        String[] ret = new String[4];
-//        Thread[] tasks = new Thread[4];
-//        for (int i = 0 ; i < nnodes ; i++) {
-//            int finalI = i;
-//            tasks[i] = new Thread(()-> {
-//                byte[] res = ((RmfNode) allNodes[finalI]).deliver(height, 0);
-//                ret[finalI] = (res == null ? null : new String(res));
-//            });
-//            tasks[i].start();
-//        }
-//
-//        for (int i = 0 ; i < nnodes ; i++) {
-//            tasks[i].join();
-//        }
-//
-//        for (int i = 0 ; i < 4 ; i++) {
-//            assertNull(ret[i]);
-////            ((RmfNode) allNodes[i]).stop();
-//        }
-//        for (int i = 0 ; i < 4 ; i++) {
-//            ((RmfNode) allNodes[i]).stop();
-//        }
-//    }
-//    @Test
-//    void TestFourServersSelectiveBroadcast() throws InterruptedException {
+        servers[i]  = new Thread(() ->((bcServer) allNodes[finalI]).start());
+        servers[i].start();
+    }
+    for (int i = 0 ; i < nnodes ; i++) {
+        servers[i].join();
+    }
+
+    for (int i = 1 ; i < nnodes ; i++) {
+        ((bcServer) allNodes[i]).serve();
+    }
+
+    HashMap<Integer, ArrayList<Block>> res = new HashMap<>();
+    for (int i = 1 ; i < nnodes ; i++) {
+        res.put(i, new ArrayList<Block>());
+    }
+    Thread[] tasks = new Thread[4];
+    for (int i = 1 ; i < 4 ;i++) {
+        int finalI = i;
+        tasks[i] = new Thread(() -> serverDoing(res.get(finalI), (bcServer) allNodes[finalI]));
+        tasks[i].start();
+    }
+    for (int i = 1 ; i < nnodes ; i++) {
+        tasks[i].join();
+    }
+
+    for (int i = 0 ; i < 100 ; i++) {
+        logger.info(format("***** Assert creator = %d", res.get(1).get(i).getHeader().getCreatorID()));
+        for (int k = 1 ; k < nnodes ;k++) {
+            assertEquals(res.get(1).get(i).getHeader().getCreatorID(), res.get(k).get(i).getHeader().getCreatorID());
+        }
+    }
+    for (int i = 0 ; i < 4 ; i++) {
+        ((bcServer) allNodes[i]).shutdown();
+    }
+}
+    void bServerDoing(List<Block> res, byzantineBcServer s) {
+        for(int i = 0; i < 100 ; i++) {
+            String msg = "Hello" + i;
+            if (i % 4 == s.getID()) {
+                s.addTransaction(msg.getBytes(), 0);
+            }
+            res.add(s.deliver(i));
+        }
+    }
+    @Test
+    void TestStressFourServersSelectiveBroadcastFault() throws InterruptedException {
+        Thread.sleep(timeToWaitBetweenTests);
+        Thread[] servers = new Thread[4];
+        int nnodes = 4;
+        String fourServersConfig = Paths.get("config", "bbcConfig", "bbcFourServers").toString();
+        logger.info("start TestStressFourServersNoFailures");
+
+        Node[] allNodes = initLocalRmfNodes(nnodes,1,fourServersConfig, new int[]{0});
+        for (int i = 0 ; i < nnodes ; i++) {
+            int finalI = i;
+            if (i == 0) {
+                servers[i]  = new Thread(() ->((byzantineBcServer) allNodes[finalI]).start());
+                servers[i].start();
+                continue;
+            }
+            servers[i]  = new Thread(() ->((bcServer) allNodes[finalI]).start());
+            servers[i].start();
+        }
+        for (int i = 0 ; i < nnodes ; i++) {
+            servers[i].join();
+        }
+
+        for (int i = 0 ; i < nnodes ; i++) {
+            if (i == 0) {
+                ((byzantineBcServer) allNodes[i]).serve();
+                continue;
+            }
+            ((bcServer) allNodes[i]).serve();
+        }
+
+        HashMap<Integer, ArrayList<Block>> res = new HashMap<>();
+        for (int i = 0 ; i < nnodes ; i++) {
+            res.put(i, new ArrayList<Block>());
+        }
+        Thread[] tasks = new Thread[4];
+        for (int i = 0 ; i < 4 ;i++) {
+            if (i == 0) {
+                int finalI1 = i;
+                tasks[i] = new Thread(() -> bServerDoing(res.get(finalI1), (byzantineBcServer) allNodes[finalI1]));
+                tasks[i].start();
+                continue;
+            }
+            int finalI = i;
+            tasks[i] = new Thread(() -> serverDoing(res.get(finalI), (bcServer) allNodes[finalI]));
+            tasks[i].start();
+        }
+        for (int i = 0 ; i < nnodes ; i++) {
+            tasks[i].join();
+        }
+
+        for (int i = 0 ; i < 100 ; i++) {
+            logger.info(format("***** Assert creator = %d", res.get(0).get(i).getHeader().getCreatorID()));
+            for (int k = 0 ; k < nnodes ;k++) {
+                assertEquals(res.get(0).get(i).getHeader().getCreatorID(), res.get(k).get(i).getHeader().getCreatorID());
+            }
+        }
+        for (int i = 0 ; i < 4 ; i++) {
+            if (i == 0) {
+                ((byzantineBcServer) allNodes[i]).shutdown();
+                continue;
+            }
+            ((bcServer) allNodes[i]).shutdown();
+        }
+    }
+
+    void asyncServerDoing(List<Block> res, asyncBcServer s) {
+        for(int i = 0; i < 100 ; i++) {
+            String msg = "Hello" + i;
+            if (i % 4 == s.getID()) {
+                s.addTransaction(msg.getBytes(), 0);
+            }
+            res.add(s.deliver(i));
+        }
+//        logger.info("******************" + s.getID() + "****************************");
+    }
+    @Test
+    void TestStressFourServersAsuncNetwork() throws InterruptedException {
 //        Thread.sleep(timeToWaitBetweenTests);
-//        Thread[] servers = new Thread[4];
-//        int nnodes = 4;
-//        String fourServersConfig = Paths.get("config", "bbcConfig", "bbcFourServers").toString();
-//        logger.info("start TestFourServersSelectiveBroadcast");
-//
-//        Node[] allNodes = initLocalRmfNodes(nnodes,1,fourServersConfig, new int[] {0});
-//        for (int i = 0 ; i < nnodes ; i++) {
-//            int finalI = i;
-//            if (i == 0) {
-//                servers[i] =  new Thread(() ->((ByzantineRmfNode) allNodes[finalI]).start());
-//            } else {
-//                servers[i]  = new Thread(() ->((RmfNode) allNodes[finalI]).start());
-//            }
-//            servers[i].start();
-//        }
-//        for (int i = 0 ; i < nnodes ; i++) {
-//            servers[i].join();
-//        }
-//        int height = 0;
-//        String msg = "Hello";
-//        ((ByzantineRmfNode) allNodes[0]).selectiveBroadcast(msg.getBytes(), 0, new int[] {1, 2});
-////        sender.act((RmfNode) allNodes[0]);
-//        String[] ret = new String[4];
-//        Thread[] tasks = new Thread[4];
-//        for (int i = 0 ; i < nnodes ; i++) {
-//            int finalI = i;
-//            if (i == 0) {
-//                tasks[i] = new Thread(()-> {
-//                    byte[] res = ((ByzantineRmfNode) allNodes[finalI]).deliver(height, 0);
-//                    ret[finalI] = (res == null ? null : new String(res));
-//                });
-//
-//            } else {
-//                tasks[i] = new Thread(()-> {
-//                    byte[] res = ((RmfNode) allNodes[finalI]).deliver(height, 0);
-//                    ret[finalI] = (res == null ? null : new String(res));
-//                });
-//            }
-//
-//            tasks[i].start();
-//        }
-//
-//        for (int i = 0 ; i < nnodes ; i++) {
-//            tasks[i].join();
-//        }
-//
-//        for (int i = 0 ; i < 4 ; i++) {
-//            assertEquals(ret[0], ret[i]);
-////            ((RmfNode) allNodes[i]).stop();
-//        }
-//        for (int i = 0 ; i < 4 ; i++) {
-//            if (i == 0)  {
-//                ((ByzantineRmfNode) allNodes[i]).stop();
-//                continue;
-//            }
-//            ((RmfNode) allNodes[i]).stop();
-//        }
-//
-//    }
-//
-//    @Test
-//    void TestStressFourServersSelectiveBroadcast() throws InterruptedException {
-//        Thread.sleep(timeToWaitBetweenTests);
-//        Thread[] servers = new Thread[4];
-//        int nnodes = 4;
-//        String fourServersConfig = Paths.get("config", "bbcConfig", "bbcFourServers").toString();
-//        logger.info("start TestFourServersSelectiveBroadcast");
-//
-//        Node[] allNodes = initLocalRmfNodes(nnodes,1,fourServersConfig, new int[] {0});
-//        for (int i = 0 ; i < nnodes ; i++) {
-//            int finalI = i;
-//            if (i == 0) {
-//                servers[i] =  new Thread(() ->((ByzantineRmfNode) allNodes[finalI]).start());
-//            } else {
-//                servers[i]  = new Thread(() ->((RmfNode) allNodes[finalI]).start());
-//            }
-//            servers[i].start();
-//        }
-//        for (int i = 0 ; i < nnodes ; i++) {
-//            servers[i].join();
-//        }
-//        for (int k = 0 ; k < 100 ; k++) {
-//            String msg = "Hello" + k;
-//            ((ByzantineRmfNode) allNodes[0]).selectiveBroadcast(msg.getBytes(), k, new int[] {1, 2});
-////        sender.act((RmfNode) allNodes[0]);
-//            String[] ret = new String[4];
-//            Thread[] tasks = new Thread[4];
-//            for (int i = 0 ; i < nnodes ; i++) {
-//                int finalI = i;
-//                if (i == 0) {
-//                    int finalK = k;
-//                    tasks[i] = new Thread(()-> {
-//                        byte[] res = ((ByzantineRmfNode) allNodes[finalI]).deliver(finalK, 0);
-//                        ret[finalI] = (res == null ? null : new String(res));
-//                    });
-//
-//                } else {
-//                    int finalK1 = k;
-//                    tasks[i] = new Thread(()-> {
-//                        byte[] res = ((RmfNode) allNodes[finalI]).deliver(finalK1, 0);
-//                        ret[finalI] = (res == null ? null : new String(res));
-//                    });
-//                }
-//
-//                tasks[i].start();
-//            }
-//
-//            for (int i = 0 ; i < nnodes ; i++) {
-//                tasks[i].join();
-//            }
-//
-//            for (int i = 0 ; i < 4 ; i++) {
-//                assertEquals(ret[0], ret[i]);
-////            ((RmfNode) allNodes[i]).stop();
-//            }
-//        }
-//
-//        for (int i = 0 ; i < 4 ; i++) {
-//            if (i == 0)  {
-//                ((ByzantineRmfNode) allNodes[i]).stop();
-//                continue;
-//            }
-//            ((RmfNode) allNodes[i]).stop();
-//        }
-//
-//    }
-//
-//    void asyncServerAction(RmfNode node, String[] res) throws InterruptedException {
-//        for (int i = 0 ; i < 100 ; i++) {
-//            Random rand = new Random();
-//            int  n = rand.nextInt(1000);
-//            if (n > 0) {
-//                logger.info(format("[#%d] sleeps for [%d] ms", node.getID(), n));
-//                Thread.sleep(n);
-//            }
-//            if (i % 4 == node.getID()) {
-//                String msg = "hello" + i;
-//                node.broadcast(msg.getBytes(), i);
-//            }
-//            byte[] ret = node.deliver(i, i % 4);
-//            res[i] = (ret == null ? null : new String(ret));
-//            if (i == 99) {
-//                logger.info(format("[#%d] i=99", node.getID()));
-//            }
-//        }
-//    }
-//
-//    @Test
-//    void TestAsyncNetwork1() throws InterruptedException {
-//        Thread.sleep(timeToWaitBetweenTests);
-//        Thread[] servers = new Thread[4];
-//        int nnodes = 4;
-//        String fourServersConfig = Paths.get("config", "bbcConfig", "bbcFourServers").toString();
-//        logger.info("start TestFourServersSenderMuteFailure");
-//
-//        Node[] allNodes = initLocalRmfNodes(nnodes,1,fourServersConfig, null);
-//        for (int i = 0 ; i < nnodes ; i++) {
-//            int finalI = i;
-//            servers[i]  = new Thread(() ->((RmfNode) allNodes[finalI]).start());
-//            servers[i].start();
-//        }
-//        for (int i = 0 ; i < nnodes ; i++) {
-//            servers[i].join();
-//        }
-//        String[][] allRes = new String[4][100];
-//        Thread[] tasks = new Thread[4];
-//
-//        for (int i = 0 ; i < 4; i++) {
-//            int finalI = i;
-//            tasks[i] = new Thread(() -> {
-//                try {
-//                    asyncServerAction((RmfNode) allNodes[finalI], allRes[finalI]);
-//                } catch (InterruptedException e) {
-//                    logger.warn("",e);
-//                }
-//            });
-//            tasks[i].start();
-//        }
-//        for (int i = 0 ; i < 4 ;i++) {
-//            tasks[i].join();
-//        }
-//
-//        for (int i = 0 ; i < 100 ; i++) {
-//            if (allRes[0][i] == null) {
-//                logger.info(format("null message detected at round [%d]", i));
-//            }
-//            for (int j = 0 ; j < 4 ; j++) {
-//
-//                assertEquals(allRes[0][i], allRes[j][i]);
-//            }
-//        }
-//
-//        for (int i = 0 ; i < 4 ; i++) {
-//            ((RmfNode) allNodes[i]).stop();
-//            logger.info(format("[#%d] stopped", i));
-//        }
-//    }
+        Thread[] servers = new Thread[4];
+        int nnodes = 4;
+        String fourServersConfig = Paths.get("config", "bbcConfig", "bbcFourServers").toString();
+        logger.info("start TestStressFourServersNoFailures");
+
+        Node[] allNodes = initLocalAsyncRmfNodes(nnodes,1,fourServersConfig, null);
+
+        for (int i = 0 ; i < nnodes ; i++) {
+            int finalI = i;
+            servers[i]  = new Thread(() ->((asyncBcServer) allNodes[finalI]).start());
+            servers[i].start();
+        }
+        for (int i = 0 ; i < nnodes ; i++) {
+            servers[i].join();
+        }
+
+        for (int i = 0 ; i < nnodes ; i++) {
+            ((asyncBcServer) allNodes[i]).serve();
+        }
+        HashMap<Integer, ArrayList<Block>> res = new HashMap<>();
+        for (int i = 0 ; i < nnodes ; i++) {
+            res.put(i, new ArrayList<Block>());
+        }
+        Thread[] tasks = new Thread[4];
+        for (int i = 0 ; i < 4 ;i++) {
+            int finalI = i;
+            tasks[i] = new Thread(() -> asyncServerDoing(res.get(finalI), (asyncBcServer) allNodes[finalI]));
+            tasks[i].start();
+        }
+        for (int i = 0 ; i < nnodes ; i++) {
+            tasks[i].join();
+        }
+
+        for (int i = 0 ; i < 100 ; i++) {
+            logger.info(format("***** Assert creator = %d", res.get(0).get(i).getHeader().getCreatorID()));
+            for (int k = 0 ; k < nnodes ;k++) {
+                assertEquals(res.get(0).get(i).getHeader().getCreatorID(), res.get(k).get(i).getHeader().getCreatorID());
+            }
+        }
+        for (int i = 0 ; i < 4 ; i++) {
+            ((asyncBcServer) allNodes[i]).shutdown();
+        }
+    }
+
+    @Test
+    void TestStressFourServerssplitBroadcastFault() throws InterruptedException {
+        Thread.sleep(timeToWaitBetweenTests);
+        Thread[] servers = new Thread[4];
+        int nnodes = 4;
+        String fourServersConfig = Paths.get("config", "bbcConfig", "bbcFourServers").toString();
+        logger.info("start TestStressFourServersNoFailures");
+
+        Node[] allNodes = initLocalRmfNodes(nnodes,1,fourServersConfig, new int[]{0});
+        for (int i = 0 ; i < nnodes ; i++) {
+            int finalI = i;
+            if (i == 0) {
+                servers[i]  = new Thread(() ->((byzantineBcServer) allNodes[finalI]).start());
+                servers[i].start();
+                continue;
+            }
+            servers[i]  = new Thread(() ->((bcServer) allNodes[finalI]).start());
+            servers[i].start();
+        }
+        for (int i = 0 ; i < nnodes ; i++) {
+            servers[i].join();
+        }
+
+        for (int i = 0 ; i < nnodes ; i++) {
+            if (i == 0) {
+                ((byzantineBcServer) allNodes[i]).setFullByz();
+                ((byzantineBcServer) allNodes[i]).serve();
+                continue;
+            }
+            ((bcServer) allNodes[i]).serve();
+        }
+
+        HashMap<Integer, ArrayList<Block>> res = new HashMap<>();
+        for (int i = 0 ; i < nnodes ; i++) {
+            res.put(i, new ArrayList<Block>());
+        }
+        Thread[] tasks = new Thread[4];
+        for (int i = 0 ; i < 4 ;i++) {
+            if (i == 0) {
+                int finalI1 = i;
+                tasks[i] = new Thread(() -> bServerDoing(res.get(finalI1), (byzantineBcServer) allNodes[finalI1]));
+                tasks[i].start();
+                continue;
+            }
+            int finalI = i;
+            tasks[i] = new Thread(() -> serverDoing(res.get(finalI), (bcServer) allNodes[finalI]));
+            tasks[i].start();
+        }
+        for (int i = 0 ; i < nnodes ; i++) {
+            tasks[i].join();
+        }
+
+        for (int i = 0 ; i < 100 ; i++) {
+            logger.info(format("***** Assert creator = %d", res.get(0).get(i).getHeader().getCreatorID()));
+            for (int k = 0 ; k < nnodes ;k++) {
+                assertEquals(res.get(0).get(i).getHeader().getCreatorID(), res.get(k).get(i).getHeader().getCreatorID());
+            }
+        }
+        for (int i = 0 ; i < 4 ; i++) {
+            if (i == 0) {
+                ((byzantineBcServer) allNodes[i]).shutdown();
+                continue;
+            }
+            ((bcServer) allNodes[i]).shutdown();
+        }
+    }
 }

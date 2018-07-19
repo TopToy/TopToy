@@ -8,17 +8,9 @@ public interface BlockHeaderOrBuilder extends
     com.google.protobuf.MessageOrBuilder {
 
   /**
-   * <code>.proto.Digest prev = 1;</code>
+   * <code>bytes prev = 1;</code>
    */
-  boolean hasPrev();
-  /**
-   * <code>.proto.Digest prev = 1;</code>
-   */
-  proto.Crypto.Digest getPrev();
-  /**
-   * <code>.proto.Digest prev = 1;</code>
-   */
-  proto.Crypto.DigestOrBuilder getPrevOrBuilder();
+  com.google.protobuf.ByteString getPrev();
 
   /**
    * <code>int32 creatorID = 2;</code>

@@ -6,18 +6,17 @@ import config.Node;
 import crypto.DigestMethod;
 import proto.Block;
 import proto.BlockHeader;
-import proto.Crypto;
 import proto.Transaction;
 import rmf.RmfNode;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
-import java.util.concurrent.Semaphore;
+import java.util.Random;
 
 import static java.lang.String.format;
 
-public class bcServer extends Node {
+public class asyncBcServer extends Node {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(bcServer.class);
     private RmfNode rmfServer;
     private blockchain bc; // TODO: Currently implement as basicBlockchain but we will make it dynamically (using config file)
@@ -26,9 +25,9 @@ public class bcServer extends Node {
     private int n;
     private int currLeader;
     private boolean stopped;
-//    final Object leaderLock = new Object();
+    //    final Object leaderLock = new Object();
     private final Object blockLock = new Object();
-//    private Semaphore newBlockNotifier = new Semaphore(0, true);
+    //    private Semaphore newBlockNotifier = new Semaphore(0, true);
 //    private final Object latencyNotifier = new Object();
 //    final Object heightLock = new Object();
     private block currBlock; // TODO: As any server should disseminates its block once in an epoch, currently a block is shipped as soon the server turn is coming.
@@ -39,7 +38,7 @@ public class bcServer extends Node {
 //    private Thread rmfThread;
 
     // TODO: Currently nodes, f, tmoInterval, tmo and configHome are coded but we will turn it into configuration file
-    public bcServer(String addr, int port, int id, int f, ArrayList<Node> nodes, String bbcConfigHome, int maxTransactionInBlock) {
+    public asyncBcServer(String addr, int port, int id, int f, ArrayList<Node> nodes, String bbcConfigHome, int maxTransactionInBlock) {
         super(addr, port, id);
         rmfServer = new RmfNode(id, addr, port, f, 100, 1000 * 1, nodes, bbcConfigHome);
         bc = new basicBlockchain(id);
@@ -59,7 +58,7 @@ public class bcServer extends Node {
     }
 
     public void serve() {
-         // TODO: did a problem might occur if not all servers starts at once?
+        // TODO: did a problem might occur if not all servers starts at once?
         mainThread.start();
 
     }
@@ -76,11 +75,20 @@ public class bcServer extends Node {
         logger.info(format("[#%d] has been shutdown successfully", getID()));
     }
     private void updateLeader() {
-            currLeader = (currLeader + 1) % n;
+        currLeader = (currLeader + 1) % n;
     }
 
     private void mainLoop() {
         while (!stopped) {
+            Random rand = new Random();
+            int x = rand.nextInt(1000) + 1;
+            logger.info(format("[#%d] sleeps for %d ms",getID(), x));
+            try {
+                Thread.sleep(x);
+            } catch (InterruptedException e) {
+                logger.error("", e);
+                return;
+            }
             leaderImpl();
             byte[] recData = rmfServer.deliver(currHeight, currLeader);
             if (recData == null) {
@@ -185,21 +193,4 @@ public class bcServer extends Node {
         }
         return bc.getBlock(index);
     }
-//    public Block deliverLast() {
-//        synchronized (latencyNotifier) {
-//            while (bc.getHeight() < f) {
-//                try {
-//                    latencyNotifier.wait();
-//                } catch (InterruptedException e) {
-//                    logger.error("Servers returned tentative block", e);
-//                }
-//            }
-//        }
-//        try {
-//            newBlockNotifier.acquire();
-//        } catch (InterruptedException e) {
-//            logger.error("Server released before receiving a new block", e);
-//        }
-//        return bc.getBlock(bc.getHeight() - f);
-//    }
 }

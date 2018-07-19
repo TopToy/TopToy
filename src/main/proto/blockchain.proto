@@ -3,11 +3,11 @@ option java_package = "proto";
 package proto;
 option java_multiple_files = true;
 
-import "crypto.proto";
+//import "crypto.proto";
 // Adding crypto data??
 
 message BlockHeader {
-    Digest prev= 1;
+    bytes prev= 1;
     int32 creatorID = 2;
     int32 height = 3;
 //    MerkleTree mt = 4;

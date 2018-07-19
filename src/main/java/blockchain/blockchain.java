@@ -30,8 +30,8 @@ public abstract class blockchain {
 //        logger.info(String.format("[height=%d, sender=%d] [prev2=%s]", b.getHeader().getHeight(),
 //                b.getHeader().getCreatorID(), Arrays.toString(Objects.requireNonNull(
 //                        DigestMethod.hash(blocks.get(b.getHeader().getHeight() - 1).getHeader())).getDigest().toByteArray())));
-        Crypto.Digest d = DigestMethod.hash(blocks.get(b.getHeader().getHeight() - 1).getHeader());
-        return DigestMethod.validate(b.getHeader().getPrev(),
+        byte[] d = DigestMethod.hash(blocks.get(b.getHeader().getHeight() - 1).getHeader());
+        return DigestMethod.validate(b.getHeader().getPrev().toByteArray(),
                 Objects.requireNonNull(d)); // TODO: Note that currentky we hash the whole block
     }
 

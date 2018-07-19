@@ -16,6 +16,7 @@ private static final long serialVersionUID = 0L;
     super(builder);
   }
   private BlockHeader() {
+    prev_ = com.google.protobuf.ByteString.EMPTY;
     creatorID_ = 0;
     height_ = 0;
   }
@@ -52,16 +53,8 @@ private static final long serialVersionUID = 0L;
             break;
           }
           case 10: {
-            proto.Crypto.Digest.Builder subBuilder = null;
-            if (prev_ != null) {
-              subBuilder = prev_.toBuilder();
-            }
-            prev_ = input.readMessage(proto.Crypto.Digest.parser(), extensionRegistry);
-            if (subBuilder != null) {
-              subBuilder.mergeFrom(prev_);
-              prev_ = subBuilder.buildPartial();
-            }
 
+            prev_ = input.readBytes();
             break;
           }
           case 16: {
@@ -99,24 +92,12 @@ private static final long serialVersionUID = 0L;
   }
 
   public static final int PREV_FIELD_NUMBER = 1;
-  private proto.Crypto.Digest prev_;
+  private com.google.protobuf.ByteString prev_;
   /**
-   * <code>.proto.Digest prev = 1;</code>
+   * <code>bytes prev = 1;</code>
    */
-  public boolean hasPrev() {
-    return prev_ != null;
-  }
-  /**
-   * <code>.proto.Digest prev = 1;</code>
-   */
-  public proto.Crypto.Digest getPrev() {
-    return prev_ == null ? proto.Crypto.Digest.getDefaultInstance() : prev_;
-  }
-  /**
-   * <code>.proto.Digest prev = 1;</code>
-   */
-  public proto.Crypto.DigestOrBuilder getPrevOrBuilder() {
-    return getPrev();
+  public com.google.protobuf.ByteString getPrev() {
+    return prev_;
   }
 
   public static final int CREATORID_FIELD_NUMBER = 2;
@@ -153,8 +134,8 @@ private static final long serialVersionUID = 0L;
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    if (prev_ != null) {
-      output.writeMessage(1, getPrev());
+    if (!prev_.isEmpty()) {
+      output.writeBytes(1, prev_);
     }
     if (creatorID_ != 0) {
       output.writeInt32(2, creatorID_);
@@ -170,9 +151,9 @@ private static final long serialVersionUID = 0L;
     if (size != -1) return size;
 
     size = 0;
-    if (prev_ != null) {
+    if (!prev_.isEmpty()) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(1, getPrev());
+        .computeBytesSize(1, prev_);
     }
     if (creatorID_ != 0) {
       size += com.google.protobuf.CodedOutputStream
@@ -198,11 +179,8 @@ private static final long serialVersionUID = 0L;
     proto.BlockHeader other = (proto.BlockHeader) obj;
 
     boolean result = true;
-    result = result && (hasPrev() == other.hasPrev());
-    if (hasPrev()) {
-      result = result && getPrev()
-          .equals(other.getPrev());
-    }
+    result = result && getPrev()
+        .equals(other.getPrev());
     result = result && (getCreatorID()
         == other.getCreatorID());
     result = result && (getHeight()
@@ -218,10 +196,8 @@ private static final long serialVersionUID = 0L;
     }
     int hash = 41;
     hash = (19 * hash) + getDescriptor().hashCode();
-    if (hasPrev()) {
-      hash = (37 * hash) + PREV_FIELD_NUMBER;
-      hash = (53 * hash) + getPrev().hashCode();
-    }
+    hash = (37 * hash) + PREV_FIELD_NUMBER;
+    hash = (53 * hash) + getPrev().hashCode();
     hash = (37 * hash) + CREATORID_FIELD_NUMBER;
     hash = (53 * hash) + getCreatorID();
     hash = (37 * hash) + HEIGHT_FIELD_NUMBER;
@@ -355,12 +331,8 @@ private static final long serialVersionUID = 0L;
     }
     public Builder clear() {
       super.clear();
-      if (prevBuilder_ == null) {
-        prev_ = null;
-      } else {
-        prev_ = null;
-        prevBuilder_ = null;
-      }
+      prev_ = com.google.protobuf.ByteString.EMPTY;
+
       creatorID_ = 0;
 
       height_ = 0;
@@ -387,11 +359,7 @@ private static final long serialVersionUID = 0L;
 
     public proto.BlockHeader buildPartial() {
       proto.BlockHeader result = new proto.BlockHeader(this);
-      if (prevBuilder_ == null) {
-        result.prev_ = prev_;
-      } else {
-        result.prev_ = prevBuilder_.build();
-      }
+      result.prev_ = prev_;
       result.creatorID_ = creatorID_;
       result.height_ = height_;
       onBuilt();
@@ -435,8 +403,8 @@ private static final long serialVersionUID = 0L;
 
     public Builder mergeFrom(proto.BlockHeader other) {
       if (other == proto.BlockHeader.getDefaultInstance()) return this;
-      if (other.hasPrev()) {
-        mergePrev(other.getPrev());
+      if (other.getPrev() != com.google.protobuf.ByteString.EMPTY) {
+        setPrev(other.getPrev());
       }
       if (other.getCreatorID() != 0) {
         setCreatorID(other.getCreatorID());
@@ -471,121 +439,33 @@ private static final long serialVersionUID = 0L;
       return this;
     }
 
-    private proto.Crypto.Digest prev_ = null;
-    private com.google.protobuf.SingleFieldBuilderV3<
-        proto.Crypto.Digest, proto.Crypto.Digest.Builder, proto.Crypto.DigestOrBuilder> prevBuilder_;
+    private com.google.protobuf.ByteString prev_ = com.google.protobuf.ByteString.EMPTY;
     /**
-     * <code>.proto.Digest prev = 1;</code>
+     * <code>bytes prev = 1;</code>
      */
-    public boolean hasPrev() {
-      return prevBuilder_ != null || prev_ != null;
+    public com.google.protobuf.ByteString getPrev() {
+      return prev_;
     }
     /**
-     * <code>.proto.Digest prev = 1;</code>
+     * <code>bytes prev = 1;</code>
      */
-    public proto.Crypto.Digest getPrev() {
-      if (prevBuilder_ == null) {
-        return prev_ == null ? proto.Crypto.Digest.getDefaultInstance() : prev_;
-      } else {
-        return prevBuilder_.getMessage();
-      }
-    }
-    /**
-     * <code>.proto.Digest prev = 1;</code>
-     */
-    public Builder setPrev(proto.Crypto.Digest value) {
-      if (prevBuilder_ == null) {
-        if (value == null) {
-          throw new NullPointerException();
-        }
-        prev_ = value;
-        onChanged();
-      } else {
-        prevBuilder_.setMessage(value);
-      }
-
+    public Builder setPrev(com.google.protobuf.ByteString value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  
+      prev_ = value;
+      onChanged();
       return this;
     }
     /**
-     * <code>.proto.Digest prev = 1;</code>
-     */
-    public Builder setPrev(
-        proto.Crypto.Digest.Builder builderForValue) {
-      if (prevBuilder_ == null) {
-        prev_ = builderForValue.build();
-        onChanged();
-      } else {
-        prevBuilder_.setMessage(builderForValue.build());
-      }
-
-      return this;
-    }
-    /**
-     * <code>.proto.Digest prev = 1;</code>
-     */
-    public Builder mergePrev(proto.Crypto.Digest value) {
-      if (prevBuilder_ == null) {
-        if (prev_ != null) {
-          prev_ =
-            proto.Crypto.Digest.newBuilder(prev_).mergeFrom(value).buildPartial();
-        } else {
-          prev_ = value;
-        }
-        onChanged();
-      } else {
-        prevBuilder_.mergeFrom(value);
-      }
-
-      return this;
-    }
-    /**
-     * <code>.proto.Digest prev = 1;</code>
+     * <code>bytes prev = 1;</code>
      */
     public Builder clearPrev() {
-      if (prevBuilder_ == null) {
-        prev_ = null;
-        onChanged();
-      } else {
-        prev_ = null;
-        prevBuilder_ = null;
-      }
-
-      return this;
-    }
-    /**
-     * <code>.proto.Digest prev = 1;</code>
-     */
-    public proto.Crypto.Digest.Builder getPrevBuilder() {
       
+      prev_ = getDefaultInstance().getPrev();
       onChanged();
-      return getPrevFieldBuilder().getBuilder();
-    }
-    /**
-     * <code>.proto.Digest prev = 1;</code>
-     */
-    public proto.Crypto.DigestOrBuilder getPrevOrBuilder() {
-      if (prevBuilder_ != null) {
-        return prevBuilder_.getMessageOrBuilder();
-      } else {
-        return prev_ == null ?
-            proto.Crypto.Digest.getDefaultInstance() : prev_;
-      }
-    }
-    /**
-     * <code>.proto.Digest prev = 1;</code>
-     */
-    private com.google.protobuf.SingleFieldBuilderV3<
-        proto.Crypto.Digest, proto.Crypto.Digest.Builder, proto.Crypto.DigestOrBuilder> 
-        getPrevFieldBuilder() {
-      if (prevBuilder_ == null) {
-        prevBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-            proto.Crypto.Digest, proto.Crypto.Digest.Builder, proto.Crypto.DigestOrBuilder>(
-                getPrev(),
-                getParentForChildren(),
-                isClean());
-        prev_ = null;
-      }
-      return prevBuilder_;
+      return this;
     }
 
     private int creatorID_ ;

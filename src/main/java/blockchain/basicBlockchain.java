@@ -18,13 +18,7 @@ public class basicBlockchain extends blockchain {
     @Override
     void createGenesis() {
         addBlock(new basicBlock()
-                .construct(-1, 0, Crypto.
-                        Digest.
-                        newBuilder().
-                        setDigest(ByteString.
-                                copyFrom(new byte[0])
-                        ).
-                        build()));
+                .construct(-1, 0, new byte[0]));
     }
 
     @Override

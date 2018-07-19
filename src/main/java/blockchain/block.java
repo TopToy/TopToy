@@ -1,5 +1,6 @@
 package blockchain;
 
+import com.google.protobuf.ByteString;
 import crypto.DigestMethod;
 import proto.Block;
 import proto.BlockHeader;
@@ -40,13 +41,13 @@ public abstract class block {
         blockBuilder.removeData(index);
     }
 
-    public Block construct(int creatorID, int height, Crypto.Digest prevHash) {
+    public Block construct(int creatorID, int height, byte[] prevHash) {
 
         return blockBuilder.setHeader(blockBuilder.
                 getHeaderBuilder().
                 setCreatorID(creatorID).
                 setHeight(height).
-                setPrev(prevHash)).
+                setPrev(ByteString.copyFrom(prevHash))).
                 build();
     }
 
