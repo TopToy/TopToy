@@ -1,6 +1,7 @@
 package crypto;
 
 import com.google.protobuf.ByteString;
+import proto.BlockHeader;
 import proto.Crypto;
 
 import java.io.ByteArrayOutputStream;
@@ -23,22 +24,20 @@ public class DigestMethod {
         }
     }
 
-    static public Crypto.Digest hash(Object obj) {
-        ObjectOutput out = null;
-        try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
-            out = new ObjectOutputStream(bos);
-            out.writeObject(obj);
-            out.flush();
-            byte[] bytesArray = bos.toByteArray();
-            return Crypto.Digest.newBuilder().setDigest(ByteString.copyFrom(digestMethod.digest(bytesArray))).build();
-        } catch (IOException e) {
-            logger.error("", e);
-        }
-        return null;
+    static public Crypto.Digest hash(BlockHeader header) {
+        return Crypto.Digest.
+                newBuilder().
+                setDigest(ByteString.copyFrom(digestMethod.digest(header.toByteArray()))).
+                build();
+
         // ignore close exception
     }
 
-    static public boolean validate(Crypto.Digest d1, Crypto.Digest d2)   {
-        return Arrays.equals(d1.getDigest().toByteArray(), d2.getDigest().toByteArray());
+    static public boolean validate(Crypto.Digest d1, Crypto.Digest d2) {
+        boolean res = Arrays.equals(d1.getDigest().toByteArray(), d2.getDigest().toByteArray());
+        if (!res) {
+            int a = 1;
+        }
+        return res;
     }
 }

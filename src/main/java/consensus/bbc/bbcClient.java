@@ -17,10 +17,10 @@ public class bbcClient {
         bbcProxy = new AsynchServiceProxy(id, configHome);
     }
 
-    public int propose(int vote, int consID) {
+    public int propose(int vote, int cid) {
         BbcProtos.BbcMsg.Builder b = BbcProtos.BbcMsg.newBuilder();
         b.setClientID(id);
-        b.setConsID(consID);
+        b.setId(cid);
         b.setVote(vote);
         BbcProtos.BbcMsg msg= b.build();
         byte[] data = msg.toByteArray();

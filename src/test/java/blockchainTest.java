@@ -75,8 +75,9 @@ public class blockchainTest {
         String SingleServerconfigHome = Paths.get("config", "bbcConfig", "bbcSingleServer").toString();
         Node[] rn1 = initLocalRmfNodes(1, 0, SingleServerconfigHome, null);
         ((bcServer) rn1[0]).start();
+        ((bcServer) rn1[0]).serve();
         ((bcServer) rn1[0]).addTransaction(("hello").getBytes(), 100);
-        Block b = ((bcServer) rn1[0]).deliver();
+        Block b = ((bcServer) rn1[0]).deliverLast();
         assertEquals(1, b.getHeader().getHeight());
         assertEquals(0, b.getHeader().getCreatorID());
         assertEquals(100, b.getData(0).getClientID());
@@ -101,21 +102,25 @@ public class blockchainTest {
         for (int i = 0 ; i < nnodes ; i++) {
             servers[i].join();
         }
+        String msg = "Hello";
+        ((bcServer) allNodes[0]).addTransaction(msg.getBytes(), 0);
+        for (int i = 0 ; i < nnodes ; i++) {
+            ((bcServer) allNodes[i]).serve();
+        }
 //        try {
 //        Thread.sleep(20 * 1000);
 //        } catch (InterruptedException e) {
 //            e.printStackTrace();
 //        }
 //        int height = 0;
-        String msg = "Hello";
-        ((bcServer) allNodes[0]).addTransaction(msg.getBytes(), 0);
 //        sender.act((RmfNode) allNodes[0]);
+        Thread.sleep(10 * 1000);
         String[] ret = new String[4];
         Thread[] tasks = new Thread[4];
         for (int i = 0 ; i < nnodes ; i++) {
             int finalI = i;
             tasks[i] = new Thread(()-> {
-                ret[finalI] = new String(((bcServer) allNodes[finalI]).deliver().getData(0).toByteArray());
+                ret[finalI] = new String(((bcServer) allNodes[finalI]).deliver(1).getData(0).getData().toByteArray());
             });
             tasks[i].start();
         }
@@ -133,26 +138,36 @@ public class blockchainTest {
         }
     }
 //
-//    @Test
-//    void TestStressFourServersNoFailures() throws InterruptedException {
-//        Thread.sleep(timeToWaitBetweenTests);
-//        Thread[] servers = new Thread[4];
-//        int nnodes = 4;
-//        String fourServersConfig = Paths.get("config", "bbcConfig", "bbcFourServers").toString();
-//        logger.info("start TestStressFourServersNoFailures");
-//
-//        Node[] allNodes = initLocalRmfNodes(nnodes,1,fourServersConfig, null);
-//        for (int i = 0 ; i < nnodes ; i++) {
-//            int finalI = i;
-//            servers[i]  = new Thread(() ->((RmfNode) allNodes[finalI]).start());
-//            servers[i].start();
-//        }
-//        for (int i = 0 ; i < nnodes ; i++) {
-//            servers[i].join();
-//        }
+    @Test
+    void TestStressFourServersNoFailures() throws InterruptedException {
+        Thread.sleep(timeToWaitBetweenTests);
+        Thread[] servers = new Thread[4];
+        int nnodes = 4;
+        String fourServersConfig = Paths.get("config", "bbcConfig", "bbcFourServers").toString();
+        logger.info("start TestStressFourServersNoFailures");
+
+        Node[] allNodes = initLocalRmfNodes(nnodes,1,fourServersConfig, null);
+        for (int i = 0 ; i < nnodes ; i++) {
+            int finalI = i;
+            servers[i]  = new Thread(() ->((bcServer) allNodes[finalI]).start());
+            servers[i].start();
+        }
+        for (int i = 0 ; i < nnodes ; i++) {
+            servers[i].join();
+        }
+
+        for (int i = 0 ; i < nnodes ; i++) {
+            ((bcServer) allNodes[i]).serve();
+        }
+
+        for (int k = 0 ; k < 100 ; k++) {
+            String msg = "Hello" + k;
+            ((bcServer) allNodes[k % 4]).addTransaction(msg.getBytes(), 0);
+        }
+        Thread.sleep(1000 * 60);
 //        for (int k = 0 ; k < 100 ; k++) {
 //            String msg = "Hello" + k;
-//            ((RmfNode) allNodes[k % 4]).broadcast(msg.getBytes(), k);
+//            ((bcServer) allNodes[k % 4]).addTransaction(msg.getBytes(), 0);
 ////        sender.act((RmfNode) allNodes[0]);
 //            String[] ret = new String[4];
 //            Thread[] tasks = new Thread[4];
@@ -178,7 +193,7 @@ public class blockchainTest {
 //        for (int i = 0 ; i < 4 ; i++) {
 //            ((RmfNode) allNodes[i]).stop();
 //        }
-//    }
+    }
 //
 //    @Test
 //    void TestFourServersSenderMuteFailure() throws InterruptedException {

@@ -2,6 +2,7 @@ import config.Config;
 import consensus.bbc.bbcClient;
 import consensus.bbc.bbcServer;
 import org.junit.jupiter.api.Test;
+import proto.BbcProtos;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -100,7 +101,7 @@ public class bbcTest {
         latch.await();
         clientDoing cDo = c -> {
             c.propose(1, 0);
-            c.propose(0,1);
+            c.propose(0, 1);
         };
 
         bbcClient c = new bbcClient(0, SingleServerconfigHome.toString());

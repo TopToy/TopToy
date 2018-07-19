@@ -24,9 +24,9 @@ public final class BbcProtos {
     int getClientID();
 
     /**
-     * <code>int32 consID = 2;</code>
+     * <code>int32 id = 2;</code>
      */
-    int getConsID();
+    int getId();
 
     /**
      * <code>int32 vote = 3;</code>
@@ -47,7 +47,7 @@ public final class BbcProtos {
     }
     private BbcMsg() {
       clientID_ = 0;
-      consID_ = 0;
+      id_ = 0;
       vote_ = 0;
     }
 
@@ -89,7 +89,7 @@ public final class BbcProtos {
             }
             case 16: {
 
-              consID_ = input.readInt32();
+              id_ = input.readInt32();
               break;
             }
             case 24: {
@@ -130,13 +130,13 @@ public final class BbcProtos {
       return clientID_;
     }
 
-    public static final int CONSID_FIELD_NUMBER = 2;
-    private int consID_;
+    public static final int ID_FIELD_NUMBER = 2;
+    private int id_;
     /**
-     * <code>int32 consID = 2;</code>
+     * <code>int32 id = 2;</code>
      */
-    public int getConsID() {
-      return consID_;
+    public int getId() {
+      return id_;
     }
 
     public static final int VOTE_FIELD_NUMBER = 3;
@@ -163,8 +163,8 @@ public final class BbcProtos {
       if (clientID_ != 0) {
         output.writeInt32(1, clientID_);
       }
-      if (consID_ != 0) {
-        output.writeInt32(2, consID_);
+      if (id_ != 0) {
+        output.writeInt32(2, id_);
       }
       if (vote_ != 0) {
         output.writeInt32(3, vote_);
@@ -181,9 +181,9 @@ public final class BbcProtos {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(1, clientID_);
       }
-      if (consID_ != 0) {
+      if (id_ != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(2, consID_);
+          .computeInt32Size(2, id_);
       }
       if (vote_ != 0) {
         size += com.google.protobuf.CodedOutputStream
@@ -207,8 +207,8 @@ public final class BbcProtos {
       boolean result = true;
       result = result && (getClientID()
           == other.getClientID());
-      result = result && (getConsID()
-          == other.getConsID());
+      result = result && (getId()
+          == other.getId());
       result = result && (getVote()
           == other.getVote());
       result = result && unknownFields.equals(other.unknownFields);
@@ -224,8 +224,8 @@ public final class BbcProtos {
       hash = (19 * hash) + getDescriptor().hashCode();
       hash = (37 * hash) + CLIENTID_FIELD_NUMBER;
       hash = (53 * hash) + getClientID();
-      hash = (37 * hash) + CONSID_FIELD_NUMBER;
-      hash = (53 * hash) + getConsID();
+      hash = (37 * hash) + ID_FIELD_NUMBER;
+      hash = (53 * hash) + getId();
       hash = (37 * hash) + VOTE_FIELD_NUMBER;
       hash = (53 * hash) + getVote();
       hash = (29 * hash) + unknownFields.hashCode();
@@ -359,7 +359,7 @@ public final class BbcProtos {
         super.clear();
         clientID_ = 0;
 
-        consID_ = 0;
+        id_ = 0;
 
         vote_ = 0;
 
@@ -386,7 +386,7 @@ public final class BbcProtos {
       public proto.BbcProtos.BbcMsg buildPartial() {
         proto.BbcProtos.BbcMsg result = new proto.BbcProtos.BbcMsg(this);
         result.clientID_ = clientID_;
-        result.consID_ = consID_;
+        result.id_ = id_;
         result.vote_ = vote_;
         onBuilt();
         return result;
@@ -432,8 +432,8 @@ public final class BbcProtos {
         if (other.getClientID() != 0) {
           setClientID(other.getClientID());
         }
-        if (other.getConsID() != 0) {
-          setConsID(other.getConsID());
+        if (other.getId() != 0) {
+          setId(other.getId());
         }
         if (other.getVote() != 0) {
           setVote(other.getVote());
@@ -491,28 +491,28 @@ public final class BbcProtos {
         return this;
       }
 
-      private int consID_ ;
+      private int id_ ;
       /**
-       * <code>int32 consID = 2;</code>
+       * <code>int32 id = 2;</code>
        */
-      public int getConsID() {
-        return consID_;
+      public int getId() {
+        return id_;
       }
       /**
-       * <code>int32 consID = 2;</code>
+       * <code>int32 id = 2;</code>
        */
-      public Builder setConsID(int value) {
+      public Builder setId(int value) {
         
-        consID_ = value;
+        id_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>int32 consID = 2;</code>
+       * <code>int32 id = 2;</code>
        */
-      public Builder clearConsID() {
+      public Builder clearId() {
         
-        consID_ = 0;
+        id_ = 0;
         onChanged();
         return this;
       }
@@ -1124,10 +1124,10 @@ public final class BbcProtos {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\017bbcProtos.proto\022\005proto\"8\n\006BbcMsg\022\020\n\010cl" +
-      "ientID\030\001 \001(\005\022\016\n\006consID\030\002 \001(\005\022\014\n\004vote\030\003 \001" +
-      "(\005\"/\n\013BbcDecision\022\016\n\006consID\030\001 \001(\005\022\020\n\010dec" +
-      "osion\030\002 \001(\005B\007\n\005protob\006proto3"
+      "\n\017bbcProtos.proto\022\005proto\"4\n\006BbcMsg\022\020\n\010cl" +
+      "ientID\030\001 \001(\005\022\n\n\002id\030\002 \001(\005\022\014\n\004vote\030\003 \001(\005\"/" +
+      "\n\013BbcDecision\022\016\n\006consID\030\001 \001(\005\022\020\n\010decosio" +
+      "n\030\002 \001(\005B\007\n\005protob\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -1146,7 +1146,7 @@ public final class BbcProtos {
     internal_static_proto_BbcMsg_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_BbcMsg_descriptor,
-        new java.lang.String[] { "ClientID", "ConsID", "Vote", });
+        new java.lang.String[] { "ClientID", "Id", "Vote", });
     internal_static_proto_BbcDecision_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_proto_BbcDecision_fieldAccessorTable = new

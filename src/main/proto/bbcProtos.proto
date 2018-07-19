@@ -3,9 +3,14 @@ option java_package = "proto";
 package proto;
 //option objc_class_prefix = "RTG";
 
+//message consID {
+//    int32 height = 1;
+//    int32 id = 2;
+//}
+
 message BbcMsg {
     int32 clientID = 1;
-    int32 consID = 2;
+    int32 id = 2;
     int32 vote = 3;
 }
 

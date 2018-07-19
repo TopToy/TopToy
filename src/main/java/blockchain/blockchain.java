@@ -2,7 +2,10 @@ package blockchain;
 
 import crypto.DigestMethod;
 import proto.Block;
+import proto.Crypto;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -22,8 +25,14 @@ public abstract class blockchain {
     abstract boolean validateBlockData(Block b);
 
     boolean validateBlockHash(Block b) {
+//        logger.info(String.format("[height=%d, sender=%d] [prev=%s]", b.getHeader().getHeight(),
+//                b.getHeader().getCreatorID(), Arrays.toString(b.getHeader().getPrev().getDigest().toByteArray())));
+//        logger.info(String.format("[height=%d, sender=%d] [prev2=%s]", b.getHeader().getHeight(),
+//                b.getHeader().getCreatorID(), Arrays.toString(Objects.requireNonNull(
+//                        DigestMethod.hash(blocks.get(b.getHeader().getHeight() - 1).getHeader())).getDigest().toByteArray())));
+        Crypto.Digest d = DigestMethod.hash(blocks.get(b.getHeader().getHeight() - 1).getHeader());
         return DigestMethod.validate(b.getHeader().getPrev(),
-                Objects.requireNonNull(DigestMethod.hash(blocks.get(b.getHeader().getHeight() - 1)))); // TODO: Note that currentky we hash the whole block
+                Objects.requireNonNull(d)); // TODO: Note that currentky we hash the whole block
     }
 
     public void addBlock(Block b) {

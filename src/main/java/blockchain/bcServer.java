@@ -6,10 +6,13 @@ import config.Node;
 import crypto.DigestMethod;
 import proto.Block;
 import proto.BlockHeader;
+import proto.Crypto;
 import proto.Transaction;
 import rmf.RmfNode;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Objects;
 import java.util.concurrent.Semaphore;
 
 import static java.lang.String.format;
@@ -25,8 +28,8 @@ public class bcServer extends Node {
     private boolean stopped;
 //    final Object leaderLock = new Object();
     private final Object blockLock = new Object();
-    private Semaphore newBlockNotifyer = new Semaphore(0);
-    private final Object latencyNotifyer = new Object();
+    private Semaphore newBlockNotifier = new Semaphore(0, true);
+    private final Object latencyNotifier = new Object();
 //    final Object heightLock = new Object();
     private block currBlock; // TODO: As any server should disseminates its block once in an epoch, currently a block is shipped as soon the server turn is coming.
 
@@ -47,60 +50,20 @@ public class bcServer extends Node {
         currHeight = 1; // starts from 1 due to the genesis block
         currLeader = 0;
         this.maxTransactionInBlock = maxTransactionInBlock;
+        mainThread = new Thread(this::mainLoop);
     }
 
     public void start() {
-        startServices();
+        rmfServer.start();
         logger.info(format("[#%d] has been initialized successfully", getID()));
     }
-     private void startServices() {
-      rmfServer.start(); // TODO: Note that if more than one server is running then this call blocks until all bbc servers are up.
-//        try {
-//            Thread.sleep(1000 * 5); // TODO: Do we really need this out of tests??
-//        } catch (InterruptedException e) {
-//            logger.error("", e);
-//        }
 
-//      waitForAll();
-//         try {
-//             Thread.sleep(10 * 1000);
-//         } catch (InterruptedException e) {
-//             e.printStackTrace();
-//         }
-         mainThread = new Thread(this::mainLoop); // TODO: did a problem might occur if not all servers starts at once?
-      mainThread.start();
+    public void serve() {
+         // TODO: did a problem might occur if not all servers starts at once?
+        mainThread.start();
 
     }
 
-//    /*
-//    Currently the system is unable to run unless all servers are up (not only 2f + 1)? we now tries to connect them all.
-//     */
-//    private void waitForAll() {
-//        rmfServer.broadcast("ready".getBytes(), 0);
-//        Thread[] allUp = new Thread[n];
-//        for (int i = 0 ; i < n ; i++) {
-//            int finalI = i;
-//            allUp[i] = new Thread(() -> {
-//                while (rmfServer.deliver(0, finalI) == null) {
-//                    try {
-//                        Thread.sleep(1000 * 1);
-//                    } catch (InterruptedException e) {
-//                        logger.error(format("[#%d] interrupted while waiting for [#%d]", getID(), finalI), e);
-//                    }
-//                    logger.info(format("[#%d] waits for [#%d] to be ready", getID(), finalI));
-//                }
-//                logger.info(format("[#%d] received ready from [#%d]", getID(), finalI));
-//            });
-//            allUp[i].start();
-//        }
-//        for (int i = 0 ; i < n ; i++) {
-//            try {
-//                allUp[i].join();
-//            } catch (InterruptedException e) {
-//                logger.error(format("[#%d] interrupted while waiting for [#%d] to join", getID(), i), e);
-//            }
-//        }
-//    }
     public void shutdown() {
         stopped =  true;
         mainThread.interrupt();
@@ -134,7 +97,7 @@ public class bcServer extends Node {
             }
 
             if (!bc.validateBlockHash(recBlock)) {
-                handlePossibleFork();
+                handlePossibleFork(recBlock);
                 continue;
             }
             if (!bc.validateBlockData(recBlock)) {
@@ -145,22 +108,22 @@ public class bcServer extends Node {
                         setCreatorID(currLeader).
                         setHeight(currHeight).
                         setPrev(DigestMethod.
-                                hash(bc.getBlock(currHeight - 1)))).
+                                hash(bc.getBlock(currHeight - 1).getHeader()))).
                         build();
             }
             bc.addBlock(recBlock);
             currHeight++;
             updateLeader();
-            synchronized (latencyNotifyer) {
+            synchronized (latencyNotifier) {
                 if (bc.getHeight() < f) {
                     continue;
                 }
                 if (bc.getHeight() == f) {
-                    latencyNotifyer.notify();
+                    latencyNotifier.notify();
                 }
             }
 
-            newBlockNotifyer.release();
+            newBlockNotifier.release();
 
         }
     }
@@ -172,7 +135,8 @@ public class bcServer extends Node {
         logger.info(format("[#%d] prepare to disseminate a new block of [height=%d]", getID(), currHeight));
 
         synchronized (blockLock) {
-            Block sealedBlock = currBlock.construct(getID(), currHeight, DigestMethod.hash(bc.getBlock(currHeight - 1)));
+//            logger.info(format("[#%d] [heigh1=%d", getID(), currHeight, ));
+            Block sealedBlock = currBlock.construct(getID(), currHeight, DigestMethod.hash(bc.getBlock(currHeight - 1).getHeader()));
             currBlock = bc.createNewBLock();
             rmfServer.broadcast(sealedBlock.toByteArray(), currHeight);
         }
@@ -197,22 +161,37 @@ public class bcServer extends Node {
 
     }
 
-    private void handlePossibleFork() {
-        logger.fatal("Possible fork has been detected, currently the synchronization service is not yet implemented");
+    private void handlePossibleFork(Block b) {
+        logger.warn(format("[#%d] possible fork! [height=%d] [%s] : [%s]",
+                getID(), currHeight, Arrays.toString(b.getHeader().getPrev().getDigest().toByteArray()),
+                Arrays.toString(Objects.requireNonNull(DigestMethod.hash(bc.getBlock(b.getHeader().getHeight() - 1).getHeader())).getDigest().toByteArray())));
+        System.exit(1);
     }
 
-    public Block deliver() {
-        synchronized (latencyNotifyer) {
+    public Block deliver(int index) {
+        synchronized (latencyNotifier) {
+            while (index > bc.getHeight() - f) {
+                try {
+                    latencyNotifier.wait();
+                } catch (InterruptedException e) {
+                    logger.error("Servers returned tentative block", e);
+                }
+            }
+        }
+        return bc.getBlock(index);
+    }
+    public Block deliverLast() {
+        synchronized (latencyNotifier) {
             while (bc.getHeight() < f) {
                 try {
-                    latencyNotifyer.wait();
+                    latencyNotifier.wait();
                 } catch (InterruptedException e) {
                     logger.error("Servers returned tentative block", e);
                 }
             }
         }
         try {
-            newBlockNotifyer.acquire();
+            newBlockNotifier.acquire();
         } catch (InterruptedException e) {
             logger.error("Server released before receiving a new block", e);
         }

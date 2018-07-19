@@ -4,6 +4,13 @@
 package proto;
 
 /**
+ * <pre>
+ *message fastVoteMsg {
+ *    int32 sender = 1;
+ *    int32 height = 2;
+ *}
+ * </pre>
+ *
  * Protobuf type {@code proto.FastBbcVote}
  */
 public  final class FastBbcVote extends
@@ -16,7 +23,9 @@ private static final long serialVersionUID = 0L;
     super(builder);
   }
   private FastBbcVote() {
+    sender_ = 0;
     vote_ = 0;
+    cid_ = 0;
   }
 
   @java.lang.Override
@@ -50,22 +59,19 @@ private static final long serialVersionUID = 0L;
             }
             break;
           }
-          case 10: {
-            proto.Meta.Builder subBuilder = null;
-            if (Meta_ != null) {
-              subBuilder = Meta_.toBuilder();
-            }
-            Meta_ = input.readMessage(proto.Meta.parser(), extensionRegistry);
-            if (subBuilder != null) {
-              subBuilder.mergeFrom(Meta_);
-              Meta_ = subBuilder.buildPartial();
-            }
+          case 8: {
 
+            sender_ = input.readInt32();
             break;
           }
           case 16: {
 
             vote_ = input.readInt32();
+            break;
+          }
+          case 24: {
+
+            cid_ = input.readInt32();
             break;
           }
         }
@@ -92,25 +98,13 @@ private static final long serialVersionUID = 0L;
             proto.FastBbcVote.class, proto.FastBbcVote.Builder.class);
   }
 
-  public static final int _META_FIELD_NUMBER = 1;
-  private proto.Meta Meta_;
+  public static final int SENDER_FIELD_NUMBER = 1;
+  private int sender_;
   /**
-   * <code>.proto.Meta _meta = 1;</code>
+   * <code>int32 sender = 1;</code>
    */
-  public boolean hasMeta() {
-    return Meta_ != null;
-  }
-  /**
-   * <code>.proto.Meta _meta = 1;</code>
-   */
-  public proto.Meta getMeta() {
-    return Meta_ == null ? proto.Meta.getDefaultInstance() : Meta_;
-  }
-  /**
-   * <code>.proto.Meta _meta = 1;</code>
-   */
-  public proto.MetaOrBuilder getMetaOrBuilder() {
-    return getMeta();
+  public int getSender() {
+    return sender_;
   }
 
   public static final int VOTE_FIELD_NUMBER = 2;
@@ -120,6 +114,15 @@ private static final long serialVersionUID = 0L;
    */
   public int getVote() {
     return vote_;
+  }
+
+  public static final int CID_FIELD_NUMBER = 3;
+  private int cid_;
+  /**
+   * <code>int32 cid = 3;</code>
+   */
+  public int getCid() {
+    return cid_;
   }
 
   private byte memoizedIsInitialized = -1;
@@ -134,11 +137,14 @@ private static final long serialVersionUID = 0L;
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    if (Meta_ != null) {
-      output.writeMessage(1, getMeta());
+    if (sender_ != 0) {
+      output.writeInt32(1, sender_);
     }
     if (vote_ != 0) {
       output.writeInt32(2, vote_);
+    }
+    if (cid_ != 0) {
+      output.writeInt32(3, cid_);
     }
     unknownFields.writeTo(output);
   }
@@ -148,13 +154,17 @@ private static final long serialVersionUID = 0L;
     if (size != -1) return size;
 
     size = 0;
-    if (Meta_ != null) {
+    if (sender_ != 0) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(1, getMeta());
+        .computeInt32Size(1, sender_);
     }
     if (vote_ != 0) {
       size += com.google.protobuf.CodedOutputStream
         .computeInt32Size(2, vote_);
+    }
+    if (cid_ != 0) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeInt32Size(3, cid_);
     }
     size += unknownFields.getSerializedSize();
     memoizedSize = size;
@@ -172,13 +182,12 @@ private static final long serialVersionUID = 0L;
     proto.FastBbcVote other = (proto.FastBbcVote) obj;
 
     boolean result = true;
-    result = result && (hasMeta() == other.hasMeta());
-    if (hasMeta()) {
-      result = result && getMeta()
-          .equals(other.getMeta());
-    }
+    result = result && (getSender()
+        == other.getSender());
     result = result && (getVote()
         == other.getVote());
+    result = result && (getCid()
+        == other.getCid());
     result = result && unknownFields.equals(other.unknownFields);
     return result;
   }
@@ -190,12 +199,12 @@ private static final long serialVersionUID = 0L;
     }
     int hash = 41;
     hash = (19 * hash) + getDescriptor().hashCode();
-    if (hasMeta()) {
-      hash = (37 * hash) + _META_FIELD_NUMBER;
-      hash = (53 * hash) + getMeta().hashCode();
-    }
+    hash = (37 * hash) + SENDER_FIELD_NUMBER;
+    hash = (53 * hash) + getSender();
     hash = (37 * hash) + VOTE_FIELD_NUMBER;
     hash = (53 * hash) + getVote();
+    hash = (37 * hash) + CID_FIELD_NUMBER;
+    hash = (53 * hash) + getCid();
     hash = (29 * hash) + unknownFields.hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -290,6 +299,13 @@ private static final long serialVersionUID = 0L;
     return builder;
   }
   /**
+   * <pre>
+   *message fastVoteMsg {
+   *    int32 sender = 1;
+   *    int32 height = 2;
+   *}
+   * </pre>
+   *
    * Protobuf type {@code proto.FastBbcVote}
    */
   public static final class Builder extends
@@ -325,13 +341,11 @@ private static final long serialVersionUID = 0L;
     }
     public Builder clear() {
       super.clear();
-      if (MetaBuilder_ == null) {
-        Meta_ = null;
-      } else {
-        Meta_ = null;
-        MetaBuilder_ = null;
-      }
+      sender_ = 0;
+
       vote_ = 0;
+
+      cid_ = 0;
 
       return this;
     }
@@ -355,12 +369,9 @@ private static final long serialVersionUID = 0L;
 
     public proto.FastBbcVote buildPartial() {
       proto.FastBbcVote result = new proto.FastBbcVote(this);
-      if (MetaBuilder_ == null) {
-        result.Meta_ = Meta_;
-      } else {
-        result.Meta_ = MetaBuilder_.build();
-      }
+      result.sender_ = sender_;
       result.vote_ = vote_;
+      result.cid_ = cid_;
       onBuilt();
       return result;
     }
@@ -402,11 +413,14 @@ private static final long serialVersionUID = 0L;
 
     public Builder mergeFrom(proto.FastBbcVote other) {
       if (other == proto.FastBbcVote.getDefaultInstance()) return this;
-      if (other.hasMeta()) {
-        mergeMeta(other.getMeta());
+      if (other.getSender() != 0) {
+        setSender(other.getSender());
       }
       if (other.getVote() != 0) {
         setVote(other.getVote());
+      }
+      if (other.getCid() != 0) {
+        setCid(other.getCid());
       }
       this.mergeUnknownFields(other.unknownFields);
       onChanged();
@@ -435,121 +449,30 @@ private static final long serialVersionUID = 0L;
       return this;
     }
 
-    private proto.Meta Meta_ = null;
-    private com.google.protobuf.SingleFieldBuilderV3<
-        proto.Meta, proto.Meta.Builder, proto.MetaOrBuilder> MetaBuilder_;
+    private int sender_ ;
     /**
-     * <code>.proto.Meta _meta = 1;</code>
+     * <code>int32 sender = 1;</code>
      */
-    public boolean hasMeta() {
-      return MetaBuilder_ != null || Meta_ != null;
+    public int getSender() {
+      return sender_;
     }
     /**
-     * <code>.proto.Meta _meta = 1;</code>
+     * <code>int32 sender = 1;</code>
      */
-    public proto.Meta getMeta() {
-      if (MetaBuilder_ == null) {
-        return Meta_ == null ? proto.Meta.getDefaultInstance() : Meta_;
-      } else {
-        return MetaBuilder_.getMessage();
-      }
-    }
-    /**
-     * <code>.proto.Meta _meta = 1;</code>
-     */
-    public Builder setMeta(proto.Meta value) {
-      if (MetaBuilder_ == null) {
-        if (value == null) {
-          throw new NullPointerException();
-        }
-        Meta_ = value;
-        onChanged();
-      } else {
-        MetaBuilder_.setMessage(value);
-      }
-
-      return this;
-    }
-    /**
-     * <code>.proto.Meta _meta = 1;</code>
-     */
-    public Builder setMeta(
-        proto.Meta.Builder builderForValue) {
-      if (MetaBuilder_ == null) {
-        Meta_ = builderForValue.build();
-        onChanged();
-      } else {
-        MetaBuilder_.setMessage(builderForValue.build());
-      }
-
-      return this;
-    }
-    /**
-     * <code>.proto.Meta _meta = 1;</code>
-     */
-    public Builder mergeMeta(proto.Meta value) {
-      if (MetaBuilder_ == null) {
-        if (Meta_ != null) {
-          Meta_ =
-            proto.Meta.newBuilder(Meta_).mergeFrom(value).buildPartial();
-        } else {
-          Meta_ = value;
-        }
-        onChanged();
-      } else {
-        MetaBuilder_.mergeFrom(value);
-      }
-
-      return this;
-    }
-    /**
-     * <code>.proto.Meta _meta = 1;</code>
-     */
-    public Builder clearMeta() {
-      if (MetaBuilder_ == null) {
-        Meta_ = null;
-        onChanged();
-      } else {
-        Meta_ = null;
-        MetaBuilder_ = null;
-      }
-
-      return this;
-    }
-    /**
-     * <code>.proto.Meta _meta = 1;</code>
-     */
-    public proto.Meta.Builder getMetaBuilder() {
+    public Builder setSender(int value) {
       
+      sender_ = value;
       onChanged();
-      return getMetaFieldBuilder().getBuilder();
+      return this;
     }
     /**
-     * <code>.proto.Meta _meta = 1;</code>
+     * <code>int32 sender = 1;</code>
      */
-    public proto.MetaOrBuilder getMetaOrBuilder() {
-      if (MetaBuilder_ != null) {
-        return MetaBuilder_.getMessageOrBuilder();
-      } else {
-        return Meta_ == null ?
-            proto.Meta.getDefaultInstance() : Meta_;
-      }
-    }
-    /**
-     * <code>.proto.Meta _meta = 1;</code>
-     */
-    private com.google.protobuf.SingleFieldBuilderV3<
-        proto.Meta, proto.Meta.Builder, proto.MetaOrBuilder> 
-        getMetaFieldBuilder() {
-      if (MetaBuilder_ == null) {
-        MetaBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-            proto.Meta, proto.Meta.Builder, proto.MetaOrBuilder>(
-                getMeta(),
-                getParentForChildren(),
-                isClean());
-        Meta_ = null;
-      }
-      return MetaBuilder_;
+    public Builder clearSender() {
+      
+      sender_ = 0;
+      onChanged();
+      return this;
     }
 
     private int vote_ ;
@@ -574,6 +497,32 @@ private static final long serialVersionUID = 0L;
     public Builder clearVote() {
       
       vote_ = 0;
+      onChanged();
+      return this;
+    }
+
+    private int cid_ ;
+    /**
+     * <code>int32 cid = 3;</code>
+     */
+    public int getCid() {
+      return cid_;
+    }
+    /**
+     * <code>int32 cid = 3;</code>
+     */
+    public Builder setCid(int value) {
+      
+      cid_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>int32 cid = 3;</code>
+     */
+    public Builder clearCid() {
+      
+      cid_ = 0;
       onChanged();
       return this;
     }

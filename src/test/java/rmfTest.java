@@ -351,7 +351,7 @@ public class rmfTest {
     void asyncServerAction(RmfNode node, String[] res) throws InterruptedException {
         for (int i = 0 ; i < 100 ; i++) {
             Random rand = new Random();
-            int  n = rand.nextInt(1000);
+            int  n = rand.nextInt(800);
             if (n > 0) {
                 logger.info(format("[#%d] sleeps for [%d] ms", node.getID(), n));
                 Thread.sleep(n);
