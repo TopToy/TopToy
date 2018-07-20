@@ -87,7 +87,7 @@ public class asyncBcServer extends Node {
     private void mainLoop() throws InterruptedException {
         while (!stopped) {
             Random rand = new Random();
-            int x = rand.nextInt(1000) + 1;
+            int x = rand.nextInt(1500) + 1;
             logger.info(format("[#%d] sleeps for %d ms",getID(), x));
                 Thread.sleep(x);
             leaderImpl();

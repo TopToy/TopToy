@@ -75,10 +75,10 @@ public class bbcServer extends DefaultSingleRecoverable {
 
     void releaseWaiting() {
         synchronized (rec) {
-            rec.notify();
+            rec.notifyAll();
         }
         synchronized (consNotify) {
-            consNotify.notify();
+            consNotify.notifyAll();
         }
     }
     @Override
@@ -100,15 +100,10 @@ public class bbcServer extends DefaultSingleRecoverable {
 
     @Override
     public byte[] appExecuteOrdered(byte[] command, MessageContext msgCtx) {
+        int cid =0;
         try {
             BbcProtos.BbcMsg msg = BbcProtos.BbcMsg.parseFrom(command);
-            int cid = msg.getId();
-            synchronized (consNotify) {
-                if (!consNotify.contains(cid)) {
-                    consNotify.add(cid);
-                    consNotify.notify();
-                }
-            }
+            cid = msg.getId();
             synchronized (rec) {
                 consVote v = new consVote();
                 if (msg.getVote() == 1) {
@@ -131,7 +126,12 @@ public class bbcServer extends DefaultSingleRecoverable {
                     rec.notify();
                 }
             }
-
+            synchronized (consNotify) {
+                if (!consNotify.contains(cid)) {
+                    consNotify.add(cid);
+                    consNotify.notify();
+                }
+            }
         } catch (Exception e) {
             logger.error("", e);
         }
@@ -157,29 +157,8 @@ public class bbcServer extends DefaultSingleRecoverable {
         return new byte[1];
     }
 
-//    private int calcMaj(ArrayList<BbcProtos.BbcMsg> rec) {
-//        int ones = Collections.
-//                frequency(
-//                        rec.
-//                                stream().
-//                                map(BbcProtos.BbcMsg::getVote).
-//                                collect(Collectors.toList())
-//                        , 1);
-//        int zeros = Collections.
-//                frequency(
-//                        rec.
-//                                stream().
-//                                map(BbcProtos.BbcMsg::getVote).
-//                                collect(Collectors.toList())
-//                        , 0);
-//
-//        if (ones > zeros) return 1;
-//        else return 0;
-//    }
-
     public int decide(int cid) {
         synchronized (rec) {
-//            consVote v = rec.get(height, consID);
             while (!rec.containsKey(cid) || rec.get(cid).pos + rec.get(cid).neg < quorumSize) {
                 try {
                     rec.wait();
@@ -188,9 +167,6 @@ public class bbcServer extends DefaultSingleRecoverable {
                     return 0;
                 }
             }
-//            v = rec.get(height, consID);
-            //        done.add(consID);
-//            rec.remove(consID); TODO: Should handle it!
             return (rec.get(cid).pos > rec.get(cid).neg ? 1 : 0);
         }
     }

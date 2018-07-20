@@ -76,19 +76,15 @@ public class RmfService extends RmfGrpc.RmfImplBase {
     protected bbcServer bbcServer;
     protected bbcClient bbcClient;
     final Object globalLock = new Object();
+    final Object bbcLock = new Object();
 
     // TODO: change to CountDownLatch??
     protected Semaphore receivedSem;
-
-
-//    final protected Map<Integer, vote> votes;
-//    final protected Map<Integer, Data> pendingMsg;
     final protected Map<Integer, Data> recMsg;
 
     final HashMap<Integer, Integer> fVotes;
-    final Table<Integer, Integer, Data> pendingMsg;
+    final HashMap<Integer, Data> pendingMsg;
     final HashMap<Integer,  BbcProtos.BbcDecision> fastBbcCons;
-//    final Table<Integer, Integer, Data> recMsg;
 
     protected Map<Integer, peer> peers;
     protected List<Node> nodes;
@@ -99,8 +95,6 @@ public class RmfService extends RmfGrpc.RmfImplBase {
     private String bbcConfig;
     private final HashMap<Integer, BbcProtos.BbcDecision> regBbcCons;
     private boolean stopped = false;
-//    private final Object dataMsgLock = new Object();
-//    private final Object wayToRecMsgLock = new Object();
 
     public RmfService(int id, int f, int tmoInterval, int tmo, ArrayList<Node> nodes, String bbcConfig) {
         this.bbcConfig = bbcConfig;
@@ -108,7 +102,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         this.receivedSem = new Semaphore(0, true);
 
         this.fVotes = new HashMap<>();
-        this.pendingMsg = HashBasedTable.create(); //new HashMap<>();
+        this.pendingMsg = new HashMap<>(); //HashBasedTable.create(); //new HashMap<>();
         this.recMsg = new HashMap<>();
 
         this.peers = new HashMap<>();
@@ -119,8 +113,6 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         this.timeoutMs = tmo;
         this.id = id;
         this.nodes = nodes;
-//        this.prevBbcCons = new HashMap<>();
-//        this.fastVoteDone = new ArrayList<>();
         this.fastBbcCons = new HashMap<>();
         this.regBbcCons = new HashMap<>();
     }
@@ -152,7 +144,6 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         } catch (InterruptedException e) {
             logger.error("", e);
         }
-//        bbcServerThread.start();
         for (Node n : nodes) {
             peers.put(n.getID(), new peer(n));
         }
@@ -162,39 +153,19 @@ public class RmfService extends RmfGrpc.RmfImplBase {
     private void bbcMissedConsensus() throws InterruptedException {
         while (!stopped) {
             ArrayList<Integer> done;
-//            synchronized (fastVoteDone) {
             synchronized (globalLock) {
                 done = new ArrayList<>(fastBbcCons.keySet());
             }
             ArrayList<Integer> last = bbcServer.notifyOnConsensusInstance(done);
             for (int cid : last) {
-                synchronized (globalLock) {
+//                synchronized (globalLock) {
                     logger.info(format("[#%d] have found missed bbc [cid=%d]", id, cid));
                     fullBbcConsensus(fastBbcCons.get(cid).getDecosion(), cid);
                 }
-            }
+//            }
         }
     }
 
-////            Thread.sleep(timeoutMs); // Sleep for a moment to ensure that there is enough time.
-////            synchronized (prevBbcCons) {
-////                last.removeAll(new ArrayList<>(prevBbcCons.keySet()));
-////            }
-//            for(Integer height : last) {
-//                int vote;
-//                synchronized (dataMsgLock) {
-//                    if (recMsg.containsKey(height)) {
-//                        vote = 1;
-//                    } else {
-//                        continue;
-//                    }
-//                }
-//                logger.info(format("[#%d] has found missed bbc consensus [height=%d]", id, height));
-//                fullBbcConsensus(vote, height);
-//            }
-//        }
-//        logger.info(format("[#%d] bbcMissedConsensus shutdown", id));
-//    }
     public void shutdown() {
         stopped = true;
         for (peer p : peers.values()) {
@@ -204,14 +175,13 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         bbcClient.close();
         logger.info(format("[#%d] bbc client has been shutdown", id));
         bbcServer.shutdown();
-        bbcMissedConsensusThread.interrupt();
         try {
             // TODO: Do we really have to interrupt the threads?
-//            bbcServerThread.interrupt();
             logger.info(format("[#%d] wait for bbcServerThread", id));
+            bbcServerThread.interrupt();
             bbcServerThread.join();
             logger.info(format("[#%d] wait for bbcMissedConsensusThread", id));
-//            bbcMissedConsensusThread.interrupt();
+            bbcMissedConsensusThread.interrupt();
             bbcMissedConsensusThread.join();
         } catch (InterruptedException e) {
             logger.error("", e);
@@ -263,24 +233,21 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             and insert it again. We will probably handle it by adding some cleanup mechanism.
       */
 
-    protected void sendReqMessage(RmfGrpc.RmfStub stub, Req req, int cHeight, int sender) {
+    protected void sendReqMessage(RmfGrpc.RmfStub stub, Req req, int cid) {
         stub.reqMessage(req, new StreamObserver<Res>() {
             @Override
             public void onNext(Res res) {
                 // TODO: We should validate the answer
-                if (res.getData().getMeta().getHeight() == cHeight && res.getData().getMeta().getSender() == sender) {
-//                    synchronized (pendingMsg) {
-//                        synchronized (recMsg){
+                if (res.getData().getMeta().getCid() == cid) {
+                    int cid = res.getMeta().getCid();
                     synchronized (globalLock) {
-                            if (!pendingMsg.contains(cHeight, sender) && !recMsg.containsKey(cHeight)) {
-                                //(!pendingMsg.containsKey(cHeight) && !recMsg.containsKey(cHeight)) {
-                                logger.info(format("[#%d] has received response message from [#%d] of [height=%d, origSender:%d]",
-                                        id, sender, res.getData().getMeta().getHeight(),  res.getData().getMeta().getSender()));
-                                pendingMsg.put(cHeight, sender, res.getData());
-                                globalLock.notify();
-                            }
+                        if (!pendingMsg.containsKey(cid) && !recMsg.containsKey(cid)) {
+                            logger.info(format("[#%d] has received response message from [#%d] for [cid=%d]",
+                                    id, res.getMeta().getSender(),  cid));
+                            pendingMsg.put(cid, res.getData());
+                            globalLock.notify();
                         }
-//                    }
+                    }
                 }
             }
 
@@ -295,10 +262,10 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             }
         });
     }
-    protected void broadcastReqMsg(Req req, int height, int sender) {
-        logger.info(format("[#%d] broadcast request message [height=%d]", id, height));
+    protected void broadcastReqMsg(Req req, int cid) {
+        logger.info(format("[#%d] broadcast request message [cid=%d]", id, cid));
         for (peer p : peers.values()) {
-            sendReqMessage(p.stub, req, height, sender);
+            sendReqMessage(p.stub, req, cid);
         }
     }
     protected void broadcastFastVoteMessage(FastBbcVote v) {
@@ -315,136 +282,63 @@ public class RmfService extends RmfGrpc.RmfImplBase {
 
     @Override
     public void disseminateMessage(Data request, StreamObserver<Empty> responseObserver) {
-        /*
-        Currently we assume that only one process send a message per round.
-        Hence, if we receive a message we fast vote for it immediately.
-         */
-//        if (request.getMeta().getSender() != request.getMeta().getHeight() % n) {
-//            return;
-//        }
-
-
         int height = request.getMeta().getHeight();
         int sender = request.getMeta().getSender();
         int cid = request.getMeta().getCid();
-
-//        synchronized (prevBbcCons) {
         synchronized (globalLock) {
-//            if (votes.get(height, sender) == -1) return;
-//            if (prevBbcCons.get(height) != null && prevBbcCons.get(height).getDecosion() == 0) return;
-        // When a new message arrives the server put it into the arrival and nothing more!!
-//        synchronized (pendingMsg) {
-//            synchronized (recMsg) {
-                if (pendingMsg.contains(height, sender) || recMsg.containsKey(height)) return;
-                pendingMsg.put(height, sender, request);
-                logger.info(format("[#%d] received data message from [%d], [height=%d]", id,
-                        sender, height));
-                timeoutMs = initTO;
-//                Meta meta = Meta.
-//                        newBuilder().
-//                        setHeight(height)
-//                        .setSender(id)
-//                        .build();
-                FastBbcVote v = FastBbcVote
-                        .newBuilder().setCid(cid).setSender(id).setVote(1).build();
-//                        .setMeta(meta).setVote(fastVoteMsg.
-//                                newBuilder().
-//                                setHeight(height).
-//                                setSender(sender)
-//                                .build())
-//                        .build();
-                broadcastFastVoteMessage(v);
-            }
-//        }
-
-//        synchronized (wayToRecMsgLock) {
-//            synchronized (dataMsgLock) {
-//                if (pendingMsg.containsKey(height) || recMsg.containsKey(height)) return;
-//                pendingMsg.put(height, request);
-//            }
-//            synchronized (prevBbcCons) {
-//                if (prevBbcCons.containsKey(height)) return;
-//            }
-//            logger.info(format("[#%d] received data message from [%d], [height=%d]", id,
-//                    request.getMeta().getSender(), height));
-//            timeoutMs = initTO;
-//            Meta meta = Meta.
-//                    newBuilder().
-//                    setHeight(height)
-//                    .setSender(id)
-//                    .build();
-//            FastBbcVote v = FastBbcVote
-//                    .newBuilder()
-//                    .setMeta(meta).setVote(1)
-//                    .build();
-//            broadcastFastVoteMessage(v);
-//        }
-
+            if (fastBbcCons.containsKey(cid) || regBbcCons.containsKey(cid)) return;
+            if (pendingMsg.containsKey(cid) || recMsg.containsKey(cid)) return;
+            pendingMsg.put(cid, request);
+            logger.info(format("[#%d] received data message from [%d], [cid=%d]", id,
+                    sender, cid));
+            timeoutMs = initTO;
+            FastBbcVote v = FastBbcVote
+                    .newBuilder().setCid(cid).setSender(id).setVote(1).build();
+            broadcastFastVoteMessage(v);
+        }
     }
 
     @Override
     public void fastVote(FastBbcVote request, StreamObserver<Empty> responeObserver) {
-//        synchronized (votes) {
         synchronized (globalLock) {
-//            int height = request.getVote().getHeight();
-//            int sender = request.getVote().getSender();
             int cid = request.getCid();
+//            logger.info(format("[#%d] received fast vote from [%d] in [cid=%d]", id, request.getSender(), cid));
             if (regBbcCons.containsKey(cid)) return;
             if (fastBbcCons.containsKey(cid)) return; // Against byzantine activity
+//            synchronized (fVotes) {
             if (!fVotes.containsKey(cid)) {
                 fVotes.put(cid, 0);
+//                    fVotes.notify(); // To prevent the case in which a process have received a message but did not vote for it yet.
             }
-//            if (votes.get(height, sender) == -1) return;
+//            }
             int curr = fVotes.get(cid);
             fVotes.remove(cid);
             fVotes.put(cid, curr + 1);
             if (fVotes.get(cid) == n) {
                 logger.info(format("[#%d] fastVote has been detected [cid=%d]", id, cid));
-//                synchronized (fastVoteDone) {
                     fastBbcCons.put(cid, BbcProtos.BbcDecision.newBuilder().setConsID(cid).setDecosion(1).build());
-//                prevBbcCons.put(height, BbcProtos.BbcDecision.newBuilder().setConsID(height).setDecosion(1).build());
-//                }
                 globalLock.notify();
             }
         }
     }
-//    @Override
-//    public void fastVote(FastBbcVote request, StreamObserver<Empty> responeObserver) {
-//        synchronized (votes) {
-//            int height = request.getMeta().getHeight();
-//            if (!votes.containsKey(height)) {
-//                votes.put(height, new vote(height));
-//            }
-//            votes.get(height).ones++;
-//            int nVotes = votes.get(height).ones;
-//            if (nVotes == n) {
-//                logger.info(format("[#%d] fastVote has been detected", id));
-//                votes.notify();
-//            }
-//        }
-//    }
-
     @Override
     public void reqMessage(proto.Req request,  StreamObserver<proto.Res> responseObserver)  {
         Data msg;
-        int height = request.getMeta().getHeight();
-        int sender = request.getMeta().getSender();
-//        synchronized (pendingMsg) {
-//            synchronized (recMsg) {
+        int cid = request.getMeta().getCid();
         synchronized (globalLock) {
-                msg = recMsg.get(height);
-//            }
+                msg = recMsg.get(cid);
             if (msg == null) {
-                msg = pendingMsg.get(height, sender);
+                msg = pendingMsg.get(cid);
             }
 
         }
         if (msg != null) {
-            logger.info(format("[#%d] has received request message from [#%d] of [height=%d]",
-                    id, request.getMeta().getSender(), request.getMeta().getHeight()));
+            logger.info(format("[#%d] has received request message from [#%d] of [cid=%d]",
+                    id, request.getMeta().getSender(), cid));
             Meta meta = Meta.newBuilder().
                     setSender(id).
                     setHeight(msg.getMeta().getHeight()).
+                    setCid(cid).
                     build();
             responseObserver.onNext(Res.newBuilder().
                     setData(msg).
@@ -452,115 +346,86 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                     build());
         }
     }
-
-//    void tryFastVote(int height, int sender) {
-//        Data msg = null;
-//        msg = pendingMsg.get(height, sender);
-//        if (msg != null) {
-//
-//        }
-//    }
-
     // TODO: Review this method again
-    public byte[] deliver(int height, int sender, int cid) {
+    public byte[] deliver(int cid) {
         int cVotes = 0;
-//        int cid = 0;
         int v = 0;
-//        synchronized (votes) {
         synchronized (globalLock) {
-//            if (fVotes.containsKey(cid)) {
-//                cVotes = fVotes.get(cid);
-//            }
-//            if (cVotes < n) {
+            if (fVotes.containsKey(cid)) {
+                cVotes = fVotes.get(cid);
+            }
+            if (cVotes < n) {
                 try {
                     globalLock.wait(timeoutMs);
                 } catch (InterruptedException e) {
                     logger.error("", e);
                     return null;
                 }
-            if (pendingMsg.contains(height, sender)) {
+            }
+
+            if (pendingMsg.containsKey(cid)) {
                 v = 1;
-                cid = pendingMsg.get(height, sender).getMeta().getCid();
-//                if (cid != consID) logger.fatal(format("[#%d] ERROR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!", id));
+            }
+            if (fVotes.containsKey(cid)) {
                 cVotes = fVotes.get(cid);
             }
-//            }
-//            if (fVotes.containsKey(cid)) {
-//                cVotes = fVotes.get(cid);
-////                votes.remove(height, sender);
-////                votes.put(height, sender, -1);
-//            }
-
-//        }
 
             if (cVotes < n) {
-//                int vote = 0;
-//            synchronized (pendingMsg) {
-//                if (pendingMsg.contains(height, sender)) {
-//                    vote = 1;
-//                }
-//            }
                 int dec = fullBbcConsensus(v, cid);
                 logger.info(format("[#%d] bbc returned [%d] for [cid=%d]", id, dec, cid));
-//                consID++;
-//
                 if (dec == 0) {
-//                    consID++;
                     timeoutMs += timeoutInterval;
                     logger.info(format("[#%d] timeout increased to %d", id, timeoutMs));
-                    if (pendingMsg.contains(height, sender)) {
-                        pendingMsg.remove(height, sender);
+                    if (pendingMsg.containsKey(cid)) {
+                        pendingMsg.remove(cid);
                     }
                     return null;
                 }
 
             } else {
-                logger.info(format("[#%d] deliver by fast vote [height=%d ; cid=%d]", id, height, cid));
+                logger.info(format("[#%d] deliver by fast vote [cid=%d]", id, cid));
             }
-//            consID++;
-            requestData(height, sender);
+            requestData(cid);
             Data msg;
-//       synchronized (pendingMsg) {
-//           synchronized (recMsg) {
-                msg = pendingMsg.get(height, sender);
-                recMsg.put(height, msg);
-                List<Integer> senders = new ArrayList<>(pendingMsg.row(height).keySet());
-                for (int k : senders) {
-                    pendingMsg.remove(height, k);
-                }
-//           }
+                msg = pendingMsg.get(cid);
+                recMsg.put(cid, msg);
+                pendingMsg.remove(cid);
             return msg.getData().toByteArray();
         }
-//       synchronized (votes) {
-//           votes.remove(height, sender);
-//       }
 
 
     }
     // TODO: We have a little bug here... note that if a process wish to perform a bbc it doesn't mean that other processes know about it. [solved??]
     protected int fullBbcConsensus(int vote, int cid) {
-//        synchronized (prevBbcCons) {
+        synchronized (bbcLock) {
             if (regBbcCons.containsKey(cid)) {
                 return regBbcCons.get(cid).getDecosion();
             }
+        }
+//            int vote = 0;
+//            if (pendingMsg.containsKey(cid) || recMsg.containsKey(cid)) {
+//                vote = 1;
+//            }
             logger.info(format("[#%d] Initiates full bbc instance [cid=%d], [vote:%d]", id, cid, vote));
             bbcClient.propose(vote, cid);
             int dec = bbcServer.decide(cid);
+        synchronized (bbcLock) {
             regBbcCons.put(cid, BbcProtos.BbcDecision.newBuilder().setConsID(cid).setDecosion(dec).build());
+        }
             return dec;
-//        }
+
     }
 
-    protected void requestData(int height, int sender) {
-        if (pendingMsg.contains(height, sender)) return;
+    protected void requestData(int cid) {
+        if (pendingMsg.containsKey(cid)) return;
         Meta meta = Meta.
                 newBuilder().
-                setHeight(height).
+                setCid(cid).
                 setSender(id).
                 build();
         Req req = Req.newBuilder().setMeta(meta).build();
-        broadcastReqMsg(req, height, sender);
-        while (!pendingMsg.contains(height, sender)) {
+        broadcastReqMsg(req, cid);
+        while (!pendingMsg.containsKey(cid)) {
             try {
                 globalLock.wait();
             } catch (InterruptedException e) {
