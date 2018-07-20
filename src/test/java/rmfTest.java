@@ -148,6 +148,7 @@ public class rmfTest {
         for (int i = 0 ; i < nnodes ; i++) {
             servers[i].join();
         }
+//        System.out.println("*********************START*************************");
         for (int k = 0 ; k < 100 ; k++) {
             String msg = "Hello" + k;
             ((RmfNode) allNodes[k % 4]).broadcast(msg.getBytes(), k);
@@ -172,7 +173,7 @@ public class rmfTest {
                 assertEquals(ret[0], ret[i]);
             }
         }
-
+//        System.out.println("*********************END*************************");
         for (int i = 0 ; i < 4 ; i++) {
             ((RmfNode) allNodes[i]).stop();
         }

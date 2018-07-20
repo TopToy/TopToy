@@ -90,7 +90,7 @@ public class RmfNode extends Node{
 
 
     deliver(int height, int sender) {
-        byte[] ret = rmfService.deliver(height, sender, cid);
+        byte[] ret = rmfService.deliver(cid);
         cid++;
         return ret;
     }

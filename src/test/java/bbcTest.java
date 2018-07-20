@@ -278,4 +278,57 @@ public class bbcTest {
         logger.info("End of stressTestFourServersAllCorrect");
 //        Thread.sleep(timeToWaitBetweenTest);
     }
+
+    @Test
+    void testFourServersFailure2() throws InterruptedException {
+        Thread.sleep(timeToWaitBetweenTest);
+        logger.info("Testing testFourServersAllCorrect1...");
+        deleteViewIfExist(FourServerconfigHome.toString());
+        int consID = 0;
+        latch = new CountDownLatch(4);
+        Thread[] serversThread = new Thread[4];
+        bbcServer[] servers = new bbcServer[4];
+        for (int i = 0 ; i < 4 ; i++) {
+            servers[i] = new bbcServer(i, 3, FourServerconfigHome.toString());
+            int finalI = i;
+            serversThread[i] = new Thread(() -> { servers[finalI].start();
+//            updateServersUp(4);
+                latch.countDown();
+            });
+            serversThread[i].start();
+        }
+//        waitForServersUp(4);
+        latch.await();
+        bbcClient[] clients = new bbcClient[4];
+        for (int i = 0 ; i < 4 ; i++) {
+            clients[i] = new bbcClient(i, FourServerconfigHome.toString());
+        }
+
+        for (int i = 0 ; i < 1000 ; i++) {
+            clients[0].propose(0, i);
+            clients[1].propose(1, i);
+            clients[2].propose(1, i);
+        }
+
+        for (int i = 0 ; i < 1000 ; i++) {
+            for (int k = 0 ; k < 4 ; k++) {
+                assertEquals(1, servers[k].decide(i));
+            }
+
+        }
+
+        for (int i = 0 ; i < 4 ; i++) {
+            clients[i].close();
+        }
+
+        for (int i = 0 ; i < 4 ; i++) {
+            servers[i].shutdown();
+        }
+//        Thread.sleep(timeToWaitBetweenTest);
+        for (int i = 0 ; i < 4 ; i++) {
+            serversThread[i].join();
+        }
+        logger.info("End of testFourServersAllCorrect1");
+
+    }
 }

@@ -89,7 +89,7 @@ public class ByzantineRmfNode extends Node{
     }
 
     public byte[] deliver(int height, int sender) {
-        byte[] res = rmfService.deliver(height, sender, cid);
+        byte[] res = rmfService.deliver(cid);
         cid++;
         return res;
     }
