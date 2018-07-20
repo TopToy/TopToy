@@ -4,13 +4,6 @@
 package proto;
 
 /**
- * <pre>
- *message fastVoteMsg {
- *    int32 sender = 1;
- *    int32 height = 2;
- *}
- * </pre>
- *
  * Protobuf type {@code proto.FastBbcVote}
  */
 public  final class FastBbcVote extends
@@ -299,13 +292,6 @@ private static final long serialVersionUID = 0L;
     return builder;
   }
   /**
-   * <pre>
-   *message fastVoteMsg {
-   *    int32 sender = 1;
-   *    int32 height = 2;
-   *}
-   * </pre>
-   *
    * Protobuf type {@code proto.FastBbcVote}
    */
   public static final class Builder extends

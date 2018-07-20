@@ -18,6 +18,7 @@ public class RmfNode extends Node{
     private RmfService rmfService;
     private Server rmfServer;
     int height;
+    int cid = 0;
     public RmfNode(int id, String addr, int port, int f, int tmoInterval, int tmo, ArrayList<Node> nodes, String bbcConfig) {
         super(addr, port, id);
         rmfService = new RmfService(id, f, tmoInterval, tmo, nodes, bbcConfig);
@@ -73,6 +74,7 @@ public class RmfNode extends Node{
                 newBuilder().
                 setSender(getID()).
                 setHeight(height).
+                setCid(cid).
                 build();
         Data dataMsg = Data.
                 newBuilder().
@@ -82,8 +84,15 @@ public class RmfNode extends Node{
         rmfService.rmfBroadcast(dataMsg);
     }
 
-    public byte[] deliver(int height, int sender) {
-        return rmfService.deliver(height, sender);
+    public byte[]
+
+
+
+
+    deliver(int height, int sender) {
+        byte[] ret = rmfService.deliver(height, sender, cid);
+        cid++;
+        return ret;
     }
 
 

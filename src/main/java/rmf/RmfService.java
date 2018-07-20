@@ -66,7 +66,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
     }
 
 //    protected int currHeight;
-    int consID = 0;
+//    int consID = 0;
     protected int id;
     protected int timeoutMs;
     int initTO;
@@ -326,6 +326,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
 
         int height = request.getMeta().getHeight();
         int sender = request.getMeta().getSender();
+        int cid = request.getMeta().getCid();
 
 //        synchronized (prevBbcCons) {
         synchronized (globalLock) {
@@ -345,7 +346,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
 //                        .setSender(id)
 //                        .build();
                 FastBbcVote v = FastBbcVote
-                        .newBuilder().setCid(consID).setSender(id).setVote(1).build();
+                        .newBuilder().setCid(cid).setSender(id).setVote(1).build();
 //                        .setMeta(meta).setVote(fastVoteMsg.
 //                                newBuilder().
 //                                setHeight(height).
@@ -461,51 +462,62 @@ public class RmfService extends RmfGrpc.RmfImplBase {
 //    }
 
     // TODO: Review this method again
-    public byte[] deliver(int height, int sender) {
+    public byte[] deliver(int height, int sender, int cid) {
         int cVotes = 0;
+//        int cid = 0;
+        int v = 0;
 //        synchronized (votes) {
         synchronized (globalLock) {
-            if (fVotes.containsKey(consID)) {
-                cVotes = fVotes.get(consID);
-            }
-            if (cVotes < n) {
+//            if (fVotes.containsKey(cid)) {
+//                cVotes = fVotes.get(cid);
+//            }
+//            if (cVotes < n) {
                 try {
                     globalLock.wait(timeoutMs);
                 } catch (InterruptedException e) {
                     logger.error("", e);
                     return null;
                 }
+            if (pendingMsg.contains(height, sender)) {
+                v = 1;
+                cid = pendingMsg.get(height, sender).getMeta().getCid();
+//                if (cid != consID) logger.fatal(format("[#%d] ERROR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!", id));
+                cVotes = fVotes.get(cid);
             }
-
-            if (fVotes.containsKey(consID)) {
-                cVotes = fVotes.get(consID);
-//                votes.remove(height, sender);
-//                votes.put(height, sender, -1);
-            }
+//            }
+//            if (fVotes.containsKey(cid)) {
+//                cVotes = fVotes.get(cid);
+////                votes.remove(height, sender);
+////                votes.put(height, sender, -1);
+//            }
 
 //        }
 
             if (cVotes < n) {
-                int vote = 0;
+//                int vote = 0;
 //            synchronized (pendingMsg) {
-                if (pendingMsg.contains(height, sender)) {
-                    vote = 1;
-                }
+//                if (pendingMsg.contains(height, sender)) {
+//                    vote = 1;
+//                }
 //            }
-                int dec = fullBbcConsensus(vote, consID);
-                logger.info(format("[#%d] bbc returned [%d] for [cid=%d]", id, dec, consID));
+                int dec = fullBbcConsensus(v, cid);
+                logger.info(format("[#%d] bbc returned [%d] for [cid=%d]", id, dec, cid));
 //                consID++;
+//
                 if (dec == 0) {
-                    consID++;
+//                    consID++;
                     timeoutMs += timeoutInterval;
                     logger.info(format("[#%d] timeout increased to %d", id, timeoutMs));
+                    if (pendingMsg.contains(height, sender)) {
+                        pendingMsg.remove(height, sender);
+                    }
                     return null;
                 }
 
             } else {
-                logger.info(format("[#%d] deliver by fast vote [height=%d ; cid=%d]", id, height, consID));
+                logger.info(format("[#%d] deliver by fast vote [height=%d ; cid=%d]", id, height, cid));
             }
-            consID++;
+//            consID++;
             requestData(height, sender);
             Data msg;
 //       synchronized (pendingMsg) {

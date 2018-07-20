@@ -8,6 +8,7 @@ import rmf.RmfNode;
 import java.io.File;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import static java.lang.String.format;
@@ -241,7 +242,10 @@ public class rmfTest {
         }
         int height = 0;
         String msg = "Hello";
-        ((ByzantineRmfNode) allNodes[0]).selectiveBroadcast(msg.getBytes(), 0, new int[] {1, 2});
+        List<Integer> ids = new ArrayList<Integer>();
+        ids.add(1);
+        ids.add(2);
+        ((ByzantineRmfNode) allNodes[0]).selectiveBroadcast(msg.getBytes(), 0, ids);
 //        sender.act((RmfNode) allNodes[0]);
         String[] ret = new String[4];
         Thread[] tasks = new Thread[4];
@@ -302,9 +306,12 @@ public class rmfTest {
         for (int i = 0 ; i < nnodes ; i++) {
             servers[i].join();
         }
+        List<Integer> ids = new ArrayList<Integer>();
+        ids.add(1);
+        ids.add(2);
         for (int k = 0 ; k < 100 ; k++) {
             String msg = "Hello" + k;
-            ((ByzantineRmfNode) allNodes[0]).selectiveBroadcast(msg.getBytes(), k, new int[] {1, 2});
+            ((ByzantineRmfNode) allNodes[0]).selectiveBroadcast(msg.getBytes(), k, ids);
 //        sender.act((RmfNode) allNodes[0]);
             String[] ret = new String[4];
             Thread[] tasks = new Thread[4];

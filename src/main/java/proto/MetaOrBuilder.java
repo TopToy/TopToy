@@ -16,4 +16,9 @@ public interface MetaOrBuilder extends
    * <code>int32 height = 2;</code>
    */
   int getHeight();
+
+  /**
+   * <code>int32 cid = 3;</code>
+   */
+  int getCid();
 }

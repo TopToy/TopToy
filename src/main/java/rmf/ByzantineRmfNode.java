@@ -23,6 +23,7 @@ public class ByzantineRmfNode extends Node{
     private RmfService rmfService;
     private Server rmfServer;
     int height;
+    int cid = 0;
 
     public ByzantineRmfNode(int id, String addr, int port, int f, int tmoInterval, int tmo, ArrayList<Node> nodes, String bbcConfig) {
         super(addr, port, id);
@@ -77,6 +78,7 @@ public class ByzantineRmfNode extends Node{
                 newBuilder().
                 setSender(getID()).
                 setHeight(height).
+                setCid(cid).
                 build();
         Data dataMsg = Data.
                 newBuilder().
@@ -87,14 +89,17 @@ public class ByzantineRmfNode extends Node{
     }
 
     public byte[] deliver(int height, int sender) {
-        return rmfService.deliver(height, sender);
+        byte[] res = rmfService.deliver(height, sender, cid);
+        cid++;
+        return res;
     }
 
-    public void selectiveBroadcast(byte[] msg, int height, int[] ids) {
+    public void selectiveBroadcast(byte[] msg, int height, List<Integer> ids) {
         Meta metaMsg = Meta.
                 newBuilder().
                 setSender(getID()).
                 setHeight(height).
+                setCid(cid).
                 build();
         Data dataMsg = Data.
                 newBuilder().
@@ -102,7 +107,7 @@ public class ByzantineRmfNode extends Node{
                 setMeta(metaMsg).
                 build();
         for (Map.Entry<Integer, RmfService.peer>  p: rmfService.peers.entrySet()) {
-            if (ArrayUtils.contains(ids, p.getKey())) {
+            if (ids.contains(p.getKey())) {
                 logger.info("sending message " + Arrays.toString(msg) + " to " + p.getKey() + " with height of " + height);
                 rmfService.sendDataMessage(p.getValue().stub, dataMsg);
             }
@@ -112,13 +117,9 @@ public class ByzantineRmfNode extends Node{
     /*
         This should used outside the rmf protocol (Note that the rmf protocol does not handle such failures)
      */
-    public void devidedBroadcast(List<byte[]> msgs, List<Integer> heights, List<int[]> ids) {
-        for (int i = 0 ; i < ids.size() ; i++) {
-            int height = heights.get(0);
-            if (heights.size() > 1) {
-                height = heights.get(i);
-            }
-            selectiveBroadcast(msgs.get(i), height, ids.get(i));
+    public void devidedBroadcast(List<byte[]> msgs, List<Integer> heights, List<List<Integer>> ids) {
+        for (int i = 0 ; i < msgs.size() ; i++) {
+            selectiveBroadcast(msgs.get(i), heights.get(i), ids.get(i));
         }
     }
 

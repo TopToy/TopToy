@@ -49,7 +49,13 @@ public class asyncBcServer extends Node {
         currHeight = 1; // starts from 1 due to the genesis block
         currLeader = 0;
         this.maxTransactionInBlock = maxTransactionInBlock;
-        mainThread = new Thread(this::mainLoop);
+        mainThread = new Thread(() -> {
+            try {
+                mainLoop();
+            } catch (InterruptedException e) {
+                logger.error("", e);
+            }
+        });
     }
 
     public void start() {
@@ -78,17 +84,12 @@ public class asyncBcServer extends Node {
         currLeader = (currLeader + 1) % n;
     }
 
-    private void mainLoop() {
+    private void mainLoop() throws InterruptedException {
         while (!stopped) {
             Random rand = new Random();
             int x = rand.nextInt(1000) + 1;
             logger.info(format("[#%d] sleeps for %d ms",getID(), x));
-            try {
                 Thread.sleep(x);
-            } catch (InterruptedException e) {
-                logger.error("", e);
-                return;
-            }
             leaderImpl();
             byte[] recData = rmfServer.deliver(currHeight, currLeader);
             if (recData == null) {
@@ -188,6 +189,7 @@ public class asyncBcServer extends Node {
                     newBlockNotifyer.wait();
                 } catch (InterruptedException e) {
                     logger.error("Servers returned tentative block", e);
+                    return null;
                 }
             }
         }

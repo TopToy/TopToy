@@ -180,6 +180,7 @@ public class bcServer extends Node {
                     newBlockNotifyer.wait();
                 } catch (InterruptedException e) {
                     logger.error("Servers returned tentative block", e);
+                    return null;
                 }
             }
         }

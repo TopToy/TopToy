@@ -13,6 +13,7 @@ import rmf.RmfNode;
 
 import java.util.*;
 import java.util.concurrent.Semaphore;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
@@ -134,36 +135,25 @@ public class byzantineBcServer extends Node {
             Block sealedBlock2 = currBlock.construct(getID(), currHeight,
                     DigestMethod.hash(BlockHeader.newBuilder().setCreatorID(getID() + 5).setHeight(10).build()));
             currBlock = bc.createNewBLock();
-            int pr = n/2;
-            int[] ids = new int[pr];
-            int[] ids2 = new int[pr];
             List<Integer> all = new ArrayList<>();
             for (int i = 0 ; i < n ;i++) {
                 all.add(i);
             }
             Collections.shuffle(all);
-            for (int i = 0 ; i < pr ;i++) {
-                ids[i] = all.get(i);
+            List<Integer> heights = new ArrayList<>();
+            List<byte[]> msgs = new ArrayList<>();
+            msgs.add(sealedBlock1.toByteArray());
+            msgs.add(sealedBlock2.toByteArray());
+            List<List<Integer>> sids = new ArrayList<>();
+            sids.add(all.subList(0, n/2));
+            sids.add(all.subList(n/2 + 1, n));
+            for (int i = 0 ; i < 2 ; i++) {
+                heights.add(currHeight);
             }
-
-            for (int i = pr  ; i < n ;i++) {
-                ids2[i] = all.get(i);
-            }
-
             if (fullByz) {
-                List<byte[]> msgs = new ArrayList<>();
-                msgs.add(sealedBlock1.toByteArray());
-                msgs.add(sealedBlock1.toByteArray());
-                msgs.add(sealedBlock2.toByteArray());
-                msgs.add(sealedBlock2.toByteArray());
-                List<Integer> height = new ArrayList<>();
-                List<int[]> sids = new ArrayList<>();
-                sids.add(ids);
-                sids.add(ids2);
-                height.add(currHeight);
-                rmfServer.devidedBroadcast(msgs, height, sids);
+                rmfServer.devidedBroadcast(msgs, heights, sids);
             }
-            rmfServer.selectiveBroadcast(sealedBlock1.toByteArray(), currHeight, ids);
+            rmfServer.selectiveBroadcast(sealedBlock1.toByteArray(), currHeight, all.subList(0, n/2));
         }
 
 

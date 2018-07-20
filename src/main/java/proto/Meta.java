@@ -18,6 +18,7 @@ private static final long serialVersionUID = 0L;
   private Meta() {
     sender_ = 0;
     height_ = 0;
+    cid_ = 0;
   }
 
   @java.lang.Override
@@ -59,6 +60,11 @@ private static final long serialVersionUID = 0L;
           case 16: {
 
             height_ = input.readInt32();
+            break;
+          }
+          case 24: {
+
+            cid_ = input.readInt32();
             break;
           }
         }
@@ -103,6 +109,15 @@ private static final long serialVersionUID = 0L;
     return height_;
   }
 
+  public static final int CID_FIELD_NUMBER = 3;
+  private int cid_;
+  /**
+   * <code>int32 cid = 3;</code>
+   */
+  public int getCid() {
+    return cid_;
+  }
+
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
@@ -121,6 +136,9 @@ private static final long serialVersionUID = 0L;
     if (height_ != 0) {
       output.writeInt32(2, height_);
     }
+    if (cid_ != 0) {
+      output.writeInt32(3, cid_);
+    }
     unknownFields.writeTo(output);
   }
 
@@ -136,6 +154,10 @@ private static final long serialVersionUID = 0L;
     if (height_ != 0) {
       size += com.google.protobuf.CodedOutputStream
         .computeInt32Size(2, height_);
+    }
+    if (cid_ != 0) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeInt32Size(3, cid_);
     }
     size += unknownFields.getSerializedSize();
     memoizedSize = size;
@@ -157,6 +179,8 @@ private static final long serialVersionUID = 0L;
         == other.getSender());
     result = result && (getHeight()
         == other.getHeight());
+    result = result && (getCid()
+        == other.getCid());
     result = result && unknownFields.equals(other.unknownFields);
     return result;
   }
@@ -172,6 +196,8 @@ private static final long serialVersionUID = 0L;
     hash = (53 * hash) + getSender();
     hash = (37 * hash) + HEIGHT_FIELD_NUMBER;
     hash = (53 * hash) + getHeight();
+    hash = (37 * hash) + CID_FIELD_NUMBER;
+    hash = (53 * hash) + getCid();
     hash = (29 * hash) + unknownFields.hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -305,6 +331,8 @@ private static final long serialVersionUID = 0L;
 
       height_ = 0;
 
+      cid_ = 0;
+
       return this;
     }
 
@@ -329,6 +357,7 @@ private static final long serialVersionUID = 0L;
       proto.Meta result = new proto.Meta(this);
       result.sender_ = sender_;
       result.height_ = height_;
+      result.cid_ = cid_;
       onBuilt();
       return result;
     }
@@ -375,6 +404,9 @@ private static final long serialVersionUID = 0L;
       }
       if (other.getHeight() != 0) {
         setHeight(other.getHeight());
+      }
+      if (other.getCid() != 0) {
+        setCid(other.getCid());
       }
       this.mergeUnknownFields(other.unknownFields);
       onChanged();
@@ -451,6 +483,32 @@ private static final long serialVersionUID = 0L;
     public Builder clearHeight() {
       
       height_ = 0;
+      onChanged();
+      return this;
+    }
+
+    private int cid_ ;
+    /**
+     * <code>int32 cid = 3;</code>
+     */
+    public int getCid() {
+      return cid_;
+    }
+    /**
+     * <code>int32 cid = 3;</code>
+     */
+    public Builder setCid(int value) {
+      
+      cid_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>int32 cid = 3;</code>
+     */
+    public Builder clearCid() {
+      
+      cid_ = 0;
       onChanged();
       return this;
     }

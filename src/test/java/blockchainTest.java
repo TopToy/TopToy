@@ -146,14 +146,14 @@ public class blockchainTest {
         for (int i = 0 ; i < nnodes ; i++) {
             tasks[i].join();
         }
-
+        for (int i = 0 ; i < 4 ; i++) {
+            ((bcServer) allNodes[i]).shutdown();
+        }
         for (int i = 0 ; i < 4 ; i++) {
             assertEquals(msg, ret[i]);
 //            ((RmfNode) allNodes[i]).stop();
         }
-        for (int i = 0 ; i < 4 ; i++) {
-            ((bcServer) allNodes[i]).shutdown();
-        }
+
     }
 //
     void serverDoing(List<Block> res, bcServer s) {
@@ -200,16 +200,16 @@ public class blockchainTest {
         for (int i = 0 ; i < nnodes ; i++) {
             tasks[i].join();
         }
-
+        for (int i = 0 ; i < 4 ; i++) {
+            ((bcServer) allNodes[i]).shutdown();
+        }
         for (int i = 0 ; i < 100 ; i++) {
             logger.info(format("***** Assert creator = %d", res.get(0).get(i).getHeader().getCreatorID()));
             for (int k = 0 ; k < nnodes ;k++) {
                 assertEquals(res.get(0).get(i).getHeader().getCreatorID(), res.get(k).get(i).getHeader().getCreatorID());
             }
         }
-        for (int i = 0 ; i < 4 ; i++) {
-            ((bcServer) allNodes[i]).shutdown();
-        }
+
     }
 //
 @Test
@@ -253,15 +253,17 @@ void TestStressFourServersMuteFault() throws InterruptedException {
         tasks[i].join();
     }
 
+    for (int i = 0 ; i < 4 ; i++) {
+        ((bcServer) allNodes[i]).shutdown();
+    }
+
     for (int i = 0 ; i < 100 ; i++) {
         logger.info(format("***** Assert creator = %d", res.get(1).get(i).getHeader().getCreatorID()));
         for (int k = 1 ; k < nnodes ;k++) {
             assertEquals(res.get(1).get(i).getHeader().getCreatorID(), res.get(k).get(i).getHeader().getCreatorID());
         }
     }
-    for (int i = 0 ; i < 4 ; i++) {
-        ((bcServer) allNodes[i]).shutdown();
-    }
+
 }
     void bServerDoing(List<Block> res, byzantineBcServer s) {
         for(int i = 0; i < 100 ; i++) {
@@ -323,12 +325,6 @@ void TestStressFourServersMuteFault() throws InterruptedException {
             tasks[i].join();
         }
 
-        for (int i = 0 ; i < 100 ; i++) {
-            logger.info(format("***** Assert creator = %d", res.get(0).get(i).getHeader().getCreatorID()));
-            for (int k = 0 ; k < nnodes ;k++) {
-                assertEquals(res.get(0).get(i).getHeader().getCreatorID(), res.get(k).get(i).getHeader().getCreatorID());
-            }
-        }
         for (int i = 0 ; i < 4 ; i++) {
             if (i == 0) {
                 ((byzantineBcServer) allNodes[i]).shutdown();
@@ -336,6 +332,14 @@ void TestStressFourServersMuteFault() throws InterruptedException {
             }
             ((bcServer) allNodes[i]).shutdown();
         }
+
+        for (int i = 0 ; i < 100 ; i++) {
+            logger.info(format("***** Assert creator = %d", res.get(0).get(i).getHeader().getCreatorID()));
+            for (int k = 0 ; k < nnodes ;k++) {
+                assertEquals(res.get(0).get(i).getHeader().getCreatorID(), res.get(k).get(i).getHeader().getCreatorID());
+            }
+        }
+
     }
 
     void asyncServerDoing(List<Block> res, asyncBcServer s) {
@@ -345,11 +349,12 @@ void TestStressFourServersMuteFault() throws InterruptedException {
                 s.addTransaction(msg.getBytes(), 0);
             }
             res.add(s.deliver(i));
+            logger.info(format("**** %d ***** %d", s.getID(), i));
         }
 //        logger.info("******************" + s.getID() + "****************************");
     }
     @Test
-    void TestStressFourServersAsuncNetwork() throws InterruptedException {
+    void TestStressFourServersAsyncNetwork() throws InterruptedException {
 //        Thread.sleep(timeToWaitBetweenTests);
         Thread[] servers = new Thread[4];
         int nnodes = 4;
@@ -384,15 +389,17 @@ void TestStressFourServersMuteFault() throws InterruptedException {
             tasks[i].join();
         }
 
+        for (int i = 0 ; i < 4 ; i++) {
+            ((asyncBcServer) allNodes[i]).shutdown();
+        }
+
         for (int i = 0 ; i < 100 ; i++) {
             logger.info(format("***** Assert creator = %d", res.get(0).get(i).getHeader().getCreatorID()));
             for (int k = 0 ; k < nnodes ;k++) {
                 assertEquals(res.get(0).get(i).getHeader().getCreatorID(), res.get(k).get(i).getHeader().getCreatorID());
             }
         }
-        for (int i = 0 ; i < 4 ; i++) {
-            ((asyncBcServer) allNodes[i]).shutdown();
-        }
+
     }
 
     @Test
