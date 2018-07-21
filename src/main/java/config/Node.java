@@ -22,4 +22,8 @@ public class Node {
         this.port = port;
         this.id = id;
     }
+
+    public Node(Node n) {
+        new Node(n.getAddr(), n.getPort(), n.getID());
+    }
 }

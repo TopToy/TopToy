@@ -5,6 +5,7 @@ import bftsmart.tom.ServiceReplica;
 import bftsmart.tom.server.defaultservices.DefaultSingleRecoverable;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
+import config.Config;
 import proto.BbcProtos;
 import java.nio.ByteBuffer;
 import java.util.*;

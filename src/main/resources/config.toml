@@ -1,0 +1,39 @@
+title = "configuration"
+
+[system]
+    n = 4
+    f = 1
+
+[setting]
+    tmo = 1000
+    tmoInterval = 100
+    rmfBbcConfigPath = "config/bbcConfig/bbcFourServers"
+    maxTransactionInBlock = 1
+
+[server]
+    id = 0
+    ip = "127.0.0.1"
+    port = 20000
+
+[[RMFcluster]]
+
+    [RMFcluster.s0]
+        id = 0
+        ip = "127.0.0.1"
+        port = 20000
+
+    [RMFcluster.s1]
+        id = 1
+        ip = "127.0.0.1"
+        port = 20010
+
+    [RMFcluster.s2]
+        id = 2
+        ip = "127.0.0.1"
+        port = 20020
+
+    [RMFcluster.s3]
+        id = 3
+        ip = "127.0.0.1"
+        port = 20030
+

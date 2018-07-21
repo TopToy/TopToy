@@ -191,6 +191,11 @@
             <version>25.1-jre</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.moandjiezana.toml</groupId>
+            <artifactId>toml4j</artifactId>
+            <version>0.7.2</version>
+        </dependency>
 
         <!--&lt;!&ndash; https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-iostreams &ndash;&gt;-->
         <!--<dependency>-->

@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class blockchainTest {
 
-    private int timeToWaitBetweenTests = 1000 * 60;
+    private int timeToWaitBetweenTests = 1; //1000 * 60;
     static Config conf = new Config();
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(blockchainTest.class);
     private String localHost = "127.0.0.1";
@@ -53,10 +53,10 @@ public class blockchainTest {
         for (int id = 0 ; id < nnodes ; id++) {
             logger.info("init server #" + id);
             if (ArrayUtils.contains(byzIds, id)) {
-                ret[id] = new byzantineBcServer(localHost, ports[id], id, f, currentNodes, configHome, 1);
+                ret[id] = new byzantineBcServer(localHost, ports[id], id);
                 continue;
             }
-            ret[id] =  new bcServer(localHost, ports[id], id, f, currentNodes, configHome, 1);
+            ret[id] =  new bcServer(localHost, ports[id], id);
         }
         return ret;
         //        n.start();
@@ -69,7 +69,7 @@ public class blockchainTest {
         Node[] ret = new Node[nnodes];
         for (int id = 0 ; id < nnodes ; id++) {
             logger.info("init server #" + id);
-            ret[id] =  new asyncBcServer(localHost, ports[id], id, f, currentNodes, configHome, 1);
+            ret[id] =  new asyncBcServer(localHost, ports[id], id);
         }
         return ret;
         //        n.start();
@@ -125,14 +125,6 @@ public class blockchainTest {
         for (int i = 0 ; i < nnodes ; i++) {
             ((bcServer) allNodes[i]).serve();
         }
-//        try {
-//        Thread.sleep(20 * 1000);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-//        int height = 0;
-//        sender.act((RmfNode) allNodes[0]);
-//        Thread.sleep(10 * 1000);
         String[] ret = new String[4];
         Thread[] tasks = new Thread[4];
         for (int i = 0 ; i < nnodes ; i++) {

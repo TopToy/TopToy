@@ -2,6 +2,7 @@ package blockchain;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
+import config.Config;
 import config.Node;
 import crypto.DigestMethod;
 import proto.Block;
@@ -38,17 +39,18 @@ public class asyncBcServer extends Node {
 //    private Thread rmfThread;
 
     // TODO: Currently nodes, f, tmoInterval, tmo and configHome are coded but we will turn it into configuration file
-    public asyncBcServer(String addr, int port, int id, int f, ArrayList<Node> nodes, String bbcConfigHome, int maxTransactionInBlock) {
-        super(addr, port, id);
-        rmfServer = new RmfNode(id, addr, port, f, 100, 1000 * 1, nodes, bbcConfigHome);
+    public asyncBcServer(String addr, int port, int id) {
+        super(addr, port, id); // TODO: Should be changed according to Config!
+        rmfServer = new RmfNode(id, addr, port, Config.getF(), Config.getTMOInterval(), Config.getTMO(),
+                Config.getRMFcluster(), Config.getRMFbbcConfigHome());
         bc = new basicBlockchain(id);
         currBlock = bc.createNewBLock();
-        this.f = f;
-        n = 3*f +1;
+        this.f = Config.getF();
+        n = Config.getN();
         stopped = false;
         currHeight = 1; // starts from 1 due to the genesis block
         currLeader = 0;
-        this.maxTransactionInBlock = maxTransactionInBlock;
+        this.maxTransactionInBlock = Config.getMaxTransactionsInBlock();
         mainThread = new Thread(() -> {
             try {
                 mainLoop();

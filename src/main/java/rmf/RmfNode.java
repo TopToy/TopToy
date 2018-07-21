@@ -1,6 +1,7 @@
 package rmf;
 
 import com.google.protobuf.ByteString;
+import config.Config;
 import config.Node;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
@@ -19,6 +20,7 @@ public class RmfNode extends Node{
     private Server rmfServer;
     int height;
     int cid = 0;
+
     public RmfNode(int id, String addr, int port, int f, int tmoInterval, int tmo, ArrayList<Node> nodes, String bbcConfig) {
         super(addr, port, id);
         rmfService = new RmfService(id, f, tmoInterval, tmo, nodes, bbcConfig);
