@@ -34,16 +34,6 @@ TODO:
  */
 public class RmfService extends RmfGrpc.RmfImplBase {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(RmfService.class);
-//    class vote {
-//        int ones;
-//        int consID;
-//
-//        vote(int consID) {
-//            this.ones = 0;
-//            this.consID = consID;
-//        }
-//    }
-
     class peer {
         ManagedChannel channel;
         RmfGrpc.RmfStub stub;
@@ -68,9 +58,9 @@ public class RmfService extends RmfGrpc.RmfImplBase {
 //    protected int currHeight;
 //    int consID = 0;
     protected int id;
-    protected int timeoutMs;
-    int initTO;
-    protected int timeoutInterval;
+//    protected int timeoutMs;
+//    int initTO;
+//    protected int timeoutInterval;
     int n;
     protected int f;
     protected bbcServer bbcServer;
@@ -96,7 +86,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
     private final HashMap<Integer, BbcProtos.BbcDecision> regBbcCons;
     private boolean stopped = false;
 
-    public RmfService(int id, int f, int tmoInterval, int tmo, ArrayList<Node> nodes, String bbcConfig) {
+    public RmfService(int id, int f, ArrayList<Node> nodes, String bbcConfig) {
         this.bbcConfig = bbcConfig;
         this.bbcClient = new bbcClient(id, bbcConfig);
         this.receivedSem = new Semaphore(0, true);
@@ -108,9 +98,9 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         this.peers = new HashMap<>();
         this.f = f;
         this.n = 3*f +1;
-        this.timeoutInterval = tmoInterval;
-        this.initTO = tmo;
-        this.timeoutMs = tmo;
+//        this.timeoutInterval = tmoInterval;
+//        this.initTO = tmo;
+//        this.timeoutMs = tmo;
         this.id = id;
         this.nodes = nodes;
         this.fastBbcCons = new HashMap<>();
@@ -291,7 +281,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             pendingMsg.put(cid, request);
             logger.info(format("[#%d] received data message from [%d], [cid=%d]", id,
                     sender, cid));
-            timeoutMs = initTO;
+//            timeoutMs = initTO;
             FastBbcVote v = FastBbcVote
                     .newBuilder().setCid(cid).setSender(id).setVote(1).build();
             broadcastFastVoteMessage(v);
@@ -347,7 +337,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         }
     }
     // TODO: Review this method again
-    public byte[] deliver(int cid) {
+    public byte[] deliver(int cid, int tmo) {
         int cVotes = 0;
         int v = 0;
         synchronized (globalLock) {
@@ -356,7 +346,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             }
             if (cVotes < n) {
                 try {
-                    globalLock.wait(timeoutMs);
+                    globalLock.wait(tmo);
                 } catch (InterruptedException e) {
                     logger.error("", e);
                     return null;
@@ -374,11 +364,9 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                 int dec = fullBbcConsensus(v, cid);
                 logger.info(format("[#%d] bbc returned [%d] for [cid=%d]", id, dec, cid));
                 if (dec == 0) {
-                    timeoutMs += timeoutInterval;
-                    logger.info(format("[#%d] timeout increased to %d", id, timeoutMs));
-                    if (pendingMsg.containsKey(cid)) {
-                        pendingMsg.remove(cid);
-                    }
+//                    timeoutMs += timeoutInterval;
+//                    logger.info(format("[#%d] timeout increased to %d", id, timeoutMs));
+                    pendingMsg.remove(cid);
                     return null;
                 }
 
@@ -401,7 +389,6 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             if (regBbcCons.containsKey(cid)) {
                 return regBbcCons.get(cid).getDecosion();
             }
-        }
 //            int vote = 0;
 //            if (pendingMsg.containsKey(cid) || recMsg.containsKey(cid)) {
 //                vote = 1;
@@ -409,10 +396,10 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             logger.info(format("[#%d] Initiates full bbc instance [cid=%d], [vote:%d]", id, cid, vote));
             bbcClient.propose(vote, cid);
             int dec = bbcServer.decide(cid);
-        synchronized (bbcLock) {
             regBbcCons.put(cid, BbcProtos.BbcDecision.newBuilder().setConsID(cid).setDecosion(dec).build());
-        }
             return dec;
+        }
+
 
     }
 

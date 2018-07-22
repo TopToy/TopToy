@@ -101,10 +101,11 @@ public class bbcServer extends DefaultSingleRecoverable {
 
     @Override
     public byte[] appExecuteOrdered(byte[] command, MessageContext msgCtx) {
-        int cid =0;
+        int cid;
         try {
             BbcProtos.BbcMsg msg = BbcProtos.BbcMsg.parseFrom(command);
             cid = msg.getId();
+            logger.debug(format("[#%d] received bbc message from [#%d]", id, msg.getClientID()));
             synchronized (rec) {
                 consVote v = new consVote();
                 if (msg.getVote() == 1) {
@@ -124,6 +125,7 @@ public class bbcServer extends DefaultSingleRecoverable {
                 }
                 rec.put(cid, v);
                 if (v.neg + v.pos == quorumSize) {
+                    logger.debug(format("[#%d] notify on  [cid=%d]", id, cid));
                     rec.notify();
                 }
             }

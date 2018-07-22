@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
@@ -26,22 +27,19 @@ public class asyncBcServer extends Node {
     private int n;
     private int currLeader;
     private boolean stopped;
-    //    final Object leaderLock = new Object();
     private final Object blockLock = new Object();
-    //    private Semaphore newBlockNotifier = new Semaphore(0, true);
-//    private final Object latencyNotifier = new Object();
-//    final Object heightLock = new Object();
     private block currBlock; // TODO: As any server should disseminates its block once in an epoch, currently a block is shipped as soon the server turn is coming.
     private final Object newBlockNotifyer = new Object();
     private int maxTransactionInBlock; // TODO: Should be done by configuration
 
+    private int tmo;
+    private int tmoInterval;
+    private int initTmo;
     private Thread mainThread;
-//    private Thread rmfThread;
-
     // TODO: Currently nodes, f, tmoInterval, tmo and configHome are coded but we will turn it into configuration file
     public asyncBcServer(String addr, int port, int id) {
         super(addr, port, id); // TODO: Should be changed according to Config!
-        rmfServer = new RmfNode(id, addr, port, Config.getF(), Config.getTMOInterval(), Config.getTMO(),
+        rmfServer = new RmfNode(id, addr, port, Config.getF(),
                 Config.getRMFcluster(), Config.getRMFbbcConfigHome());
         bc = new basicBlockchain(id);
         currBlock = bc.createNewBLock();
@@ -50,6 +48,9 @@ public class asyncBcServer extends Node {
         stopped = false;
         currHeight = 1; // starts from 1 due to the genesis block
         currLeader = 0;
+        tmo = Config.getTMO();
+        tmoInterval = Config.getTMOInterval();
+        initTmo = tmo;
         this.maxTransactionInBlock = Config.getMaxTransactionsInBlock();
         mainThread = new Thread(() -> {
             try {
@@ -93,8 +94,10 @@ public class asyncBcServer extends Node {
             logger.info(format("[#%d] sleeps for %d ms",getID(), x));
                 Thread.sleep(x);
             leaderImpl();
-            byte[] recData = rmfServer.deliver(currHeight, currLeader);
+            byte[] recData = rmfServer.deliver(currHeight, currLeader, tmo);
             if (recData == null) {
+                tmo += tmoInterval;
+                logger.info(format("[#%d] Unable to receive block, timeout increased to [%d] ms", getID(), tmo));
                 updateLeader();
                 continue;
             }
@@ -111,6 +114,19 @@ public class asyncBcServer extends Node {
                 handlePossibleFork(recBlock);
                 continue;
             }
+
+            if (bc.getHeight() + 1 > f && bc.getBlocks(bc.getHeight() - f, bc.getHeight()).
+                    stream().
+                    map(b -> b.getHeader().getCreatorID()).
+                    collect(Collectors.toList()).
+                    contains(recBlock.getHeader().getCreatorID())) {
+                logger.info("[#%d] Unable to receive block, sender is in the last f blocks");
+                tmo += tmoInterval;
+                logger.info(format("[#%d] Unable to receive block, timeout increased to [%d] ms", getID(), tmo));
+                updateLeader();
+                continue;
+            }
+
             if (!bc.validateBlockData(recBlock)) {
                 logger.warn(format("[#%d] received an invalid data in a valid block, creating an empty block [height=%d]", getID(), currHeight));
                 recBlock = Block.newBuilder(). // creates emptyBlock
@@ -122,7 +138,7 @@ public class asyncBcServer extends Node {
                                 hash(bc.getBlock(currHeight - 1).getHeader())))).
                         build();
             }
-
+            tmo = initTmo;
             synchronized (newBlockNotifyer) {
                 bc.addBlock(recBlock);
                 newBlockNotifyer.notify();

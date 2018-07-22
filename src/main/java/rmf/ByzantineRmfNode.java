@@ -25,9 +25,9 @@ public class ByzantineRmfNode extends Node{
     int height;
     int cid = 0;
 
-    public ByzantineRmfNode(int id, String addr, int port, int f, int tmoInterval, int tmo, ArrayList<Node> nodes, String bbcConfig) {
+    public ByzantineRmfNode(int id, String addr, int port, int f, ArrayList<Node> nodes, String bbcConfig) {
         super(addr, port, id);
-        rmfService = new RmfService(id, f, tmoInterval, tmo, nodes, bbcConfig);
+        rmfService = new RmfService(id, f, nodes, bbcConfig);
         startGrpcServer();
 //        height = 0;
     }
@@ -88,8 +88,8 @@ public class ByzantineRmfNode extends Node{
         rmfService.rmfBroadcast(dataMsg);
     }
 
-    public byte[] deliver(int height, int sender) {
-        byte[] res = rmfService.deliver(cid);
+    public byte[] deliver(int height, int sender, int tmo) {
+        byte[] res = rmfService.deliver(cid, tmo);
         cid++;
         return res;
     }

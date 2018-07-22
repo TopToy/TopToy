@@ -21,9 +21,9 @@ public class RmfNode extends Node{
     int height;
     int cid = 0;
 
-    public RmfNode(int id, String addr, int port, int f, int tmoInterval, int tmo, ArrayList<Node> nodes, String bbcConfig) {
+    public RmfNode(int id, String addr, int port, int f , ArrayList<Node> nodes, String bbcConfig) {
         super(addr, port, id);
-        rmfService = new RmfService(id, f, tmoInterval, tmo, nodes, bbcConfig);
+        rmfService = new RmfService(id, f, nodes, bbcConfig);
         startGrpcServer();
 //        height = 0;
     }
@@ -91,8 +91,8 @@ public class RmfNode extends Node{
 
 
 
-    deliver(int height, int sender) {
-        byte[] ret = rmfService.deliver(cid);
+    deliver(int height, int sender, int tmo) {
+        byte[] ret = rmfService.deliver(cid, tmo);
         cid++;
         return ret;
     }

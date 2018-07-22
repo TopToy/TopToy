@@ -29,21 +29,19 @@ public class byzantineBcServer extends Node {
     private int currLeader;
     private boolean stopped;
     private boolean fullByz = false;
-    //    final Object leaderLock = new Object();
     private final Object blockLock = new Object();
-//    private Semaphore newBlockNotifier = new Semaphore(0, true);
-//    private final Object latencyNotifier = new Object();
-    //    final Object heightLock = new Object();
     private final Object newBlockNotifyer = new Object();
     private block currBlock; // TODO: As any server should disseminates its block once in an epoch, currently a block is shipped as soon the server turn is coming.
 
     private int maxTransactionInBlock; // TODO: Should be done by configuration
-
+    private int tmo;
+    private int tmoInterval;
+    private int initTmo;
     private Thread mainThread;
 
     public byzantineBcServer(String addr, int port, int id) {
         super(addr, port, id); // TODO: Should be changed according to Config!
-        rmfServer = new ByzantineRmfNode(id, addr, port, Config.getF(), Config.getTMOInterval(), Config.getTMO(),
+        rmfServer = new ByzantineRmfNode(id, addr, port, Config.getF(),
                 Config.getRMFcluster(), Config.getRMFbbcConfigHome());
         bc = new basicBlockchain(id);
         currBlock = bc.createNewBLock();
@@ -53,6 +51,9 @@ public class byzantineBcServer extends Node {
         currHeight = 1; // starts from 1 due to the genesis block
         currLeader = 0;
         this.maxTransactionInBlock = Config.getMaxTransactionsInBlock();
+        tmo =  Config.getTMO();
+        tmoInterval =  Config.getTMOInterval();
+        initTmo = tmo;
         mainThread = new Thread(this::mainLoop);
     }
 
@@ -85,8 +86,10 @@ public class byzantineBcServer extends Node {
     private void mainLoop() {
             while (!stopped) {
                 leaderImpl();
-                byte[] recData = rmfServer.deliver(currHeight, currLeader);
+                byte[] recData = rmfServer.deliver(currHeight, currLeader, tmo);
                 if (recData == null) {
+                    tmo += tmoInterval;
+                    logger.info(format("[#%d] Unable to receive block, timeout increased to [%d] ms", getID(), tmo));
                     updateLeader();
                     continue;
                 }
@@ -103,6 +106,18 @@ public class byzantineBcServer extends Node {
                     handlePossibleFork(recBlock);
                     continue;
                 }
+
+                if (bc.getHeight() + 1 > f && bc.getBlocks(bc.getHeight() - f, bc.getHeight()).
+                        stream().
+                        map(b -> b.getHeader().getCreatorID()).
+                        collect(Collectors.toList()).
+                        contains(recBlock.getHeader().getCreatorID())) {
+                    tmo += tmoInterval;
+                    logger.info(format("[#%d] Unable to receive block, timeout increased to [%d] ms", getID(), tmo));
+                    updateLeader();
+                    continue;
+                }
+
                 if (!bc.validateBlockData(recBlock)) {
                     logger.warn(format("[#%d] received an invalid data in a valid block, creating an empty block [height=%d]", getID(), currHeight));
                     recBlock = Block.newBuilder(). // creates emptyBlock
@@ -115,6 +130,7 @@ public class byzantineBcServer extends Node {
                             build();
                 }
 
+                tmo = initTmo;
                 synchronized (newBlockNotifyer) {
                     bc.addBlock(recBlock);
                     newBlockNotifyer.notify();

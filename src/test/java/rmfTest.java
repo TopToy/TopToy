@@ -52,10 +52,10 @@ public class rmfTest {
         for (int id = 0 ; id < nnodes ; id++) {
             logger.info("init server #" + id);
             if (ArrayUtils.contains(byzIds, id)) {
-                ret[id] = new ByzantineRmfNode(id, localHost, ports[id], f, 1, 1000 * 1, currentNodes, configHome);
+                ret[id] = new ByzantineRmfNode(id, localHost, ports[id], f,  currentNodes, configHome);
                 continue;
             }
-            ret[id] =  new RmfNode(id, localHost, ports[id], f, 1, 1000 * 1, currentNodes, configHome);
+            ret[id] =  new RmfNode(id, localHost, ports[id], f, currentNodes, configHome);
         }
         return ret;
         //        n.start();
@@ -82,7 +82,7 @@ public class rmfTest {
         ((RmfNode) rn[0]).start();
         String msg = "hello world";
         ((RmfNode) rn[0]).broadcast(msg.getBytes(), 0);
-        assertEquals(msg, new String(((RmfNode) rn[0]).deliver(0, 0)));
+        assertEquals(msg, new String(((RmfNode) rn[0]).deliver(0, 0, 1000)));
         ((RmfNode) rn[0]).stop();
 
     }
@@ -113,7 +113,7 @@ public class rmfTest {
         for (int i = 0 ; i < nnodes ; i++) {
             int finalI = i;
             tasks[i] = new Thread(()-> {
-                ret[finalI] = new String(((RmfNode) allNodes[finalI]).deliver(height, 0));
+                ret[finalI] = new String(((RmfNode) allNodes[finalI]).deliver(height, 0, 1000));
             });
             tasks[i].start();
         }
@@ -159,7 +159,7 @@ public class rmfTest {
                 int finalI = i;
                 int finalK = k;
                 tasks[i] = new Thread(()-> {
-                    ret[finalI] = new String(((RmfNode) allNodes[finalI]).deliver(finalK, finalK % 4));
+                    ret[finalI] = new String(((RmfNode) allNodes[finalI]).deliver(finalK, finalK % 4, 1000));
                 });
                 tasks[i].start();
             }
@@ -202,7 +202,7 @@ public class rmfTest {
         for (int i = 0 ; i < nnodes ; i++) {
             int finalI = i;
             tasks[i] = new Thread(()-> {
-                byte[] res = ((RmfNode) allNodes[finalI]).deliver(height, 0);
+                byte[] res = ((RmfNode) allNodes[finalI]).deliver(height, 0, 1000);
                 ret[finalI] = (res == null ? null : new String(res));
             });
             tasks[i].start();
@@ -254,13 +254,13 @@ public class rmfTest {
             int finalI = i;
             if (i == 0) {
                 tasks[i] = new Thread(()-> {
-                    byte[] res = ((ByzantineRmfNode) allNodes[finalI]).deliver(height, 0);
+                    byte[] res = ((ByzantineRmfNode) allNodes[finalI]).deliver(height, 0, 1000);
                     ret[finalI] = (res == null ? null : new String(res));
                 });
 
             } else {
                 tasks[i] = new Thread(()-> {
-                    byte[] res = ((RmfNode) allNodes[finalI]).deliver(height, 0);
+                    byte[] res = ((RmfNode) allNodes[finalI]).deliver(height, 0, 1000);
                     ret[finalI] = (res == null ? null : new String(res));
                 });
             }
@@ -321,14 +321,14 @@ public class rmfTest {
                 if (i == 0) {
                     int finalK = k;
                     tasks[i] = new Thread(()-> {
-                        byte[] res = ((ByzantineRmfNode) allNodes[finalI]).deliver(finalK, 0);
+                        byte[] res = ((ByzantineRmfNode) allNodes[finalI]).deliver(finalK, 0, 1000);
                         ret[finalI] = (res == null ? null : new String(res));
                     });
 
                 } else {
                     int finalK1 = k;
                     tasks[i] = new Thread(()-> {
-                        byte[] res = ((RmfNode) allNodes[finalI]).deliver(finalK1, 0);
+                        byte[] res = ((RmfNode) allNodes[finalI]).deliver(finalK1, 0, 1000);
                         ret[finalI] = (res == null ? null : new String(res));
                     });
                 }
@@ -368,7 +368,7 @@ public class rmfTest {
                 String msg = "hello" + i;
                 node.broadcast(msg.getBytes(), i);
             }
-            byte[] ret = node.deliver(i, i % 4);
+            byte[] ret = node.deliver(i, i % 4, 1000);
             res[i] = (ret == null ? null : new String(ret));
             if (i == 99) {
                 logger.info(format("[#%d] i=99", node.getID()));
