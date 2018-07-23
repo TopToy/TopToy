@@ -10,6 +10,7 @@ import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -29,6 +30,8 @@ public class Config {
         String SETTING_TMO_INTERVAL_KEY = "setting.tmoInterval";
         String SETTING_RMFBBCCONFIG_KEY = "setting.rmfBbcConfigPath";
         String SETTING_MAXTRANSACTIONSINBLOCK_KEY = "setting.maxTransactionInBlock";
+        String SERVER_PRIVKEY = "server.privateKey";
+        String SERVER_PUBKEY = "server.publicKey";
     }
 
     private static tomlKeys tKeys;
@@ -93,6 +96,15 @@ public class Config {
         return ret;
     }
 
+    public static HashMap<Integer, String> getClusterPubKeys() {
+        Toml t = conf.getTables(tKeys.RMFCLUSTER_KEY).get(0);
+        HashMap<Integer, String> ret = new HashMap<>();
+        for (int i = 0 ; i < getN() ; i++) {
+            Toml node = t.getTable("s" + i);
+            ret.put(Math.toIntExact(node.getLong("id")), node.getString("publicKey"));
+        }
+        return ret;
+    }
     public static int getMaxTransactionsInBlock() {
         return Math.toIntExact(conf.getLong(tKeys.SETTING_MAXTRANSACTIONSINBLOCK_KEY));
     }
@@ -101,7 +113,14 @@ public class Config {
         return conf.getString(tKeys.SETTING_RMFBBCCONFIG_KEY);
     }
 
+    public static String getPublicKey() {
+        return conf.getString(tKeys.SERVER_PUBKEY);
+    }
 
+
+    public static String getPrivateKey() {
+        return conf.getString(tKeys.SERVER_PRIVKEY);
+    }
 
 
 }

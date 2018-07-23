@@ -1,5 +1,6 @@
 import config.Config;
 import config.Node;
+import crypto.pkiUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.junit.jupiter.api.Test;
 import rmf.ByzantineRmfNode;
@@ -63,6 +64,8 @@ public class rmfTest {
     }
     @Test
     void TestSingleServer() throws InterruptedException {
+//        String sig = pkiUtils.sign("abc");
+//        boolean a = pkiUtils.verify(0, "abc", sig);
         Thread.sleep(timeToWaitBetweenTests);
         serversUp = 0;
         logger.info("start TestSingleServer");
