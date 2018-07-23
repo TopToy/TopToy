@@ -35,6 +35,11 @@ TODO:
  */
 public class RmfService extends RmfGrpc.RmfImplBase {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(RmfService.class);
+    class fvote {
+        int cid;
+        int count;
+        BbcProtos.BbcDecision.Builder dec = BbcProtos.BbcDecision.newBuilder();
+    }
     class peer {
         ManagedChannel channel;
         RmfGrpc.RmfStub stub;
@@ -73,7 +78,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
     protected Semaphore receivedSem;
     final protected Map<Integer, Data> recMsg;
 
-    final HashMap<Integer, Integer> fVotes;
+    final HashMap<Integer, fvote> fVotes;
     final HashMap<Integer, Data> pendingMsg;
     final HashMap<Integer,  BbcProtos.BbcDecision> fastBbcCons;
 
@@ -291,7 +296,8 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                     sender, cid));
 //            timeoutMs = initTO;
             FastBbcVote v = FastBbcVote
-                    .newBuilder().setCid(cid).setSender(id).setVote(1).build();
+                    .newBuilder().setCid(cid).setSender(id).setVote(1).
+                            setSig(String.valueOf(cid) + String.valueOf(id) + String.valueOf(1)).build();
             broadcastFastVoteMessage(v);
         }
     }
@@ -305,16 +311,22 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             if (fastBbcCons.containsKey(cid)) return; // Against byzantine activity
 //            synchronized (fVotes) {
             if (!fVotes.containsKey(cid)) {
-                fVotes.put(cid, 0);
+                fvote v = new fvote();
+                v.dec.setConsID(cid);
+                v.cid = cid;
+                v.count = 0;
+                fVotes.put(cid, v);
 //                    fVotes.notify(); // To prevent the case in which a process have received a message but did not vote for it yet.
             }
 //            }
-            int curr = fVotes.get(cid);
-            fVotes.remove(cid);
-            fVotes.put(cid, curr + 1);
-            if (fVotes.get(cid) == n) {
+//            int curr = fVotes.get(cid);
+//            fVotes.remove(cid);
+//            fVotes.put(cid, curr + 1);
+            fVotes.get(cid).count++;
+            fVotes.get(cid).dec.addSignatures(request.getSig());
+            if (fVotes.get(cid).count == n) {
                 logger.info(format("[#%d] fastVote has been detected [cid=%d]", id, cid));
-                    fastBbcCons.put(cid, BbcProtos.BbcDecision.newBuilder().setConsID(cid).setDecosion(1).build());
+                    fastBbcCons.put(cid, fVotes.get(cid).dec.setDecosion(1).build());
                 globalLock.notify();
             }
         }
@@ -350,7 +362,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         int v = 0;
         synchronized (globalLock) {
             if (fVotes.containsKey(cid)) {
-                cVotes = fVotes.get(cid);
+                cVotes = fVotes.get(cid).count;
             }
             if (cVotes < n) {
                 try {
@@ -365,7 +377,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                 v = 1;
             }
             if (fVotes.containsKey(cid)) {
-                cVotes = fVotes.get(cid);
+                cVotes = fVotes.get(cid).count;
             }
 
             if (cVotes < n) {
