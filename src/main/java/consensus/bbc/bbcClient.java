@@ -5,6 +5,7 @@ import bftsmart.tom.AsynchServiceProxy;
 import bftsmart.tom.RequestContext;
 import bftsmart.tom.core.messages.TOMMessage;
 import bftsmart.tom.core.messages.TOMMessageType;
+import crypto.pkiUtils;
 import proto.BbcProtos;
 
 
@@ -22,6 +23,7 @@ public class bbcClient {
         b.setClientID(id);
         b.setId(cid);
         b.setVote(vote);
+        b.setSig(pkiUtils.sign(String.valueOf(cid) + String.valueOf(id) + String.valueOf(vote)));
         BbcProtos.BbcMsg msg= b.build();
         byte[] data = msg.toByteArray();
         bbcProxy.invokeAsynchRequest(data, new ReplyListener() {

@@ -22,7 +22,10 @@ public class bbcServer extends DefaultSingleRecoverable {
     class consVote {
         int pos = 0;
         int neg = 0;
+        BbcProtos.BbcDecision.Builder dec = BbcProtos.BbcDecision.newBuilder();
     }
+
+
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(bbcServer.class);
 
     private int id;
@@ -107,24 +110,21 @@ public class bbcServer extends DefaultSingleRecoverable {
             cid = msg.getId();
             logger.debug(format("[#%d] received bbc message from [#%d]", id, msg.getClientID()));
             synchronized (rec) {
-                consVote v = new consVote();
-                if (msg.getVote() == 1) {
-                    v.pos++;
-                } else {
-                    v.neg++;
+                if (!rec.containsKey(cid)) {
+                    consVote v = new consVote();
+                    v.dec.setConsID(cid);
+                    rec.put(cid, v);
                 }
                 consVote curr = rec.get(cid);
-                if (curr != null) {
-                    if (curr.neg +  curr.pos < quorumSize) {
-                        v.pos += curr.pos;
-                        v.neg += curr.neg;
+                if (curr.neg +  curr.pos < quorumSize) {
+                    if (msg.getVote() == 1) {
+                        curr.pos++;
                     } else {
-                        v = curr;
+                        curr.neg++;
                     }
-                    rec.remove(cid);
                 }
-                rec.put(cid, v);
-                if (v.neg + v.pos == quorumSize) {
+                curr.dec.addSignatures(msg.getSig());
+                if (curr.neg + curr.pos == quorumSize) {
                     logger.debug(format("[#%d] notify on  [cid=%d]", id, cid));
                     rec.notify();
                 }
@@ -160,17 +160,18 @@ public class bbcServer extends DefaultSingleRecoverable {
         return new byte[1];
     }
 
-    public int decide(int cid) {
+    public BbcProtos.BbcDecision decide(int cid) {
         synchronized (rec) {
             while (!rec.containsKey(cid) || rec.get(cid).pos + rec.get(cid).neg < quorumSize) {
                 try {
                     rec.wait();
                 } catch (InterruptedException e) {
                     logger.error("", e);
-                    return 0;
+                    return null;
                 }
             }
-            return (rec.get(cid).pos > rec.get(cid).neg ? 1 : 0);
+            return (rec.get(cid).pos > rec.get(cid).neg ?
+                    rec.get(cid).dec.setDecosion(1).build() : rec.get(cid).dec.setDecosion(0).build());
         }
     }
 

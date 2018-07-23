@@ -32,6 +32,16 @@ public final class BbcProtos {
      * <code>int32 vote = 3;</code>
      */
     int getVote();
+
+    /**
+     * <code>string sig = 4;</code>
+     */
+    java.lang.String getSig();
+    /**
+     * <code>string sig = 4;</code>
+     */
+    com.google.protobuf.ByteString
+        getSigBytes();
   }
   /**
    * Protobuf type {@code proto.BbcMsg}
@@ -49,6 +59,7 @@ public final class BbcProtos {
       clientID_ = 0;
       id_ = 0;
       vote_ = 0;
+      sig_ = "";
     }
 
     @java.lang.Override
@@ -95,6 +106,12 @@ public final class BbcProtos {
             case 24: {
 
               vote_ = input.readInt32();
+              break;
+            }
+            case 34: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              sig_ = s;
               break;
             }
           }
@@ -148,6 +165,40 @@ public final class BbcProtos {
       return vote_;
     }
 
+    public static final int SIG_FIELD_NUMBER = 4;
+    private volatile java.lang.Object sig_;
+    /**
+     * <code>string sig = 4;</code>
+     */
+    public java.lang.String getSig() {
+      java.lang.Object ref = sig_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        sig_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string sig = 4;</code>
+     */
+    public com.google.protobuf.ByteString
+        getSigBytes() {
+      java.lang.Object ref = sig_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        sig_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -169,6 +220,9 @@ public final class BbcProtos {
       if (vote_ != 0) {
         output.writeInt32(3, vote_);
       }
+      if (!getSigBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 4, sig_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -188,6 +242,9 @@ public final class BbcProtos {
       if (vote_ != 0) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(3, vote_);
+      }
+      if (!getSigBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, sig_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -211,6 +268,8 @@ public final class BbcProtos {
           == other.getId());
       result = result && (getVote()
           == other.getVote());
+      result = result && getSig()
+          .equals(other.getSig());
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -228,6 +287,8 @@ public final class BbcProtos {
       hash = (53 * hash) + getId();
       hash = (37 * hash) + VOTE_FIELD_NUMBER;
       hash = (53 * hash) + getVote();
+      hash = (37 * hash) + SIG_FIELD_NUMBER;
+      hash = (53 * hash) + getSig().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -363,6 +424,8 @@ public final class BbcProtos {
 
         vote_ = 0;
 
+        sig_ = "";
+
         return this;
       }
 
@@ -388,6 +451,7 @@ public final class BbcProtos {
         result.clientID_ = clientID_;
         result.id_ = id_;
         result.vote_ = vote_;
+        result.sig_ = sig_;
         onBuilt();
         return result;
       }
@@ -437,6 +501,10 @@ public final class BbcProtos {
         }
         if (other.getVote() != 0) {
           setVote(other.getVote());
+        }
+        if (!other.getSig().isEmpty()) {
+          sig_ = other.sig_;
+          onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -542,6 +610,75 @@ public final class BbcProtos {
         onChanged();
         return this;
       }
+
+      private java.lang.Object sig_ = "";
+      /**
+       * <code>string sig = 4;</code>
+       */
+      public java.lang.String getSig() {
+        java.lang.Object ref = sig_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          sig_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string sig = 4;</code>
+       */
+      public com.google.protobuf.ByteString
+          getSigBytes() {
+        java.lang.Object ref = sig_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          sig_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string sig = 4;</code>
+       */
+      public Builder setSig(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        sig_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string sig = 4;</code>
+       */
+      public Builder clearSig() {
+        
+        sig_ = getDefaultInstance().getSig();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string sig = 4;</code>
+       */
+      public Builder setSigBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        sig_ = value;
+        onChanged();
+        return this;
+      }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFieldsProto3(unknownFields);
@@ -604,6 +741,25 @@ public final class BbcProtos {
      * <code>int32 decosion = 2;</code>
      */
     int getDecosion();
+
+    /**
+     * <code>repeated string signatures = 3;</code>
+     */
+    java.util.List<java.lang.String>
+        getSignaturesList();
+    /**
+     * <code>repeated string signatures = 3;</code>
+     */
+    int getSignaturesCount();
+    /**
+     * <code>repeated string signatures = 3;</code>
+     */
+    java.lang.String getSignatures(int index);
+    /**
+     * <code>repeated string signatures = 3;</code>
+     */
+    com.google.protobuf.ByteString
+        getSignaturesBytes(int index);
   }
   /**
    * Protobuf type {@code proto.BbcDecision}
@@ -620,6 +776,7 @@ public final class BbcProtos {
     private BbcDecision() {
       consID_ = 0;
       decosion_ = 0;
+      signatures_ = com.google.protobuf.LazyStringArrayList.EMPTY;
     }
 
     @java.lang.Override
@@ -663,6 +820,15 @@ public final class BbcProtos {
               decosion_ = input.readInt32();
               break;
             }
+            case 26: {
+              java.lang.String s = input.readStringRequireUtf8();
+              if (!((mutable_bitField0_ & 0x00000004) == 0x00000004)) {
+                signatures_ = new com.google.protobuf.LazyStringArrayList();
+                mutable_bitField0_ |= 0x00000004;
+              }
+              signatures_.add(s);
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -671,6 +837,9 @@ public final class BbcProtos {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
+        if (((mutable_bitField0_ & 0x00000004) == 0x00000004)) {
+          signatures_ = signatures_.getUnmodifiableView();
+        }
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
       }
@@ -687,6 +856,7 @@ public final class BbcProtos {
               proto.BbcProtos.BbcDecision.class, proto.BbcProtos.BbcDecision.Builder.class);
     }
 
+    private int bitField0_;
     public static final int CONSID_FIELD_NUMBER = 1;
     private int consID_;
     /**
@@ -703,6 +873,35 @@ public final class BbcProtos {
      */
     public int getDecosion() {
       return decosion_;
+    }
+
+    public static final int SIGNATURES_FIELD_NUMBER = 3;
+    private com.google.protobuf.LazyStringList signatures_;
+    /**
+     * <code>repeated string signatures = 3;</code>
+     */
+    public com.google.protobuf.ProtocolStringList
+        getSignaturesList() {
+      return signatures_;
+    }
+    /**
+     * <code>repeated string signatures = 3;</code>
+     */
+    public int getSignaturesCount() {
+      return signatures_.size();
+    }
+    /**
+     * <code>repeated string signatures = 3;</code>
+     */
+    public java.lang.String getSignatures(int index) {
+      return signatures_.get(index);
+    }
+    /**
+     * <code>repeated string signatures = 3;</code>
+     */
+    public com.google.protobuf.ByteString
+        getSignaturesBytes(int index) {
+      return signatures_.getByteString(index);
     }
 
     private byte memoizedIsInitialized = -1;
@@ -723,6 +922,9 @@ public final class BbcProtos {
       if (decosion_ != 0) {
         output.writeInt32(2, decosion_);
       }
+      for (int i = 0; i < signatures_.size(); i++) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, signatures_.getRaw(i));
+      }
       unknownFields.writeTo(output);
     }
 
@@ -738,6 +940,14 @@ public final class BbcProtos {
       if (decosion_ != 0) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(2, decosion_);
+      }
+      {
+        int dataSize = 0;
+        for (int i = 0; i < signatures_.size(); i++) {
+          dataSize += computeStringSizeNoTag(signatures_.getRaw(i));
+        }
+        size += dataSize;
+        size += 1 * getSignaturesList().size();
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -759,6 +969,8 @@ public final class BbcProtos {
           == other.getConsID());
       result = result && (getDecosion()
           == other.getDecosion());
+      result = result && getSignaturesList()
+          .equals(other.getSignaturesList());
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -774,6 +986,10 @@ public final class BbcProtos {
       hash = (53 * hash) + getConsID();
       hash = (37 * hash) + DECOSION_FIELD_NUMBER;
       hash = (53 * hash) + getDecosion();
+      if (getSignaturesCount() > 0) {
+        hash = (37 * hash) + SIGNATURES_FIELD_NUMBER;
+        hash = (53 * hash) + getSignaturesList().hashCode();
+      }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -907,6 +1123,8 @@ public final class BbcProtos {
 
         decosion_ = 0;
 
+        signatures_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000004);
         return this;
       }
 
@@ -929,8 +1147,16 @@ public final class BbcProtos {
 
       public proto.BbcProtos.BbcDecision buildPartial() {
         proto.BbcProtos.BbcDecision result = new proto.BbcProtos.BbcDecision(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
         result.consID_ = consID_;
         result.decosion_ = decosion_;
+        if (((bitField0_ & 0x00000004) == 0x00000004)) {
+          signatures_ = signatures_.getUnmodifiableView();
+          bitField0_ = (bitField0_ & ~0x00000004);
+        }
+        result.signatures_ = signatures_;
+        result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
       }
@@ -978,6 +1204,16 @@ public final class BbcProtos {
         if (other.getDecosion() != 0) {
           setDecosion(other.getDecosion());
         }
+        if (!other.signatures_.isEmpty()) {
+          if (signatures_.isEmpty()) {
+            signatures_ = other.signatures_;
+            bitField0_ = (bitField0_ & ~0x00000004);
+          } else {
+            ensureSignaturesIsMutable();
+            signatures_.addAll(other.signatures_);
+          }
+          onChanged();
+        }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
         return this;
@@ -1004,6 +1240,7 @@ public final class BbcProtos {
         }
         return this;
       }
+      private int bitField0_;
 
       private int consID_ ;
       /**
@@ -1053,6 +1290,100 @@ public final class BbcProtos {
       public Builder clearDecosion() {
         
         decosion_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private com.google.protobuf.LazyStringList signatures_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      private void ensureSignaturesIsMutable() {
+        if (!((bitField0_ & 0x00000004) == 0x00000004)) {
+          signatures_ = new com.google.protobuf.LazyStringArrayList(signatures_);
+          bitField0_ |= 0x00000004;
+         }
+      }
+      /**
+       * <code>repeated string signatures = 3;</code>
+       */
+      public com.google.protobuf.ProtocolStringList
+          getSignaturesList() {
+        return signatures_.getUnmodifiableView();
+      }
+      /**
+       * <code>repeated string signatures = 3;</code>
+       */
+      public int getSignaturesCount() {
+        return signatures_.size();
+      }
+      /**
+       * <code>repeated string signatures = 3;</code>
+       */
+      public java.lang.String getSignatures(int index) {
+        return signatures_.get(index);
+      }
+      /**
+       * <code>repeated string signatures = 3;</code>
+       */
+      public com.google.protobuf.ByteString
+          getSignaturesBytes(int index) {
+        return signatures_.getByteString(index);
+      }
+      /**
+       * <code>repeated string signatures = 3;</code>
+       */
+      public Builder setSignatures(
+          int index, java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureSignaturesIsMutable();
+        signatures_.set(index, value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated string signatures = 3;</code>
+       */
+      public Builder addSignatures(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureSignaturesIsMutable();
+        signatures_.add(value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated string signatures = 3;</code>
+       */
+      public Builder addAllSignatures(
+          java.lang.Iterable<java.lang.String> values) {
+        ensureSignaturesIsMutable();
+        com.google.protobuf.AbstractMessageLite.Builder.addAll(
+            values, signatures_);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated string signatures = 3;</code>
+       */
+      public Builder clearSignatures() {
+        signatures_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000004);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated string signatures = 3;</code>
+       */
+      public Builder addSignaturesBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        ensureSignaturesIsMutable();
+        signatures_.add(value);
         onChanged();
         return this;
       }
@@ -1124,10 +1455,11 @@ public final class BbcProtos {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\017bbcProtos.proto\022\005proto\"4\n\006BbcMsg\022\020\n\010cl" +
-      "ientID\030\001 \001(\005\022\n\n\002id\030\002 \001(\005\022\014\n\004vote\030\003 \001(\005\"/" +
-      "\n\013BbcDecision\022\016\n\006consID\030\001 \001(\005\022\020\n\010decosio" +
-      "n\030\002 \001(\005B\007\n\005protob\006proto3"
+      "\n\017bbcProtos.proto\022\005proto\"A\n\006BbcMsg\022\020\n\010cl" +
+      "ientID\030\001 \001(\005\022\n\n\002id\030\002 \001(\005\022\014\n\004vote\030\003 \001(\005\022\013" +
+      "\n\003sig\030\004 \001(\t\"C\n\013BbcDecision\022\016\n\006consID\030\001 \001" +
+      "(\005\022\020\n\010decosion\030\002 \001(\005\022\022\n\nsignatures\030\003 \003(\t" +
+      "B\007\n\005protob\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -1146,13 +1478,13 @@ public final class BbcProtos {
     internal_static_proto_BbcMsg_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_BbcMsg_descriptor,
-        new java.lang.String[] { "ClientID", "Id", "Vote", });
+        new java.lang.String[] { "ClientID", "Id", "Vote", "Sig", });
     internal_static_proto_BbcDecision_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_proto_BbcDecision_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_BbcDecision_descriptor,
-        new java.lang.String[] { "ConsID", "Decosion", });
+        new java.lang.String[] { "ConsID", "Decosion", "Signatures", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

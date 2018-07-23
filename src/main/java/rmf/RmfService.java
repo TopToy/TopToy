@@ -395,9 +395,9 @@ public class RmfService extends RmfGrpc.RmfImplBase {
 //            }
             logger.info(format("[#%d] Initiates full bbc instance [cid=%d], [vote:%d]", id, cid, vote));
             bbcClient.propose(vote, cid);
-            int dec = bbcServer.decide(cid);
-            regBbcCons.put(cid, BbcProtos.BbcDecision.newBuilder().setConsID(cid).setDecosion(dec).build());
-            return dec;
+            BbcProtos.BbcDecision dec = bbcServer.decide(cid);
+            regBbcCons.put(cid, dec);
+            return dec.getDecosion();
         }
 
 

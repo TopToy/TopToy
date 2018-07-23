@@ -112,8 +112,8 @@ public class bbcTest {
          Asserts is being doing in the main thread which is OK.
          */
         serverDoing sDo2 = s1 -> {
-            assertEquals(1, s1.decide(0));
-            assertEquals(0, s1.decide(1));
+            assertEquals(1, s1.decide(0).getDecosion());
+            assertEquals(0, s1.decide(1).getDecosion());
         };
 
         sDo2.act(s);
@@ -152,7 +152,7 @@ public class bbcTest {
         }
 
         for (int i = 0 ; i < 4 ; i++) {
-            assertEquals(consID % 2, servers[i].decide(consID));
+            assertEquals(consID % 2, servers[i].decide(consID).getDecosion());
         }
         consID++;
         for (int i = 0 ; i < 4 ; i++) {
@@ -160,7 +160,7 @@ public class bbcTest {
         }
 
         for (int i = 0 ; i < 4 ; i++) {
-            assertEquals(consID % 2, servers[i].decide(consID));
+            assertEquals(consID % 2, servers[i].decide(consID).getDecosion());
         }
         for (int i = 0 ; i < 4 ; i++) {
             clients[i].close();
@@ -207,7 +207,7 @@ public class bbcTest {
                 clients[k].propose(consID % 2, consID);
             }
             for (int k = 0 ; k < 4 ;k++) {
-                assertEquals(consID % 2, servers[k].decide(consID));
+                assertEquals(consID % 2, servers[k].decide(consID).getDecosion());
             }
             consID++;
         }
@@ -258,7 +258,7 @@ public class bbcTest {
                 clients[k].propose(consID % 2, consID);
             }
             for (int k = 0 ; k < 4 ; k++) {
-                assertEquals(consID % 2, servers[k].decide(consID));
+                assertEquals(consID % 2, servers[k].decide(consID).getDecosion());
             }
             consID++;
 
@@ -312,7 +312,7 @@ public class bbcTest {
 
         for (int i = 0 ; i < 1000 ; i++) {
             for (int k = 0 ; k < 4 ; k++) {
-                assertEquals(1, servers[k].decide(i));
+                assertEquals(1, servers[k].decide(i).getDecosion());
             }
 
         }
