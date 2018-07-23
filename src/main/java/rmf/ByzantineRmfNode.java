@@ -2,6 +2,7 @@ package rmf;
 
 import com.google.protobuf.ByteString;
 import config.Node;
+import crypto.pkiUtils;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import org.apache.commons.lang.ArrayUtils;
@@ -80,16 +81,16 @@ public class ByzantineRmfNode extends Node{
                 setHeight(height).
                 setCid(cid).
                 build();
-        Data dataMsg = Data.
+        Data.Builder dataMsg = Data.
                 newBuilder().
                 setData(ByteString.copyFrom(msg)).
-                setMeta(metaMsg).
-                build();
-        rmfService.rmfBroadcast(dataMsg);
+                setMeta(metaMsg);
+        rmfService.rmfBroadcast(dataMsg.setSig(pkiUtils.sign(String.valueOf(cid) + String.valueOf(getID())
+                + String.valueOf(height) + new String (dataMsg.getData().toByteArray()))).build());
     }
 
     public byte[] deliver(int height, int sender, int tmo) {
-        byte[] res = rmfService.deliver(cid, tmo);
+        byte[] res = rmfService.deliver(cid, tmo, sender, height);
         cid++;
         return res;
     }
@@ -101,15 +102,15 @@ public class ByzantineRmfNode extends Node{
                 setHeight(height).
                 setCid(cid).
                 build();
-        Data dataMsg = Data.
+        Data.Builder dataMsg = Data.
                 newBuilder().
                 setData(ByteString.copyFrom(msg)).
-                setMeta(metaMsg).
-                build();
+                setMeta(metaMsg);
         for (Map.Entry<Integer, RmfService.peer>  p: rmfService.peers.entrySet()) {
             if (ids.contains(p.getKey())) {
                 logger.info("sending message " + Arrays.toString(msg) + " to " + p.getKey() + " with height of " + height);
-                rmfService.sendDataMessage(p.getValue().stub, dataMsg);
+                rmfService.sendDataMessage(p.getValue().stub, dataMsg.setSig(pkiUtils.sign(String.valueOf(cid) + String.valueOf(getID())
+                        + String.valueOf(height) + new String (dataMsg.getData().toByteArray()))).build());
             }
 
         }

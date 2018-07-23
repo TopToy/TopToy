@@ -55,16 +55,17 @@ public final class RmfService {
     java.lang.String[] descriptorData = {
       "\n\020rmfService.proto\022\005proto\"\007\n\005Empty\"3\n\004Me" +
       "ta\022\016\n\006sender\030\001 \001(\005\022\016\n\006height\030\002 \001(\005\022\013\n\003ci" +
-      "d\030\003 \001(\005\"0\n\004Data\022\032\n\005_meta\030\001 \001(\0132\013.proto.M" +
-      "eta\022\014\n\004data\030\002 \001(\014\"!\n\003Req\022\032\n\005_meta\030\001 \001(\0132" +
-      "\013.proto.Meta\"=\n\003Res\022\032\n\005_meta\030\001 \001(\0132\013.pro" +
-      "to.Meta\022\032\n\005_data\030\002 \001(\0132\013.proto.Data\"8\n\013F" +
-      "astBbcVote\022\016\n\006sender\030\001 \001(\005\022\014\n\004vote\030\002 \001(\005" +
-      "\022\013\n\003cid\030\003 \001(\0052\220\001\n\003Rmf\0221\n\022DisseminateMess" +
-      "age\022\013.proto.Data\032\014.proto.Empty\"\000\022.\n\010Fast" +
-      "Vote\022\022.proto.FastBbcVote\032\014.proto.Empty\"\000" +
-      "\022&\n\nreqMessage\022\n.proto.Req\032\n.proto.Res\"\000" +
-      "B\t\n\005protoP\001b\006proto3"
+      "d\030\003 \001(\005\"=\n\004Data\022\032\n\005_meta\030\001 \001(\0132\013.proto.M" +
+      "eta\022\014\n\004data\030\002 \001(\014\022\013\n\003sig\030\003 \001(\t\"!\n\003Req\022\032\n" +
+      "\005_meta\030\001 \001(\0132\013.proto.Meta\"=\n\003Res\022\032\n\005_met" +
+      "a\030\001 \001(\0132\013.proto.Meta\022\032\n\005_data\030\002 \001(\0132\013.pr" +
+      "oto.Data\"E\n\013FastBbcVote\022\016\n\006sender\030\001 \001(\005\022" +
+      "\014\n\004vote\030\002 \001(\005\022\013\n\003cid\030\003 \001(\005\022\013\n\003sig\030\004 \001(\t2" +
+      "\220\001\n\003Rmf\0221\n\022DisseminateMessage\022\013.proto.Da" +
+      "ta\032\014.proto.Empty\"\000\022.\n\010FastVote\022\022.proto.F" +
+      "astBbcVote\032\014.proto.Empty\"\000\022&\n\nreqMessage" +
+      "\022\n.proto.Req\032\n.proto.Res\"\000B\t\n\005protoP\001b\006p" +
+      "roto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -95,7 +96,7 @@ public final class RmfService {
     internal_static_proto_Data_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_Data_descriptor,
-        new java.lang.String[] { "Meta", "Data", });
+        new java.lang.String[] { "Meta", "Data", "Sig", });
     internal_static_proto_Req_descriptor =
       getDescriptor().getMessageTypes().get(3);
     internal_static_proto_Req_fieldAccessorTable = new
@@ -113,7 +114,7 @@ public final class RmfService {
     internal_static_proto_FastBbcVote_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_FastBbcVote_descriptor,
-        new java.lang.String[] { "Sender", "Vote", "Cid", });
+        new java.lang.String[] { "Sender", "Vote", "Cid", "Sig", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

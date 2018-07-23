@@ -5,6 +5,7 @@ import com.google.common.collect.Table;
 import config.Node;
 import consensus.bbc.bbcClient;
 import consensus.bbc.bbcServer;
+import crypto.pkiUtils;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.Server;
@@ -223,7 +224,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             and insert it again. We will probably handle it by adding some cleanup mechanism.
       */
 
-    protected void sendReqMessage(RmfGrpc.RmfStub stub, Req req, int cid) {
+    protected void sendReqMessage(RmfGrpc.RmfStub stub, Req req, int cid, int sender, int height) {
         stub.reqMessage(req, new StreamObserver<Res>() {
             @Override
             public void onNext(Res res) {
@@ -232,6 +233,13 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                     int cid = res.getMeta().getCid();
                     synchronized (globalLock) {
                         if (!pendingMsg.containsKey(cid) && !recMsg.containsKey(cid)) {
+                            if (!pkiUtils.verify(sender,
+                                    String.valueOf(cid) +
+                            String.valueOf(sender) + String.valueOf(height) + new String(res.getData().getData().toByteArray()),
+                                    res.getData().getSig())) {
+                                logger.info(format("[#%d] has received invalid response message from [#%d] for [cid=%d]",
+                                        id, res.getMeta().getSender(),  cid));
+                            }
                             logger.info(format("[#%d] has received response message from [#%d] for [cid=%d]",
                                     id, res.getMeta().getSender(),  cid));
                             pendingMsg.put(cid, res.getData());
@@ -252,10 +260,10 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             }
         });
     }
-    protected void broadcastReqMsg(Req req, int cid) {
+    protected void broadcastReqMsg(Req req, int cid, int sender, int height) {
         logger.info(format("[#%d] broadcast request message [cid=%d]", id, cid));
         for (peer p : peers.values()) {
-            sendReqMessage(p.stub, req, cid);
+            sendReqMessage(p.stub, req, cid, sender, height);
         }
     }
     protected void broadcastFastVoteMessage(FastBbcVote v) {
@@ -337,7 +345,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         }
     }
     // TODO: Review this method again
-    public byte[] deliver(int cid, int tmo) {
+    public byte[] deliver(int cid, int tmo, int sender, int height) {
         int cVotes = 0;
         int v = 0;
         synchronized (globalLock) {
@@ -373,7 +381,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             } else {
                 logger.info(format("[#%d] deliver by fast vote [cid=%d]", id, cid));
             }
-            requestData(cid);
+            requestData(cid, sender, height);
             Data msg;
                 msg = pendingMsg.get(cid);
                 recMsg.put(cid, msg);
@@ -403,7 +411,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
 
     }
 
-    protected void requestData(int cid) {
+    protected void requestData(int cid, int sender, int height) {
         if (pendingMsg.containsKey(cid)) return;
         Meta meta = Meta.
                 newBuilder().
@@ -411,7 +419,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                 setSender(id).
                 build();
         Req req = Req.newBuilder().setMeta(meta).build();
-        broadcastReqMsg(req, cid);
+        broadcastReqMsg(req, cid, sender, height);
         while (!pendingMsg.containsKey(cid)) {
             try {
                 globalLock.wait();

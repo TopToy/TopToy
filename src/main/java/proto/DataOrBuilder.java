@@ -24,4 +24,14 @@ public interface DataOrBuilder extends
    * <code>bytes data = 2;</code>
    */
   com.google.protobuf.ByteString getData();
+
+  /**
+   * <code>string sig = 3;</code>
+   */
+  java.lang.String getSig();
+  /**
+   * <code>string sig = 3;</code>
+   */
+  com.google.protobuf.ByteString
+      getSigBytes();
 }

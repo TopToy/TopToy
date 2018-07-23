@@ -19,6 +19,7 @@ private static final long serialVersionUID = 0L;
     sender_ = 0;
     vote_ = 0;
     cid_ = 0;
+    sig_ = "";
   }
 
   @java.lang.Override
@@ -65,6 +66,12 @@ private static final long serialVersionUID = 0L;
           case 24: {
 
             cid_ = input.readInt32();
+            break;
+          }
+          case 34: {
+            java.lang.String s = input.readStringRequireUtf8();
+
+            sig_ = s;
             break;
           }
         }
@@ -118,6 +125,40 @@ private static final long serialVersionUID = 0L;
     return cid_;
   }
 
+  public static final int SIG_FIELD_NUMBER = 4;
+  private volatile java.lang.Object sig_;
+  /**
+   * <code>string sig = 4;</code>
+   */
+  public java.lang.String getSig() {
+    java.lang.Object ref = sig_;
+    if (ref instanceof java.lang.String) {
+      return (java.lang.String) ref;
+    } else {
+      com.google.protobuf.ByteString bs = 
+          (com.google.protobuf.ByteString) ref;
+      java.lang.String s = bs.toStringUtf8();
+      sig_ = s;
+      return s;
+    }
+  }
+  /**
+   * <code>string sig = 4;</code>
+   */
+  public com.google.protobuf.ByteString
+      getSigBytes() {
+    java.lang.Object ref = sig_;
+    if (ref instanceof java.lang.String) {
+      com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString.copyFromUtf8(
+              (java.lang.String) ref);
+      sig_ = b;
+      return b;
+    } else {
+      return (com.google.protobuf.ByteString) ref;
+    }
+  }
+
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
@@ -139,6 +180,9 @@ private static final long serialVersionUID = 0L;
     if (cid_ != 0) {
       output.writeInt32(3, cid_);
     }
+    if (!getSigBytes().isEmpty()) {
+      com.google.protobuf.GeneratedMessageV3.writeString(output, 4, sig_);
+    }
     unknownFields.writeTo(output);
   }
 
@@ -158,6 +202,9 @@ private static final long serialVersionUID = 0L;
     if (cid_ != 0) {
       size += com.google.protobuf.CodedOutputStream
         .computeInt32Size(3, cid_);
+    }
+    if (!getSigBytes().isEmpty()) {
+      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, sig_);
     }
     size += unknownFields.getSerializedSize();
     memoizedSize = size;
@@ -181,6 +228,8 @@ private static final long serialVersionUID = 0L;
         == other.getVote());
     result = result && (getCid()
         == other.getCid());
+    result = result && getSig()
+        .equals(other.getSig());
     result = result && unknownFields.equals(other.unknownFields);
     return result;
   }
@@ -198,6 +247,8 @@ private static final long serialVersionUID = 0L;
     hash = (53 * hash) + getVote();
     hash = (37 * hash) + CID_FIELD_NUMBER;
     hash = (53 * hash) + getCid();
+    hash = (37 * hash) + SIG_FIELD_NUMBER;
+    hash = (53 * hash) + getSig().hashCode();
     hash = (29 * hash) + unknownFields.hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -333,6 +384,8 @@ private static final long serialVersionUID = 0L;
 
       cid_ = 0;
 
+      sig_ = "";
+
       return this;
     }
 
@@ -358,6 +411,7 @@ private static final long serialVersionUID = 0L;
       result.sender_ = sender_;
       result.vote_ = vote_;
       result.cid_ = cid_;
+      result.sig_ = sig_;
       onBuilt();
       return result;
     }
@@ -407,6 +461,10 @@ private static final long serialVersionUID = 0L;
       }
       if (other.getCid() != 0) {
         setCid(other.getCid());
+      }
+      if (!other.getSig().isEmpty()) {
+        sig_ = other.sig_;
+        onChanged();
       }
       this.mergeUnknownFields(other.unknownFields);
       onChanged();
@@ -509,6 +567,75 @@ private static final long serialVersionUID = 0L;
     public Builder clearCid() {
       
       cid_ = 0;
+      onChanged();
+      return this;
+    }
+
+    private java.lang.Object sig_ = "";
+    /**
+     * <code>string sig = 4;</code>
+     */
+    public java.lang.String getSig() {
+      java.lang.Object ref = sig_;
+      if (!(ref instanceof java.lang.String)) {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        sig_ = s;
+        return s;
+      } else {
+        return (java.lang.String) ref;
+      }
+    }
+    /**
+     * <code>string sig = 4;</code>
+     */
+    public com.google.protobuf.ByteString
+        getSigBytes() {
+      java.lang.Object ref = sig_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        sig_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    /**
+     * <code>string sig = 4;</code>
+     */
+    public Builder setSig(
+        java.lang.String value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  
+      sig_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string sig = 4;</code>
+     */
+    public Builder clearSig() {
+      
+      sig_ = getDefaultInstance().getSig();
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string sig = 4;</code>
+     */
+    public Builder setSigBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+      
+      sig_ = value;
       onChanged();
       return this;
     }

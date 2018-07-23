@@ -21,4 +21,14 @@ public interface FastBbcVoteOrBuilder extends
    * <code>int32 cid = 3;</code>
    */
   int getCid();
+
+  /**
+   * <code>string sig = 4;</code>
+   */
+  java.lang.String getSig();
+  /**
+   * <code>string sig = 4;</code>
+   */
+  com.google.protobuf.ByteString
+      getSigBytes();
 }

@@ -3,6 +3,7 @@ package rmf;
 import com.google.protobuf.ByteString;
 import config.Config;
 import config.Node;
+import crypto.pkiUtils;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import proto.Data;
@@ -78,12 +79,12 @@ public class RmfNode extends Node{
                 setHeight(height).
                 setCid(cid).
                 build();
-        Data dataMsg = Data.
+        Data.Builder dataMsg = Data.
                 newBuilder().
                 setData(ByteString.copyFrom(msg)).
-                setMeta(metaMsg).
-                build();
-        rmfService.rmfBroadcast(dataMsg);
+                setMeta(metaMsg);
+        rmfService.rmfBroadcast(dataMsg.setSig(pkiUtils.sign(String.valueOf(cid) + String.valueOf(getID())
+                + String.valueOf(height) + new String (dataMsg.getData().toByteArray()))).build());
     }
 
     public byte[]
@@ -92,7 +93,7 @@ public class RmfNode extends Node{
 
 
     deliver(int height, int sender, int tmo) {
-        byte[] ret = rmfService.deliver(cid, tmo);
+        byte[] ret = rmfService.deliver(cid, tmo, sender, height);
         cid++;
         return ret;
     }
