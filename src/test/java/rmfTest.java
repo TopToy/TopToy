@@ -17,11 +17,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class rmfTest {
-    interface nodeDoing {
-        void act(RmfNode node);
-    }
-    private int serversUp = 0;
-    private final Object serversUpLock = new Object();
     private int timeToWaitBetweenTests = 1000 * 15;
     static Config conf = new Config();
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(rmfTest.class);
@@ -59,19 +54,14 @@ public class rmfTest {
             ret[id] =  new RmfNode(id, localHost, ports[id], f, currentNodes, configHome);
         }
         return ret;
-        //        n.start();
 
     }
     @Test
     void TestSingleServer() throws InterruptedException {
-//        String sig = pkiUtils.sign("abc");
-//        boolean a = pkiUtils.verify(0, "abc", sig);
         Thread.sleep(timeToWaitBetweenTests);
-        serversUp = 0;
         logger.info("start TestSingleServer");
         String SingleServerconfigHome = Paths.get("config", "bbcConfig", "bbcSingleServer").toString();
         Node[] rn1 = initLocalRmfNodes(1, 0, SingleServerconfigHome, null);
-        RmfNode rn = ((RmfNode) rn1[0]);
         ((RmfNode) rn1[0]).start();
         ((RmfNode) rn1[0]).stop();
     }
@@ -110,7 +100,6 @@ public class rmfTest {
         int height = 0;
         String msg = "Hello";
         ((RmfNode) allNodes[0]).broadcast(msg.getBytes(), 0);
-//        sender.act((RmfNode) allNodes[0]);
         String[] ret = new String[4];
         Thread[] tasks = new Thread[4];
         for (int i = 0 ; i < nnodes ; i++) {
@@ -127,7 +116,6 @@ public class rmfTest {
 
         for (int i = 0 ; i < 4 ; i++) {
             assertEquals(msg, ret[i]);
-//            ((RmfNode) allNodes[i]).stop();
         }
         for (int i = 0 ; i < 4 ; i++) {
             ((RmfNode) allNodes[i]).stop();
@@ -151,11 +139,9 @@ public class rmfTest {
         for (int i = 0 ; i < nnodes ; i++) {
             servers[i].join();
         }
-//        System.out.println("*********************START*************************");
         for (int k = 0 ; k < 100 ; k++) {
             String msg = "Hello" + k;
             ((RmfNode) allNodes[k % 4]).broadcast(msg.getBytes(), k);
-//        sender.act((RmfNode) allNodes[0]);
             String[] ret = new String[4];
             Thread[] tasks = new Thread[4];
             for (int i = 0 ; i < nnodes ; i++) {
@@ -172,11 +158,9 @@ public class rmfTest {
             }
 
             for (int i = 0 ; i < 4 ; i++) {
-//                logger.info(format("******** round [%d:%d], message is [%s:%s] *********", k, i,  msg, ret[i]));
                 assertEquals(ret[0], ret[i]);
             }
         }
-//        System.out.println("*********************END*************************");
         for (int i = 0 ; i < 4 ; i++) {
             ((RmfNode) allNodes[i]).stop();
         }
@@ -217,7 +201,6 @@ public class rmfTest {
 
         for (int i = 0 ; i < 4 ; i++) {
             assertNull(ret[i]);
-//            ((RmfNode) allNodes[i]).stop();
         }
         for (int i = 0 ; i < 4 ; i++) {
             ((RmfNode) allNodes[i]).stop();
@@ -250,7 +233,6 @@ public class rmfTest {
         ids.add(1);
         ids.add(2);
         ((ByzantineRmfNode) allNodes[0]).selectiveBroadcast(msg.getBytes(), 0, ids);
-//        sender.act((RmfNode) allNodes[0]);
         String[] ret = new String[4];
         Thread[] tasks = new Thread[4];
         for (int i = 0 ; i < nnodes ; i++) {
@@ -277,7 +259,6 @@ public class rmfTest {
 
         for (int i = 0 ; i < 4 ; i++) {
             assertEquals(ret[0], ret[i]);
-//            ((RmfNode) allNodes[i]).stop();
         }
         for (int i = 0 ; i < 4 ; i++) {
             if (i == 0)  {
@@ -345,7 +326,6 @@ public class rmfTest {
 
             for (int i = 0 ; i < 4 ; i++) {
                 assertEquals(ret[0], ret[i]);
-//            ((RmfNode) allNodes[i]).stop();
             }
         }
 

@@ -1,26 +1,19 @@
 package rmf;
 
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Table;
 import config.Node;
-import consensus.bbc.bbcClient;
-import consensus.bbc.bbcServer;
+//import consensus.bbc.bbcClient;
+import consensus.bbc.bbcService;
 import crypto.pkiUtils;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.Server;
 import io.grpc.stub.StreamObserver;
-import org.omg.PortableInterceptor.INACTIVE;
 import proto.*;
 
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
@@ -60,17 +53,10 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             }
         }
     }
-
-//    protected int currHeight;
-//    int consID = 0;
     protected int id;
-//    protected int timeoutMs;
-//    int initTO;
-//    protected int timeoutInterval;
     int n;
     protected int f;
-    protected bbcServer bbcServer;
-    protected bbcClient bbcClient;
+    protected bbcService bbcService;
     final Object globalLock = new Object();
     final Object bbcLock = new Object();
 
@@ -85,7 +71,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
     protected Map<Integer, peer> peers;
     protected List<Node> nodes;
 
-    private Thread bbcServerThread;
+    private Thread bbcServiceThread;
     private Thread bbcMissedConsensusThread;
     protected Server server;
     private String bbcConfig;
@@ -94,19 +80,15 @@ public class RmfService extends RmfGrpc.RmfImplBase {
 
     public RmfService(int id, int f, ArrayList<Node> nodes, String bbcConfig) {
         this.bbcConfig = bbcConfig;
-        this.bbcClient = new bbcClient(id, bbcConfig);
         this.receivedSem = new Semaphore(0, true);
 
         this.fVotes = new HashMap<>();
-        this.pendingMsg = new HashMap<>(); //HashBasedTable.create(); //new HashMap<>();
+        this.pendingMsg = new HashMap<>();
         this.recMsg = new HashMap<>();
 
         this.peers = new HashMap<>();
         this.f = f;
         this.n = 3*f +1;
-//        this.timeoutInterval = tmoInterval;
-//        this.initTO = tmo;
-//        this.timeoutMs = tmo;
         this.id = id;
         this.nodes = nodes;
         this.fastBbcCons = new HashMap<>();
@@ -114,18 +96,18 @@ public class RmfService extends RmfGrpc.RmfImplBase {
     }
 
     public void start() {
-        this.bbcServer = new bbcServer(id, 2*f + 1, bbcConfig);
+        this.bbcService = new bbcService(id, 2*f + 1, bbcConfig);
         CountDownLatch latch = new CountDownLatch(1);
-        bbcServerThread = new Thread(() -> {
+        bbcServiceThread = new Thread(() -> {
                 /*
                     Note that in case that there is more than one bbc server this call blocks until all servers are up.
                  */
-            this.bbcServer.start();
+            this.bbcService.start();
             logger.info(format("[#%d] bbc server is up", id));
             latch.countDown();
         }
         );
-        bbcServerThread.start();
+        bbcServiceThread.start();
         bbcMissedConsensusThread = new Thread(() ->
         {
             try {
@@ -152,13 +134,11 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             synchronized (globalLock) {
                 done = new ArrayList<>(fastBbcCons.keySet());
             }
-            ArrayList<Integer> last = bbcServer.notifyOnConsensusInstance(done);
+            ArrayList<Integer> last = bbcService.notifyOnConsensusInstance(done);
             for (int cid : last) {
-//                synchronized (globalLock) {
-                    logger.info(format("[#%d] have found missed bbc [cid=%d]", id, cid));
-                    fullBbcConsensus(fastBbcCons.get(cid).getDecosion(), cid);
-                }
-//            }
+                logger.info(format("[#%d] have found missed bbc [cid=%d]", id, cid));
+                fullBbcConsensus(fastBbcCons.get(cid).getDecosion(), cid);
+            }
         }
     }
 
@@ -168,14 +148,12 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             p.shutdown();
         }
         logger.info(format("[#%d] Connections has been shutdown", id));
-        bbcClient.close();
-        logger.info(format("[#%d] bbc client has been shutdown", id));
-        bbcServer.shutdown();
+        bbcService.shutdown();
         try {
             // TODO: Do we really have to interrupt the threads?
-            logger.info(format("[#%d] wait for bbcServerThread", id));
-            bbcServerThread.interrupt();
-            bbcServerThread.join();
+            logger.info(format("[#%d] wait for bbcServiceThread", id));
+            bbcServiceThread.interrupt();
+            bbcServiceThread.join();
             logger.info(format("[#%d] wait for bbcMissedConsensusThread", id));
             bbcMissedConsensusThread.interrupt();
             bbcMissedConsensusThread.join();
@@ -294,7 +272,6 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             pendingMsg.put(cid, request);
             logger.info(format("[#%d] received data message from [%d], [cid=%d]", id,
                     sender, cid));
-//            timeoutMs = initTO;
             FastBbcVote v = FastBbcVote
                     .newBuilder().setCid(cid).setSender(id).setVote(1).
                             setSig(String.valueOf(cid) + String.valueOf(id) + String.valueOf(1)).build();
@@ -306,22 +283,16 @@ public class RmfService extends RmfGrpc.RmfImplBase {
     public void fastVote(FastBbcVote request, StreamObserver<Empty> responeObserver) {
         synchronized (globalLock) {
             int cid = request.getCid();
-//            logger.info(format("[#%d] received fast vote from [%d] in [cid=%d]", id, request.getSender(), cid));
             if (regBbcCons.containsKey(cid)) return;
             if (fastBbcCons.containsKey(cid)) return; // Against byzantine activity
-//            synchronized (fVotes) {
             if (!fVotes.containsKey(cid)) {
                 fvote v = new fvote();
                 v.dec.setConsID(cid);
                 v.cid = cid;
                 v.count = 0;
                 fVotes.put(cid, v);
-//                    fVotes.notify(); // To prevent the case in which a process have received a message but did not vote for it yet.
             }
-//            }
-//            int curr = fVotes.get(cid);
-//            fVotes.remove(cid);
-//            fVotes.put(cid, curr + 1);
+
             fVotes.get(cid).count++;
             fVotes.get(cid).dec.addSignatures(request.getSig());
             if (fVotes.get(cid).count == n) {
@@ -384,8 +355,6 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                 int dec = fullBbcConsensus(v, cid);
                 logger.info(format("[#%d] bbc returned [%d] for [cid=%d]", id, dec, cid));
                 if (dec == 0) {
-//                    timeoutMs += timeoutInterval;
-//                    logger.info(format("[#%d] timeout increased to %d", id, timeoutMs));
                     pendingMsg.remove(cid);
                     return null;
                 }
@@ -409,13 +378,9 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             if (regBbcCons.containsKey(cid)) {
                 return regBbcCons.get(cid).getDecosion();
             }
-//            int vote = 0;
-//            if (pendingMsg.containsKey(cid) || recMsg.containsKey(cid)) {
-//                vote = 1;
-//            }
             logger.info(format("[#%d] Initiates full bbc instance [cid=%d], [vote:%d]", id, cid, vote));
-            bbcClient.propose(vote, cid);
-            BbcProtos.BbcDecision dec = bbcServer.decide(cid);
+            bbcService.propose(vote, cid);
+            BbcProtos.BbcDecision dec = bbcService.decide(cid);
             regBbcCons.put(cid, dec);
             return dec.getDecosion();
         }
@@ -440,10 +405,5 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                 return;
             }
         }
-//        try {
-//            receivedSem.acquire();
-//        } catch (InterruptedException e) {
-//            logger.error("", e);
-//        }
     }
 }
