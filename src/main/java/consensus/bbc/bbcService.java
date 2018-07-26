@@ -59,17 +59,11 @@ public class bbcService extends DefaultSingleRecoverable {
 //            logger.error("", ex);
 //        }
 
-         Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                // Use stderr here since the logger may have been reset by its JVM shutdown hook.
-                if (sr != null) {
-                    logger.warn(format("[#%d] shutting down bbc server since JVM is shutting down", id));
-                    sr.kill();
-                    logger.warn(format("[#%d] server shut down", id));
-                }
-            }
-        });
+         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+             // Use stderr here since the logger may have been reset by its JVM shutdown hook.
+             logger.warn(format("[#%d] shutting down bbc server since JVM is shutting down", id));
+             shutdown();
+         }));
     }
     public void shutdown() {
         logger.info(format("[#%d] shutting down bbc server", id));
