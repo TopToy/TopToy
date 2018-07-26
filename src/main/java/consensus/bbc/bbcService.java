@@ -31,11 +31,8 @@ public class bbcService extends DefaultSingleRecoverable {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(bbcService.class);
 
     private int id;
-    AsynchServiceProxy bbcProxy;
+    private AsynchServiceProxy bbcProxy;
     private final HashMap<Integer, consVote> rec;
-//    private List<Integer> done;
-//    private Lock lock;
-//    private Condition consEnd;
     private int quorumSize;
     private String configHome;
     private ServiceReplica sr;
@@ -43,8 +40,6 @@ public class bbcService extends DefaultSingleRecoverable {
     public bbcService(int id, int quorumSize, String configHome) {
         this.id = id;
         rec = new HashMap<>();
-//        lock = new ReentrantLock();
-//        consEnd = lock.newCondition();
         sr = null;
         this.quorumSize = quorumSize;
         this.configHome = configHome;
@@ -52,24 +47,13 @@ public class bbcService extends DefaultSingleRecoverable {
     }
 
     public void start() {
-//        try {
-            sr = new ServiceReplica(id, this, this, configHome);
-            bbcProxy = new AsynchServiceProxy(id, configHome);
-//        } catch (Exception ex) {
-//            logger.error("", ex);
-//        }
-
-         Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                // Use stderr here since the logger may have been reset by its JVM shutdown hook.
-                if (sr != null) {
-                    logger.warn(format("[#%d] shutting down bbc server since JVM is shutting down", id));
-                    sr.kill();
-                    logger.warn(format("[#%d] server shut down", id));
-                }
-            }
-        });
+        sr = new ServiceReplica(id, this, this, configHome);
+        bbcProxy = new AsynchServiceProxy(id, configHome);
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+         // Use stderr here since the logger may have been reset by its JVM shutdown hook.
+         logger.warn(format("[#%d] shutting down bbc server since JVM is shutting down", id));
+         shutdown();
+        }));
     }
     public void shutdown() {
         logger.info(format("[#%d] shutting down bbc server", id));
@@ -85,7 +69,7 @@ public class bbcService extends DefaultSingleRecoverable {
         }
     }
 
-    void releaseWaiting() {
+    private void releaseWaiting() {
         synchronized (rec) {
             rec.notifyAll();
         }
@@ -96,17 +80,11 @@ public class bbcService extends DefaultSingleRecoverable {
     @Override
     public void installSnapshot(byte[] state) {
         logger.info(format("[#%d] installSnapshot called", id));
-//        state newState = (consensus.bbc.state) SerializationUtils.deserialize(state);
-//        quorumSize = newState.quorumSize;
-//        rec = newState.rec;
     }
 
     @Override
     public byte[] getSnapshot() {
         logger.info(format("[#%d] getSnapshot called", id));
-//        state newState = new state(rec, quorumSize);
-//        byte[] data = SerializationUtils.serialize(newState);
-//        return data;
         return new byte[1];
     }
 
@@ -151,20 +129,6 @@ public class bbcService extends DefaultSingleRecoverable {
 
     @Override
     public byte[] appExecuteUnordered(byte[] command, MessageContext msgCtx) {
-//        int consID = ByteBuffer.wrap(command).getInt();
-//        synchronized (rec) {
-//            while (!rec.containsKey(consID) ||  rec.get(consID).size() < quorumSize) {
-//                try {
-//                    rec.wait();
-//                } catch (InterruptedException e) {
-//                    logger.error("", e);
-//                }
-//            }
-//            int ret = calcMaj(rec.get(consID));
-////        done.add(consID);
-//            rec.remove(consID);
-//            return ByteBuffer.allocate(Integer.SIZE/Byte.SIZE).putInt(ret).array();
-//        }
         return new byte[1];
     }
 
@@ -218,22 +182,8 @@ public class bbcService extends DefaultSingleRecoverable {
 
             }
         }, TOMMessageType.ORDERED_REQUEST);
-//        byte[] cmd = ByteBuffer.allocate(Integer.SIZE/Byte.SIZE).putInt(consID).array(); // Blocks until ends
-//        byte[] res = vpbcProxy.invokeUnordered(cmd);
-//        int ret = ByteBuffer.wrap(res).getInt();
-//        consID++;
-//        return ret;
         return 0;
     }
 
 }
 
-//class state implements Serializable{
-//    public TreeMap<Integer, ArrayList<BbcProtos.BbcMsg>> rec;
-//    public int quorumSize;
-//
-//    public state(TreeMap<Integer, ArrayList<BbcProtos.BbcMsg>> rec, int quorumSize) {
-//        this.rec = rec;
-//        this.quorumSize = quorumSize;
-//    }
-//}
