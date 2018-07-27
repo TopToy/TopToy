@@ -66,17 +66,11 @@ public class RBrodcastService extends DefaultSingleRecoverable {
         @Override
         public void installSnapshot(byte[] state) {
             logger.info(format("[#%d] installSnapshot called", id));
-//        state newState = (consensus.bbc.state) SerializationUtils.deserialize(state);
-//        quorumSize = newState.quorumSize;
-//        rec = newState.rec;
         }
 
         @Override
         public byte[] getSnapshot() {
             logger.info(format("[#%d] getSnapshot called", id));
-//        state newState = new state(rec, quorumSize);
-//        byte[] data = SerializationUtils.serialize(newState);
-//        return data;
             return new byte[1];
         }
 
