@@ -1,20 +1,17 @@
 import blockchain.asyncBcServer;
-import blockchain.bcServer;
+import blockchain.cbcServer;
 import blockchain.byzantineBcServer;
-import com.google.protobuf.ByteString;
 import config.Config;
 import config.Node;
 import org.apache.commons.lang.ArrayUtils;
 import org.junit.jupiter.api.Test;
 import proto.Block;
-import proto.Transaction;
 
 import java.io.File;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Random;
 
 import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -56,7 +53,7 @@ public class blockchainTest {
                 ret[id] = new byzantineBcServer(localHost, ports[id], id);
                 continue;
             }
-            ret[id] =  new bcServer(localHost, ports[id], id);
+            ret[id] =  new cbcServer(localHost, ports[id], id);
         }
         return ret;
         //        n.start();
@@ -76,33 +73,33 @@ public class blockchainTest {
 
     }
 
-    @Test
-    void TestSingleServer() throws InterruptedException {
-        Thread.sleep(timeToWaitBetweenTests);
-        logger.info("start TestSingleServer");
-        String SingleServerconfigHome = Paths.get("config", "bbcConfig", "bbcSingleServer").toString();
-        Node[] rn1 = initLocalRmfNodes(1, 0, SingleServerconfigHome, null);
-        ((bcServer) rn1[0]).start();
-        ((bcServer) rn1[0]).shutdown();
-    }
-
-    @Test
-    void TestSingleServerDisseminateMessage() throws InterruptedException {
-        Thread.sleep(timeToWaitBetweenTests);
-        logger.info("start TestSingleServer");
-        String SingleServerconfigHome = Paths.get("config", "bbcConfig", "bbcSingleServer").toString();
-        Node[] rn1 = initLocalRmfNodes(1, 0, SingleServerconfigHome, null);
-        ((bcServer) rn1[0]).start();
-        ((bcServer) rn1[0]).serve();
-        ((bcServer) rn1[0]).addTransaction(("hello").getBytes(), 100);
-        Block b = ((bcServer) rn1[0]).deliver(1);
-        assertEquals(1, b.getHeader().getHeight());
-        assertEquals(0, b.getHeader().getCreatorID());
-//        assertEquals(100, b.getData(0).getClientID());
-//        assertEquals("hello", new String(b.getData(0).getData().toByteArray()));
-        ((bcServer) rn1[0]).shutdown();
-
-    }
+//    @Test
+//    void TestSingleServer() throws InterruptedException {
+//        Thread.sleep(timeToWaitBetweenTests);
+//        logger.info("start TestSingleServer");
+//        String SingleServerconfigHome = Paths.get("config", "bbcConfig", "bbcSingleServer").toString();
+//        Node[] rn1 = initLocalRmfNodes(1, 0, SingleServerconfigHome, null);
+//        ((cbcServer) rn1[0]).start();
+//        ((cbcServer) rn1[0]).shutdown();
+//    }
+//
+//    @Test
+//    void TestSingleServerDisseminateMessage() throws InterruptedException {
+//        Thread.sleep(timeToWaitBetweenTests);
+//        logger.info("start TestSingleServer");
+//        String SingleServerconfigHome = Paths.get("config", "bbcConfig", "bbcSingleServer").toString();
+//        Node[] rn1 = initLocalRmfNodes(1, 0, SingleServerconfigHome, null);
+//        ((cbcServer) rn1[0]).start();
+//        ((cbcServer) rn1[0]).serve();
+//        ((cbcServer) rn1[0]).addTransaction(("hello").getBytes(), 100);
+//        Block b = ((cbcServer) rn1[0]).deliver(1);
+//        assertEquals(1, b.getHeader().getHeight());
+//        assertEquals(0, b.getHeader().getCreatorID());
+////        assertEquals(100, b.getData(0).getClientID());
+////        assertEquals("hello", new String(b.getData(0).getData().toByteArray()));
+//        ((cbcServer) rn1[0]).shutdown();
+//
+//    }
 
     @Test
     void TestFourServersNoFailuresSingleMessage() throws InterruptedException {
@@ -114,23 +111,23 @@ public class blockchainTest {
         Node[] allNodes = initLocalRmfNodes(nnodes,1,fourServersConfig, null);
         for (int i = 0 ; i < nnodes ; i++) {
             int finalI = i;
-            servers[i]  = new Thread(() ->((bcServer) allNodes[finalI]).start());
+            servers[i]  = new Thread(() ->((cbcServer) allNodes[finalI]).start());
             servers[i].start();
         }
         for (int i = 0 ; i < nnodes ; i++) {
             servers[i].join();
         }
         String msg = "Hello";
-        ((bcServer) allNodes[0]).addTransaction(msg.getBytes(), 0);
+        ((cbcServer) allNodes[0]).addTransaction(msg.getBytes(), 0);
         for (int i = 0 ; i < nnodes ; i++) {
-            ((bcServer) allNodes[i]).serve();
+            ((cbcServer) allNodes[i]).serve();
         }
         String[] ret = new String[4];
         Thread[] tasks = new Thread[4];
         for (int i = 0 ; i < nnodes ; i++) {
             int finalI = i;
             tasks[i] = new Thread(()-> {
-                ret[finalI] = new String(((bcServer) allNodes[finalI]).deliver(1).getData(0).getData().toByteArray());
+                ret[finalI] = new String(((cbcServer) allNodes[finalI]).deliver(1).getData(0).getData().toByteArray());
             });
             tasks[i].start();
         }
@@ -139,7 +136,7 @@ public class blockchainTest {
             tasks[i].join();
         }
         for (int i = 0 ; i < 4 ; i++) {
-            ((bcServer) allNodes[i]).shutdown();
+            ((cbcServer) allNodes[i]).shutdown();
         }
         for (int i = 0 ; i < 4 ; i++) {
             assertEquals(msg, ret[i]);
@@ -148,7 +145,7 @@ public class blockchainTest {
 
     }
 //
-    void serverDoing(List<Block> res, bcServer s) {
+    void serverDoing(List<Block> res, cbcServer s) {
         for(int i = 0; i < 100 ; i++) {
             String msg = "Hello" + i;
             if (i % 4 == s.getID()) {
@@ -169,7 +166,7 @@ public class blockchainTest {
         Node[] allNodes = initLocalRmfNodes(nnodes,1,fourServersConfig, null);
         for (int i = 0 ; i < nnodes ; i++) {
             int finalI = i;
-            servers[i]  = new Thread(() ->((bcServer) allNodes[finalI]).start());
+            servers[i]  = new Thread(() ->((cbcServer) allNodes[finalI]).start());
             servers[i].start();
         }
         for (int i = 0 ; i < nnodes ; i++) {
@@ -177,7 +174,7 @@ public class blockchainTest {
         }
 
         for (int i = 0 ; i < nnodes ; i++) {
-            ((bcServer) allNodes[i]).serve();
+            ((cbcServer) allNodes[i]).serve();
         }
         HashMap<Integer, ArrayList<Block>> res = new HashMap<>();
         for (int i = 0 ; i < nnodes ; i++) {
@@ -186,14 +183,14 @@ public class blockchainTest {
         Thread[] tasks = new Thread[4];
         for (int i = 0 ; i < 4 ;i++) {
             int finalI = i;
-            tasks[i] = new Thread(() -> serverDoing(res.get(finalI), (bcServer) allNodes[finalI]));
+            tasks[i] = new Thread(() -> serverDoing(res.get(finalI), (cbcServer) allNodes[finalI]));
             tasks[i].start();
         }
         for (int i = 0 ; i < nnodes ; i++) {
             tasks[i].join();
         }
         for (int i = 0 ; i < 4 ; i++) {
-            ((bcServer) allNodes[i]).shutdown();
+            ((cbcServer) allNodes[i]).shutdown();
         }
         for (int i = 0 ; i < 100 ; i++) {
             logger.info(format("***** Assert creator = %d", res.get(0).get(i).getHeader().getCreatorID()));
@@ -220,7 +217,7 @@ void TestStressFourServersMuteFault() throws InterruptedException {
 //            servers[i].start();
 //            continue;
 //        }
-        servers[i]  = new Thread(() ->((bcServer) allNodes[finalI]).start());
+        servers[i]  = new Thread(() ->((cbcServer) allNodes[finalI]).start());
         servers[i].start();
     }
     for (int i = 0 ; i < nnodes ; i++) {
@@ -228,7 +225,7 @@ void TestStressFourServersMuteFault() throws InterruptedException {
     }
 
     for (int i = 1 ; i < nnodes ; i++) {
-        ((bcServer) allNodes[i]).serve();
+        ((cbcServer) allNodes[i]).serve();
     }
 
     HashMap<Integer, ArrayList<Block>> res = new HashMap<>();
@@ -238,7 +235,7 @@ void TestStressFourServersMuteFault() throws InterruptedException {
     Thread[] tasks = new Thread[4];
     for (int i = 1 ; i < 4 ;i++) {
         int finalI = i;
-        tasks[i] = new Thread(() -> serverDoing(res.get(finalI), (bcServer) allNodes[finalI]));
+        tasks[i] = new Thread(() -> serverDoing(res.get(finalI), (cbcServer) allNodes[finalI]));
         tasks[i].start();
     }
     for (int i = 1 ; i < nnodes ; i++) {
@@ -246,7 +243,7 @@ void TestStressFourServersMuteFault() throws InterruptedException {
     }
 
     for (int i = 0 ; i < 4 ; i++) {
-        ((bcServer) allNodes[i]).shutdown();
+        ((cbcServer) allNodes[i]).shutdown();
     }
 
     for (int i = 0 ; i < 100 ; i++) {
@@ -282,7 +279,7 @@ void TestStressFourServersMuteFault() throws InterruptedException {
                 servers[i].start();
                 continue;
             }
-            servers[i]  = new Thread(() ->((bcServer) allNodes[finalI]).start());
+            servers[i]  = new Thread(() ->((cbcServer) allNodes[finalI]).start());
             servers[i].start();
         }
         for (int i = 0 ; i < nnodes ; i++) {
@@ -294,7 +291,7 @@ void TestStressFourServersMuteFault() throws InterruptedException {
                 ((byzantineBcServer) allNodes[i]).serve();
                 continue;
             }
-            ((bcServer) allNodes[i]).serve();
+            ((cbcServer) allNodes[i]).serve();
         }
 
         HashMap<Integer, ArrayList<Block>> res = new HashMap<>();
@@ -310,7 +307,7 @@ void TestStressFourServersMuteFault() throws InterruptedException {
                 continue;
             }
             int finalI = i;
-            tasks[i] = new Thread(() -> serverDoing(res.get(finalI), (bcServer) allNodes[finalI]));
+            tasks[i] = new Thread(() -> serverDoing(res.get(finalI), (cbcServer) allNodes[finalI]));
             tasks[i].start();
         }
         for (int i = 0 ; i < nnodes ; i++) {
@@ -322,7 +319,7 @@ void TestStressFourServersMuteFault() throws InterruptedException {
                 ((byzantineBcServer) allNodes[i]).shutdown();
                 continue;
             }
-            ((bcServer) allNodes[i]).shutdown();
+            ((cbcServer) allNodes[i]).shutdown();
         }
 
         for (int i = 0 ; i < 100 ; i++) {
@@ -412,7 +409,7 @@ void TestStressFourServersMuteFault() throws InterruptedException {
 //                servers[i].start();
 //                continue;
 //            }
-//            servers[i]  = new Thread(() ->((bcServer) allNodes[finalI]).start());
+//            servers[i]  = new Thread(() ->((cbcServer) allNodes[finalI]).start());
 //            servers[i].start();
 //        }
 //        for (int i = 0 ; i < nnodes ; i++) {
@@ -425,7 +422,7 @@ void TestStressFourServersMuteFault() throws InterruptedException {
 //                ((byzantineBcServer) allNodes[i]).serve();
 //                continue;
 //            }
-//            ((bcServer) allNodes[i]).serve();
+//            ((cbcServer) allNodes[i]).serve();
 //        }
 //
 //        Thread.sleep(10 * 1000);
@@ -434,7 +431,7 @@ void TestStressFourServersMuteFault() throws InterruptedException {
 //                ((byzantineBcServer) allNodes[i]).shutdown();
 //                continue;
 //            }
-//            ((bcServer) allNodes[i]).shutdown();
+//            ((cbcServer) allNodes[i]).shutdown();
 //        }
 //    }
 }

@@ -11,12 +11,12 @@ import proto.*;
 import rmf.RmfNode;
 
 import java.util.*;
-import java.util.concurrent.Semaphore;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
-public class bcServer extends Node {
+public abstract class bcServer extends Node {
+
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(bcServer.class);
     protected RmfNode rmfServer;
     protected RBrodcastService rbService;
@@ -41,6 +41,7 @@ public class bcServer extends Node {
 
     // TODO: Currently nodes, f, tmoInterval, tmo and configHome are coded but we will turn it into configuration file
     public bcServer(String addr, int port, int id) {
+
         super(addr, port, id); // TODO: Should be changed according to Config!
         rmfServer = new RmfNode(id, addr, port, Config.getF(),
                 Config.getRMFcluster(), Config.getRMFbbcConfigHome());
@@ -75,7 +76,7 @@ public class bcServer extends Node {
     }
 
     public void serve() {
-         // TODO: did a problem might occur if not all servers starts at once?
+        // TODO: did a problem might occur if not all servers starts at once?
         panicThread.start();
         mainThread.start();
 
@@ -93,7 +94,7 @@ public class bcServer extends Node {
         logger.info(format("[#%d] has been shutdown successfully", getID()));
     }
     private void updateLeader() {
-            currLeader = (currLeader + 1) % n;
+        currLeader = (currLeader + 1) % n;
     }
 
     private void mainLoop() {
@@ -164,21 +165,7 @@ public class bcServer extends Node {
         }
     }
 
-    private void leaderImpl() {
-        if (currLeader != getID()) {
-            return;
-        }
-        logger.info(format("[#%d] prepare to disseminate a new block of [height=%d]", getID(), currHeight));
-
-        synchronized (blockLock) {
-//            logger.info(format("[#%d] [heigh1=%d", getID(), currHeight, ));
-            Block sealedBlock = currBlock.construct(getID(), currHeight, DigestMethod.hash(bc.getBlock(currHeight - 1).getHeader()));
-            currBlock = bc.createNewBLock();
-            rmfServer.broadcast(sealedBlock.toByteArray(), currHeight);
-        }
-
-
-    }
+    abstract void leaderImpl();
 
     public boolean addTransaction(byte[] data, int clientID) {
         Transaction t = Transaction.newBuilder().setClientID(clientID).setData(ByteString.copyFrom(data)).build();
@@ -258,7 +245,7 @@ public class bcServer extends Node {
             fp.put(b.getHeader().getHeight(), p);
         }
         rbService.broadcast(p.toByteArray(), getID());
-      handleFork();
+        handleFork();
     }
 
     public Block deliver(int index) {
