@@ -18,17 +18,15 @@ import static java.lang.String.format;
 
 public class RmfNode extends Node{
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(RmfNode.class);
-    private boolean stopped = false;
-    private RmfService rmfService;
-    private Server rmfServer;
-    int height;
-    int cid = 0;
+    protected boolean stopped = false;
+    protected RmfService rmfService;
+    protected Server rmfServer;
+    protected int cid = 0;
 
     public RmfNode(int id, String addr, int port, int f , ArrayList<Node> nodes, String bbcConfig) {
         super(addr, port, id);
         rmfService = new RmfService(id, f, nodes, bbcConfig);
         startGrpcServer();
-//        height = 0;
     }
 
     private void startGrpcServer() {

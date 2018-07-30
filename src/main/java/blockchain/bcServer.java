@@ -18,25 +18,25 @@ import static java.lang.String.format;
 
 public class bcServer extends Node {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(bcServer.class);
-    private RmfNode rmfServer;
-    private RBrodcastService rbService;
-    private blockchain bc; // TODO: Currently implement as basicBlockchain but we will make it dynamically (using config file)
-    private int currHeight;
-    private int f;
-    private int n;
-    private int currLeader;
-    private boolean stopped;
-    private final Object blockLock = new Object();
-    private block currBlock; // TODO: As any server should disseminates its block once in an epoch, currently a block is shipped as soon the server turn is coming.
-    private final Object newBlockNotifyer = new Object();
-    private int maxTransactionInBlock; // TODO: Should be done by configuration
-    private int tmo;
-    private int tmoInterval;
-    private int initTmo;
-    private Thread mainThread;
-    private Thread panicThread;
-    private final List<Integer> cids;
-    private HashMap<Integer, ForkProof> fp;
+    protected RmfNode rmfServer;
+    protected RBrodcastService rbService;
+    protected blockchain bc; // TODO: Currently implement as basicBlockchain but we will make it dynamically (using config file)
+    protected int currHeight;
+    protected int f;
+    protected int n;
+    protected int currLeader;
+    protected boolean stopped;
+    protected final Object blockLock = new Object();
+    protected block currBlock; // TODO: As any server should disseminates its block once in an epoch, currently a block is shipped as soon the server turn is coming.
+    protected final Object newBlockNotifyer = new Object();
+    protected int maxTransactionInBlock; // TODO: Should be done by configuration
+    protected int tmo;
+    protected int tmoInterval;
+    protected int initTmo;
+    protected Thread mainThread;
+    protected Thread panicThread;
+    protected final List<Integer> cids;
+    protected HashMap<Integer, ForkProof> fp;
     final Object panicLock = new Object();
 
     // TODO: Currently nodes, f, tmoInterval, tmo and configHome are coded but we will turn it into configuration file
