@@ -8,6 +8,7 @@ import bftsmart.tom.ServiceReplica;
 import bftsmart.tom.core.messages.TOMMessage;
 import bftsmart.tom.core.messages.TOMMessageType;
 import bftsmart.tom.server.defaultservices.DefaultSingleRecoverable;
+import crypto.bbcDigSig;
 import crypto.pkiUtils;
 import proto.BbcProtos;
 
@@ -168,7 +169,7 @@ public class bbcService extends DefaultSingleRecoverable {
         b.setClientID(id);
         b.setId(cid);
         b.setVote(vote);
-        b.setSig(pkiUtils.sign(String.valueOf(cid) + String.valueOf(id) + String.valueOf(vote)));
+        b.setSig(bbcDigSig.sign(b));
         BbcProtos.BbcMsg msg= b.build();
         byte[] data = msg.toByteArray();
         bbcProxy.invokeAsynchRequest(data, new ReplyListener() {

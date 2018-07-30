@@ -3,11 +3,13 @@ package rmf;
 import com.google.protobuf.ByteString;
 import config.Node;
 import crypto.pkiUtils;
+import crypto.rmfDigSig;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import org.apache.commons.lang.ArrayUtils;
 import proto.Data;
 import proto.Meta;
+import proto.RmfResult;
 
 import java.io.IOException;
 import java.util.*;
@@ -85,12 +87,16 @@ public class ByzantineRmfNode extends Node{
                 newBuilder().
                 setData(ByteString.copyFrom(msg)).
                 setMeta(metaMsg);
-        rmfService.rmfBroadcast(dataMsg.setSig(pkiUtils.sign(String.valueOf(cid) + String.valueOf(getID())
-                + String.valueOf(height) + new String (dataMsg.getData().toByteArray()))).build());
+        rmfService.rmfBroadcast(dataMsg.setSig(rmfDigSig.sign(dataMsg)).build());
     }
 
-    public byte[] deliver(int height, int sender, int tmo) {
-        byte[] res = rmfService.deliver(cid, tmo, sender, height);
+    public RmfResult deliver(int height, int sender, int tmo) {
+        Data data = rmfService.deliver(cid, tmo, sender, height);
+        RmfResult res = RmfResult.
+                newBuilder().
+                setCid(cid).
+                setData(data == null ? ByteString.EMPTY : data.getData()).
+                build();
         cid++;
         return res;
     }
@@ -106,11 +112,11 @@ public class ByzantineRmfNode extends Node{
                 newBuilder().
                 setData(ByteString.copyFrom(msg)).
                 setMeta(metaMsg);
+        Data dmsg = dataMsg.setSig(rmfDigSig.sign(dataMsg)).build();
         for (Map.Entry<Integer, RmfService.peer>  p: rmfService.peers.entrySet()) {
             if (ids.contains(p.getKey())) {
                 logger.info("sending message " + Arrays.toString(msg) + " to " + p.getKey() + " with height of " + height);
-                rmfService.sendDataMessage(p.getValue().stub, dataMsg.setSig(pkiUtils.sign(String.valueOf(cid) + String.valueOf(getID())
-                        + String.valueOf(height) + new String (dataMsg.getData().toByteArray()))).build());
+                rmfService.sendDataMessage(p.getValue().stub, dmsg);
             }
 
         }
@@ -122,6 +128,19 @@ public class ByzantineRmfNode extends Node{
         for (int i = 0 ; i < msgs.size() ; i++) {
             selectiveBroadcast(msgs.get(i), heights.get(i), ids.get(i));
         }
+    }
+
+    public String getRmfDataSig(int cid) {
+        return rmfService.getMessageSig(cid);
+    }
+
+    public RmfResult nonBlockingDeliver(int cid) {
+        Data data = rmfService.nonBlockingDeliver(cid);
+        return RmfResult.
+                newBuilder().
+                setCid(cid).
+                setData(data == null ? ByteString.EMPTY : data.getData()).
+                build();
     }
 
 }

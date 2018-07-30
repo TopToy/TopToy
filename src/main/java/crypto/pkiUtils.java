@@ -17,7 +17,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class pkiUtils {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(pkiUtils.class);
-    private static PublicKey pubKey;
+//    private static PublicKey pubKey;
     private static PrivateKey privKey;
     private static HashMap<Integer, PublicKey> clusterPubKeys = new HashMap<>();
 
@@ -29,8 +29,8 @@ public class pkiUtils {
             PKCS8EncodedKeySpec keySpecPKCS8 = new PKCS8EncodedKeySpec(key);
 
             privKey = kf.generatePrivate(keySpecPKCS8);
-            X509EncodedKeySpec keySpecX509 = new X509EncodedKeySpec(Base64.getDecoder().decode(Config.getPublicKey().replaceAll("\\s+","")));
-            pubKey = kf.generatePublic(keySpecX509);
+//            X509EncodedKeySpec keySpecX509 = new X509EncodedKeySpec(Base64.getDecoder().decode(Config.getPublicKey().replaceAll("\\s+","")));
+//            pubKey = kf.generatePublic(keySpecX509);
             HashMap<Integer, String> keys = Config.getClusterPubKeys();
             for (int i : keys.keySet()) {
                 X509EncodedKeySpec spec = new X509EncodedKeySpec(Base64.getDecoder().decode(keys.get(i).replaceAll("\\s+","")));

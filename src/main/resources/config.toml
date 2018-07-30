@@ -8,30 +8,31 @@ title = "configuration"
     tmo = 1000
     tmoInterval = 100
     rmfBbcConfigPath = "config/bbcConfig/bbcFourServers"
+    RBroadcastConfigPath = "src/main/java/consensus/RBroadcast/config"
     maxTransactionInBlock = 1
 
 [server]
     id = 0
     ip = "127.0.0.1"
     port = 20000
-    privateKey = """MIICXAIBAAKBgQCTnNSo0xapOz4SZyWVYE/rZrB0gTa12U0L9O+8HoH3gA+plIRV
-                bcfhEtOU8zlRZzl9AF9HUbVIF37ABCEkkqedBxO6/XNKsHOhqFGW891KdlUfUxoU
-                vxgUEaWJcpL7h9KdpITXEyawZN1q6GuoLKJF938BUutcsBoTCUdNgMPpewIDAQAB
-                AoGAIQ0SiKKLBmVfZpt1zNZ9zoV1qQBtkZYQLEcxjnt+Oj6QQzYf00j7Yifm/Ajh
-                oppsQtLcgomG/5dTKAdErH2xzZsVe9zPLpH0YRCQgvH156iMChjpuTn2juuKL9Jn
-                N3LyZ0Qh16TJfb2D9FPk2Hy8ivAZ0AXaKDrWfnLbOlA/P4ECQQD716eU8izEfgqf
-                sXbdFkALEXV7XDS6Qv12sIbF3GmqeB4hIrMXai4vcYCR+bwjwrHQOmtPzYPMb/CO
-                afc562xhAkEAlgytK6uFY/hUIUQxxVNYviwQwaiNyORs2xGQHXb/8ehCVrzT7lFz
-                rRrvQpI5myfzHgIvXebJajqiKOjmkBdDWwJBAPvSvGOXdWRVlFHypiSUpx1qK8ta
-                e+70JXaVNW6L46ztx1Li26nCJsSR/jn5OkOX3y2T/NIjcnLuS+Bb3TYxToECQGC/
-                wbTjvnmMOCrO/sx+Bj1wykkkNm+vIaVLOMJW5YcEPCoTTQ9gQ5b9RAKHqE8rvi2+
-                OO5yDbLKJZ79NRT5evsCQAR+76wykMXZN907C/JYKdq3N0bBFW9KEenddoiKd2NP
-                a+wqpz2/4EYkI4BawZ3gUZtHoxSvw8tWS2Io0SpU+Rs="""
+    privateKey = """MIICXAIBAAKBgQCZlLGnX6NqN1ZpwcN+5aN7r9n56H5/b24NcA2RKN4XX1Y26hDZ
+                    cA4Nl+Fu4NbVhg/kpOHJ2EstMKRlJKOIJ+0yUSLiLnGUMt+LesVjO5rY0tyyWLW1
+                    pMAnmreI0R2ZLuJv6R4rtGwe7Pj/mrgYGHa218gax7qWcpdiHou1lE5hNwIDAQAB
+                    AoGANGrrt5SM0dPRSoc3kjgOdEiwvPr9McF2bl+wQbsREikX4+Y/mfcE1N7hslZK
+                    /NWk1wTvi1SnU+UmNt8qcW4vJlXwh+yBJlqIdLLTaEC7Qnl88GbMKbkcLi3wVBUg
+                    N6/APdcRVYZMUoMn/nx5ZELjizMimEmEMQuzmrBKQPWRJQECQQDG/deyAZMJWOGj
+                    8AHZWcX6AFkorztv21sJRcW3ZQNbiVrNMjsi+pX7HyIaetcd/CuwAWQ5qKY5c3yx
+                    vZ+ZidNDAkEAxZRmz9X4DkFFLYn95yh/v5jY9jL4IcgmLjYK0hKIdVE8ZVyYxFRR
+                    dzlvNlotnEQt3xpzZRd+gfff4wsM01+I/QJAA17NRnCMYv4kZDhub5X7qm5TFENT
+                    iGN4uUF7Rc3qLqS26v7MzZzc6XHvi+9EsXdR7hs37VoT5qk0FXaWu20ALQJAaavM
+                    LP5IM/+OqyNxa29Km8N4znxGH3M3kGGQ+fe1ieFPxvp2LhLWm0hZhZ1HZZtFWVyB
+                    OSEOpR5YXMrtKiOfVQJBALegCoV9OV38jbOISCzaqI3bysjE6d8qIJB5/cvhND/b
+                    xeNekVH4jz9Fsx8eJp8KLVF0GI/EG2uxWVaF2gULuAA="""
 
-    publicKey = """MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCTnNSo0xapOz4SZyWVYE/rZrB0
-                  gTa12U0L9O+8HoH3gA+plIRVbcfhEtOU8zlRZzl9AF9HUbVIF37ABCEkkqedBxO6
-                  /XNKsHOhqFGW891KdlUfUxoUvxgUEaWJcpL7h9KdpITXEyawZN1q6GuoLKJF938B
-                  UutcsBoTCUdNgMPpewIDAQAB"""
+    publicKey = """MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCZlLGnX6NqN1ZpwcN+5aN7r9n5
+                   6H5/b24NcA2RKN4XX1Y26hDZcA4Nl+Fu4NbVhg/kpOHJ2EstMKRlJKOIJ+0yUSLi
+                   LnGUMt+LesVjO5rY0tyyWLW1pMAnmreI0R2ZLuJv6R4rtGwe7Pj/mrgYGHa218ga
+                   x7qWcpdiHou1lE5hNwIDAQAB"""
 
 [[RMFcluster]]
 
@@ -39,35 +40,35 @@ title = "configuration"
         id = 0
         ip = "127.0.0.1"
         port = 20000
-        publicKey = """MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCTnNSo0xapOz4SZyWVYE/rZrB0
-                      gTa12U0L9O+8HoH3gA+plIRVbcfhEtOU8zlRZzl9AF9HUbVIF37ABCEkkqedBxO6
-                      /XNKsHOhqFGW891KdlUfUxoUvxgUEaWJcpL7h9KdpITXEyawZN1q6GuoLKJF938B
-                      UutcsBoTCUdNgMPpewIDAQAB"""
+        publicKey = """MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCZlLGnX6NqN1ZpwcN+5aN7r9n5
+                       6H5/b24NcA2RKN4XX1Y26hDZcA4Nl+Fu4NbVhg/kpOHJ2EstMKRlJKOIJ+0yUSLi
+                       LnGUMt+LesVjO5rY0tyyWLW1pMAnmreI0R2ZLuJv6R4rtGwe7Pj/mrgYGHa218ga
+                       x7qWcpdiHou1lE5hNwIDAQAB"""
 
     [RMFcluster.s1]
         id = 1
         ip = "127.0.0.1"
         port = 20010
-        publicKey = """MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCTnNSo0xapOz4SZyWVYE/rZrB0
-                      gTa12U0L9O+8HoH3gA+plIRVbcfhEtOU8zlRZzl9AF9HUbVIF37ABCEkkqedBxO6
-                      /XNKsHOhqFGW891KdlUfUxoUvxgUEaWJcpL7h9KdpITXEyawZN1q6GuoLKJF938B
-                      UutcsBoTCUdNgMPpewIDAQAB"""
+        publicKey = """MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCZlLGnX6NqN1ZpwcN+5aN7r9n5
+                       6H5/b24NcA2RKN4XX1Y26hDZcA4Nl+Fu4NbVhg/kpOHJ2EstMKRlJKOIJ+0yUSLi
+                       LnGUMt+LesVjO5rY0tyyWLW1pMAnmreI0R2ZLuJv6R4rtGwe7Pj/mrgYGHa218ga
+                       x7qWcpdiHou1lE5hNwIDAQAB"""
 
     [RMFcluster.s2]
         id = 2
         ip = "127.0.0.1"
         port = 20020
-        publicKey = """MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCTnNSo0xapOz4SZyWVYE/rZrB0
-                      gTa12U0L9O+8HoH3gA+plIRVbcfhEtOU8zlRZzl9AF9HUbVIF37ABCEkkqedBxO6
-                      /XNKsHOhqFGW891KdlUfUxoUvxgUEaWJcpL7h9KdpITXEyawZN1q6GuoLKJF938B
-                      UutcsBoTCUdNgMPpewIDAQAB"""
+        publicKey = """MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCZlLGnX6NqN1ZpwcN+5aN7r9n5
+                       6H5/b24NcA2RKN4XX1Y26hDZcA4Nl+Fu4NbVhg/kpOHJ2EstMKRlJKOIJ+0yUSLi
+                       LnGUMt+LesVjO5rY0tyyWLW1pMAnmreI0R2ZLuJv6R4rtGwe7Pj/mrgYGHa218ga
+                       x7qWcpdiHou1lE5hNwIDAQAB"""
 
     [RMFcluster.s3]
         id = 3
         ip = "127.0.0.1"
         port = 20030
-        publicKey="""MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCTnNSo0xapOz4SZyWVYE/rZrB0
-                  gTa12U0L9O+8HoH3gA+plIRVbcfhEtOU8zlRZzl9AF9HUbVIF37ABCEkkqedBxO6
-                  /XNKsHOhqFGW891KdlUfUxoUvxgUEaWJcpL7h9KdpITXEyawZN1q6GuoLKJF938B
-                  UutcsBoTCUdNgMPpewIDAQAB"""
+        publicKey="""MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCZlLGnX6NqN1ZpwcN+5aN7r9n5
+                     6H5/b24NcA2RKN4XX1Y26hDZcA4Nl+Fu4NbVhg/kpOHJ2EstMKRlJKOIJ+0yUSLi
+                     LnGUMt+LesVjO5rY0tyyWLW1pMAnmreI0R2ZLuJv6R4rtGwe7Pj/mrgYGHa218ga
+                     x7qWcpdiHou1lE5hNwIDAQAB"""
 

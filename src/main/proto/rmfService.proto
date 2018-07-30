@@ -38,6 +38,12 @@ message FastBbcVote {
     int32 cid = 3;
     string sig = 4;
 }
+
+message RmfResult {
+    int32 cid = 1;
+    bytes data = 2;
+}
+
 service Rmf {
     rpc DisseminateMessage(Data) returns (Empty) {};
     rpc FastVote(FastBbcVote) returns (Empty) {};

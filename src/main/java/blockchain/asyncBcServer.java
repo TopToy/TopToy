@@ -94,8 +94,8 @@ public class asyncBcServer extends Node {
             logger.info(format("[#%d] sleeps for %d ms",getID(), x));
                 Thread.sleep(x);
             leaderImpl();
-            byte[] recData = rmfServer.deliver(currHeight, currLeader, tmo);
-            if (recData == null) {
+            byte[] recData = rmfServer.deliver(currHeight, currLeader, tmo).getData().toByteArray();
+            if (recData.length == 0) {
                 tmo += tmoInterval;
                 logger.info(format("[#%d] Unable to receive block, timeout increased to [%d] ms", getID(), tmo));
                 updateLeader();

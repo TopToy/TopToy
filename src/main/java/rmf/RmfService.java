@@ -4,6 +4,7 @@ import config.Node;
 //import consensus.bbc.bbcClient;
 import consensus.bbc.bbcService;
 import crypto.pkiUtils;
+import crypto.rmfDigSig;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.Server;
@@ -216,12 +217,10 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                     int cid = res.getMeta().getCid();
                     synchronized (globalLock) {
                         if (!pendingMsg.containsKey(cid) && !recMsg.containsKey(cid)) {
-                            if (!pkiUtils.verify(sender,
-                                    String.valueOf(cid) +
-                            String.valueOf(sender) + String.valueOf(height) + new String(res.getData().getData().toByteArray()),
-                                    res.getData().getSig())) {
+                            if (!rmfDigSig.verify(sender, res.getData())) {
                                 logger.info(format("[#%d] has received invalid response message from [#%d] for [cid=%d]",
                                         id, res.getMeta().getSender(),  cid));
+                                return;
                             }
                             logger.info(format("[#%d] has received response message from [#%d] for [cid=%d]",
                                     id, res.getMeta().getSender(),  cid));
@@ -328,7 +327,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         }
     }
     // TODO: Review this method again
-    public byte[] deliver(int cid, int tmo, int sender, int height) {
+    public Data deliver(int cid, int tmo, int sender, int height) {
         int cVotes = 0;
         int v = 0;
         synchronized (globalLock) {
@@ -367,7 +366,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                 msg = pendingMsg.get(cid);
                 recMsg.put(cid, msg);
                 pendingMsg.remove(cid);
-            return msg.getData().toByteArray();
+            return msg;
         }
 
 
@@ -405,5 +404,19 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                 return;
             }
         }
+    }
+
+    public String getMessageSig(int cid) {
+        if (recMsg.containsKey(cid)) {
+            return recMsg.get(cid).getSig();
+        }
+        return null;
+    }
+
+    public Data nonBlockingDeliver(int cid) {
+        if (recMsg.containsKey(cid)) {
+            return recMsg.get(cid);
+        }
+        return null;
     }
 }

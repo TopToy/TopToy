@@ -16,6 +16,10 @@ import static io.grpc.stub.ServerCalls.asyncUnimplementedStreamingCall;
 import static io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall;
 
 /**
+ * <pre>
+ *message empty {
+ *}
+ * </pre>
  */
 @javax.annotation.Generated(
     value = "by gRPC proto compiler (version 1.13.1)",
@@ -54,33 +58,6 @@ public final class blockchainServiceGrpc {
      return getAddTransactionMethod;
   }
 
-  private static volatile io.grpc.MethodDescriptor<proto.Block,
-      proto.Block> getSynchronzieOnErrorMethod;
-
-  public static io.grpc.MethodDescriptor<proto.Block,
-      proto.Block> getSynchronzieOnErrorMethod() {
-    io.grpc.MethodDescriptor<proto.Block, proto.Block> getSynchronzieOnErrorMethod;
-    if ((getSynchronzieOnErrorMethod = blockchainServiceGrpc.getSynchronzieOnErrorMethod) == null) {
-      synchronized (blockchainServiceGrpc.class) {
-        if ((getSynchronzieOnErrorMethod = blockchainServiceGrpc.getSynchronzieOnErrorMethod) == null) {
-          blockchainServiceGrpc.getSynchronzieOnErrorMethod = getSynchronzieOnErrorMethod = 
-              io.grpc.MethodDescriptor.<proto.Block, proto.Block>newBuilder()
-              .setType(io.grpc.MethodDescriptor.MethodType.BIDI_STREAMING)
-              .setFullMethodName(generateFullMethodName(
-                  "proto.blockchainService", "synchronzieOnError"))
-              .setSampledToLocalTracing(true)
-              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
-                  proto.Block.getDefaultInstance()))
-              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
-                  proto.Block.getDefaultInstance()))
-                  .setSchemaDescriptor(new blockchainServiceMethodDescriptorSupplier("synchronzieOnError"))
-                  .build();
-          }
-        }
-     }
-     return getSynchronzieOnErrorMethod;
-  }
-
   /**
    * Creates a new async stub that supports all call types for the service
    */
@@ -105,6 +82,10 @@ public final class blockchainServiceGrpc {
   }
 
   /**
+   * <pre>
+   *message empty {
+   *}
+   * </pre>
    */
   public static abstract class blockchainServiceImplBase implements io.grpc.BindableService {
 
@@ -118,16 +99,6 @@ public final class blockchainServiceGrpc {
       asyncUnimplementedUnaryCall(getAddTransactionMethod(), responseObserver);
     }
 
-    /**
-     * <pre>
-     * synchronized between servers!
-     * </pre>
-     */
-    public io.grpc.stub.StreamObserver<proto.Block> synchronzieOnError(
-        io.grpc.stub.StreamObserver<proto.Block> responseObserver) {
-      return asyncUnimplementedStreamingCall(getSynchronzieOnErrorMethod(), responseObserver);
-    }
-
     @java.lang.Override public final io.grpc.ServerServiceDefinition bindService() {
       return io.grpc.ServerServiceDefinition.builder(getServiceDescriptor())
           .addMethod(
@@ -137,18 +108,15 @@ public final class blockchainServiceGrpc {
                 proto.Transaction,
                 proto.accepted>(
                   this, METHODID_ADD_TRANSACTION)))
-          .addMethod(
-            getSynchronzieOnErrorMethod(),
-            asyncBidiStreamingCall(
-              new MethodHandlers<
-                proto.Block,
-                proto.Block>(
-                  this, METHODID_SYNCHRONZIE_ON_ERROR)))
           .build();
     }
   }
 
   /**
+   * <pre>
+   *message empty {
+   *}
+   * </pre>
    */
   public static final class blockchainServiceStub extends io.grpc.stub.AbstractStub<blockchainServiceStub> {
     private blockchainServiceStub(io.grpc.Channel channel) {
@@ -176,20 +144,13 @@ public final class blockchainServiceGrpc {
       asyncUnaryCall(
           getChannel().newCall(getAddTransactionMethod(), getCallOptions()), request, responseObserver);
     }
-
-    /**
-     * <pre>
-     * synchronized between servers!
-     * </pre>
-     */
-    public io.grpc.stub.StreamObserver<proto.Block> synchronzieOnError(
-        io.grpc.stub.StreamObserver<proto.Block> responseObserver) {
-      return asyncBidiStreamingCall(
-          getChannel().newCall(getSynchronzieOnErrorMethod(), getCallOptions()), responseObserver);
-    }
   }
 
   /**
+   * <pre>
+   *message empty {
+   *}
+   * </pre>
    */
   public static final class blockchainServiceBlockingStub extends io.grpc.stub.AbstractStub<blockchainServiceBlockingStub> {
     private blockchainServiceBlockingStub(io.grpc.Channel channel) {
@@ -219,6 +180,10 @@ public final class blockchainServiceGrpc {
   }
 
   /**
+   * <pre>
+   *message empty {
+   *}
+   * </pre>
    */
   public static final class blockchainServiceFutureStub extends io.grpc.stub.AbstractStub<blockchainServiceFutureStub> {
     private blockchainServiceFutureStub(io.grpc.Channel channel) {
@@ -249,7 +214,6 @@ public final class blockchainServiceGrpc {
   }
 
   private static final int METHODID_ADD_TRANSACTION = 0;
-  private static final int METHODID_SYNCHRONZIE_ON_ERROR = 1;
 
   private static final class MethodHandlers<Req, Resp> implements
       io.grpc.stub.ServerCalls.UnaryMethod<Req, Resp>,
@@ -282,9 +246,6 @@ public final class blockchainServiceGrpc {
     public io.grpc.stub.StreamObserver<Req> invoke(
         io.grpc.stub.StreamObserver<Resp> responseObserver) {
       switch (methodId) {
-        case METHODID_SYNCHRONZIE_ON_ERROR:
-          return (io.grpc.stub.StreamObserver<Req>) serviceImpl.synchronzieOnError(
-              (io.grpc.stub.StreamObserver<proto.Block>) responseObserver);
         default:
           throw new AssertionError();
       }
@@ -337,7 +298,6 @@ public final class blockchainServiceGrpc {
           serviceDescriptor = result = io.grpc.ServiceDescriptor.newBuilder(SERVICE_NAME)
               .setSchemaDescriptor(new blockchainServiceFileDescriptorSupplier())
               .addMethod(getAddTransactionMethod())
-              .addMethod(getSynchronzieOnErrorMethod())
               .build();
         }
       }

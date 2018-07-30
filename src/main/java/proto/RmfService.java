@@ -44,6 +44,11 @@ public final class RmfService {
   static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_proto_FastBbcVote_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_proto_RmfResult_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_proto_RmfResult_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -60,7 +65,8 @@ public final class RmfService {
       "\005_meta\030\001 \001(\0132\013.proto.Meta\"=\n\003Res\022\032\n\005_met" +
       "a\030\001 \001(\0132\013.proto.Meta\022\032\n\005_data\030\002 \001(\0132\013.pr" +
       "oto.Data\"E\n\013FastBbcVote\022\016\n\006sender\030\001 \001(\005\022" +
-      "\014\n\004vote\030\002 \001(\005\022\013\n\003cid\030\003 \001(\005\022\013\n\003sig\030\004 \001(\t2" +
+      "\014\n\004vote\030\002 \001(\005\022\013\n\003cid\030\003 \001(\005\022\013\n\003sig\030\004 \001(\t\"" +
+      "&\n\tRmfResult\022\013\n\003cid\030\001 \001(\005\022\014\n\004data\030\002 \001(\0142" +
       "\220\001\n\003Rmf\0221\n\022DisseminateMessage\022\013.proto.Da" +
       "ta\032\014.proto.Empty\"\000\022.\n\010FastVote\022\022.proto.F" +
       "astBbcVote\032\014.proto.Empty\"\000\022&\n\nreqMessage" +
@@ -115,6 +121,12 @@ public final class RmfService {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_FastBbcVote_descriptor,
         new java.lang.String[] { "Sender", "Vote", "Cid", "Sig", });
+    internal_static_proto_RmfResult_descriptor =
+      getDescriptor().getMessageTypes().get(6);
+    internal_static_proto_RmfResult_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_proto_RmfResult_descriptor,
+        new java.lang.String[] { "Cid", "Data", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

@@ -86,8 +86,8 @@ public class byzantineBcServer extends Node {
     private void mainLoop() {
             while (!stopped) {
                 leaderImpl();
-                byte[] recData = rmfServer.deliver(currHeight, currLeader, tmo);
-                if (recData == null) {
+                byte[] recData = rmfServer.deliver(currHeight, currLeader, tmo).getData().toByteArray();
+                if (recData.length == 0) {
                     tmo += tmoInterval;
                     logger.info(format("[#%d] Unable to receive block, timeout increased to [%d] ms", getID(), tmo));
                     updateLeader();

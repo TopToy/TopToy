@@ -4,10 +4,12 @@ import com.google.protobuf.ByteString;
 import config.Config;
 import config.Node;
 import crypto.pkiUtils;
+import crypto.rmfDigSig;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import proto.Data;
 import proto.Meta;
+import proto.RmfResult;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -83,20 +85,31 @@ public class RmfNode extends Node{
                 newBuilder().
                 setData(ByteString.copyFrom(msg)).
                 setMeta(metaMsg);
-        rmfService.rmfBroadcast(dataMsg.setSig(pkiUtils.sign(String.valueOf(cid) + String.valueOf(getID())
-                + String.valueOf(height) + new String (dataMsg.getData().toByteArray()))).build());
+        rmfService.rmfBroadcast(dataMsg.setSig(rmfDigSig.sign(dataMsg)).build());
     }
 
-    public byte[]
-
-
-
-
-    deliver(int height, int sender, int tmo) {
-        byte[] ret = rmfService.deliver(cid, tmo, sender, height);
+    public RmfResult deliver(int height, int sender, int tmo) {
+        Data data = rmfService.deliver(cid, tmo, sender, height);
+        RmfResult res = RmfResult.
+                newBuilder().
+                setCid(cid).
+                setData(data == null ? ByteString.EMPTY : data.getData()).
+                build();
         cid++;
-        return ret;
+        return res;
     }
 
+    public String getRmfDataSig(int cid) {
+        return rmfService.getMessageSig(cid);
+    }
+
+    public RmfResult nonBlockingDeliver(int cid) {
+        Data data = rmfService.nonBlockingDeliver(cid);
+        return RmfResult.
+                newBuilder().
+                setCid(cid).
+                setData(data == null ? ByteString.EMPTY : data.getData()).
+                build();
+    }
 
 }

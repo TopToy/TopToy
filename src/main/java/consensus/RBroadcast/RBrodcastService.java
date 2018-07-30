@@ -29,6 +29,7 @@ public class RBrodcastService extends DefaultSingleRecoverable {
         private ServiceReplica sr;
         private String configHome;
         final Object globalLock = new Object();
+        private int cid = 0;
 
         public RBrodcastService(int id, String configHome) {
             this.id = id;
@@ -106,13 +107,14 @@ public class RBrodcastService extends DefaultSingleRecoverable {
             }
         }
 
-    public int broadcast(byte[] m, int id, int cid) {
+    public int broadcast(byte[] m, int id) {
         RBrodcast.RBMsg msg = RBrodcast.RBMsg.
                 newBuilder().
                 setCid(cid).
                 setId(id).
                 setData(ByteString.copyFrom(m)).
                 build();
+        cid++;
         byte[] data = msg.toByteArray();
         RBProxy.invokeAsynchRequest(data, new ReplyListener() {
             @Override
