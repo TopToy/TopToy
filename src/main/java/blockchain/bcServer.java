@@ -103,7 +103,9 @@ public abstract class bcServer extends Node {
         while (!stopped) {
             synchronized (panicLock) {
                 if (fp.containsKey(currHeight)) {
-                    handleFork();
+                    ForkProof p = fp.get(currHeight);
+                    fp.remove(currHeight);
+                    handleFork(p);
                 }
                 leaderImpl();
                 RmfResult msg = rmfServer.deliver(currHeight, currLeader, tmo);
@@ -123,6 +125,20 @@ public abstract class bcServer extends Node {
                     updateLeader();
                     continue;
                 }
+                // TODO: validate meta info (if the meta isn't match we should treat it as a Byz behaviour
+                if (recBlock.getHeader().getHeight() != currHeight ||
+                        recBlock.getHeader().getCreatorID() != currLeader ||
+                        !bc.validateBlockData(recBlock)) {
+                    logger.warn(format("[#%d] received an invalid data in a valid block, creating an empty block [height=%d]", getID(), currHeight));
+                    recBlock = Block.newBuilder(). // creates emptyBlock
+                            setHeader(BlockHeader.
+                            newBuilder().
+                            setCreatorID(currLeader).
+                            setHeight(currHeight).
+                            setPrev(ByteString.copyFrom(DigestMethod.
+                                    hash(bc.getBlock(currHeight - 1).getHeader().toByteArray())))).
+                            build();
+                }
 
                 if (!bc.validateBlockHash(recBlock)) {
                     announceFork(recBlock, cid);
@@ -141,17 +157,7 @@ public abstract class bcServer extends Node {
                     continue;
                 }
 
-                if (!bc.validateBlockData(recBlock)) {
-                    logger.warn(format("[#%d] received an invalid data in a valid block, creating an empty block [height=%d]", getID(), currHeight));
-                    recBlock = Block.newBuilder(). // creates emptyBlock
-                            setHeader(BlockHeader.
-                            newBuilder().
-                            setCreatorID(currLeader).
-                            setHeight(currHeight).
-                            setPrev(ByteString.copyFrom(DigestMethod.
-                                    hash(bc.getBlock(currHeight - 1).getHeader().toByteArray())))).
-                            build();
-                }
+
                 tmo = initTmo;
                 synchronized (newBlockNotifyer) {
                     synchronized (cids) {
@@ -186,49 +192,66 @@ public abstract class bcServer extends Node {
 
     }
 
+    private boolean validateForkProof(ForkProof p)  {
+        Block curr = null;
+        Block prev = null;
+        try {
+            curr = Block.parseFrom(p.getCurr().getData());
+            prev = Block.parseFrom(p.getPrev().getData());
+        } catch (InvalidProtocolBufferException e) {
+            logger.error("", e);
+            return false;
+        }
+        int currBlockH = curr.getHeader().getHeight();
+        if (fp.containsKey(currBlockH)) {
+            return false;
+        }
+        fp.put(currBlockH, p);
+        if (currBlockH > currHeight) {
+            return false;
+        }
+
+        if (!(curr.getHeader().getCreatorID() == currLeader && curr.getHeader().getHeight() == currHeight)
+                && bc.getBlock(currBlockH).getHeader().getCreatorID() != curr.getHeader().getCreatorID()) {
+            return false;
+        }
+
+        if (bc.getBlock(currBlockH - 1).getHeader().getCreatorID() != prev.getHeader().getCreatorID()) {
+            return false;
+        }
+        Data currData = Data.newBuilder().
+                setMeta(Meta.newBuilder().
+                        setCid(p.getCurr().getCid()).
+                        setHeight(curr.getHeader().getHeight()).
+                        setSender(curr.getHeader().getCreatorID()).
+                        build()).
+                setData(curr.toByteString()).
+                setSig(p.getCurrSig()).
+                build();
+        if (!rmfDigSig.verify(curr.getHeader().getCreatorID(), currData)) {
+            return false;
+        }
+        Data prevData = Data.newBuilder().
+                setMeta(Meta.newBuilder().
+                        setCid(p.getPrev().getCid()).
+                        setHeight(prev.getHeader().getHeight()).
+                        setSender(prev.getHeader().getCreatorID()).
+                        build()).
+                setData(prev.toByteString()).
+                setSig(p.getPrevSig()).
+                build();
+        if (!rmfDigSig.verify(prev.getHeader().getCreatorID(), prevData)) {
+            return false;
+        }
+
+        logger.info(format("[#%d] panic for fork has been delivered", getID()));
+        return true;
+    }
     private void deliverForkAnnounce() throws InterruptedException, InvalidProtocolBufferException {
         while (!stopped) {
             ForkProof p = ForkProof.parseFrom(rbService.deliver());
             synchronized (panicLock) {
-                Block curr = Block.parseFrom(p.getCurr().getData());
-                int currBlockH = curr.getHeader().getHeight();
-                if (currBlockH >= currHeight) {
-                    if (!fp.containsKey(currBlockH)) {
-                        fp.put(currBlockH, p);
-                    }
-                    continue;
-                }
-
-                Data currData = Data.newBuilder().
-                        setMeta(Meta.newBuilder().
-                                setCid(p.getCurr().getCid()).
-                                setHeight(curr.getHeader().getHeight()).
-                                setSender(curr.getHeader().getCreatorID()).
-                                build()).
-                        setData(curr.toByteString()).
-                        setSig(p.getCurrSig()).
-                        build();
-                if (!rmfDigSig.verify(curr.getHeader().getCreatorID(), currData)) {
-                    continue;
-                }
-
-                Block prev = Block.parseFrom(p.getPrev().getData());
-
-                Data prevData = Data.newBuilder().
-                        setMeta(Meta.newBuilder().
-                                setCid(p.getPrev().getCid()).
-                                setHeight(prev.getHeader().getHeight()).
-                                setSender(prev.getHeader().getCreatorID()).
-                                build()).
-                        setData(prev.toByteString()).
-                        setSig(p.getPrevSig()).
-                        build();
-                if (!rmfDigSig.verify(prev.getHeader().getCreatorID(), prevData)) {
-                    continue;
-                }
-
-                logger.info(format("[#%d] panic for fork has been delivered", getID()));
-                handleFork();
+                handleFork(p);
             }
         }
     }
@@ -245,11 +268,8 @@ public abstract class bcServer extends Node {
                 setPrev(rmfServer.nonBlockingDeliver(prevCid)).
                 setPrevSig(rmfServer.getRmfDataSig(prevCid)).
                 build();
-        if (!fp.containsKey(b.getHeader().getHeight())) {
-            fp.put(b.getHeader().getHeight(), p);
-        }
         rbService.broadcast(p.toByteArray(), getID());
-        handleFork();
+        handleFork(p);
     }
 
     public Block deliver(int index) {
@@ -266,8 +286,15 @@ public abstract class bcServer extends Node {
         return bc.getBlock(index);
     }
 
-    private void handleFork() {
+    private void handleFork(ForkProof p) {
+        if (!validateForkProof(p)) {
+            return;
+        }
         logger.info(format("[#%d] handleFork has been called", getID()));
-        System.exit(1);
+        try {
+            Thread.sleep(60 * 10 * 1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }

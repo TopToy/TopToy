@@ -179,11 +179,11 @@ public class byzantineBcServer extends bcServer {
             }
             if (fullByz) {
                 ((ByzantineRmfNode)rmfServer).devidedBroadcast(msgs, heights, sids);
+
+            } else {
+                ((ByzantineRmfNode)rmfServer).selectiveBroadcast(sealedBlock1.toByteArray(), currHeight, all.subList(0, n/2));
             }
-            ((ByzantineRmfNode)rmfServer).selectiveBroadcast(sealedBlock1.toByteArray(), currHeight, all.subList(0, n/2));
         }
-
-
     }
 
 //    public boolean addTransaction(byte[] data, int clientID) {
