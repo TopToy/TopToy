@@ -22,9 +22,10 @@ public class Config {
         String SERVER_KEY = "server";
         String SERVER_ID_KEY = "server.id";
         String SERVER_IP_KEY = "server.ip";
-        String SERVER_PORT_KEY = "server.port";
-        String RMFCLUSTER_KEY = "RMFcluster";
-        String RMFCLUSTER_SERVER_KEY = "RMFcluster.s";
+        String SERVER_RMFPORT_KEY = "server.rmfPort";
+        String SERVER_SYNCPORT_KEY = "server.syncPort";
+        String RMFCLUSTER_KEY = "cluster";
+        String RMFCLUSTER_SERVER_KEY = "cluster.s";
         String SETTING_KEY = "setting";
         String SETTING_TMO_KEY = "setting.tmo";
         String SETTING_TMO_INTERVAL_KEY = "setting.tmoInterval";
@@ -73,7 +74,8 @@ public class Config {
 
     public static Node getNodeConf() {
         return new Node(conf.getString(tKeys.SERVER_IP_KEY),
-                Math.toIntExact(conf.getLong(tKeys.SERVER_PORT_KEY)),
+                Math.toIntExact(conf.getLong(tKeys.SERVER_RMFPORT_KEY)),
+                Math.toIntExact(conf.getLong(tKeys.SERVER_SYNCPORT_KEY)),
                 Math.toIntExact(conf.getLong(tKeys.SERVER_ID_KEY)));
     }
 
@@ -91,7 +93,8 @@ public class Config {
         for (int i = 0 ; i < getN() ; i++) {
             Toml node = t.getTable("s" + i);
             ret.add(new Node(node.getString("ip"),
-                    Math.toIntExact(node.getLong("port")),
+                    Math.toIntExact(node.getLong("rmfPort")),
+                    Math.toIntExact(node.getLong("syncPort")),
                     Math.toIntExact(node.getLong("id"))));
         }
         return ret;

@@ -20,8 +20,8 @@ import static java.lang.String.format;
 public class asyncBcServer extends bcServer {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(cbcServer.class);
 
-    public asyncBcServer(String addr, int port, int id) {
-        super(addr, port, id);
+    public asyncBcServer(String addr, int rmfPort, int syncPort, int id) {
+        super(addr, rmfPort, syncPort, id);
     }
 //    private RmfNode rmfServer;
 //    private blockchain bc; // TODO: Currently implement as basicBlockchain but we will make it dynamically (using config file)

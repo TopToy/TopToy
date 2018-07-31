@@ -21,11 +21,11 @@ public class rmfTest {
     static Config conf = new Config();
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(rmfTest.class);
     private String localHost = "127.0.0.1";
-    private int[] ports = {20000, 20010, 20020, 20030};
-    private Node s0= new Node(localHost, ports[0], 0);
-    private Node s1= new Node(localHost, ports[1], 1);
-    private Node s2= new Node(localHost, ports[2], 2);
-    private Node s3= new Node(localHost, ports[3], 3);
+    private int[] rmfPorts = {20000, 20010, 20020, 20030};
+    private Node s0= new Node(localHost, rmfPorts[0], -1, 0);
+    private Node s1= new Node(localHost, rmfPorts[1], -1, 1);
+    private Node s2= new Node(localHost, rmfPorts[2], -1, 2);
+    private Node s3= new Node(localHost, rmfPorts[3], -1, 3);
     private ArrayList<Node> nodes = new ArrayList<Node>() {{add(s0); add(s1); add(s2); add(s3);}};
 
     private static void deleteViewIfExist(String configHome){
@@ -48,10 +48,10 @@ public class rmfTest {
         for (int id = 0 ; id < nnodes ; id++) {
             logger.info("init server #" + id);
             if (ArrayUtils.contains(byzIds, id)) {
-                ret[id] = new ByzantineRmfNode(id, localHost, ports[id], f,  currentNodes, configHome);
+                ret[id] = new ByzantineRmfNode(id, localHost, rmfPorts[id], f,  currentNodes, configHome);
                 continue;
             }
-            ret[id] =  new RmfNode(id, localHost, ports[id], f, currentNodes, configHome);
+            ret[id] =  new RmfNode(id, localHost, rmfPorts[id], f, currentNodes, configHome);
         }
         return ret;
 

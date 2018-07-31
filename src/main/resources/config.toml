@@ -14,7 +14,8 @@ title = "configuration"
 [server]
     id = 0
     ip = "127.0.0.1"
-    port = 20000
+    rmfPort = 20000
+    syncPort = 30000
     privateKey = """MIICXAIBAAKBgQCZlLGnX6NqN1ZpwcN+5aN7r9n56H5/b24NcA2RKN4XX1Y26hDZ
                     cA4Nl+Fu4NbVhg/kpOHJ2EstMKRlJKOIJ+0yUSLiLnGUMt+LesVjO5rY0tyyWLW1
                     pMAnmreI0R2ZLuJv6R4rtGwe7Pj/mrgYGHa218gax7qWcpdiHou1lE5hNwIDAQAB
@@ -34,39 +35,43 @@ title = "configuration"
                    LnGUMt+LesVjO5rY0tyyWLW1pMAnmreI0R2ZLuJv6R4rtGwe7Pj/mrgYGHa218ga
                    x7qWcpdiHou1lE5hNwIDAQAB"""
 
-[[RMFcluster]]
+[[cluster]]
 
-    [RMFcluster.s0]
+    [cluster.s0]
         id = 0
         ip = "127.0.0.1"
-        port = 20000
+        rmfPort = 20000
+        syncPort = 30000
         publicKey = """MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCZlLGnX6NqN1ZpwcN+5aN7r9n5
                        6H5/b24NcA2RKN4XX1Y26hDZcA4Nl+Fu4NbVhg/kpOHJ2EstMKRlJKOIJ+0yUSLi
                        LnGUMt+LesVjO5rY0tyyWLW1pMAnmreI0R2ZLuJv6R4rtGwe7Pj/mrgYGHa218ga
                        x7qWcpdiHou1lE5hNwIDAQAB"""
 
-    [RMFcluster.s1]
+    [cluster.s1]
         id = 1
         ip = "127.0.0.1"
-        port = 20010
+        rmfPort = 20010
+        syncPort = 30010
         publicKey = """MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCZlLGnX6NqN1ZpwcN+5aN7r9n5
                        6H5/b24NcA2RKN4XX1Y26hDZcA4Nl+Fu4NbVhg/kpOHJ2EstMKRlJKOIJ+0yUSLi
                        LnGUMt+LesVjO5rY0tyyWLW1pMAnmreI0R2ZLuJv6R4rtGwe7Pj/mrgYGHa218ga
                        x7qWcpdiHou1lE5hNwIDAQAB"""
 
-    [RMFcluster.s2]
+    [cluster.s2]
         id = 2
         ip = "127.0.0.1"
-        port = 20020
+        rmfPort = 20020
+        syncPort = 30020
         publicKey = """MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCZlLGnX6NqN1ZpwcN+5aN7r9n5
                        6H5/b24NcA2RKN4XX1Y26hDZcA4Nl+Fu4NbVhg/kpOHJ2EstMKRlJKOIJ+0yUSLi
                        LnGUMt+LesVjO5rY0tyyWLW1pMAnmreI0R2ZLuJv6R4rtGwe7Pj/mrgYGHa218ga
                        x7qWcpdiHou1lE5hNwIDAQAB"""
 
-    [RMFcluster.s3]
+    [cluster.s3]
         id = 3
         ip = "127.0.0.1"
-        port = 20030
+        rmfPort = 20030
+        syncPort = 30030
         publicKey="""MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCZlLGnX6NqN1ZpwcN+5aN7r9n5
                      6H5/b24NcA2RKN4XX1Y26hDZcA4Nl+Fu4NbVhg/kpOHJ2EstMKRlJKOIJ+0yUSLi
                      LnGUMt+LesVjO5rY0tyyWLW1pMAnmreI0R2ZLuJv6R4rtGwe7Pj/mrgYGHa218ga

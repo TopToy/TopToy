@@ -23,11 +23,12 @@ public class blockchainTest {
     static Config conf = new Config();
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(blockchainTest.class);
     private String localHost = "127.0.0.1";
-    private int[] ports = {20000, 20010, 20020, 20030};
-    private Node s0= new Node(localHost, ports[0], 0);
-    private Node s1= new Node(localHost, ports[1], 1);
-    private Node s2= new Node(localHost, ports[2], 2);
-    private Node s3= new Node(localHost, ports[3], 3);
+    private int[] rmfPorts = {20000, 20010, 20020, 20030};
+    private int[] syncPort = {30000, 30010, 30020, 30030};
+    private Node s0= new Node(localHost, rmfPorts[0], syncPort[0], 0);
+    private Node s1= new Node(localHost, rmfPorts[1], syncPort[1], 1);
+    private Node s2= new Node(localHost, rmfPorts[2], syncPort[2], 2);
+    private Node s3= new Node(localHost, rmfPorts[3], syncPort[3], 3);
     private ArrayList<Node> nodes = new ArrayList<Node>() {{add(s0); add(s1); add(s2); add(s3);}};
 
     private static void deleteViewIfExist(String configHome){
@@ -50,10 +51,10 @@ public class blockchainTest {
         for (int id = 0 ; id < nnodes ; id++) {
             logger.info("init server #" + id);
             if (ArrayUtils.contains(byzIds, id)) {
-                ret[id] = new byzantineBcServer(localHost, ports[id], id);
+                ret[id] = new byzantineBcServer(localHost, rmfPorts[id], syncPort[id], id);
                 continue;
             }
-            ret[id] =  new cbcServer(localHost, ports[id], id);
+            ret[id] =  new cbcServer(localHost, rmfPorts[id], syncPort[id], id);
         }
         return ret;
         //        n.start();
@@ -66,7 +67,7 @@ public class blockchainTest {
         Node[] ret = new Node[nnodes];
         for (int id = 0 ; id < nnodes ; id++) {
             logger.info("init server #" + id);
-            ret[id] =  new asyncBcServer(localHost, ports[id], id);
+            ret[id] =  new asyncBcServer(localHost, rmfPorts[id], syncPort[id], id);
         }
         return ret;
         //        n.start();

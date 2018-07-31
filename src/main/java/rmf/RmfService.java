@@ -40,7 +40,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
 
         peer(Node node) {
             channel = ManagedChannelBuilder.
-                    forAddress(node.getAddr(), node.getPort()).
+                    forAddress(node.getAddr(), node.getRmfPort()).
                     usePlaintext().
                     build();
             stub = RmfGrpc.newStub(channel);

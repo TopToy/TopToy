@@ -18,8 +18,8 @@ import static java.lang.String.format;
 public class cbcServer extends bcServer {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(cbcServer.class);
 
-    public cbcServer(String addr, int port, int id) {
-        super(addr, port, id);
+    public cbcServer(String addr, int rmfPort, int syncPort, int id) {
+        super(addr, rmfPort, syncPort, id);
     }
 //    protected RmfNode rmfServer;
 //    protected RBrodcastService rbService;

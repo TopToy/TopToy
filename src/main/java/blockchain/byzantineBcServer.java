@@ -20,10 +20,10 @@ public class byzantineBcServer extends bcServer {
 
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(cbcServer.class);
     private boolean fullByz = false;
-    public byzantineBcServer(String addr, int port, int id) {
-        super(addr, port, id);
+    public byzantineBcServer(String addr, int rmfPort, int syncPort, int id) {
+        super(addr, rmfPort, syncPort, id);
 
-        rmfServer = new ByzantineRmfNode(id, addr, port, Config.getF(),
+        rmfServer = new ByzantineRmfNode(id, addr, rmfPort, Config.getF(),
                 Config.getRMFcluster(), Config.getRMFbbcConfigHome());
     }
 

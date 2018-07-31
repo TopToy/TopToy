@@ -2,28 +2,34 @@ package config;
 
 public class Node {
     String addr;
-    int port;
+    int rmfPort;
+    int syncPort;
     int id;
 
     public String getAddr() {
         return addr;
     }
 
-    public int getPort() {
-        return port;
+    public int getRmfPort() {
+        return rmfPort;
     }
 
     public int getID() {
         return id;
     }
 
-    public Node(String addr, int port, int id) {
+    public int getSyncPort() {
+        return syncPort;
+    }
+
+    public Node(String addr, int rmfPort, int syncPort, int id) {
         this.addr = addr;
-        this.port = port;
+        this.rmfPort = rmfPort;
+        this.syncPort = syncPort;
         this.id = id;
     }
 
     public Node(Node n) {
-        new Node(n.getAddr(), n.getPort(), n.getID());
+        new Node(n.getAddr(), n.getRmfPort(), n.getSyncPort(), n.getID());
     }
 }

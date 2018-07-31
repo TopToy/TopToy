@@ -41,10 +41,10 @@ public abstract class bcServer extends Node {
     final Object panicLock = new Object();
 
     // TODO: Currently nodes, f, tmoInterval, tmo and configHome are coded but we will turn it into configuration file
-    public bcServer(String addr, int port, int id) {
+    public bcServer(String addr, int rmfPort, int syncPort, int id) {
 
-        super(addr, port, id); // TODO: Should be changed according to Config!
-        rmfServer = new RmfNode(id, addr, port, Config.getF(),
+        super(addr, rmfPort, syncPort, id); // TODO: Should be changed according to Config!
+        rmfServer = new RmfNode(id, addr, rmfPort, Config.getF(),
                 Config.getRMFcluster(), Config.getRMFbbcConfigHome());
 
         rbService = new RBrodcastService(id, Config.getRBroadcastConfigHome());

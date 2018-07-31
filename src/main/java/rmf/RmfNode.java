@@ -23,8 +23,8 @@ public class RmfNode extends Node{
     protected Server rmfServer;
     protected int cid = 0;
 
-    public RmfNode(int id, String addr, int port, int f , ArrayList<Node> nodes, String bbcConfig) {
-        super(addr, port, id);
+    public RmfNode(int id, String addr, int rmfPort, int f , ArrayList<Node> nodes, String bbcConfig) {
+        super(addr, rmfPort, -1,  id);
         rmfService = new RmfService(id, f, nodes, bbcConfig);
         startGrpcServer();
     }
@@ -32,7 +32,7 @@ public class RmfNode extends Node{
     private void startGrpcServer() {
         try {
             rmfServer = ServerBuilder.
-                    forPort(getPort()).
+                    forPort(getRmfPort()).
                     addService(rmfService).
                     build().
                     start();
