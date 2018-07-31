@@ -16,6 +16,8 @@ private static final long serialVersionUID = 0L;
     super(builder);
   }
   private ForkProof() {
+    currSig_ = "";
+    prevSig_ = "";
   }
 
   @java.lang.Override
@@ -63,6 +65,12 @@ private static final long serialVersionUID = 0L;
             break;
           }
           case 18: {
+            java.lang.String s = input.readStringRequireUtf8();
+
+            currSig_ = s;
+            break;
+          }
+          case 26: {
             proto.RmfResult.Builder subBuilder = null;
             if (prev_ != null) {
               subBuilder = prev_.toBuilder();
@@ -73,6 +81,12 @@ private static final long serialVersionUID = 0L;
               prev_ = subBuilder.buildPartial();
             }
 
+            break;
+          }
+          case 34: {
+            java.lang.String s = input.readStringRequireUtf8();
+
+            prevSig_ = s;
             break;
           }
         }
@@ -120,25 +134,93 @@ private static final long serialVersionUID = 0L;
     return getCurr();
   }
 
-  public static final int PREV_FIELD_NUMBER = 2;
+  public static final int CURRSIG_FIELD_NUMBER = 2;
+  private volatile java.lang.Object currSig_;
+  /**
+   * <code>string currSig = 2;</code>
+   */
+  public java.lang.String getCurrSig() {
+    java.lang.Object ref = currSig_;
+    if (ref instanceof java.lang.String) {
+      return (java.lang.String) ref;
+    } else {
+      com.google.protobuf.ByteString bs = 
+          (com.google.protobuf.ByteString) ref;
+      java.lang.String s = bs.toStringUtf8();
+      currSig_ = s;
+      return s;
+    }
+  }
+  /**
+   * <code>string currSig = 2;</code>
+   */
+  public com.google.protobuf.ByteString
+      getCurrSigBytes() {
+    java.lang.Object ref = currSig_;
+    if (ref instanceof java.lang.String) {
+      com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString.copyFromUtf8(
+              (java.lang.String) ref);
+      currSig_ = b;
+      return b;
+    } else {
+      return (com.google.protobuf.ByteString) ref;
+    }
+  }
+
+  public static final int PREV_FIELD_NUMBER = 3;
   private proto.RmfResult prev_;
   /**
-   * <code>.proto.RmfResult prev = 2;</code>
+   * <code>.proto.RmfResult prev = 3;</code>
    */
   public boolean hasPrev() {
     return prev_ != null;
   }
   /**
-   * <code>.proto.RmfResult prev = 2;</code>
+   * <code>.proto.RmfResult prev = 3;</code>
    */
   public proto.RmfResult getPrev() {
     return prev_ == null ? proto.RmfResult.getDefaultInstance() : prev_;
   }
   /**
-   * <code>.proto.RmfResult prev = 2;</code>
+   * <code>.proto.RmfResult prev = 3;</code>
    */
   public proto.RmfResultOrBuilder getPrevOrBuilder() {
     return getPrev();
+  }
+
+  public static final int PREVSIG_FIELD_NUMBER = 4;
+  private volatile java.lang.Object prevSig_;
+  /**
+   * <code>string prevSig = 4;</code>
+   */
+  public java.lang.String getPrevSig() {
+    java.lang.Object ref = prevSig_;
+    if (ref instanceof java.lang.String) {
+      return (java.lang.String) ref;
+    } else {
+      com.google.protobuf.ByteString bs = 
+          (com.google.protobuf.ByteString) ref;
+      java.lang.String s = bs.toStringUtf8();
+      prevSig_ = s;
+      return s;
+    }
+  }
+  /**
+   * <code>string prevSig = 4;</code>
+   */
+  public com.google.protobuf.ByteString
+      getPrevSigBytes() {
+    java.lang.Object ref = prevSig_;
+    if (ref instanceof java.lang.String) {
+      com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString.copyFromUtf8(
+              (java.lang.String) ref);
+      prevSig_ = b;
+      return b;
+    } else {
+      return (com.google.protobuf.ByteString) ref;
+    }
   }
 
   private byte memoizedIsInitialized = -1;
@@ -156,8 +238,14 @@ private static final long serialVersionUID = 0L;
     if (curr_ != null) {
       output.writeMessage(1, getCurr());
     }
+    if (!getCurrSigBytes().isEmpty()) {
+      com.google.protobuf.GeneratedMessageV3.writeString(output, 2, currSig_);
+    }
     if (prev_ != null) {
-      output.writeMessage(2, getPrev());
+      output.writeMessage(3, getPrev());
+    }
+    if (!getPrevSigBytes().isEmpty()) {
+      com.google.protobuf.GeneratedMessageV3.writeString(output, 4, prevSig_);
     }
     unknownFields.writeTo(output);
   }
@@ -171,9 +259,15 @@ private static final long serialVersionUID = 0L;
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(1, getCurr());
     }
+    if (!getCurrSigBytes().isEmpty()) {
+      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, currSig_);
+    }
     if (prev_ != null) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(2, getPrev());
+        .computeMessageSize(3, getPrev());
+    }
+    if (!getPrevSigBytes().isEmpty()) {
+      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, prevSig_);
     }
     size += unknownFields.getSerializedSize();
     memoizedSize = size;
@@ -196,11 +290,15 @@ private static final long serialVersionUID = 0L;
       result = result && getCurr()
           .equals(other.getCurr());
     }
+    result = result && getCurrSig()
+        .equals(other.getCurrSig());
     result = result && (hasPrev() == other.hasPrev());
     if (hasPrev()) {
       result = result && getPrev()
           .equals(other.getPrev());
     }
+    result = result && getPrevSig()
+        .equals(other.getPrevSig());
     result = result && unknownFields.equals(other.unknownFields);
     return result;
   }
@@ -216,10 +314,14 @@ private static final long serialVersionUID = 0L;
       hash = (37 * hash) + CURR_FIELD_NUMBER;
       hash = (53 * hash) + getCurr().hashCode();
     }
+    hash = (37 * hash) + CURRSIG_FIELD_NUMBER;
+    hash = (53 * hash) + getCurrSig().hashCode();
     if (hasPrev()) {
       hash = (37 * hash) + PREV_FIELD_NUMBER;
       hash = (53 * hash) + getPrev().hashCode();
     }
+    hash = (37 * hash) + PREVSIG_FIELD_NUMBER;
+    hash = (53 * hash) + getPrevSig().hashCode();
     hash = (29 * hash) + unknownFields.hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -355,12 +457,16 @@ private static final long serialVersionUID = 0L;
         curr_ = null;
         currBuilder_ = null;
       }
+      currSig_ = "";
+
       if (prevBuilder_ == null) {
         prev_ = null;
       } else {
         prev_ = null;
         prevBuilder_ = null;
       }
+      prevSig_ = "";
+
       return this;
     }
 
@@ -388,11 +494,13 @@ private static final long serialVersionUID = 0L;
       } else {
         result.curr_ = currBuilder_.build();
       }
+      result.currSig_ = currSig_;
       if (prevBuilder_ == null) {
         result.prev_ = prev_;
       } else {
         result.prev_ = prevBuilder_.build();
       }
+      result.prevSig_ = prevSig_;
       onBuilt();
       return result;
     }
@@ -437,8 +545,16 @@ private static final long serialVersionUID = 0L;
       if (other.hasCurr()) {
         mergeCurr(other.getCurr());
       }
+      if (!other.getCurrSig().isEmpty()) {
+        currSig_ = other.currSig_;
+        onChanged();
+      }
       if (other.hasPrev()) {
         mergePrev(other.getPrev());
+      }
+      if (!other.getPrevSig().isEmpty()) {
+        prevSig_ = other.prevSig_;
+        onChanged();
       }
       this.mergeUnknownFields(other.unknownFields);
       onChanged();
@@ -584,17 +700,86 @@ private static final long serialVersionUID = 0L;
       return currBuilder_;
     }
 
+    private java.lang.Object currSig_ = "";
+    /**
+     * <code>string currSig = 2;</code>
+     */
+    public java.lang.String getCurrSig() {
+      java.lang.Object ref = currSig_;
+      if (!(ref instanceof java.lang.String)) {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        currSig_ = s;
+        return s;
+      } else {
+        return (java.lang.String) ref;
+      }
+    }
+    /**
+     * <code>string currSig = 2;</code>
+     */
+    public com.google.protobuf.ByteString
+        getCurrSigBytes() {
+      java.lang.Object ref = currSig_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        currSig_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    /**
+     * <code>string currSig = 2;</code>
+     */
+    public Builder setCurrSig(
+        java.lang.String value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  
+      currSig_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string currSig = 2;</code>
+     */
+    public Builder clearCurrSig() {
+      
+      currSig_ = getDefaultInstance().getCurrSig();
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string currSig = 2;</code>
+     */
+    public Builder setCurrSigBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+      
+      currSig_ = value;
+      onChanged();
+      return this;
+    }
+
     private proto.RmfResult prev_ = null;
     private com.google.protobuf.SingleFieldBuilderV3<
         proto.RmfResult, proto.RmfResult.Builder, proto.RmfResultOrBuilder> prevBuilder_;
     /**
-     * <code>.proto.RmfResult prev = 2;</code>
+     * <code>.proto.RmfResult prev = 3;</code>
      */
     public boolean hasPrev() {
       return prevBuilder_ != null || prev_ != null;
     }
     /**
-     * <code>.proto.RmfResult prev = 2;</code>
+     * <code>.proto.RmfResult prev = 3;</code>
      */
     public proto.RmfResult getPrev() {
       if (prevBuilder_ == null) {
@@ -604,7 +789,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>.proto.RmfResult prev = 2;</code>
+     * <code>.proto.RmfResult prev = 3;</code>
      */
     public Builder setPrev(proto.RmfResult value) {
       if (prevBuilder_ == null) {
@@ -620,7 +805,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.proto.RmfResult prev = 2;</code>
+     * <code>.proto.RmfResult prev = 3;</code>
      */
     public Builder setPrev(
         proto.RmfResult.Builder builderForValue) {
@@ -634,7 +819,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.proto.RmfResult prev = 2;</code>
+     * <code>.proto.RmfResult prev = 3;</code>
      */
     public Builder mergePrev(proto.RmfResult value) {
       if (prevBuilder_ == null) {
@@ -652,7 +837,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.proto.RmfResult prev = 2;</code>
+     * <code>.proto.RmfResult prev = 3;</code>
      */
     public Builder clearPrev() {
       if (prevBuilder_ == null) {
@@ -666,7 +851,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.proto.RmfResult prev = 2;</code>
+     * <code>.proto.RmfResult prev = 3;</code>
      */
     public proto.RmfResult.Builder getPrevBuilder() {
       
@@ -674,7 +859,7 @@ private static final long serialVersionUID = 0L;
       return getPrevFieldBuilder().getBuilder();
     }
     /**
-     * <code>.proto.RmfResult prev = 2;</code>
+     * <code>.proto.RmfResult prev = 3;</code>
      */
     public proto.RmfResultOrBuilder getPrevOrBuilder() {
       if (prevBuilder_ != null) {
@@ -685,7 +870,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>.proto.RmfResult prev = 2;</code>
+     * <code>.proto.RmfResult prev = 3;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
         proto.RmfResult, proto.RmfResult.Builder, proto.RmfResultOrBuilder> 
@@ -699,6 +884,75 @@ private static final long serialVersionUID = 0L;
         prev_ = null;
       }
       return prevBuilder_;
+    }
+
+    private java.lang.Object prevSig_ = "";
+    /**
+     * <code>string prevSig = 4;</code>
+     */
+    public java.lang.String getPrevSig() {
+      java.lang.Object ref = prevSig_;
+      if (!(ref instanceof java.lang.String)) {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        prevSig_ = s;
+        return s;
+      } else {
+        return (java.lang.String) ref;
+      }
+    }
+    /**
+     * <code>string prevSig = 4;</code>
+     */
+    public com.google.protobuf.ByteString
+        getPrevSigBytes() {
+      java.lang.Object ref = prevSig_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        prevSig_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    /**
+     * <code>string prevSig = 4;</code>
+     */
+    public Builder setPrevSig(
+        java.lang.String value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  
+      prevSig_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string prevSig = 4;</code>
+     */
+    public Builder clearPrevSig() {
+      
+      prevSig_ = getDefaultInstance().getPrevSig();
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string prevSig = 4;</code>
+     */
+    public Builder setPrevSigBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+      
+      prevSig_ = value;
+      onChanged();
+      return this;
     }
     public final Builder setUnknownFields(
         final com.google.protobuf.UnknownFieldSet unknownFields) {

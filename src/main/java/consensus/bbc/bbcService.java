@@ -50,6 +50,7 @@ public class bbcService extends DefaultSingleRecoverable {
     public void start() {
         sr = new ServiceReplica(id, this, this, configHome);
         bbcProxy = new AsynchServiceProxy(id, configHome);
+
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
          // Use stderr here since the logger may have been reset by its JVM shutdown hook.
          logger.warn(format("[#%d] shutting down bbc server since JVM is shutting down", id));

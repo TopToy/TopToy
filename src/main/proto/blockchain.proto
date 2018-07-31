@@ -10,6 +10,7 @@ message BlockHeader {
     bytes prev= 1;
     int32 creatorID = 2;
     int32 height = 3;
+    bytes transactionHash = 4;
 //    MerkleTree mt = 4;
 }
 
@@ -37,7 +38,9 @@ message accepted {
 
 message ForkProof {
     RmfResult curr = 1;
-    RmfResult prev = 2;
+    string currSig = 2;
+    RmfResult prev = 3;
+    string prevSig = 4;
 }
 
 //message empty {

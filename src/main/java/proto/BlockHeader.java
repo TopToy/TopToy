@@ -19,6 +19,7 @@ private static final long serialVersionUID = 0L;
     prev_ = com.google.protobuf.ByteString.EMPTY;
     creatorID_ = 0;
     height_ = 0;
+    transactionHash_ = com.google.protobuf.ByteString.EMPTY;
   }
 
   @java.lang.Override
@@ -67,6 +68,11 @@ private static final long serialVersionUID = 0L;
             height_ = input.readInt32();
             break;
           }
+          case 34: {
+
+            transactionHash_ = input.readBytes();
+            break;
+          }
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -112,14 +118,23 @@ private static final long serialVersionUID = 0L;
   public static final int HEIGHT_FIELD_NUMBER = 3;
   private int height_;
   /**
-   * <pre>
-   *    MerkleTree mt = 4;
-   * </pre>
-   *
    * <code>int32 height = 3;</code>
    */
   public int getHeight() {
     return height_;
+  }
+
+  public static final int TRANSACTIONHASH_FIELD_NUMBER = 4;
+  private com.google.protobuf.ByteString transactionHash_;
+  /**
+   * <pre>
+   *    MerkleTree mt = 4;
+   * </pre>
+   *
+   * <code>bytes transactionHash = 4;</code>
+   */
+  public com.google.protobuf.ByteString getTransactionHash() {
+    return transactionHash_;
   }
 
   private byte memoizedIsInitialized = -1;
@@ -143,6 +158,9 @@ private static final long serialVersionUID = 0L;
     if (height_ != 0) {
       output.writeInt32(3, height_);
     }
+    if (!transactionHash_.isEmpty()) {
+      output.writeBytes(4, transactionHash_);
+    }
     unknownFields.writeTo(output);
   }
 
@@ -162,6 +180,10 @@ private static final long serialVersionUID = 0L;
     if (height_ != 0) {
       size += com.google.protobuf.CodedOutputStream
         .computeInt32Size(3, height_);
+    }
+    if (!transactionHash_.isEmpty()) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeBytesSize(4, transactionHash_);
     }
     size += unknownFields.getSerializedSize();
     memoizedSize = size;
@@ -185,6 +207,8 @@ private static final long serialVersionUID = 0L;
         == other.getCreatorID());
     result = result && (getHeight()
         == other.getHeight());
+    result = result && getTransactionHash()
+        .equals(other.getTransactionHash());
     result = result && unknownFields.equals(other.unknownFields);
     return result;
   }
@@ -202,6 +226,8 @@ private static final long serialVersionUID = 0L;
     hash = (53 * hash) + getCreatorID();
     hash = (37 * hash) + HEIGHT_FIELD_NUMBER;
     hash = (53 * hash) + getHeight();
+    hash = (37 * hash) + TRANSACTIONHASH_FIELD_NUMBER;
+    hash = (53 * hash) + getTransactionHash().hashCode();
     hash = (29 * hash) + unknownFields.hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -337,6 +363,8 @@ private static final long serialVersionUID = 0L;
 
       height_ = 0;
 
+      transactionHash_ = com.google.protobuf.ByteString.EMPTY;
+
       return this;
     }
 
@@ -362,6 +390,7 @@ private static final long serialVersionUID = 0L;
       result.prev_ = prev_;
       result.creatorID_ = creatorID_;
       result.height_ = height_;
+      result.transactionHash_ = transactionHash_;
       onBuilt();
       return result;
     }
@@ -411,6 +440,9 @@ private static final long serialVersionUID = 0L;
       }
       if (other.getHeight() != 0) {
         setHeight(other.getHeight());
+      }
+      if (other.getTransactionHash() != com.google.protobuf.ByteString.EMPTY) {
+        setTransactionHash(other.getTransactionHash());
       }
       this.mergeUnknownFields(other.unknownFields);
       onChanged();
@@ -496,20 +528,12 @@ private static final long serialVersionUID = 0L;
 
     private int height_ ;
     /**
-     * <pre>
-     *    MerkleTree mt = 4;
-     * </pre>
-     *
      * <code>int32 height = 3;</code>
      */
     public int getHeight() {
       return height_;
     }
     /**
-     * <pre>
-     *    MerkleTree mt = 4;
-     * </pre>
-     *
      * <code>int32 height = 3;</code>
      */
     public Builder setHeight(int value) {
@@ -519,15 +543,52 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <pre>
-     *    MerkleTree mt = 4;
-     * </pre>
-     *
      * <code>int32 height = 3;</code>
      */
     public Builder clearHeight() {
       
       height_ = 0;
+      onChanged();
+      return this;
+    }
+
+    private com.google.protobuf.ByteString transactionHash_ = com.google.protobuf.ByteString.EMPTY;
+    /**
+     * <pre>
+     *    MerkleTree mt = 4;
+     * </pre>
+     *
+     * <code>bytes transactionHash = 4;</code>
+     */
+    public com.google.protobuf.ByteString getTransactionHash() {
+      return transactionHash_;
+    }
+    /**
+     * <pre>
+     *    MerkleTree mt = 4;
+     * </pre>
+     *
+     * <code>bytes transactionHash = 4;</code>
+     */
+    public Builder setTransactionHash(com.google.protobuf.ByteString value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  
+      transactionHash_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     *    MerkleTree mt = 4;
+     * </pre>
+     *
+     * <code>bytes transactionHash = 4;</code>
+     */
+    public Builder clearTransactionHash() {
+      
+      transactionHash_ = getDefaultInstance().getTransactionHash();
       onChanged();
       return this;
     }

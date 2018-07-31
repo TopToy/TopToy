@@ -179,7 +179,7 @@ public class asyncBcServer extends bcServer {
 
         synchronized (blockLock) {
 //            logger.info(format("[#%d] [heigh1=%d", getID(), currHeight, ));
-            Block sealedBlock = currBlock.construct(getID(), currHeight, DigestMethod.hash(bc.getBlock(currHeight - 1).getHeader()));
+            Block sealedBlock = currBlock.construct(getID(), currHeight, DigestMethod.hash(bc.getBlock(currHeight - 1).getHeader().toByteArray()));
             currBlock = bc.createNewBLock();
             rmfServer.broadcast(sealedBlock.toByteArray(), currHeight);
         }

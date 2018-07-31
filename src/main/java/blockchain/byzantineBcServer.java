@@ -155,22 +155,25 @@ public class byzantineBcServer extends bcServer {
 
         synchronized (blockLock) {
 //            logger.info(format("[#%d] [heigh1=%d", getID(), currHeight, ));
-            Block sealedBlock1 = currBlock.construct(getID(), currHeight, DigestMethod.hash(bc.getBlock(currHeight - 1).getHeader()));
+            Block sealedBlock1 = currBlock.construct(getID(), currHeight,
+                    DigestMethod.hash(bc.getBlock(currHeight - 1).getHeader().toByteArray()));
+            String msg = "Hello Byz";
+            addTransaction(msg.getBytes(), getID());
             Block sealedBlock2 = currBlock.construct(getID(), currHeight,
-                    DigestMethod.hash(BlockHeader.newBuilder().setCreatorID(getID() + 5).setHeight(10).build()));
+                    DigestMethod.hash(bc.getBlock(currHeight - 1).getHeader().toByteArray()));
             currBlock = bc.createNewBLock();
             List<Integer> all = new ArrayList<>();
             for (int i = 0 ; i < n ;i++) {
                 all.add(i);
             }
-            Collections.shuffle(all);
+//            Collections.shuffle(all);
             List<Integer> heights = new ArrayList<>();
             List<byte[]> msgs = new ArrayList<>();
             msgs.add(sealedBlock1.toByteArray());
             msgs.add(sealedBlock2.toByteArray());
             List<List<Integer>> sids = new ArrayList<>();
-            sids.add(all.subList(0, n/2));
-            sids.add(all.subList(n/2 + 1, n));
+            sids.add(all.subList(0, 3));
+            sids.add(all.subList(3, 4));
             for (int i = 0 ; i < 2 ; i++) {
                 heights.add(currHeight);
             }

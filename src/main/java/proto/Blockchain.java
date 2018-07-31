@@ -49,16 +49,18 @@ public final class Blockchain {
   static {
     java.lang.String[] descriptorData = {
       "\n\020blockchain.proto\022\005proto\032\020rmfService.pr" +
-      "oto\">\n\013BlockHeader\022\014\n\004prev\030\001 \001(\014\022\021\n\tcrea" +
-      "torID\030\002 \001(\005\022\016\n\006height\030\003 \001(\005\"M\n\005Block\022\"\n\006" +
-      "header\030\001 \001(\0132\022.proto.BlockHeader\022 \n\004data" +
-      "\030\002 \003(\0132\022.proto.Transaction\"-\n\013Transactio" +
-      "n\022\020\n\010clientID\030\001 \001(\005\022\014\n\004data\030\002 \001(\014\"\034\n\010acc" +
-      "epted\022\020\n\010accepted\030\001 \001(\010\"K\n\tForkProof\022\036\n\004" +
-      "curr\030\001 \001(\0132\020.proto.RmfResult\022\036\n\004prev\030\002 \001" +
-      "(\0132\020.proto.RmfResult2L\n\021blockchainServic" +
-      "e\0227\n\016addTransaction\022\022.proto.Transaction\032" +
-      "\017.proto.accepted\"\000B\t\n\005protoP\001b\006proto3"
+      "oto\"W\n\013BlockHeader\022\014\n\004prev\030\001 \001(\014\022\021\n\tcrea" +
+      "torID\030\002 \001(\005\022\016\n\006height\030\003 \001(\005\022\027\n\017transacti" +
+      "onHash\030\004 \001(\014\"M\n\005Block\022\"\n\006header\030\001 \001(\0132\022." +
+      "proto.BlockHeader\022 \n\004data\030\002 \003(\0132\022.proto." +
+      "Transaction\"-\n\013Transaction\022\020\n\010clientID\030\001" +
+      " \001(\005\022\014\n\004data\030\002 \001(\014\"\034\n\010accepted\022\020\n\010accept" +
+      "ed\030\001 \001(\010\"m\n\tForkProof\022\036\n\004curr\030\001 \001(\0132\020.pr" +
+      "oto.RmfResult\022\017\n\007currSig\030\002 \001(\t\022\036\n\004prev\030\003" +
+      " \001(\0132\020.proto.RmfResult\022\017\n\007prevSig\030\004 \001(\t2" +
+      "L\n\021blockchainService\0227\n\016addTransaction\022\022" +
+      ".proto.Transaction\032\017.proto.accepted\"\000B\t\n" +
+      "\005protoP\001b\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -78,7 +80,7 @@ public final class Blockchain {
     internal_static_proto_BlockHeader_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_BlockHeader_descriptor,
-        new java.lang.String[] { "Prev", "CreatorID", "Height", });
+        new java.lang.String[] { "Prev", "CreatorID", "Height", "TransactionHash", });
     internal_static_proto_Block_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_proto_Block_fieldAccessorTable = new
@@ -102,7 +104,7 @@ public final class Blockchain {
     internal_static_proto_ForkProof_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_ForkProof_descriptor,
-        new java.lang.String[] { "Curr", "Prev", });
+        new java.lang.String[] { "Curr", "CurrSig", "Prev", "PrevSig", });
     proto.RmfService.getDescriptor();
   }
 

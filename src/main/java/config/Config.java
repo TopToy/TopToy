@@ -29,7 +29,7 @@ public class Config {
         String SETTING_TMO_KEY = "setting.tmo";
         String SETTING_TMO_INTERVAL_KEY = "setting.tmoInterval";
         String SETTING_RMFBBCCONFIG_KEY = "setting.rmfBbcConfigPath";
-        String SETTING_RBROADACSTCONFIG_PATH = "RBroadcastConfigPath";
+        String SETTING_RBROADACSTCONFIG_PATH = "setting.RBroadcastConfigPath";
         String SETTING_MAXTRANSACTIONSINBLOCK_KEY = "setting.maxTransactionInBlock";
         String SERVER_PRIVKEY = "server.privateKey";
         String SERVER_PUBKEY = "server.publicKey";

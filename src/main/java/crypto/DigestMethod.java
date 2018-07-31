@@ -7,7 +7,7 @@ import java.util.Arrays;
 public class DigestMethod {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(DigestMethod.class);
 
-    static public byte[] hash(BlockHeader header) {
+    static public byte[] hash(byte[] toHash) {
         MessageDigest digestMethod = null;
         try {
             digestMethod = MessageDigest.getInstance("SHA-256");
@@ -15,7 +15,7 @@ public class DigestMethod {
             logger.fatal("", e);
         }
         assert digestMethod != null;
-        return digestMethod.digest(header.toByteArray());
+        return digestMethod.digest(toHash);
     }
 
     static public boolean validate(byte[] d1, byte[] d2) {

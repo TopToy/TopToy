@@ -393,45 +393,45 @@ void TestStressFourServersMuteFault() throws InterruptedException {
 
     }
 
-//    @Test
-//    void TestFourServersSplitBroadcastFault() throws InterruptedException {
-//        Thread.sleep(timeToWaitBetweenTests);
-//        Thread[] servers = new Thread[4];
-//        int nnodes = 4;
-//        String fourServersConfig = Paths.get("config", "bbcConfig", "bbcFourServers").toString();
-//        logger.info("start TestStressFourServersNoFailures");
-//
-//        Node[] allNodes = initLocalRmfNodes(nnodes,1,fourServersConfig, new int[]{0});
-//        for (int i = 0 ; i < nnodes ; i++) {
-//            int finalI = i;
-//            if (i == 0) {
-//                servers[i]  = new Thread(() ->((byzantineBcServer) allNodes[finalI]).start());
-//                servers[i].start();
-//                continue;
-//            }
-//            servers[i]  = new Thread(() ->((cbcServer) allNodes[finalI]).start());
-//            servers[i].start();
-//        }
-//        for (int i = 0 ; i < nnodes ; i++) {
-//            servers[i].join();
-//        }
-//
-//        for (int i = 0 ; i < nnodes ; i++) {
-//            if (i == 0) {
-//                ((byzantineBcServer) allNodes[i]).setFullByz();
-//                ((byzantineBcServer) allNodes[i]).serve();
-//                continue;
-//            }
-//            ((cbcServer) allNodes[i]).serve();
-//        }
-//
-//        Thread.sleep(10 * 1000);
-//        for (int i = 0 ; i < 4 ; i++) {
-//            if (i == 0) {
-//                ((byzantineBcServer) allNodes[i]).shutdown();
-//                continue;
-//            }
-//            ((cbcServer) allNodes[i]).shutdown();
-//        }
-//    }
+    @Test
+    void TestFourServersSplitBroadcastFault() throws InterruptedException {
+        Thread.sleep(timeToWaitBetweenTests);
+        Thread[] servers = new Thread[4];
+        int nnodes = 4;
+        String fourServersConfig = Paths.get("config", "bbcConfig", "bbcFourServers").toString();
+        logger.info("start TestStressFourServersNoFailures");
+
+        Node[] allNodes = initLocalRmfNodes(nnodes,1,fourServersConfig, new int[]{0});
+        for (int i = 0 ; i < nnodes ; i++) {
+            int finalI = i;
+            if (i == 0) {
+                servers[i]  = new Thread(() ->((byzantineBcServer) allNodes[finalI]).start());
+                servers[i].start();
+                continue;
+            }
+            servers[i]  = new Thread(() ->((cbcServer) allNodes[finalI]).start());
+            servers[i].start();
+        }
+        for (int i = 0 ; i < nnodes ; i++) {
+            servers[i].join();
+        }
+
+        for (int i = 0 ; i < nnodes ; i++) {
+            if (i == 0) {
+                ((byzantineBcServer) allNodes[i]).setFullByz();
+                ((byzantineBcServer) allNodes[i]).serve();
+                continue;
+            }
+            ((cbcServer) allNodes[i]).serve();
+        }
+
+        Thread.sleep(10 * 1000);
+        for (int i = 0 ; i < 4 ; i++) {
+            if (i == 0) {
+                ((byzantineBcServer) allNodes[i]).shutdown();
+                continue;
+            }
+            ((cbcServer) allNodes[i]).shutdown();
+        }
+    }
 }

@@ -33,7 +33,7 @@ public abstract class block {
 //        return blockBuilder.getHeader().getCreatorID();
 //    }
 
-    public void addTransaction(Transaction t) {
+    void addTransaction(Transaction t) {
             blockBuilder.addData(t);
     }
 
@@ -42,12 +42,16 @@ public abstract class block {
     }
 
     public Block construct(int creatorID, int height, byte[] prevHash) {
-
+        byte[] tHash = new byte[0];
+        for (Transaction t : blockBuilder.getDataList()) {
+            tHash = DigestMethod.hash(t.toByteArray());
+        }
         return blockBuilder.setHeader(blockBuilder.
                 getHeaderBuilder().
-                setCreatorID(creatorID).
-                setHeight(height).
-                setPrev(ByteString.copyFrom(prevHash))).
+                    setCreatorID(creatorID).
+                    setHeight(height).
+                    setPrev(ByteString.copyFrom(prevHash)).
+                    setTransactionHash(ByteString.copyFrom(tHash))).
                 build();
     }
 

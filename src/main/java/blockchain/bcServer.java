@@ -72,6 +72,7 @@ public abstract class bcServer extends Node {
 
     public void start() {
         rmfServer.start();
+        rbService.start();
         logger.info(format("[#%d] has been initialized successfully", getID()));
     }
 
@@ -91,6 +92,7 @@ public abstract class bcServer extends Node {
             logger.error("", e);
         }
         rmfServer.stop();
+        rbService.shutdown();
         logger.info(format("[#%d] has been shutdown successfully", getID()));
     }
     private void updateLeader() {
@@ -147,7 +149,7 @@ public abstract class bcServer extends Node {
                             setCreatorID(currLeader).
                             setHeight(currHeight).
                             setPrev(ByteString.copyFrom(DigestMethod.
-                                    hash(bc.getBlock(currHeight - 1).getHeader())))).
+                                    hash(bc.getBlock(currHeight - 1).getHeader().toByteArray())))).
                             build();
                 }
                 tmo = initTmo;
@@ -204,7 +206,7 @@ public abstract class bcServer extends Node {
                                 setSender(curr.getHeader().getCreatorID()).
                                 build()).
                         setData(curr.toByteString()).
-                        setSig(rmfServer.getRmfDataSig(p.getCurr().getCid())).
+                        setSig(p.getCurrSig()).
                         build();
                 if (!rmfDigSig.verify(curr.getHeader().getCreatorID(), currData)) {
                     continue;
@@ -219,7 +221,7 @@ public abstract class bcServer extends Node {
                                 setSender(prev.getHeader().getCreatorID()).
                                 build()).
                         setData(prev.toByteString()).
-                        setSig(rmfServer.getRmfDataSig(p.getPrev().getCid())).
+                        setSig(p.getPrevSig()).
                         build();
                 if (!rmfDigSig.verify(prev.getHeader().getCreatorID(), prevData)) {
                     continue;
@@ -230,17 +232,19 @@ public abstract class bcServer extends Node {
             }
         }
     }
-
+    // TODO: We should handle the case where cid = 0 (edge case, not critical for correctness)
     private void announceFork(Block b, int cid) {
         logger.warn(format("[#%d] possible fork! [height=%d] [%s] : [%s]",
                 getID(), currHeight, Arrays.toString(b.getHeader().getPrev().toByteArray()),
-                Arrays.toString(Objects.requireNonNull(DigestMethod.hash(bc.getBlock(b.getHeader().getHeight() - 1).getHeader())))));
-        int prevCid = cids.get(bc.getHeight());
+                Arrays.toString(Objects.requireNonNull(DigestMethod.hash(bc.getBlock(b.getHeader().getHeight() - 1).getHeader().toByteArray())))));
+        int prevCid = cids.get(bc.getHeight() - 1);
         ForkProof p = ForkProof.
                 newBuilder().
                 setCurr(rmfServer.nonBlockingDeliver(cid)).
-                setPrev(rmfServer.nonBlockingDeliver(prevCid))
-                .build();
+                setCurrSig(rmfServer.getRmfDataSig(cid)).
+                setPrev(rmfServer.nonBlockingDeliver(prevCid)).
+                setPrevSig(rmfServer.getRmfDataSig(prevCid)).
+                build();
         if (!fp.containsKey(b.getHeader().getHeight())) {
             fp.put(b.getHeader().getHeight(), p);
         }

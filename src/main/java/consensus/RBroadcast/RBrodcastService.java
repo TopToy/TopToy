@@ -81,7 +81,7 @@ public class RBrodcastService extends DefaultSingleRecoverable {
                 RBrodcast.RBMsg msg = RBrodcast.RBMsg.parseFrom(command);
                 synchronized (globalLock) {
                     recMsg.add(msg);
-                    recMsg.notify();
+                    globalLock.notify();
                 }
             } catch (Exception e) {
                 logger.error("", e);

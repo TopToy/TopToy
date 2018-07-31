@@ -18,11 +18,16 @@ public interface BlockHeaderOrBuilder extends
   int getCreatorID();
 
   /**
+   * <code>int32 height = 3;</code>
+   */
+  int getHeight();
+
+  /**
    * <pre>
    *    MerkleTree mt = 4;
    * </pre>
    *
-   * <code>int32 height = 3;</code>
+   * <code>bytes transactionHash = 4;</code>
    */
-  int getHeight();
+  com.google.protobuf.ByteString getTransactionHash();
 }

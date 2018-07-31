@@ -21,15 +21,35 @@ public interface ForkProofOrBuilder extends
   proto.RmfResultOrBuilder getCurrOrBuilder();
 
   /**
-   * <code>.proto.RmfResult prev = 2;</code>
+   * <code>string currSig = 2;</code>
+   */
+  java.lang.String getCurrSig();
+  /**
+   * <code>string currSig = 2;</code>
+   */
+  com.google.protobuf.ByteString
+      getCurrSigBytes();
+
+  /**
+   * <code>.proto.RmfResult prev = 3;</code>
    */
   boolean hasPrev();
   /**
-   * <code>.proto.RmfResult prev = 2;</code>
+   * <code>.proto.RmfResult prev = 3;</code>
    */
   proto.RmfResult getPrev();
   /**
-   * <code>.proto.RmfResult prev = 2;</code>
+   * <code>.proto.RmfResult prev = 3;</code>
    */
   proto.RmfResultOrBuilder getPrevOrBuilder();
+
+  /**
+   * <code>string prevSig = 4;</code>
+   */
+  java.lang.String getPrevSig();
+  /**
+   * <code>string prevSig = 4;</code>
+   */
+  com.google.protobuf.ByteString
+      getPrevSigBytes();
 }
