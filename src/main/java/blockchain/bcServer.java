@@ -6,6 +6,7 @@ import config.Config;
 import config.Node;
 import consensus.RBroadcast.RBrodcastService;
 import crypto.DigestMethod;
+import crypto.blockDigSig;
 import crypto.rmfDigSig;
 import proto.*;
 import rmf.RmfNode;
@@ -219,28 +220,35 @@ public abstract class bcServer extends Node {
         if (bc.getBlock(currBlockH - 1).getHeader().getCreatorID() != prev.getHeader().getCreatorID()) {
             return false;
         }
-        Data currData = Data.newBuilder().
-                setMeta(Meta.newBuilder().
-                        setCid(p.getCurr().getCid()).
-                        setHeight(curr.getHeader().getHeight()).
-                        setSender(curr.getHeader().getCreatorID()).
-                        build()).
-                setData(curr.toByteString()).
-                setSig(p.getCurrSig()).
-                build();
-        if (!rmfDigSig.verify(curr.getHeader().getCreatorID(), currData)) {
+//        Data currData = Data.newBuilder().
+//                setMeta(Meta.newBuilder().
+//                        setCid(p.getCurr().getCid()).
+//                        setHeight(curr.getHeader().getHeight()).
+//                        setSender(curr.getHeader().getCreatorID()).
+//                        build()).
+//                setData(curr.toByteString()).
+//                setSig(p.getCurrSig()).
+//                build();
+        if (!blockDigSig.verify(curr.getHeader().getCreatorID(), p.getCurr().getCid(), p.getCurrSig(), curr)) {
             return false;
         }
-        Data prevData = Data.newBuilder().
-                setMeta(Meta.newBuilder().
-                        setCid(p.getPrev().getCid()).
-                        setHeight(prev.getHeader().getHeight()).
-                        setSender(prev.getHeader().getCreatorID()).
-                        build()).
-                setData(prev.toByteString()).
-                setSig(p.getPrevSig()).
-                build();
-        if (!rmfDigSig.verify(prev.getHeader().getCreatorID(), prevData)) {
+//        if (!rmfDigSig.verify(curr.getHeader().getCreatorID(), currData)) {
+//            return false;
+//        }
+//        Data prevData = Data.newBuilder().
+//                setMeta(Meta.newBuilder().
+//                        setCid(p.getPrev().getCid()).
+//                        setHeight(prev.getHeader().getHeight()).
+//                        setSender(prev.getHeader().getCreatorID()).
+//                        build()).
+//                setData(prev.toByteString()).
+//                setSig(p.getPrevSig()).
+//                build();
+//        if (!rmfDigSig.verify(prev.getHeader().getCreatorID(), prevData)) {
+//            return false;
+//        }
+
+        if (!blockDigSig.verify(prev.getHeader().getCreatorID(), p.getPrev().getCid(), p.getPrevSig(), prev)) {
             return false;
         }
 

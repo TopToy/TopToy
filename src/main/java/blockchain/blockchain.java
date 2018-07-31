@@ -27,7 +27,7 @@ public abstract class blockchain {
     boolean validateBlockHash(Block b) {
         byte[] d = DigestMethod.hash(blocks.get(b.getHeader().getHeight() - 1).getHeader().toByteArray());
         return DigestMethod.validate(b.getHeader().getPrev().toByteArray(),
-                Objects.requireNonNull(d)); // TODO: Note that currentky we hash the whole block
+                Objects.requireNonNull(d));
     }
 
     public void addBlock(Block b) {

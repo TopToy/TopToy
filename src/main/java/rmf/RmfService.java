@@ -381,7 +381,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             bbcService.propose(vote, cid);
             BbcProtos.BbcDecision dec = bbcService.decide(cid);
             regBbcCons.put(cid, dec);
-            return dec.getDecosion();
+            return dec.getDecosion(); // TODO: On shutting down null might expected
         }
 
 
