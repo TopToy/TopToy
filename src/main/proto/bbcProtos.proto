@@ -9,14 +9,15 @@ package proto;
 //}
 
 message BbcMsg {
-    int32 clientID = 1;
+    int32 propserID = 1;
     int32 id = 2;
     int32 vote = 3;
     string sig = 4;
 }
 
+
 message BbcDecision {
     int32 consID = 1;
     int32 decosion = 2;
-    repeated string signatures = 3;
+    repeated BbcMsg votes = 3;
 }

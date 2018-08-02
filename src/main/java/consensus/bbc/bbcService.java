@@ -96,7 +96,7 @@ public class bbcService extends DefaultSingleRecoverable {
         try {
             BbcProtos.BbcMsg msg = BbcProtos.BbcMsg.parseFrom(command);
             cid = msg.getId();
-            logger.debug(format("[#%d] received bbc message from [#%d]", id, msg.getClientID()));
+            logger.debug(format("[#%d] received bbc message from [#%d]", id, msg.getPropserID()));
             synchronized (rec) {
                 if (!rec.containsKey(cid)) {
                     consVote v = new consVote();
@@ -111,7 +111,7 @@ public class bbcService extends DefaultSingleRecoverable {
                         curr.neg++;
                     }
                 }
-                curr.dec.addSignatures(msg.getSig());
+                curr.dec.addVotes(msg);
                 if (curr.neg + curr.pos == quorumSize) {
                     logger.debug(format("[#%d] notify on  [cid=%d]", id, cid));
                     rec.notify();
@@ -167,7 +167,7 @@ public class bbcService extends DefaultSingleRecoverable {
 
     public int propose(int vote, int cid) {
         BbcProtos.BbcMsg.Builder b = BbcProtos.BbcMsg.newBuilder();
-        b.setClientID(id);
+        b.setPropserID(id);
         b.setId(cid);
         b.setVote(vote);
         b.setSig(bbcDigSig.sign(b));

@@ -3,6 +3,7 @@ package rmf;
 import config.Node;
 //import consensus.bbc.bbcClient;
 import consensus.bbc.bbcService;
+import crypto.bbcDigSig;
 import crypto.pkiUtils;
 import crypto.rmfDigSig;
 import io.grpc.ManagedChannel;
@@ -185,7 +186,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         });
     }
 
-    protected void sendFastVoteMessage(RmfGrpc.RmfStub stub, FastBbcVote v) {
+    protected void sendFastVoteMessage(RmfGrpc.RmfStub stub, BbcProtos.BbcMsg v) {
         stub.fastVote(v, new StreamObserver<Empty>() {
             @Override
             public void onNext(Empty empty) {
@@ -248,7 +249,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             sendReqMessage(p.stub, req, cid, sender, height);
         }
     }
-    protected void broadcastFastVoteMessage(FastBbcVote v) {
+    protected void broadcastFastVoteMessage(BbcProtos.BbcMsg v) {
         for (peer p : peers.values()) {
             sendFastVoteMessage(p.stub, v);
         }
@@ -271,17 +272,18 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             pendingMsg.put(cid, request);
             logger.info(format("[#%d] received data message from [%d], [cid=%d]", id,
                     sender, cid));
-            FastBbcVote v = FastBbcVote
-                    .newBuilder().setCid(cid).setSender(id).setVote(1).
-                            setSig(String.valueOf(cid) + String.valueOf(id) + String.valueOf(1)).build();
-            broadcastFastVoteMessage(v);
+            BbcProtos.BbcMsg.Builder v = BbcProtos.BbcMsg
+                    .newBuilder().setId(cid).setPropserID(id).setVote(1);
+            v.setSig(bbcDigSig.sign(v));
+
+            broadcastFastVoteMessage(v.build());
         }
     }
 
     @Override
-    public void fastVote(FastBbcVote request, StreamObserver<Empty> responeObserver) {
+    public void fastVote(BbcProtos.BbcMsg request, StreamObserver<Empty> responeObserver) {
         synchronized (globalLock) {
-            int cid = request.getCid();
+            int cid = request.getId();
             if (regBbcCons.containsKey(cid)) return;
             if (fastBbcCons.containsKey(cid)) return; // Against byzantine activity
             if (!fVotes.containsKey(cid)) {
@@ -293,7 +295,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             }
 
             fVotes.get(cid).count++;
-            fVotes.get(cid).dec.addSignatures(request.getSig());
+            fVotes.get(cid).dec.addVotes(request);
             if (fVotes.get(cid).count == n) {
                 logger.info(format("[#%d] fastVote has been detected [cid=%d]", id, cid));
                     fastBbcCons.put(cid, fVotes.get(cid).dec.setDecosion(1).build());

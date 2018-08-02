@@ -54,23 +54,23 @@ public final class RmfGrpc {
      return getDisseminateMessageMethod;
   }
 
-  private static volatile io.grpc.MethodDescriptor<proto.FastBbcVote,
+  private static volatile io.grpc.MethodDescriptor<proto.BbcProtos.BbcMsg,
       proto.Empty> getFastVoteMethod;
 
-  public static io.grpc.MethodDescriptor<proto.FastBbcVote,
+  public static io.grpc.MethodDescriptor<proto.BbcProtos.BbcMsg,
       proto.Empty> getFastVoteMethod() {
-    io.grpc.MethodDescriptor<proto.FastBbcVote, proto.Empty> getFastVoteMethod;
+    io.grpc.MethodDescriptor<proto.BbcProtos.BbcMsg, proto.Empty> getFastVoteMethod;
     if ((getFastVoteMethod = RmfGrpc.getFastVoteMethod) == null) {
       synchronized (RmfGrpc.class) {
         if ((getFastVoteMethod = RmfGrpc.getFastVoteMethod) == null) {
           RmfGrpc.getFastVoteMethod = getFastVoteMethod = 
-              io.grpc.MethodDescriptor.<proto.FastBbcVote, proto.Empty>newBuilder()
+              io.grpc.MethodDescriptor.<proto.BbcProtos.BbcMsg, proto.Empty>newBuilder()
               .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
               .setFullMethodName(generateFullMethodName(
                   "proto.Rmf", "FastVote"))
               .setSampledToLocalTracing(true)
               .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
-                  proto.FastBbcVote.getDefaultInstance()))
+                  proto.BbcProtos.BbcMsg.getDefaultInstance()))
               .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
                   proto.Empty.getDefaultInstance()))
                   .setSchemaDescriptor(new RmfMethodDescriptorSupplier("FastVote"))
@@ -144,7 +144,7 @@ public final class RmfGrpc {
 
     /**
      */
-    public void fastVote(proto.FastBbcVote request,
+    public void fastVote(proto.BbcProtos.BbcMsg request,
         io.grpc.stub.StreamObserver<proto.Empty> responseObserver) {
       asyncUnimplementedUnaryCall(getFastVoteMethod(), responseObserver);
     }
@@ -169,7 +169,7 @@ public final class RmfGrpc {
             getFastVoteMethod(),
             asyncUnaryCall(
               new MethodHandlers<
-                proto.FastBbcVote,
+                proto.BbcProtos.BbcMsg,
                 proto.Empty>(
                   this, METHODID_FAST_VOTE)))
           .addMethod(
@@ -211,7 +211,7 @@ public final class RmfGrpc {
 
     /**
      */
-    public void fastVote(proto.FastBbcVote request,
+    public void fastVote(proto.BbcProtos.BbcMsg request,
         io.grpc.stub.StreamObserver<proto.Empty> responseObserver) {
       asyncUnaryCall(
           getChannel().newCall(getFastVoteMethod(), getCallOptions()), request, responseObserver);
@@ -253,7 +253,7 @@ public final class RmfGrpc {
 
     /**
      */
-    public proto.Empty fastVote(proto.FastBbcVote request) {
+    public proto.Empty fastVote(proto.BbcProtos.BbcMsg request) {
       return blockingUnaryCall(
           getChannel(), getFastVoteMethod(), getCallOptions(), request);
     }
@@ -295,7 +295,7 @@ public final class RmfGrpc {
     /**
      */
     public com.google.common.util.concurrent.ListenableFuture<proto.Empty> fastVote(
-        proto.FastBbcVote request) {
+        proto.BbcProtos.BbcMsg request) {
       return futureUnaryCall(
           getChannel().newCall(getFastVoteMethod(), getCallOptions()), request);
     }
@@ -335,7 +335,7 @@ public final class RmfGrpc {
               (io.grpc.stub.StreamObserver<proto.Empty>) responseObserver);
           break;
         case METHODID_FAST_VOTE:
-          serviceImpl.fastVote((proto.FastBbcVote) request,
+          serviceImpl.fastVote((proto.BbcProtos.BbcMsg) request,
               (io.grpc.stub.StreamObserver<proto.Empty>) responseObserver);
           break;
         case METHODID_REQ_MESSAGE:
