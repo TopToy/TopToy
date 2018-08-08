@@ -19,6 +19,7 @@ private static final long serialVersionUID = 0L;
     sender_ = 0;
     height_ = 0;
     cid_ = 0;
+    cidSeries_ = 0;
   }
 
   @java.lang.Override
@@ -65,6 +66,11 @@ private static final long serialVersionUID = 0L;
           case 24: {
 
             cid_ = input.readInt32();
+            break;
+          }
+          case 32: {
+
+            cidSeries_ = input.readInt32();
             break;
           }
         }
@@ -118,6 +124,15 @@ private static final long serialVersionUID = 0L;
     return cid_;
   }
 
+  public static final int CIDSERIES_FIELD_NUMBER = 4;
+  private int cidSeries_;
+  /**
+   * <code>int32 cidSeries = 4;</code>
+   */
+  public int getCidSeries() {
+    return cidSeries_;
+  }
+
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
@@ -139,6 +154,9 @@ private static final long serialVersionUID = 0L;
     if (cid_ != 0) {
       output.writeInt32(3, cid_);
     }
+    if (cidSeries_ != 0) {
+      output.writeInt32(4, cidSeries_);
+    }
     unknownFields.writeTo(output);
   }
 
@@ -158,6 +176,10 @@ private static final long serialVersionUID = 0L;
     if (cid_ != 0) {
       size += com.google.protobuf.CodedOutputStream
         .computeInt32Size(3, cid_);
+    }
+    if (cidSeries_ != 0) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeInt32Size(4, cidSeries_);
     }
     size += unknownFields.getSerializedSize();
     memoizedSize = size;
@@ -181,6 +203,8 @@ private static final long serialVersionUID = 0L;
         == other.getHeight());
     result = result && (getCid()
         == other.getCid());
+    result = result && (getCidSeries()
+        == other.getCidSeries());
     result = result && unknownFields.equals(other.unknownFields);
     return result;
   }
@@ -198,6 +222,8 @@ private static final long serialVersionUID = 0L;
     hash = (53 * hash) + getHeight();
     hash = (37 * hash) + CID_FIELD_NUMBER;
     hash = (53 * hash) + getCid();
+    hash = (37 * hash) + CIDSERIES_FIELD_NUMBER;
+    hash = (53 * hash) + getCidSeries();
     hash = (29 * hash) + unknownFields.hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -333,6 +359,8 @@ private static final long serialVersionUID = 0L;
 
       cid_ = 0;
 
+      cidSeries_ = 0;
+
       return this;
     }
 
@@ -358,6 +386,7 @@ private static final long serialVersionUID = 0L;
       result.sender_ = sender_;
       result.height_ = height_;
       result.cid_ = cid_;
+      result.cidSeries_ = cidSeries_;
       onBuilt();
       return result;
     }
@@ -407,6 +436,9 @@ private static final long serialVersionUID = 0L;
       }
       if (other.getCid() != 0) {
         setCid(other.getCid());
+      }
+      if (other.getCidSeries() != 0) {
+        setCidSeries(other.getCidSeries());
       }
       this.mergeUnknownFields(other.unknownFields);
       onChanged();
@@ -509,6 +541,32 @@ private static final long serialVersionUID = 0L;
     public Builder clearCid() {
       
       cid_ = 0;
+      onChanged();
+      return this;
+    }
+
+    private int cidSeries_ ;
+    /**
+     * <code>int32 cidSeries = 4;</code>
+     */
+    public int getCidSeries() {
+      return cidSeries_;
+    }
+    /**
+     * <code>int32 cidSeries = 4;</code>
+     */
+    public Builder setCidSeries(int value) {
+      
+      cidSeries_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>int32 cidSeries = 4;</code>
+     */
+    public Builder clearCidSeries() {
+      
+      cidSeries_ = 0;
       onChanged();
       return this;
     }

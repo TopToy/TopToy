@@ -6,11 +6,14 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class bbcTest {
+    int cidSeries = 0;
     private int timeToWaitBetweenTest = 15 * 1000;
     static Config conf = new Config();
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(bbcTest.class);
@@ -58,10 +61,10 @@ public class bbcTest {
         });
         t1.start();
         latch.await();
-        s.propose(1, 0);
-        s.propose(0, 1);
-        assertEquals(1, s.decide(0).getDecosion());
-        assertEquals(0, s.decide(1).getDecosion());
+        s.propose(1, cidSeries, 0);
+        s.propose(0, cidSeries, 1);
+        assertEquals(1, s.decide(cidSeries, 0).getDecosion());
+        assertEquals(0, s.decide(cidSeries, 1).getDecosion());
         s.shutdown();
         t1.join();
 
@@ -85,19 +88,19 @@ public class bbcTest {
         }
         latch.await();
         for (int i = 0 ; i < 4 ; i++) {
-            servers[i].propose(consID % 2, consID);
+            servers[i].propose(consID % 2, cidSeries, consID);
         }
 
         for (int i = 0 ; i < 4 ; i++) {
-            assertEquals(consID % 2, servers[i].decide(consID).getDecosion());
+            assertEquals(consID % 2, servers[i].decide(cidSeries, consID).getDecosion());
         }
         consID++;
         for (int i = 0 ; i < 4 ; i++) {
-            servers[i].propose(consID % 2, consID);
+            servers[i].propose(consID % 2, cidSeries, consID);
         }
 
         for (int i = 0 ; i < 4 ; i++) {
-            assertEquals(consID % 2, servers[i].decide(consID).getDecosion());
+            assertEquals(consID % 2, servers[i].decide(cidSeries, consID).getDecosion());
         }
         for (int i = 0 ; i < 4 ; i++) {
             servers[i].shutdown();
@@ -130,10 +133,10 @@ public class bbcTest {
         for (int i = 0 ; i < 4 ; i++) {
             for (int k = 0 ; k < 4 ; k++) {
                 if (i == k) continue;
-                servers[k].propose(consID % 2, consID);
+                servers[k].propose(consID % 2, cidSeries, consID);
             }
             for (int k = 0 ; k < 4 ;k++) {
-                assertEquals(consID % 2, servers[k].decide(consID).getDecosion());
+                assertEquals(consID % 2, servers[k].decide(cidSeries, consID).getDecosion());
             }
             consID++;
         }
@@ -166,10 +169,10 @@ public class bbcTest {
         latch.await();
         for (int i = 0 ; i < 100 ; i++) {
             for (int k = 0 ; k < 4 ; k++) {
-                servers[k].propose(consID % 2, consID);
+                servers[k].propose(consID % 2, cidSeries, consID);
             }
             for (int k = 0 ; k < 4 ; k++) {
-                assertEquals(consID % 2, servers[k].decide(consID).getDecosion());
+                assertEquals(consID % 2, servers[k].decide(cidSeries, consID).getDecosion());
             }
             consID++;
 
@@ -201,14 +204,14 @@ public class bbcTest {
         }
         latch.await();
         for (int i = 0 ; i < 1000 ; i++) {
-            servers[0].propose(0, i);
-            servers[1].propose(1, i);
-            servers[2].propose(1, i);
+            servers[0].propose(0, cidSeries, i);
+            servers[1].propose(1, cidSeries, i);
+            servers[2].propose(1, cidSeries, i);
         }
 
         for (int i = 0 ; i < 1000 ; i++) {
             for (int k = 0 ; k < 4 ; k++) {
-                assertEquals(1, servers[k].decide(i).getDecosion());
+                assertEquals(1, servers[k].decide(cidSeries, i).getDecosion());
             }
 
         }

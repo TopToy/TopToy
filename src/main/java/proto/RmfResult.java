@@ -17,6 +17,7 @@ private static final long serialVersionUID = 0L;
   }
   private RmfResult() {
     cid_ = 0;
+    cidSeries_ = 0;
     data_ = com.google.protobuf.ByteString.EMPTY;
   }
 
@@ -56,7 +57,12 @@ private static final long serialVersionUID = 0L;
             cid_ = input.readInt32();
             break;
           }
-          case 18: {
+          case 16: {
+
+            cidSeries_ = input.readInt32();
+            break;
+          }
+          case 26: {
 
             data_ = input.readBytes();
             break;
@@ -94,10 +100,19 @@ private static final long serialVersionUID = 0L;
     return cid_;
   }
 
-  public static final int DATA_FIELD_NUMBER = 2;
+  public static final int CIDSERIES_FIELD_NUMBER = 2;
+  private int cidSeries_;
+  /**
+   * <code>int32 cidSeries = 2;</code>
+   */
+  public int getCidSeries() {
+    return cidSeries_;
+  }
+
+  public static final int DATA_FIELD_NUMBER = 3;
   private com.google.protobuf.ByteString data_;
   /**
-   * <code>bytes data = 2;</code>
+   * <code>bytes data = 3;</code>
    */
   public com.google.protobuf.ByteString getData() {
     return data_;
@@ -118,8 +133,11 @@ private static final long serialVersionUID = 0L;
     if (cid_ != 0) {
       output.writeInt32(1, cid_);
     }
+    if (cidSeries_ != 0) {
+      output.writeInt32(2, cidSeries_);
+    }
     if (!data_.isEmpty()) {
-      output.writeBytes(2, data_);
+      output.writeBytes(3, data_);
     }
     unknownFields.writeTo(output);
   }
@@ -133,9 +151,13 @@ private static final long serialVersionUID = 0L;
       size += com.google.protobuf.CodedOutputStream
         .computeInt32Size(1, cid_);
     }
+    if (cidSeries_ != 0) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeInt32Size(2, cidSeries_);
+    }
     if (!data_.isEmpty()) {
       size += com.google.protobuf.CodedOutputStream
-        .computeBytesSize(2, data_);
+        .computeBytesSize(3, data_);
     }
     size += unknownFields.getSerializedSize();
     memoizedSize = size;
@@ -155,6 +177,8 @@ private static final long serialVersionUID = 0L;
     boolean result = true;
     result = result && (getCid()
         == other.getCid());
+    result = result && (getCidSeries()
+        == other.getCidSeries());
     result = result && getData()
         .equals(other.getData());
     result = result && unknownFields.equals(other.unknownFields);
@@ -170,6 +194,8 @@ private static final long serialVersionUID = 0L;
     hash = (19 * hash) + getDescriptor().hashCode();
     hash = (37 * hash) + CID_FIELD_NUMBER;
     hash = (53 * hash) + getCid();
+    hash = (37 * hash) + CIDSERIES_FIELD_NUMBER;
+    hash = (53 * hash) + getCidSeries();
     hash = (37 * hash) + DATA_FIELD_NUMBER;
     hash = (53 * hash) + getData().hashCode();
     hash = (29 * hash) + unknownFields.hashCode();
@@ -303,6 +329,8 @@ private static final long serialVersionUID = 0L;
       super.clear();
       cid_ = 0;
 
+      cidSeries_ = 0;
+
       data_ = com.google.protobuf.ByteString.EMPTY;
 
       return this;
@@ -328,6 +356,7 @@ private static final long serialVersionUID = 0L;
     public proto.RmfResult buildPartial() {
       proto.RmfResult result = new proto.RmfResult(this);
       result.cid_ = cid_;
+      result.cidSeries_ = cidSeries_;
       result.data_ = data_;
       onBuilt();
       return result;
@@ -372,6 +401,9 @@ private static final long serialVersionUID = 0L;
       if (other == proto.RmfResult.getDefaultInstance()) return this;
       if (other.getCid() != 0) {
         setCid(other.getCid());
+      }
+      if (other.getCidSeries() != 0) {
+        setCidSeries(other.getCidSeries());
       }
       if (other.getData() != com.google.protobuf.ByteString.EMPTY) {
         setData(other.getData());
@@ -429,15 +461,41 @@ private static final long serialVersionUID = 0L;
       return this;
     }
 
+    private int cidSeries_ ;
+    /**
+     * <code>int32 cidSeries = 2;</code>
+     */
+    public int getCidSeries() {
+      return cidSeries_;
+    }
+    /**
+     * <code>int32 cidSeries = 2;</code>
+     */
+    public Builder setCidSeries(int value) {
+      
+      cidSeries_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>int32 cidSeries = 2;</code>
+     */
+    public Builder clearCidSeries() {
+      
+      cidSeries_ = 0;
+      onChanged();
+      return this;
+    }
+
     private com.google.protobuf.ByteString data_ = com.google.protobuf.ByteString.EMPTY;
     /**
-     * <code>bytes data = 2;</code>
+     * <code>bytes data = 3;</code>
      */
     public com.google.protobuf.ByteString getData() {
       return data_;
     }
     /**
-     * <code>bytes data = 2;</code>
+     * <code>bytes data = 3;</code>
      */
     public Builder setData(com.google.protobuf.ByteString value) {
       if (value == null) {
@@ -449,7 +507,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>bytes data = 2;</code>
+     * <code>bytes data = 3;</code>
      */
     public Builder clearData() {
       

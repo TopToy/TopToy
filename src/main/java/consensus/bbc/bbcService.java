@@ -8,8 +8,11 @@ import bftsmart.tom.ServiceReplica;
 import bftsmart.tom.core.messages.TOMMessage;
 import bftsmart.tom.core.messages.TOMMessageType;
 import bftsmart.tom.server.defaultservices.DefaultSingleRecoverable;
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 import crypto.bbcDigSig;
 import crypto.pkiUtils;
+import org.omg.PortableInterceptor.INACTIVE;
 import proto.BbcProtos;
 
 import java.util.*;
@@ -28,23 +31,28 @@ public class bbcService extends DefaultSingleRecoverable {
         BbcProtos.BbcDecision.Builder dec = BbcProtos.BbcDecision.newBuilder();
     }
 
-
+    class fastVotePart {
+        BbcProtos.BbcDecision d;
+        boolean done;
+    }
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(bbcService.class);
 
     private int id;
+    final Object globalLock = new Object();
     private AsynchServiceProxy bbcProxy;
-    private final HashMap<Integer, consVote> rec;
+    private final Table<Integer, Integer, consVote> rec;
     private int quorumSize;
     private String configHome;
     private ServiceReplica sr;
-    private final List<Integer> consNotify;
+//    private final List<Integer> consNotify;
+    private Table<Integer, Integer, fastVotePart> fastVote = HashBasedTable.create();
     public bbcService(int id, int quorumSize, String configHome) {
         this.id = id;
-        rec = new HashMap<>();
+        rec = HashBasedTable.create();
         sr = null;
         this.quorumSize = quorumSize;
         this.configHome = configHome;
-        consNotify = new ArrayList<>();
+//        consNotify = new ArrayList<>();
     }
 
     public void start() {
@@ -72,12 +80,12 @@ public class bbcService extends DefaultSingleRecoverable {
     }
 
     private void releaseWaiting() {
-        synchronized (rec) {
-            rec.notifyAll();
+        synchronized (globalLock) {
+            globalLock.notifyAll();
         }
-        synchronized (consNotify) {
-            consNotify.notifyAll();
-        }
+//        synchronized (consNotify) {
+//            consNotify.notifyAll();
+//        }
     }
     @Override
     public void installSnapshot(byte[] state) {
@@ -94,16 +102,23 @@ public class bbcService extends DefaultSingleRecoverable {
     public byte[] appExecuteOrdered(byte[] command, MessageContext msgCtx) {
         int cid;
         try {
+            synchronized (globalLock) {
             BbcProtos.BbcMsg msg = BbcProtos.BbcMsg.parseFrom(command);
-            cid = msg.getId();
+            cid = msg.getCid();
+            int cidSeries = msg.getCidSeries();
             logger.debug(format("[#%d] received bbc message from [#%d]", id, msg.getPropserID()));
-            synchronized (rec) {
-                if (!rec.containsKey(cid)) {
-                    consVote v = new consVote();
-                    v.dec.setConsID(cid);
-                    rec.put(cid, v);
+                if (fastVote.contains(cidSeries, cid) && !fastVote.get(cidSeries, cid).done) {
+                    logger.info(format("[#%d] re-participate in a consensus [cidSeries=%d ; cid=%d]", id, cidSeries, cid));
+                    propose(fastVote.get(cidSeries, cid).d.getDecosion(), cidSeries, cid);
+                    fastVote.get(cidSeries, cid).done = true;
                 }
-                consVote curr = rec.get(cid);
+                if (!rec.contains(cidSeries, cid)) {
+                    consVote v = new consVote();
+                    v.dec.setCid(cid);
+                    v.dec.setCidSeries(cidSeries);
+                    rec.put(cidSeries, cid, v);
+                }
+                consVote curr = rec.get(cidSeries, cid);
                 if (curr.neg +  curr.pos < quorumSize) {
                     if (msg.getVote() == 1) {
                         curr.pos++;
@@ -114,15 +129,15 @@ public class bbcService extends DefaultSingleRecoverable {
                 curr.dec.addVotes(msg);
                 if (curr.neg + curr.pos == quorumSize) {
                     logger.debug(format("[#%d] notify on  [cid=%d]", id, cid));
-                    rec.notify();
+                    globalLock.notify();
                 }
             }
-            synchronized (consNotify) {
-                if (!consNotify.contains(cid)) {
-                    consNotify.add(cid);
-                    consNotify.notify();
-                }
-            }
+//            synchronized (consNotify) {
+//                if (!consNotify.contains(cid)) {
+//                    consNotify.add(cid);
+//                    consNotify.notify();
+//                }
+//            }
         } catch (Exception e) {
             logger.error("", e);
         }
@@ -134,41 +149,42 @@ public class bbcService extends DefaultSingleRecoverable {
         return new byte[1];
     }
 
-    public BbcProtos.BbcDecision decide(int cid) {
-        synchronized (rec) {
-            while (!rec.containsKey(cid) || rec.get(cid).pos + rec.get(cid).neg < quorumSize) {
-                try {
-                    rec.wait();
-                } catch (InterruptedException e) {
-                    logger.error("", e);
-                    return null;
-                }
+    public BbcProtos.BbcDecision decide(int cidSeries, int cid) throws InterruptedException {
+        synchronized (globalLock) {
+            while (!rec.contains(cidSeries, cid) || rec.get(cidSeries, cid).pos + rec.get(cidSeries, cid).neg < quorumSize) {
+//                try {
+                    globalLock.wait();
+//                } catch (InterruptedException e) {
+//                    logger.error("", e);
+//                    return null;
+//                }
             }
-            return (rec.get(cid).pos > rec.get(cid).neg ?
-                    rec.get(cid).dec.setDecosion(1).build() : rec.get(cid).dec.setDecosion(0).build());
+            return (rec.get(cidSeries, cid).pos > rec.get(cidSeries, cid).neg ?
+                    rec.get(cidSeries, cid).dec.setDecosion(1).build() : rec.get(cidSeries, cid).dec.setDecosion(0).build());
         }
     }
 
-    public ArrayList<Integer> notifyOnConsensusInstance(List<Integer> req) throws InterruptedException {
-        if (req.size() == 0) return new ArrayList<>();
-        List<Integer> ret;
-        synchronized (consNotify) {
-            while (consNotify.isEmpty()) {
-                consNotify.wait();
-            }
-            ret = consNotify.stream().filter(
-                    req::contains).
-            collect(Collectors.toList());
-            consNotify.removeAll(req);
-            // TODO: Handle the list size!
-        }
-        return (ArrayList<Integer>) ret;
-    }
+//    public ArrayList<Integer> getConsensusInstance(List<Integer> req)  {
+//        if (req.size() == 0) return new ArrayList<>();
+//        List<Integer> ret;
+//        synchronized (consNotify) {
+//            if (consNotify.isEmpty()) {
+//                return null;
+//            }
+//            ret = consNotify.stream().filter(
+//                    req::contains).
+//            collect(Collectors.toList());
+//            consNotify.removeAll(req);
+//            // TODO: Handle the list size!
+//        }
+//        return (ArrayList<Integer>) ret;
+//    }
 
-    public int propose(int vote, int cid) {
+    public int propose(int vote, int cidSeries, int cid) {
         BbcProtos.BbcMsg.Builder b = BbcProtos.BbcMsg.newBuilder();
         b.setPropserID(id);
-        b.setId(cid);
+        b.setCid(cid);
+        b.setCidSeries(cidSeries);
         b.setVote(vote);
         b.setSig(bbcDigSig.sign(b));
         BbcProtos.BbcMsg msg= b.build();
@@ -185,6 +201,28 @@ public class bbcService extends DefaultSingleRecoverable {
             }
         }, TOMMessageType.ORDERED_REQUEST);
         return 0;
+    }
+
+//    public void cleanBuffers(int cid) {
+//        synchronized (globalLock) {
+////            consNotify.removeAll(consNotify.stream().filter(c -> c == cid).collect(Collectors.toList()));
+//            rec.remove(cid);
+//            fastVote.remove(cid);
+//
+//        }
+//    }
+
+    public void updateFastVote(BbcProtos.BbcDecision b) {
+        synchronized (globalLock) {
+            int fcid = b.getCid();
+            int fcidSeries = b.getCidSeries();
+            if (!fastVote.contains(fcidSeries, fcid)) {
+                fastVotePart fv = new fastVotePart();
+                fv.d = b;
+                fv.done = false;
+                fastVote.put(fcidSeries, fcid, fv);
+            }
+        }
     }
 
 }

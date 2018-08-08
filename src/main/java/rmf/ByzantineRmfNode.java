@@ -103,12 +103,13 @@ public class ByzantineRmfNode extends RmfNode {
 //        return res;
 //    }
 
-    public void selectiveBroadcast(byte[] msg, int height, List<Integer> ids) {
+    public void selectiveBroadcast(int cidSeries, int cid, byte[] msg, int height, List<Integer> ids) {
         Meta metaMsg = Meta.
                 newBuilder().
                 setSender(getID()).
                 setHeight(height).
                 setCid(cid).
+                setCidSeries(cidSeries).
                 build();
         Data.Builder dataMsg = Data.
                 newBuilder().
@@ -126,9 +127,9 @@ public class ByzantineRmfNode extends RmfNode {
     /*
         This should used outside the rmf protocol (Note that the rmf protocol does not handle such failures)
      */
-    public void devidedBroadcast(List<byte[]> msgs, List<Integer> heights, List<List<Integer>> ids) {
+    public void devidedBroadcast(int cidSeries, int cid, List<byte[]> msgs, List<Integer> heights, List<List<Integer>> ids) {
         for (int i = 0 ; i < msgs.size() ; i++) {
-            selectiveBroadcast(msgs.get(i), heights.get(i), ids.get(i));
+            selectiveBroadcast(cidSeries, cid, msgs.get(i), heights.get(i), ids.get(i));
         }
     }
 

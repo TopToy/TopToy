@@ -30,7 +30,8 @@ public class Config {
         String SETTING_TMO_KEY = "setting.tmo";
         String SETTING_TMO_INTERVAL_KEY = "setting.tmoInterval";
         String SETTING_RMFBBCCONFIG_KEY = "setting.rmfBbcConfigPath";
-        String SETTING_RBROADACSTCONFIG_PATH = "setting.RBroadcastConfigPath";
+        String SETTING_PAINCRBCONFIG_PATH = "setting.panicRBroadcastConfigPath";
+        String SETTING_SYNCRBCONFIG_PATH = "setting.syncRBroadcastConfigPath";
         String SETTING_MAXTRANSACTIONSINBLOCK_KEY = "setting.maxTransactionInBlock";
         String SERVER_PRIVKEY = "server.privateKey";
         String SERVER_PUBKEY = "server.publicKey";
@@ -87,7 +88,7 @@ public class Config {
         return Math.toIntExact(conf.getLong(tKeys.SETTING_TMO_INTERVAL_KEY));
     }
 
-    public static ArrayList<Node> getRMFcluster() {
+    public static ArrayList<Node> getCluster() {
         Toml t = conf.getTables(tKeys.RMFCLUSTER_KEY).get(0);
         ArrayList<Node> ret = new ArrayList<>();
         for (int i = 0 ; i < getN() ; i++) {
@@ -99,6 +100,19 @@ public class Config {
         }
         return ret;
     }
+
+//    public static ArrayList<Node> getSynccluster() {
+//        Toml t = conf.getTables(tKeys.RMFCLUSTER_KEY).get(0);
+//        ArrayList<Node> ret = new ArrayList<>();
+//        for (int i = 0 ; i < getN() ; i++) {
+//            Toml node = t.getTable("s" + i);
+//            ret.add(new Node(node.getString("ip"),
+//                    Math.toIntExact(node.getLong("rmfPort")),
+//                    Math.toIntExact(node.getLong("syncPort")),
+//                    Math.toIntExact(node.getLong("id"))));
+//        }
+//        return ret;
+//    }
 
     public static HashMap<Integer, String> getClusterPubKeys() {
         Toml t = conf.getTables(tKeys.RMFCLUSTER_KEY).get(0);
@@ -117,8 +131,12 @@ public class Config {
         return conf.getString(tKeys.SETTING_RMFBBCCONFIG_KEY);
     }
 
-    public static String getRBroadcastConfigHome() {
-        return conf.getString(tKeys.SETTING_RBROADACSTCONFIG_PATH);
+    public static String getPanicRBConfigHome() {
+        return conf.getString(tKeys.SETTING_PAINCRBCONFIG_PATH);
+    }
+
+    public static String getSyncRBConfigHome() {
+        return conf.getString(tKeys.SETTING_SYNCRBCONFIG_PATH);
     }
 
     public static String getPublicKey() {

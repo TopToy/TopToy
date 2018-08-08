@@ -22,9 +22,9 @@ public class byzantineBcServer extends bcServer {
     private boolean fullByz = false;
     public byzantineBcServer(String addr, int rmfPort, int syncPort, int id) {
         super(addr, rmfPort, syncPort, id);
-
+        rmfServer.stop();
         rmfServer = new ByzantineRmfNode(id, addr, rmfPort, Config.getF(),
-                Config.getRMFcluster(), Config.getRMFbbcConfigHome());
+                Config.getCluster(), Config.getRMFbbcConfigHome());
     }
 
 //    private ByzantineRmfNode rmfServer;
@@ -178,15 +178,25 @@ public class byzantineBcServer extends bcServer {
                 heights.add(currHeight);
             }
             if (fullByz) {
-                ((ByzantineRmfNode)rmfServer).devidedBroadcast(msgs, heights, sids);
+                ((ByzantineRmfNode)rmfServer).devidedBroadcast(cidSeries, cid, msgs, heights, sids);
 
             } else {
-                ((ByzantineRmfNode)rmfServer).selectiveBroadcast(sealedBlock1.toByteArray(), currHeight, all.subList(0, n/2));
+                ((ByzantineRmfNode)rmfServer).selectiveBroadcast(cidSeries, cid, sealedBlock1.toByteArray(), currHeight, all.subList(0, n/2));
             }
         }
     }
 
-//    public boolean addTransaction(byte[] data, int clientID) {
+    @Override
+    blockchain initBC(int id) {
+        return new basicBlockchain(id);
+    }
+
+    @Override
+    blockchain getBC(int start, int end) {
+        return new basicBlockchain(this.bc, start, end);
+    }
+
+    //    public boolean addTransaction(byte[] data, int clientID) {
 //        Transaction t = Transaction.newBuilder().setClientID(clientID).setData(ByteString.copyFrom(data)).build();
 //        synchronized (blockLock) {
 //            if (currBlock.getTransactionCount() >= maxTransactionInBlock) {

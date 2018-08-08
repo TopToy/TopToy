@@ -16,6 +16,7 @@ message Meta {
     int32 sender = 1;
     int32 height = 2;
     int32 cid = 3;
+    int32 cidSeries = 4;
 }
 
 message Data {
@@ -42,7 +43,8 @@ message Res {
 
 message RmfResult {
     int32 cid = 1;
-    bytes data = 2;
+    int32 cidSeries = 2;
+    bytes data = 3;
 }
 
 service Rmf {

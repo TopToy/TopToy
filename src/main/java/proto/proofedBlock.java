@@ -18,7 +18,6 @@ private static final long serialVersionUID = 0L;
   private proofedBlock() {
     cid_ = 0;
     sig_ = "";
-    votes_ = java.util.Collections.emptyList();
   }
 
   @java.lang.Override
@@ -76,15 +75,6 @@ private static final long serialVersionUID = 0L;
             sig_ = s;
             break;
           }
-          case 34: {
-            if (!((mutable_bitField0_ & 0x00000008) == 0x00000008)) {
-              votes_ = new java.util.ArrayList<proto.BbcProtos.BbcDecision>();
-              mutable_bitField0_ |= 0x00000008;
-            }
-            votes_.add(
-                input.readMessage(proto.BbcProtos.BbcDecision.parser(), extensionRegistry));
-            break;
-          }
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -93,9 +83,6 @@ private static final long serialVersionUID = 0L;
       throw new com.google.protobuf.InvalidProtocolBufferException(
           e).setUnfinishedMessage(this);
     } finally {
-      if (((mutable_bitField0_ & 0x00000008) == 0x00000008)) {
-        votes_ = java.util.Collections.unmodifiableList(votes_);
-      }
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
     }
@@ -112,7 +99,6 @@ private static final long serialVersionUID = 0L;
             proto.proofedBlock.class, proto.proofedBlock.Builder.class);
   }
 
-  private int bitField0_;
   public static final int B_FIELD_NUMBER = 1;
   private proto.Block b_;
   /**
@@ -146,6 +132,10 @@ private static final long serialVersionUID = 0L;
   public static final int SIG_FIELD_NUMBER = 3;
   private volatile java.lang.Object sig_;
   /**
+   * <pre>
+   *    repeated BbcDecision votes = 4;
+   * </pre>
+   *
    * <code>string Sig = 3;</code>
    */
   public java.lang.String getSig() {
@@ -161,6 +151,10 @@ private static final long serialVersionUID = 0L;
     }
   }
   /**
+   * <pre>
+   *    repeated BbcDecision votes = 4;
+   * </pre>
+   *
    * <code>string Sig = 3;</code>
    */
   public com.google.protobuf.ByteString
@@ -175,41 +169,6 @@ private static final long serialVersionUID = 0L;
     } else {
       return (com.google.protobuf.ByteString) ref;
     }
-  }
-
-  public static final int VOTES_FIELD_NUMBER = 4;
-  private java.util.List<proto.BbcProtos.BbcDecision> votes_;
-  /**
-   * <code>repeated .proto.BbcDecision votes = 4;</code>
-   */
-  public java.util.List<proto.BbcProtos.BbcDecision> getVotesList() {
-    return votes_;
-  }
-  /**
-   * <code>repeated .proto.BbcDecision votes = 4;</code>
-   */
-  public java.util.List<? extends proto.BbcProtos.BbcDecisionOrBuilder> 
-      getVotesOrBuilderList() {
-    return votes_;
-  }
-  /**
-   * <code>repeated .proto.BbcDecision votes = 4;</code>
-   */
-  public int getVotesCount() {
-    return votes_.size();
-  }
-  /**
-   * <code>repeated .proto.BbcDecision votes = 4;</code>
-   */
-  public proto.BbcProtos.BbcDecision getVotes(int index) {
-    return votes_.get(index);
-  }
-  /**
-   * <code>repeated .proto.BbcDecision votes = 4;</code>
-   */
-  public proto.BbcProtos.BbcDecisionOrBuilder getVotesOrBuilder(
-      int index) {
-    return votes_.get(index);
   }
 
   private byte memoizedIsInitialized = -1;
@@ -233,9 +192,6 @@ private static final long serialVersionUID = 0L;
     if (!getSigBytes().isEmpty()) {
       com.google.protobuf.GeneratedMessageV3.writeString(output, 3, sig_);
     }
-    for (int i = 0; i < votes_.size(); i++) {
-      output.writeMessage(4, votes_.get(i));
-    }
     unknownFields.writeTo(output);
   }
 
@@ -254,10 +210,6 @@ private static final long serialVersionUID = 0L;
     }
     if (!getSigBytes().isEmpty()) {
       size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, sig_);
-    }
-    for (int i = 0; i < votes_.size(); i++) {
-      size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(4, votes_.get(i));
     }
     size += unknownFields.getSerializedSize();
     memoizedSize = size;
@@ -284,8 +236,6 @@ private static final long serialVersionUID = 0L;
         == other.getCid());
     result = result && getSig()
         .equals(other.getSig());
-    result = result && getVotesList()
-        .equals(other.getVotesList());
     result = result && unknownFields.equals(other.unknownFields);
     return result;
   }
@@ -305,10 +255,6 @@ private static final long serialVersionUID = 0L;
     hash = (53 * hash) + getCid();
     hash = (37 * hash) + SIG_FIELD_NUMBER;
     hash = (53 * hash) + getSig().hashCode();
-    if (getVotesCount() > 0) {
-      hash = (37 * hash) + VOTES_FIELD_NUMBER;
-      hash = (53 * hash) + getVotesList().hashCode();
-    }
     hash = (29 * hash) + unknownFields.hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -434,7 +380,6 @@ private static final long serialVersionUID = 0L;
     private void maybeForceBuilderInitialization() {
       if (com.google.protobuf.GeneratedMessageV3
               .alwaysUseFieldBuilders) {
-        getVotesFieldBuilder();
       }
     }
     public Builder clear() {
@@ -449,12 +394,6 @@ private static final long serialVersionUID = 0L;
 
       sig_ = "";
 
-      if (votesBuilder_ == null) {
-        votes_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00000008);
-      } else {
-        votesBuilder_.clear();
-      }
       return this;
     }
 
@@ -477,8 +416,6 @@ private static final long serialVersionUID = 0L;
 
     public proto.proofedBlock buildPartial() {
       proto.proofedBlock result = new proto.proofedBlock(this);
-      int from_bitField0_ = bitField0_;
-      int to_bitField0_ = 0;
       if (bBuilder_ == null) {
         result.b_ = b_;
       } else {
@@ -486,16 +423,6 @@ private static final long serialVersionUID = 0L;
       }
       result.cid_ = cid_;
       result.sig_ = sig_;
-      if (votesBuilder_ == null) {
-        if (((bitField0_ & 0x00000008) == 0x00000008)) {
-          votes_ = java.util.Collections.unmodifiableList(votes_);
-          bitField0_ = (bitField0_ & ~0x00000008);
-        }
-        result.votes_ = votes_;
-      } else {
-        result.votes_ = votesBuilder_.build();
-      }
-      result.bitField0_ = to_bitField0_;
       onBuilt();
       return result;
     }
@@ -547,32 +474,6 @@ private static final long serialVersionUID = 0L;
         sig_ = other.sig_;
         onChanged();
       }
-      if (votesBuilder_ == null) {
-        if (!other.votes_.isEmpty()) {
-          if (votes_.isEmpty()) {
-            votes_ = other.votes_;
-            bitField0_ = (bitField0_ & ~0x00000008);
-          } else {
-            ensureVotesIsMutable();
-            votes_.addAll(other.votes_);
-          }
-          onChanged();
-        }
-      } else {
-        if (!other.votes_.isEmpty()) {
-          if (votesBuilder_.isEmpty()) {
-            votesBuilder_.dispose();
-            votesBuilder_ = null;
-            votes_ = other.votes_;
-            bitField0_ = (bitField0_ & ~0x00000008);
-            votesBuilder_ = 
-              com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
-                 getVotesFieldBuilder() : null;
-          } else {
-            votesBuilder_.addAllMessages(other.votes_);
-          }
-        }
-      }
       this.mergeUnknownFields(other.unknownFields);
       onChanged();
       return this;
@@ -599,7 +500,6 @@ private static final long serialVersionUID = 0L;
       }
       return this;
     }
-    private int bitField0_;
 
     private proto.Block b_ = null;
     private com.google.protobuf.SingleFieldBuilderV3<
@@ -746,6 +646,10 @@ private static final long serialVersionUID = 0L;
 
     private java.lang.Object sig_ = "";
     /**
+     * <pre>
+     *    repeated BbcDecision votes = 4;
+     * </pre>
+     *
      * <code>string Sig = 3;</code>
      */
     public java.lang.String getSig() {
@@ -761,6 +665,10 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
+     * <pre>
+     *    repeated BbcDecision votes = 4;
+     * </pre>
+     *
      * <code>string Sig = 3;</code>
      */
     public com.google.protobuf.ByteString
@@ -777,6 +685,10 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
+     * <pre>
+     *    repeated BbcDecision votes = 4;
+     * </pre>
+     *
      * <code>string Sig = 3;</code>
      */
     public Builder setSig(
@@ -790,6 +702,10 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
+     * <pre>
+     *    repeated BbcDecision votes = 4;
+     * </pre>
+     *
      * <code>string Sig = 3;</code>
      */
     public Builder clearSig() {
@@ -799,6 +715,10 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
+     * <pre>
+     *    repeated BbcDecision votes = 4;
+     * </pre>
+     *
      * <code>string Sig = 3;</code>
      */
     public Builder setSigBytes(
@@ -811,246 +731,6 @@ private static final long serialVersionUID = 0L;
       sig_ = value;
       onChanged();
       return this;
-    }
-
-    private java.util.List<proto.BbcProtos.BbcDecision> votes_ =
-      java.util.Collections.emptyList();
-    private void ensureVotesIsMutable() {
-      if (!((bitField0_ & 0x00000008) == 0x00000008)) {
-        votes_ = new java.util.ArrayList<proto.BbcProtos.BbcDecision>(votes_);
-        bitField0_ |= 0x00000008;
-       }
-    }
-
-    private com.google.protobuf.RepeatedFieldBuilderV3<
-        proto.BbcProtos.BbcDecision, proto.BbcProtos.BbcDecision.Builder, proto.BbcProtos.BbcDecisionOrBuilder> votesBuilder_;
-
-    /**
-     * <code>repeated .proto.BbcDecision votes = 4;</code>
-     */
-    public java.util.List<proto.BbcProtos.BbcDecision> getVotesList() {
-      if (votesBuilder_ == null) {
-        return java.util.Collections.unmodifiableList(votes_);
-      } else {
-        return votesBuilder_.getMessageList();
-      }
-    }
-    /**
-     * <code>repeated .proto.BbcDecision votes = 4;</code>
-     */
-    public int getVotesCount() {
-      if (votesBuilder_ == null) {
-        return votes_.size();
-      } else {
-        return votesBuilder_.getCount();
-      }
-    }
-    /**
-     * <code>repeated .proto.BbcDecision votes = 4;</code>
-     */
-    public proto.BbcProtos.BbcDecision getVotes(int index) {
-      if (votesBuilder_ == null) {
-        return votes_.get(index);
-      } else {
-        return votesBuilder_.getMessage(index);
-      }
-    }
-    /**
-     * <code>repeated .proto.BbcDecision votes = 4;</code>
-     */
-    public Builder setVotes(
-        int index, proto.BbcProtos.BbcDecision value) {
-      if (votesBuilder_ == null) {
-        if (value == null) {
-          throw new NullPointerException();
-        }
-        ensureVotesIsMutable();
-        votes_.set(index, value);
-        onChanged();
-      } else {
-        votesBuilder_.setMessage(index, value);
-      }
-      return this;
-    }
-    /**
-     * <code>repeated .proto.BbcDecision votes = 4;</code>
-     */
-    public Builder setVotes(
-        int index, proto.BbcProtos.BbcDecision.Builder builderForValue) {
-      if (votesBuilder_ == null) {
-        ensureVotesIsMutable();
-        votes_.set(index, builderForValue.build());
-        onChanged();
-      } else {
-        votesBuilder_.setMessage(index, builderForValue.build());
-      }
-      return this;
-    }
-    /**
-     * <code>repeated .proto.BbcDecision votes = 4;</code>
-     */
-    public Builder addVotes(proto.BbcProtos.BbcDecision value) {
-      if (votesBuilder_ == null) {
-        if (value == null) {
-          throw new NullPointerException();
-        }
-        ensureVotesIsMutable();
-        votes_.add(value);
-        onChanged();
-      } else {
-        votesBuilder_.addMessage(value);
-      }
-      return this;
-    }
-    /**
-     * <code>repeated .proto.BbcDecision votes = 4;</code>
-     */
-    public Builder addVotes(
-        int index, proto.BbcProtos.BbcDecision value) {
-      if (votesBuilder_ == null) {
-        if (value == null) {
-          throw new NullPointerException();
-        }
-        ensureVotesIsMutable();
-        votes_.add(index, value);
-        onChanged();
-      } else {
-        votesBuilder_.addMessage(index, value);
-      }
-      return this;
-    }
-    /**
-     * <code>repeated .proto.BbcDecision votes = 4;</code>
-     */
-    public Builder addVotes(
-        proto.BbcProtos.BbcDecision.Builder builderForValue) {
-      if (votesBuilder_ == null) {
-        ensureVotesIsMutable();
-        votes_.add(builderForValue.build());
-        onChanged();
-      } else {
-        votesBuilder_.addMessage(builderForValue.build());
-      }
-      return this;
-    }
-    /**
-     * <code>repeated .proto.BbcDecision votes = 4;</code>
-     */
-    public Builder addVotes(
-        int index, proto.BbcProtos.BbcDecision.Builder builderForValue) {
-      if (votesBuilder_ == null) {
-        ensureVotesIsMutable();
-        votes_.add(index, builderForValue.build());
-        onChanged();
-      } else {
-        votesBuilder_.addMessage(index, builderForValue.build());
-      }
-      return this;
-    }
-    /**
-     * <code>repeated .proto.BbcDecision votes = 4;</code>
-     */
-    public Builder addAllVotes(
-        java.lang.Iterable<? extends proto.BbcProtos.BbcDecision> values) {
-      if (votesBuilder_ == null) {
-        ensureVotesIsMutable();
-        com.google.protobuf.AbstractMessageLite.Builder.addAll(
-            values, votes_);
-        onChanged();
-      } else {
-        votesBuilder_.addAllMessages(values);
-      }
-      return this;
-    }
-    /**
-     * <code>repeated .proto.BbcDecision votes = 4;</code>
-     */
-    public Builder clearVotes() {
-      if (votesBuilder_ == null) {
-        votes_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00000008);
-        onChanged();
-      } else {
-        votesBuilder_.clear();
-      }
-      return this;
-    }
-    /**
-     * <code>repeated .proto.BbcDecision votes = 4;</code>
-     */
-    public Builder removeVotes(int index) {
-      if (votesBuilder_ == null) {
-        ensureVotesIsMutable();
-        votes_.remove(index);
-        onChanged();
-      } else {
-        votesBuilder_.remove(index);
-      }
-      return this;
-    }
-    /**
-     * <code>repeated .proto.BbcDecision votes = 4;</code>
-     */
-    public proto.BbcProtos.BbcDecision.Builder getVotesBuilder(
-        int index) {
-      return getVotesFieldBuilder().getBuilder(index);
-    }
-    /**
-     * <code>repeated .proto.BbcDecision votes = 4;</code>
-     */
-    public proto.BbcProtos.BbcDecisionOrBuilder getVotesOrBuilder(
-        int index) {
-      if (votesBuilder_ == null) {
-        return votes_.get(index);  } else {
-        return votesBuilder_.getMessageOrBuilder(index);
-      }
-    }
-    /**
-     * <code>repeated .proto.BbcDecision votes = 4;</code>
-     */
-    public java.util.List<? extends proto.BbcProtos.BbcDecisionOrBuilder> 
-         getVotesOrBuilderList() {
-      if (votesBuilder_ != null) {
-        return votesBuilder_.getMessageOrBuilderList();
-      } else {
-        return java.util.Collections.unmodifiableList(votes_);
-      }
-    }
-    /**
-     * <code>repeated .proto.BbcDecision votes = 4;</code>
-     */
-    public proto.BbcProtos.BbcDecision.Builder addVotesBuilder() {
-      return getVotesFieldBuilder().addBuilder(
-          proto.BbcProtos.BbcDecision.getDefaultInstance());
-    }
-    /**
-     * <code>repeated .proto.BbcDecision votes = 4;</code>
-     */
-    public proto.BbcProtos.BbcDecision.Builder addVotesBuilder(
-        int index) {
-      return getVotesFieldBuilder().addBuilder(
-          index, proto.BbcProtos.BbcDecision.getDefaultInstance());
-    }
-    /**
-     * <code>repeated .proto.BbcDecision votes = 4;</code>
-     */
-    public java.util.List<proto.BbcProtos.BbcDecision.Builder> 
-         getVotesBuilderList() {
-      return getVotesFieldBuilder().getBuilderList();
-    }
-    private com.google.protobuf.RepeatedFieldBuilderV3<
-        proto.BbcProtos.BbcDecision, proto.BbcProtos.BbcDecision.Builder, proto.BbcProtos.BbcDecisionOrBuilder> 
-        getVotesFieldBuilder() {
-      if (votesBuilder_ == null) {
-        votesBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
-            proto.BbcProtos.BbcDecision, proto.BbcProtos.BbcDecision.Builder, proto.BbcProtos.BbcDecisionOrBuilder>(
-                votes_,
-                ((bitField0_ & 0x00000008) == 0x00000008),
-                getParentForChildren(),
-                isClean());
-        votes_ = null;
-      }
-      return votesBuilder_;
     }
     public final Builder setUnknownFields(
         final com.google.protobuf.UnknownFieldSet unknownFields) {

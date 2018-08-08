@@ -26,36 +26,20 @@ public interface proofedBlockOrBuilder extends
   int getCid();
 
   /**
+   * <pre>
+   *    repeated BbcDecision votes = 4;
+   * </pre>
+   *
    * <code>string Sig = 3;</code>
    */
   java.lang.String getSig();
   /**
+   * <pre>
+   *    repeated BbcDecision votes = 4;
+   * </pre>
+   *
    * <code>string Sig = 3;</code>
    */
   com.google.protobuf.ByteString
       getSigBytes();
-
-  /**
-   * <code>repeated .proto.BbcDecision votes = 4;</code>
-   */
-  java.util.List<proto.BbcProtos.BbcDecision> 
-      getVotesList();
-  /**
-   * <code>repeated .proto.BbcDecision votes = 4;</code>
-   */
-  proto.BbcProtos.BbcDecision getVotes(int index);
-  /**
-   * <code>repeated .proto.BbcDecision votes = 4;</code>
-   */
-  int getVotesCount();
-  /**
-   * <code>repeated .proto.BbcDecision votes = 4;</code>
-   */
-  java.util.List<? extends proto.BbcProtos.BbcDecisionOrBuilder> 
-      getVotesOrBuilderList();
-  /**
-   * <code>repeated .proto.BbcDecision votes = 4;</code>
-   */
-  proto.BbcProtos.BbcDecisionOrBuilder getVotesOrBuilder(
-      int index);
 }

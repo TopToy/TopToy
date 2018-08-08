@@ -13,7 +13,12 @@ public interface RmfResultOrBuilder extends
   int getCid();
 
   /**
-   * <code>bytes data = 2;</code>
+   * <code>int32 cidSeries = 2;</code>
+   */
+  int getCidSeries();
+
+  /**
+   * <code>bytes data = 3;</code>
    */
   com.google.protobuf.ByteString getData();
 }

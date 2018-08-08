@@ -21,7 +21,7 @@ public class RmfNode extends Node{
     protected boolean stopped = false;
     protected RmfService rmfService;
     protected Server rmfServer;
-    protected int cid = 0;
+//    protected int cid = 0;
 
     public RmfNode(int id, String addr, int rmfPort, int f , ArrayList<Node> nodes, String bbcConfig) {
         super(addr, rmfPort, -1,  id);
@@ -73,13 +73,14 @@ public class RmfNode extends Node{
         rmfService.start();
     }
 
-    public void broadcast(byte[] msg, int height) {
+    public void broadcast(int cidSeries, int cid, byte[] msg, int height) {
         logger.info(format("[#%d] broadcast data message with [height=%d]", getID(), height));
         Meta metaMsg = Meta.
                 newBuilder().
                 setSender(getID()).
                 setHeight(height).
                 setCid(cid).
+                setCidSeries(cidSeries).
                 build();
         Data.Builder dataMsg = Data.
                 newBuilder().
@@ -88,40 +89,41 @@ public class RmfNode extends Node{
         rmfService.rmfBroadcast(dataMsg.setSig(rmfDigSig.sign(dataMsg)).build());
     }
 
-    public RmfResult deliver(int height, int sender, int tmo) {
-        Data data = rmfService.deliver(cid, tmo, sender, height);
+    public RmfResult deliver(int cidSeries, int cid, int height, int sender, int tmo) throws InterruptedException {
+        Data data = rmfService.deliver(cidSeries, cid, tmo, sender, height);
         if (data != null && data.getMeta().getCid() == -1) {
             return RmfResult.newBuilder().setCid(-1).build();
         }
         RmfResult res = RmfResult.
                 newBuilder().
                 setCid(cid).
+                setCidSeries(cidSeries).
                 setData(data == null ? ByteString.EMPTY : data.getData()).
                 build();
-        cid++;
+//        cid++;
         return res;
     }
 
-    public String getRmfDataSig(int cid) {
-        return rmfService.getMessageSig(cid);
+    public String getRmfDataSig(int cidSeries, int cid) {
+        return rmfService.getMessageSig(cidSeries, cid);
     }
 
-    public RmfResult nonBlockingDeliver(int cid) {
-        Data data = rmfService.nonBlockingDeliver(cid);
-        return RmfResult.
-                newBuilder().
-                setCid(cid).
-                setData(data == null ? ByteString.EMPTY : data.getData()).
-                build();
-    }
+//    public RmfResult nonBlockingDeliver(int cid) {
+//        Data data = rmfService.nonBlockingDeliver(cid);
+//        return RmfResult.
+//                newBuilder().
+//                setCid(cid).
+//                setData(data == null ? ByteString.EMPTY : data.getData()).
+//                build();
+//    }
 
-    public void updateCid(int nCid) {
-        cid = nCid;
-    }
-
-    public void cleanBuffers() {
+//    public void updateCid(int nCid) {
+//        cid = nCid;
+//    }
+//
+//    public void cleanBuffers() {
 //        rmfService.cleanBuffers(cid);
-    }
+//    }
 
     public void suspendAllThreads() {
 

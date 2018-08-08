@@ -8,7 +8,8 @@ title = "configuration"
     tmo = 1000
     tmoInterval = 100
     rmfBbcConfigPath = "config/bbcConfig/bbcFourServers"
-    RBroadcastConfigPath = "src/main/java/consensus/RBroadcast/config"
+    panicRBroadcastConfigPath = "src/main/resources/panicRBConfig"
+    syncRBroadcastConfigPath = "src/main/resources/syncRBConfig"
     maxTransactionInBlock = 1
 
 [server]

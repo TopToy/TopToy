@@ -23,11 +23,21 @@ public interface BlockHeaderOrBuilder extends
   int getHeight();
 
   /**
+   * <code>bytes transactionHash = 4;</code>
+   */
+  com.google.protobuf.ByteString getTransactionHash();
+
+  /**
+   * <code>int32 cid = 5;</code>
+   */
+  int getCid();
+
+  /**
    * <pre>
    *    MerkleTree mt = 4;
    * </pre>
    *
-   * <code>bytes transactionHash = 4;</code>
+   * <code>int32 cidSeries = 6;</code>
    */
-  com.google.protobuf.ByteString getTransactionHash();
+  int getCidSeries();
 }

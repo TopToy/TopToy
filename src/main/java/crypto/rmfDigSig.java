@@ -2,13 +2,12 @@ package crypto;
 
 import proto.Data;
 
-import java.util.Objects;
 
 public class rmfDigSig implements digitalSignature {
     @Override
     public String signMessage(Object toSign) {
         Data.Builder m = (Data.Builder) toSign;
-        return pkiUtils.sign(String.valueOf(m.getMeta().getCid())
+        return pkiUtils.sign(String.valueOf(m.getMeta().getCidSeries()) + String.valueOf(m.getMeta().getCid())
                 + new String (m.getData().toByteArray()));
     }
 
@@ -16,7 +15,7 @@ public class rmfDigSig implements digitalSignature {
     public boolean verifyMessage(int id, Object toVer) {
         Data m = (Data) toVer;
         return  pkiUtils.verify(id,
-                String.valueOf(m.getMeta().getCid())
+                String.valueOf(m.getMeta().getCidSeries()) + String.valueOf(m.getMeta().getCid())
                         + new String(m.getData().toByteArray()),
                 m.getSig());
     }

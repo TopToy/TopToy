@@ -7,6 +7,7 @@ public class blockDigSig implements digitalSignature {
     protected class blockVerifyer {
         protected Block b;
         protected int cid;
+        int cidSeries;
         protected String sig;
     }
     private blockVerifyer bv = new blockVerifyer();
@@ -19,16 +20,17 @@ public class blockDigSig implements digitalSignature {
     @Override
     public boolean verifyMessage(int id, Object toVer) {
         return  pkiUtils.verify(id,
-                String.valueOf(bv.cid)
+                String.valueOf(bv.cidSeries) + String.valueOf(bv.cid)
                         + new String(bv.b.toByteArray()),
                 bv.sig);
     }
 
-    public static boolean verify(int id, int cid, String sig, Block b) {
+    public static boolean verify(int id, int cidSeries, int cid, String sig, Block b) {
         blockDigSig bs = new blockDigSig();
         bs.bv.b = b;
         bs.bv.cid = cid;
         bs.bv.sig = sig;
+        bs.bv.cidSeries = cidSeries;
         return bs.verifyMessage(id, null);
     }
 }

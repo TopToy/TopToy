@@ -11,6 +11,8 @@ message BlockHeader {
     int32 creatorID = 2;
     int32 height = 3;
     bytes transactionHash = 4;
+    int32 cid = 5;
+    int32 cidSeries = 6;
 //    MerkleTree mt = 4;
 }
 
@@ -37,11 +39,13 @@ message accepted {
 }
 
 message ForkProof {
-    RmfResult curr = 1;
-    string currSig = 2;
-    RmfResult prev = 3;
-    string prevSig = 4;
+    int32 sender = 1;
+    Block curr = 2;
+    string currSig = 3;
+    Block prev = 4;
+    string prevSig = 5;
 }
+
 
 //message empty {
 //

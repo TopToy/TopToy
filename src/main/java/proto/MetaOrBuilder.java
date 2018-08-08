@@ -21,4 +21,9 @@ public interface MetaOrBuilder extends
    * <code>int32 cid = 3;</code>
    */
   int getCid();
+
+  /**
+   * <code>int32 cidSeries = 4;</code>
+   */
+  int getCidSeries();
 }

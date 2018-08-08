@@ -6,8 +6,12 @@ import proto.Crypto;
 
 public class basicBlockchain extends blockchain {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(basicBlockchain.class);
+
+    public basicBlockchain(blockchain orig, int start, int end) {
+        super(orig, start, end);
+    }
     public basicBlockchain(int creatorID) {
-        super(creatorID, "SHA-256");
+        super(creatorID);
     }
 
     @Override
@@ -22,10 +26,7 @@ public class basicBlockchain extends blockchain {
     }
 
     @Override
-    boolean validateBlockData(Block b) {
+    public boolean validateBlockData(Block b) {
         return true;
     }
-
-
-
 }

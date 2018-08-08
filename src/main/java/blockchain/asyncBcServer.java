@@ -181,12 +181,20 @@ public class asyncBcServer extends bcServer {
 //            logger.info(format("[#%d] [heigh1=%d", getID(), currHeight, ));
             Block sealedBlock = currBlock.construct(getID(), currHeight, DigestMethod.hash(bc.getBlock(currHeight - 1).getHeader().toByteArray()));
             currBlock = bc.createNewBLock();
-            rmfServer.broadcast(sealedBlock.toByteArray(), currHeight);
+            rmfServer.broadcast(cidSeries, cid, sealedBlock.toByteArray(), currHeight);
         }
 
 
     }
+    @Override
+    blockchain initBC(int id) {
+        return new basicBlockchain(id);
+    }
 
+    @Override
+    blockchain getBC(int start, int end) {
+        return new basicBlockchain(this.bc, start, end);
+    }
 //    public boolean addTransaction(byte[] data, int clientID) {
 //        Transaction t = Transaction.newBuilder().setClientID(clientID).setData(ByteString.copyFrom(data)).build();
 //        synchronized (blockLock) {

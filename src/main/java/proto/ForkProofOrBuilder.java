@@ -8,47 +8,52 @@ public interface ForkProofOrBuilder extends
     com.google.protobuf.MessageOrBuilder {
 
   /**
-   * <code>.proto.RmfResult curr = 1;</code>
+   * <code>int32 sender = 1;</code>
+   */
+  int getSender();
+
+  /**
+   * <code>.proto.Block curr = 2;</code>
    */
   boolean hasCurr();
   /**
-   * <code>.proto.RmfResult curr = 1;</code>
+   * <code>.proto.Block curr = 2;</code>
    */
-  proto.RmfResult getCurr();
+  proto.Block getCurr();
   /**
-   * <code>.proto.RmfResult curr = 1;</code>
+   * <code>.proto.Block curr = 2;</code>
    */
-  proto.RmfResultOrBuilder getCurrOrBuilder();
+  proto.BlockOrBuilder getCurrOrBuilder();
 
   /**
-   * <code>string currSig = 2;</code>
+   * <code>string currSig = 3;</code>
    */
   java.lang.String getCurrSig();
   /**
-   * <code>string currSig = 2;</code>
+   * <code>string currSig = 3;</code>
    */
   com.google.protobuf.ByteString
       getCurrSigBytes();
 
   /**
-   * <code>.proto.RmfResult prev = 3;</code>
+   * <code>.proto.Block prev = 4;</code>
    */
   boolean hasPrev();
   /**
-   * <code>.proto.RmfResult prev = 3;</code>
+   * <code>.proto.Block prev = 4;</code>
    */
-  proto.RmfResult getPrev();
+  proto.Block getPrev();
   /**
-   * <code>.proto.RmfResult prev = 3;</code>
+   * <code>.proto.Block prev = 4;</code>
    */
-  proto.RmfResultOrBuilder getPrevOrBuilder();
+  proto.BlockOrBuilder getPrevOrBuilder();
 
   /**
-   * <code>string prevSig = 4;</code>
+   * <code>string prevSig = 5;</code>
    */
   java.lang.String getPrevSig();
   /**
-   * <code>string prevSig = 4;</code>
+   * <code>string prevSig = 5;</code>
    */
   com.google.protobuf.ByteString
       getPrevSigBytes();

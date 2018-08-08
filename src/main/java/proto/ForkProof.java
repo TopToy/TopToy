@@ -16,6 +16,7 @@ private static final long serialVersionUID = 0L;
     super(builder);
   }
   private ForkProof() {
+    sender_ = 0;
     currSig_ = "";
     prevSig_ = "";
   }
@@ -51,12 +52,17 @@ private static final long serialVersionUID = 0L;
             }
             break;
           }
-          case 10: {
-            proto.RmfResult.Builder subBuilder = null;
+          case 8: {
+
+            sender_ = input.readInt32();
+            break;
+          }
+          case 18: {
+            proto.Block.Builder subBuilder = null;
             if (curr_ != null) {
               subBuilder = curr_.toBuilder();
             }
-            curr_ = input.readMessage(proto.RmfResult.parser(), extensionRegistry);
+            curr_ = input.readMessage(proto.Block.parser(), extensionRegistry);
             if (subBuilder != null) {
               subBuilder.mergeFrom(curr_);
               curr_ = subBuilder.buildPartial();
@@ -64,18 +70,18 @@ private static final long serialVersionUID = 0L;
 
             break;
           }
-          case 18: {
+          case 26: {
             java.lang.String s = input.readStringRequireUtf8();
 
             currSig_ = s;
             break;
           }
-          case 26: {
-            proto.RmfResult.Builder subBuilder = null;
+          case 34: {
+            proto.Block.Builder subBuilder = null;
             if (prev_ != null) {
               subBuilder = prev_.toBuilder();
             }
-            prev_ = input.readMessage(proto.RmfResult.parser(), extensionRegistry);
+            prev_ = input.readMessage(proto.Block.parser(), extensionRegistry);
             if (subBuilder != null) {
               subBuilder.mergeFrom(prev_);
               prev_ = subBuilder.buildPartial();
@@ -83,7 +89,7 @@ private static final long serialVersionUID = 0L;
 
             break;
           }
-          case 34: {
+          case 42: {
             java.lang.String s = input.readStringRequireUtf8();
 
             prevSig_ = s;
@@ -113,31 +119,40 @@ private static final long serialVersionUID = 0L;
             proto.ForkProof.class, proto.ForkProof.Builder.class);
   }
 
-  public static final int CURR_FIELD_NUMBER = 1;
-  private proto.RmfResult curr_;
+  public static final int SENDER_FIELD_NUMBER = 1;
+  private int sender_;
   /**
-   * <code>.proto.RmfResult curr = 1;</code>
+   * <code>int32 sender = 1;</code>
+   */
+  public int getSender() {
+    return sender_;
+  }
+
+  public static final int CURR_FIELD_NUMBER = 2;
+  private proto.Block curr_;
+  /**
+   * <code>.proto.Block curr = 2;</code>
    */
   public boolean hasCurr() {
     return curr_ != null;
   }
   /**
-   * <code>.proto.RmfResult curr = 1;</code>
+   * <code>.proto.Block curr = 2;</code>
    */
-  public proto.RmfResult getCurr() {
-    return curr_ == null ? proto.RmfResult.getDefaultInstance() : curr_;
+  public proto.Block getCurr() {
+    return curr_ == null ? proto.Block.getDefaultInstance() : curr_;
   }
   /**
-   * <code>.proto.RmfResult curr = 1;</code>
+   * <code>.proto.Block curr = 2;</code>
    */
-  public proto.RmfResultOrBuilder getCurrOrBuilder() {
+  public proto.BlockOrBuilder getCurrOrBuilder() {
     return getCurr();
   }
 
-  public static final int CURRSIG_FIELD_NUMBER = 2;
+  public static final int CURRSIG_FIELD_NUMBER = 3;
   private volatile java.lang.Object currSig_;
   /**
-   * <code>string currSig = 2;</code>
+   * <code>string currSig = 3;</code>
    */
   public java.lang.String getCurrSig() {
     java.lang.Object ref = currSig_;
@@ -152,7 +167,7 @@ private static final long serialVersionUID = 0L;
     }
   }
   /**
-   * <code>string currSig = 2;</code>
+   * <code>string currSig = 3;</code>
    */
   public com.google.protobuf.ByteString
       getCurrSigBytes() {
@@ -168,31 +183,31 @@ private static final long serialVersionUID = 0L;
     }
   }
 
-  public static final int PREV_FIELD_NUMBER = 3;
-  private proto.RmfResult prev_;
+  public static final int PREV_FIELD_NUMBER = 4;
+  private proto.Block prev_;
   /**
-   * <code>.proto.RmfResult prev = 3;</code>
+   * <code>.proto.Block prev = 4;</code>
    */
   public boolean hasPrev() {
     return prev_ != null;
   }
   /**
-   * <code>.proto.RmfResult prev = 3;</code>
+   * <code>.proto.Block prev = 4;</code>
    */
-  public proto.RmfResult getPrev() {
-    return prev_ == null ? proto.RmfResult.getDefaultInstance() : prev_;
+  public proto.Block getPrev() {
+    return prev_ == null ? proto.Block.getDefaultInstance() : prev_;
   }
   /**
-   * <code>.proto.RmfResult prev = 3;</code>
+   * <code>.proto.Block prev = 4;</code>
    */
-  public proto.RmfResultOrBuilder getPrevOrBuilder() {
+  public proto.BlockOrBuilder getPrevOrBuilder() {
     return getPrev();
   }
 
-  public static final int PREVSIG_FIELD_NUMBER = 4;
+  public static final int PREVSIG_FIELD_NUMBER = 5;
   private volatile java.lang.Object prevSig_;
   /**
-   * <code>string prevSig = 4;</code>
+   * <code>string prevSig = 5;</code>
    */
   public java.lang.String getPrevSig() {
     java.lang.Object ref = prevSig_;
@@ -207,7 +222,7 @@ private static final long serialVersionUID = 0L;
     }
   }
   /**
-   * <code>string prevSig = 4;</code>
+   * <code>string prevSig = 5;</code>
    */
   public com.google.protobuf.ByteString
       getPrevSigBytes() {
@@ -235,17 +250,20 @@ private static final long serialVersionUID = 0L;
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
+    if (sender_ != 0) {
+      output.writeInt32(1, sender_);
+    }
     if (curr_ != null) {
-      output.writeMessage(1, getCurr());
+      output.writeMessage(2, getCurr());
     }
     if (!getCurrSigBytes().isEmpty()) {
-      com.google.protobuf.GeneratedMessageV3.writeString(output, 2, currSig_);
+      com.google.protobuf.GeneratedMessageV3.writeString(output, 3, currSig_);
     }
     if (prev_ != null) {
-      output.writeMessage(3, getPrev());
+      output.writeMessage(4, getPrev());
     }
     if (!getPrevSigBytes().isEmpty()) {
-      com.google.protobuf.GeneratedMessageV3.writeString(output, 4, prevSig_);
+      com.google.protobuf.GeneratedMessageV3.writeString(output, 5, prevSig_);
     }
     unknownFields.writeTo(output);
   }
@@ -255,19 +273,23 @@ private static final long serialVersionUID = 0L;
     if (size != -1) return size;
 
     size = 0;
+    if (sender_ != 0) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeInt32Size(1, sender_);
+    }
     if (curr_ != null) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(1, getCurr());
+        .computeMessageSize(2, getCurr());
     }
     if (!getCurrSigBytes().isEmpty()) {
-      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, currSig_);
+      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, currSig_);
     }
     if (prev_ != null) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(3, getPrev());
+        .computeMessageSize(4, getPrev());
     }
     if (!getPrevSigBytes().isEmpty()) {
-      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, prevSig_);
+      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(5, prevSig_);
     }
     size += unknownFields.getSerializedSize();
     memoizedSize = size;
@@ -285,6 +307,8 @@ private static final long serialVersionUID = 0L;
     proto.ForkProof other = (proto.ForkProof) obj;
 
     boolean result = true;
+    result = result && (getSender()
+        == other.getSender());
     result = result && (hasCurr() == other.hasCurr());
     if (hasCurr()) {
       result = result && getCurr()
@@ -310,6 +334,8 @@ private static final long serialVersionUID = 0L;
     }
     int hash = 41;
     hash = (19 * hash) + getDescriptor().hashCode();
+    hash = (37 * hash) + SENDER_FIELD_NUMBER;
+    hash = (53 * hash) + getSender();
     if (hasCurr()) {
       hash = (37 * hash) + CURR_FIELD_NUMBER;
       hash = (53 * hash) + getCurr().hashCode();
@@ -451,6 +477,8 @@ private static final long serialVersionUID = 0L;
     }
     public Builder clear() {
       super.clear();
+      sender_ = 0;
+
       if (currBuilder_ == null) {
         curr_ = null;
       } else {
@@ -489,6 +517,7 @@ private static final long serialVersionUID = 0L;
 
     public proto.ForkProof buildPartial() {
       proto.ForkProof result = new proto.ForkProof(this);
+      result.sender_ = sender_;
       if (currBuilder_ == null) {
         result.curr_ = curr_;
       } else {
@@ -542,6 +571,9 @@ private static final long serialVersionUID = 0L;
 
     public Builder mergeFrom(proto.ForkProof other) {
       if (other == proto.ForkProof.getDefaultInstance()) return this;
+      if (other.getSender() != 0) {
+        setSender(other.getSender());
+      }
       if (other.hasCurr()) {
         mergeCurr(other.getCurr());
       }
@@ -583,29 +615,55 @@ private static final long serialVersionUID = 0L;
       return this;
     }
 
-    private proto.RmfResult curr_ = null;
-    private com.google.protobuf.SingleFieldBuilderV3<
-        proto.RmfResult, proto.RmfResult.Builder, proto.RmfResultOrBuilder> currBuilder_;
+    private int sender_ ;
     /**
-     * <code>.proto.RmfResult curr = 1;</code>
+     * <code>int32 sender = 1;</code>
+     */
+    public int getSender() {
+      return sender_;
+    }
+    /**
+     * <code>int32 sender = 1;</code>
+     */
+    public Builder setSender(int value) {
+      
+      sender_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>int32 sender = 1;</code>
+     */
+    public Builder clearSender() {
+      
+      sender_ = 0;
+      onChanged();
+      return this;
+    }
+
+    private proto.Block curr_ = null;
+    private com.google.protobuf.SingleFieldBuilderV3<
+        proto.Block, proto.Block.Builder, proto.BlockOrBuilder> currBuilder_;
+    /**
+     * <code>.proto.Block curr = 2;</code>
      */
     public boolean hasCurr() {
       return currBuilder_ != null || curr_ != null;
     }
     /**
-     * <code>.proto.RmfResult curr = 1;</code>
+     * <code>.proto.Block curr = 2;</code>
      */
-    public proto.RmfResult getCurr() {
+    public proto.Block getCurr() {
       if (currBuilder_ == null) {
-        return curr_ == null ? proto.RmfResult.getDefaultInstance() : curr_;
+        return curr_ == null ? proto.Block.getDefaultInstance() : curr_;
       } else {
         return currBuilder_.getMessage();
       }
     }
     /**
-     * <code>.proto.RmfResult curr = 1;</code>
+     * <code>.proto.Block curr = 2;</code>
      */
-    public Builder setCurr(proto.RmfResult value) {
+    public Builder setCurr(proto.Block value) {
       if (currBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
@@ -619,10 +677,10 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.proto.RmfResult curr = 1;</code>
+     * <code>.proto.Block curr = 2;</code>
      */
     public Builder setCurr(
-        proto.RmfResult.Builder builderForValue) {
+        proto.Block.Builder builderForValue) {
       if (currBuilder_ == null) {
         curr_ = builderForValue.build();
         onChanged();
@@ -633,13 +691,13 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.proto.RmfResult curr = 1;</code>
+     * <code>.proto.Block curr = 2;</code>
      */
-    public Builder mergeCurr(proto.RmfResult value) {
+    public Builder mergeCurr(proto.Block value) {
       if (currBuilder_ == null) {
         if (curr_ != null) {
           curr_ =
-            proto.RmfResult.newBuilder(curr_).mergeFrom(value).buildPartial();
+            proto.Block.newBuilder(curr_).mergeFrom(value).buildPartial();
         } else {
           curr_ = value;
         }
@@ -651,7 +709,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.proto.RmfResult curr = 1;</code>
+     * <code>.proto.Block curr = 2;</code>
      */
     public Builder clearCurr() {
       if (currBuilder_ == null) {
@@ -665,33 +723,33 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.proto.RmfResult curr = 1;</code>
+     * <code>.proto.Block curr = 2;</code>
      */
-    public proto.RmfResult.Builder getCurrBuilder() {
+    public proto.Block.Builder getCurrBuilder() {
       
       onChanged();
       return getCurrFieldBuilder().getBuilder();
     }
     /**
-     * <code>.proto.RmfResult curr = 1;</code>
+     * <code>.proto.Block curr = 2;</code>
      */
-    public proto.RmfResultOrBuilder getCurrOrBuilder() {
+    public proto.BlockOrBuilder getCurrOrBuilder() {
       if (currBuilder_ != null) {
         return currBuilder_.getMessageOrBuilder();
       } else {
         return curr_ == null ?
-            proto.RmfResult.getDefaultInstance() : curr_;
+            proto.Block.getDefaultInstance() : curr_;
       }
     }
     /**
-     * <code>.proto.RmfResult curr = 1;</code>
+     * <code>.proto.Block curr = 2;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        proto.RmfResult, proto.RmfResult.Builder, proto.RmfResultOrBuilder> 
+        proto.Block, proto.Block.Builder, proto.BlockOrBuilder> 
         getCurrFieldBuilder() {
       if (currBuilder_ == null) {
         currBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-            proto.RmfResult, proto.RmfResult.Builder, proto.RmfResultOrBuilder>(
+            proto.Block, proto.Block.Builder, proto.BlockOrBuilder>(
                 getCurr(),
                 getParentForChildren(),
                 isClean());
@@ -702,7 +760,7 @@ private static final long serialVersionUID = 0L;
 
     private java.lang.Object currSig_ = "";
     /**
-     * <code>string currSig = 2;</code>
+     * <code>string currSig = 3;</code>
      */
     public java.lang.String getCurrSig() {
       java.lang.Object ref = currSig_;
@@ -717,7 +775,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>string currSig = 2;</code>
+     * <code>string currSig = 3;</code>
      */
     public com.google.protobuf.ByteString
         getCurrSigBytes() {
@@ -733,7 +791,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>string currSig = 2;</code>
+     * <code>string currSig = 3;</code>
      */
     public Builder setCurrSig(
         java.lang.String value) {
@@ -746,7 +804,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>string currSig = 2;</code>
+     * <code>string currSig = 3;</code>
      */
     public Builder clearCurrSig() {
       
@@ -755,7 +813,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>string currSig = 2;</code>
+     * <code>string currSig = 3;</code>
      */
     public Builder setCurrSigBytes(
         com.google.protobuf.ByteString value) {
@@ -769,29 +827,29 @@ private static final long serialVersionUID = 0L;
       return this;
     }
 
-    private proto.RmfResult prev_ = null;
+    private proto.Block prev_ = null;
     private com.google.protobuf.SingleFieldBuilderV3<
-        proto.RmfResult, proto.RmfResult.Builder, proto.RmfResultOrBuilder> prevBuilder_;
+        proto.Block, proto.Block.Builder, proto.BlockOrBuilder> prevBuilder_;
     /**
-     * <code>.proto.RmfResult prev = 3;</code>
+     * <code>.proto.Block prev = 4;</code>
      */
     public boolean hasPrev() {
       return prevBuilder_ != null || prev_ != null;
     }
     /**
-     * <code>.proto.RmfResult prev = 3;</code>
+     * <code>.proto.Block prev = 4;</code>
      */
-    public proto.RmfResult getPrev() {
+    public proto.Block getPrev() {
       if (prevBuilder_ == null) {
-        return prev_ == null ? proto.RmfResult.getDefaultInstance() : prev_;
+        return prev_ == null ? proto.Block.getDefaultInstance() : prev_;
       } else {
         return prevBuilder_.getMessage();
       }
     }
     /**
-     * <code>.proto.RmfResult prev = 3;</code>
+     * <code>.proto.Block prev = 4;</code>
      */
-    public Builder setPrev(proto.RmfResult value) {
+    public Builder setPrev(proto.Block value) {
       if (prevBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
@@ -805,10 +863,10 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.proto.RmfResult prev = 3;</code>
+     * <code>.proto.Block prev = 4;</code>
      */
     public Builder setPrev(
-        proto.RmfResult.Builder builderForValue) {
+        proto.Block.Builder builderForValue) {
       if (prevBuilder_ == null) {
         prev_ = builderForValue.build();
         onChanged();
@@ -819,13 +877,13 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.proto.RmfResult prev = 3;</code>
+     * <code>.proto.Block prev = 4;</code>
      */
-    public Builder mergePrev(proto.RmfResult value) {
+    public Builder mergePrev(proto.Block value) {
       if (prevBuilder_ == null) {
         if (prev_ != null) {
           prev_ =
-            proto.RmfResult.newBuilder(prev_).mergeFrom(value).buildPartial();
+            proto.Block.newBuilder(prev_).mergeFrom(value).buildPartial();
         } else {
           prev_ = value;
         }
@@ -837,7 +895,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.proto.RmfResult prev = 3;</code>
+     * <code>.proto.Block prev = 4;</code>
      */
     public Builder clearPrev() {
       if (prevBuilder_ == null) {
@@ -851,33 +909,33 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.proto.RmfResult prev = 3;</code>
+     * <code>.proto.Block prev = 4;</code>
      */
-    public proto.RmfResult.Builder getPrevBuilder() {
+    public proto.Block.Builder getPrevBuilder() {
       
       onChanged();
       return getPrevFieldBuilder().getBuilder();
     }
     /**
-     * <code>.proto.RmfResult prev = 3;</code>
+     * <code>.proto.Block prev = 4;</code>
      */
-    public proto.RmfResultOrBuilder getPrevOrBuilder() {
+    public proto.BlockOrBuilder getPrevOrBuilder() {
       if (prevBuilder_ != null) {
         return prevBuilder_.getMessageOrBuilder();
       } else {
         return prev_ == null ?
-            proto.RmfResult.getDefaultInstance() : prev_;
+            proto.Block.getDefaultInstance() : prev_;
       }
     }
     /**
-     * <code>.proto.RmfResult prev = 3;</code>
+     * <code>.proto.Block prev = 4;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        proto.RmfResult, proto.RmfResult.Builder, proto.RmfResultOrBuilder> 
+        proto.Block, proto.Block.Builder, proto.BlockOrBuilder> 
         getPrevFieldBuilder() {
       if (prevBuilder_ == null) {
         prevBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-            proto.RmfResult, proto.RmfResult.Builder, proto.RmfResultOrBuilder>(
+            proto.Block, proto.Block.Builder, proto.BlockOrBuilder>(
                 getPrev(),
                 getParentForChildren(),
                 isClean());
@@ -888,7 +946,7 @@ private static final long serialVersionUID = 0L;
 
     private java.lang.Object prevSig_ = "";
     /**
-     * <code>string prevSig = 4;</code>
+     * <code>string prevSig = 5;</code>
      */
     public java.lang.String getPrevSig() {
       java.lang.Object ref = prevSig_;
@@ -903,7 +961,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>string prevSig = 4;</code>
+     * <code>string prevSig = 5;</code>
      */
     public com.google.protobuf.ByteString
         getPrevSigBytes() {
@@ -919,7 +977,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>string prevSig = 4;</code>
+     * <code>string prevSig = 5;</code>
      */
     public Builder setPrevSig(
         java.lang.String value) {
@@ -932,7 +990,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>string prevSig = 4;</code>
+     * <code>string prevSig = 5;</code>
      */
     public Builder clearPrevSig() {
       
@@ -941,7 +999,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>string prevSig = 4;</code>
+     * <code>string prevSig = 5;</code>
      */
     public Builder setPrevSigBytes(
         com.google.protobuf.ByteString value) {
