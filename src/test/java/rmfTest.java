@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class rmfTest {
-    private int timeToWaitBetweenTests = 1; //1000 * 15;
+    private int timeToWaitBetweenTests =1000 * 15;
     static Config conf = new Config();
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(rmfTest.class);
     private String localHost = "127.0.0.1";
@@ -148,7 +148,7 @@ public class rmfTest {
                 int finalI = i;
                 int finalK = k;
                 tasks[i] = new Thread(()-> {
-                    ret[finalI] = new String(((RmfNode) allNodes[finalI]).deliver(finalK, finalK % 4, 1000).getData().toByteArray());
+                    ret[finalI] = new String(((RmfNode) allNodes[finalI]).deliver(finalK, finalK % 4, 1* 1000).getData().toByteArray());
                 });
                 tasks[i].start();
             }

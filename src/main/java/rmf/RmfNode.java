@@ -90,6 +90,9 @@ public class RmfNode extends Node{
 
     public RmfResult deliver(int height, int sender, int tmo) {
         Data data = rmfService.deliver(cid, tmo, sender, height);
+        if (data != null && data.getMeta().getCid() == -1) {
+            return RmfResult.newBuilder().setCid(-1).build();
+        }
         RmfResult res = RmfResult.
                 newBuilder().
                 setCid(cid).
@@ -110,6 +113,18 @@ public class RmfNode extends Node{
                 setCid(cid).
                 setData(data == null ? ByteString.EMPTY : data.getData()).
                 build();
+    }
+
+    public void updateCid(int nCid) {
+        cid = nCid;
+    }
+
+    public void cleanBuffers() {
+//        rmfService.cleanBuffers(cid);
+    }
+
+    public void suspendAllThreads() {
+
     }
 
 }
