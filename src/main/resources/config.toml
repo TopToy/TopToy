@@ -10,7 +10,7 @@ title = "configuration"
     rmfBbcConfigPath = "config/bbcConfig/bbcFourServers"
     panicRBroadcastConfigPath = "src/main/resources/panicRBConfig"
     syncRBroadcastConfigPath = "src/main/resources/syncRBConfig"
-    maxTransactionInBlock = 1
+    maxTransactionInBlock = 2
 
 [server]
     id = 0

@@ -129,7 +129,7 @@ public abstract class bcServer extends Node {
         while (!stopped) {
 
             synchronized (fp) {
-                for (Integer key : fp.keySet().stream().filter(k -> k <= currHeight).collect(Collectors.toList())) {
+                for (Integer key : fp.keySet().stream().filter(k -> k < currHeight).collect(Collectors.toList())) {
                     fpEntry pe = fp.get(key);
                     if (!pe.done) {
                         logger.info(format("[#%d] have found a panic message [height=%d] [fp=%d]", getID(), currHeight, key));
@@ -151,7 +151,12 @@ public abstract class bcServer extends Node {
 //                }
 //            }
 
+            try {
                 leaderImpl();
+            } catch (InterruptedException e) {
+                logger.info(format("[#%d] main thread has been interrupted on leader impl", getID()));
+                continue;
+            }
             RmfResult msg = null;
             try {
                 msg = rmfServer.deliver(cidSeries, cid, currHeight, currLeader, tmo);
@@ -250,7 +255,7 @@ public abstract class bcServer extends Node {
 //        }
     }
 
-    abstract void leaderImpl();
+    abstract void leaderImpl() throws InterruptedException;
 
     abstract blockchain initBC(int id);
 
@@ -539,13 +544,23 @@ public abstract class bcServer extends Node {
 //            bc.removeBlock(bc.getHeight()); // meant to handle the case in which the front is split between the to leading blocks
 //        }
         logger.info(format("[#%d] adopt a version of [length=%d] from [#%d]", getID(), choosen.getVList().size(), choosen.getSender()));
-        bc.setBlocks(choosen.getVList().stream().map(proofedBlock::getB).collect(Collectors.toList()), forkPoint - 1);
-        if (!bc.validateBlockHash(bc.getBlock(bc.getHeight())) ||
-                !bc.validateBlockData(bc.getBlock(bc.getHeight()))) {
-            logger.info(format("[#%d] deleted a block [height=%d]", getID(), bc.getHeight()));
-            bc.removeBlock(bc.getHeight()); // meant to handle the case in which the front is split between the to leading blocks
-//            rmfServer.updateCid(bc.getBlock(bc.getHeight()).getHeader().getCid() + 1);
+        synchronized (newBlockNotifyer) {
+            bc.setBlocks(choosen.getVList().stream().map(proofedBlock::getB).collect(Collectors.toList()), forkPoint - 1);
+            if (!bc.validateBlockHash(bc.getBlock(bc.getHeight())) ||
+                    !bc.validateBlockData(bc.getBlock(bc.getHeight()))) {
+                logger.info(format("[#%d] deleted a block [height=%d]", getID(), bc.getHeight()));
+                bc.removeBlock(bc.getHeight()); // meant to handle the case in which the front is split between the to leading blocks
+            }
+            newBlockNotifyer.notify();
+//                    }
         }
+//        bc.setBlocks(choosen.getVList().stream().map(proofedBlock::getB).collect(Collectors.toList()), forkPoint - 1);
+//        if (!bc.validateBlockHash(bc.getBlock(bc.getHeight())) ||
+//                !bc.validateBlockData(bc.getBlock(bc.getHeight()))) {
+//            logger.info(format("[#%d] deleted a block [height=%d]", getID(), bc.getHeight()));
+//            bc.removeBlock(bc.getHeight()); // meant to handle the case in which the front is split between the to leading blocks
+////            rmfServer.updateCid(bc.getBlock(bc.getHeight()).getHeader().getCid() + 1);
+//        }
         //        rmfServer.updateCid(bc.getBlock(bc.getHeight()).getHeader().getCid() + 2);
         currLeader = (bc.getBlock(bc.getHeight()).getHeader().getCreatorID() + 1) % n;
         currHeight = bc.getHeight() + 1;

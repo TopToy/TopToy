@@ -80,7 +80,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
     boolean onSync = false;
     final Object syncLock = new Object();
     private Thread bbcServiceThread;
-//    private Thread bbcMissedConsensusThread;
+    private Thread bbcMissedConsensusThread;
     protected Server server;
     private String bbcConfig;
     private final Table<Integer, Integer, BbcProtos.BbcDecision> regBbcCons;
@@ -116,9 +116,15 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         }
         );
         bbcServiceThread.start();
-//        bbcMissedConsensusThread = new Thread(() ->
-//        {   bbcMissedConsensus(); });
-//        bbcMissedConsensusThread.start();
+        bbcMissedConsensusThread = new Thread(() ->
+        {
+            try {
+                bbcMissedConsensus();
+            } catch (InterruptedException e) {
+                logger.error(format("[#%d]", e));
+            }
+        });
+        bbcMissedConsensusThread.start();
         try {
             latch.await();
         } catch (InterruptedException e) {
@@ -130,32 +136,22 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         logger.info(format("[#%d] Initiated grpc client", id));
     }
 //    // TODO: Bug alert!!
-//    private void bbcMissedConsensus()  {
-//        while (!stopped) {
-////            synchronized (syncLock) {
-////                if (onSync) continue;
-////            }
-//            ArrayList<Integer> done;
-//            synchronized (globalLock) {
-//                done = new ArrayList<>(fastBbcCons.keySet());
-//            }
-//            ArrayList<Integer> last = null;
-//
-////            try {
-//////                last = bbcService.notifyOnConsensusInstance(done);
-////            } catch (InterruptedException e) {
-////                logger.warn(format("[#%d] bbc missed consensus interrupted", id));
-////            }
-//            assert last != null;
-//            for (int cid : last) {
-////                synchronized (syncLock) {
-////                    if (onSync) break;
-////                }
-//                logger.info(format("[#%d] have found missed bbc [cid=%d]", id, cid));
-//                fullBbcConsensus(fastBbcCons.get(cid).getDecosion(), cid);
-//            }
-//        }
-//    }
+    private void bbcMissedConsensus() throws InterruptedException {
+        while (!stopped) {
+            Thread.sleep(5 * 1000); // TODO: Hard code timeout, should it changed? (we probably can do it by notifications)
+            synchronized (fastBbcCons) {
+                if (fastBbcCons.rowKeySet().isEmpty()) {
+                    logger.info(format("[#%d] There are no fast bbc", id));
+                    continue;
+                }
+                int fcidSeries = Collections.max(fastBbcCons.rowKeySet());
+                int fcid = Collections.max(fastBbcCons.row(fcidSeries).keySet());
+                logger.info(format("[#%d] Trying re-participate [cidSeries=%d ; cid=%d]", id, fcidSeries, fcid));
+                bbcService.periodicallyVoteMissingConsensus(fastBbcCons.get(fcidSeries, fcid));
+            }
+
+        }
+    }
 
     public void shutdown() {
         stopped = true;
@@ -174,10 +170,10 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                 bbcServiceThread.join();
                 logger.info(format("[#%d] wait for bbcMissedConsensusThread", id));
             }
-//            if (bbcMissedConsensusThread != null) {
-//                bbcMissedConsensusThread.interrupt();
-//                bbcMissedConsensusThread.join();
-//            }
+            if (bbcMissedConsensusThread != null) {
+                bbcMissedConsensusThread.interrupt();
+                bbcMissedConsensusThread.join();
+            }
         } catch (InterruptedException e) {
             logger.error("", e);
         }
@@ -233,8 +229,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             @Override
             public void onNext(Res res) {
                 // TODO: We should validate the answer
-                if (res.getData().getMeta().getCid() == cid) {
-                    int cid = res.getMeta().getCid();
+                if (res.getData().getMeta().getCid() == cid && res.getData().getMeta().getCidSeries() == cidSeries) {
                     synchronized (globalLock) {
                         if (!pendingMsg.contains(cidSeries, cid) && !recMsg.contains(cidSeries, cid)) {
                             if (!rmfDigSig.verify(sender, res.getData())) {
@@ -263,7 +258,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         });
     }
     protected void broadcastReqMsg(Req req, int cidSeries, int cid, int sender, int height) {
-        logger.info(format("[#%d] broadcast request message [cid=%d]", id, cid));
+        logger.info(format("[#%d] broadcast request message [cidSeries=%d ; cid=%d]", id, cidSeries, cid));
         for (int p : peers.keySet()) {
             if (p == id) continue;
             sendReqMessage(peers.get(p).stub, req, cidSeries, cid, sender, height);
@@ -289,7 +284,9 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         int cid = request.getMeta().getCid();
         int cidSeries = request.getMeta().getCidSeries();
         synchronized (globalLock) {
-            if (fastBbcCons.contains(cidSeries, cid) || regBbcCons.contains(cidSeries, cid)) return;
+            synchronized (fastBbcCons) {
+                if (fastBbcCons.contains(cidSeries, cid) || regBbcCons.contains(cidSeries, cid)) return;
+            }
             if (pendingMsg.contains(cidSeries, cid) || recMsg.contains(cidSeries, cid)) return;
             pendingMsg.put(cidSeries, cid, request);
             logger.info(format("[#%d] received data message from [%d], [cidSeries=%d ; cid=%d]", id,
@@ -330,7 +327,9 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             int cid = request.getCid();
             int cidSeries = request.getCidSeries();
             if (regBbcCons.contains(cidSeries, cid)) return;
-            if (fastBbcCons.contains(cidSeries, cid)) return; // Against byzantine activity
+            synchronized (fastBbcCons) {
+                if (fastBbcCons.contains(cidSeries, cid)) return; // Against byzantine activity
+            }
             if (!fVotes.contains(cidSeries, cid)) {
                 fvote v = new fvote();
                 v.dec.setCid(cid);
@@ -350,8 +349,10 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             fVotes.get(cidSeries, cid).dec.addVotes(request);
             if (fVotes.get(cidSeries, cid).voters.size() == n) {
                 logger.info(format("[#%d] fastVote has been detected [cidSeries=%d ; cid=%d]", id, cidSeries, cid));
+                synchronized (fastBbcCons) {
                     fastBbcCons.put(cidSeries, cid, fVotes.get(cidSeries, cid).dec.setDecosion(1).build());
-                    bbcService.updateFastVote(fVotes.get(cidSeries, cid).dec.build());
+                }
+                bbcService.updateFastVote(fVotes.get(cidSeries, cid).dec.build());
                 globalLock.notify();
             }
         }
@@ -381,6 +382,9 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                     setData(msg).
                     setMeta(meta).
                     build());
+        } else {
+            logger.info(format("[#%d] has received request message from [#%d] of [cidSeries=%d ; cid=%d] but buffers are empty",
+                    id, request.getMeta().getSender(), cidSeries, cid));
         }
     }
 
@@ -487,22 +491,18 @@ public class RmfService extends RmfGrpc.RmfImplBase {
 
     }
 
-    protected void requestData(int cidSeries, int cid, int sender, int height) {
+    protected void requestData(int cidSeries, int cid, int sender, int height) throws InterruptedException {
         if (pendingMsg.contains(cidSeries, cid)) return;
         Meta meta = Meta.
                 newBuilder().
                 setCid(cid).
+                setCidSeries(cidSeries).
                 setSender(id).
                 build();
         Req req = Req.newBuilder().setMeta(meta).build();
         broadcastReqMsg(req, cidSeries, cid, sender, height);
         while (!pendingMsg.contains(cidSeries, cid)) {
-            try {
-                globalLock.wait();
-            } catch (InterruptedException e) {
-                logger.error("", e);
-                return;
-            }
+            globalLock.wait();
         }
     }
 

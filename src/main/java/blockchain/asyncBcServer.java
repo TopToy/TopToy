@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 import static java.lang.String.format;
 
 public class asyncBcServer extends bcServer {
-    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(cbcServer.class);
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(asyncBcServer.class);
 
     public asyncBcServer(String addr, int rmfPort, int syncPort, int id) {
         super(addr, rmfPort, syncPort, id);
@@ -163,20 +163,14 @@ public class asyncBcServer extends bcServer {
 //        }
 //    }
 
-     void leaderImpl() {
+     void leaderImpl() throws InterruptedException {
         Random rand = new Random();
             int x = rand.nextInt(1500) + 1;
             logger.info(format("[#%d] sleeps for %d ms",getID(), x));
-         try {
              Thread.sleep(x);
-         } catch (InterruptedException e) {
-             logger.error("", e);
-         }
-         if (currLeader != getID()) {
-            return;
-        }
-        logger.info(format("[#%d] prepare to disseminate a new block of [height=%d]", getID(), currHeight));
 
+        if (currLeader != getID()) return;
+         logger.info(format("[#%d] prepare to disseminate a new block of [height=%d]", getID(), currHeight));
         synchronized (blockLock) {
 //            logger.info(format("[#%d] [heigh1=%d", getID(), currHeight, ));
             Block sealedBlock = currBlock.construct(getID(), currHeight, DigestMethod.hash(bc.getBlock(currHeight - 1).getHeader().toByteArray()));

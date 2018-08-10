@@ -183,7 +183,7 @@ public class ServerConnection {
             if (socket != null && socketOutStream != null) {
                 try {
                     //do an extra copy of the data to be sent, but on a single out stream write
-                    byte[] mac = (useMAC && this.controller.getStaticConf().getUseMACs() == 1)?macSend.doFinal(messageData):null;
+                    byte[] mac = (useMAC && this.controller.getStaticConf().getUseMACs() == 1) ? macSend.doFinal(messageData) : null;
                     byte[] data = new byte[5 +messageData.length+((mac!=null)?mac.length:0)];
                     int value = messageData.length;
 

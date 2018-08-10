@@ -108,9 +108,11 @@ public class bbcService extends DefaultSingleRecoverable {
             int cidSeries = msg.getCidSeries();
             logger.debug(format("[#%d] received bbc message from [#%d]", id, msg.getPropserID()));
                 if (fastVote.contains(cidSeries, cid) && !fastVote.get(cidSeries, cid).done) {
-                    logger.info(format("[#%d] re-participate in a consensus [cidSeries=%d ; cid=%d]", id, cidSeries, cid));
-                    propose(fastVote.get(cidSeries, cid).d.getDecosion(), cidSeries, cid);
-                    fastVote.get(cidSeries, cid).done = true;
+                    if (msg.getPropserID() != id) {
+                        logger.info(format("[#%d] re-participate in a consensus [cidSeries=%d ; cid=%d]", id, cidSeries, cid));
+                        propose(fastVote.get(cidSeries, cid).d.getDecosion(), cidSeries, cid);
+                        fastVote.get(cidSeries, cid).done = true;
+                    }
                 }
                 if (!rec.contains(cidSeries, cid)) {
                     consVote v = new consVote();
@@ -221,6 +223,27 @@ public class bbcService extends DefaultSingleRecoverable {
                 fv.d = b;
                 fv.done = false;
                 fastVote.put(fcidSeries, fcid, fv);
+            }
+        }
+    }
+
+    public void periodicallyVoteMissingConsensus(BbcProtos.BbcDecision b) {
+        synchronized (globalLock) {
+            int fcid = b.getCid();
+            int fcidSeries = b.getCidSeries();
+            if (rec.contains(fcidSeries, fcid)) {
+                if (!fastVote.contains(fcidSeries, fcid)) {
+                    fastVotePart fv = new fastVotePart();
+                    fv.d = b;
+                    fv.done = false;
+                    fastVote.put(fcidSeries, fcid, fv);
+                }
+                if (!fastVote.get(fcidSeries, fcid).done) {
+                    logger.info(format("[#%d] re-participate in a consensus (periodicallyVoteMissingConsensus) " +
+                            "[cidSeries=%d ; cid=%d]", id, fcidSeries, fcid));
+                    propose(b.getDecosion(), fcidSeries, fcid);
+                    fastVote.get(fcidSeries, fcid).done = true;
+                }
             }
         }
     }

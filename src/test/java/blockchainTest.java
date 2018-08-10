@@ -66,6 +66,10 @@ public class blockchainTest {
         ArrayList<Node> currentNodes = new ArrayList<>(nodes.subList(0, nnodes));
         Node[] ret = new Node[nnodes];
         for (int id = 0 ; id < nnodes ; id++) {
+            if (ArrayUtils.contains(byzIds, id)) {
+                ret[id] = new byzantineBcServer(localHost, rmfPorts[id], syncPort[id], id);
+                continue;
+            }
             logger.info("init server #" + id);
             ret[id] =  new asyncBcServer(localHost, rmfPorts[id], syncPort[id], id);
         }
@@ -257,10 +261,11 @@ void TestStressFourServersMuteFault() throws InterruptedException {
 }
     void bServerDoing(List<Block> res, byzantineBcServer s) {
         for(int i = 0; i < 100 ; i++) {
-            String msg = "Hello" + i;
-            if (i % 4 == s.getID()) {
-                s.addTransaction(msg.getBytes(), 0);
-            }
+//            String msg = "Hello" + i;
+//            if (i % 4 == s.getID()) {
+//                s.addTransaction(msg.getBytes(), 0);
+//            }
+            logger.info(format("**** %d ***** %d", s.getID(), i));
             res.add(s.deliver(i));
         }
     }
@@ -502,6 +507,91 @@ void TestStressFourServersMuteFault() throws InterruptedException {
             logger.info(format("***** Assert creator = %d", res.get(0).get(i).getHeader().getCreatorID()));
             for (int k = 0 ; k < nnodes ;k++) {
                 assertEquals(res.get(0).get(i).getHeader().getCreatorID(), res.get(k).get(i).getHeader().getCreatorID());
+                for (int j = 0 ; j < res.get(0).get(i).getDataList().size() ; j++) {
+                    logger.info(format("***** Assert data = %s",
+                            new String(res.get(0).get(i).getData(j).getData().toByteArray())));
+                    assertEquals(new String(res.get(0).get(i).getData(j).getData().toByteArray()),
+                            new String(res.get(k).get(i).getData(j).getData().toByteArray()));
+                }
+
+            }
+        }
+
+
+
+    }
+
+    @Test
+    void TestStressAsyncFourServersSplitBrodacastFault() throws InterruptedException {
+        Thread.sleep(timeToWaitBetweenTests);
+        Thread[] servers = new Thread[4];
+        int nnodes = 4;
+        String fourServersConfig = Paths.get("config", "bbcConfig", "bbcFourServers").toString();
+        logger.info("start TestStressFourServersNoFailures");
+
+        Node[] allNodes = initLocalAsyncRmfNodes(nnodes,1,fourServersConfig, new int[]{0});
+        for (int i = 0 ; i < nnodes ; i++) {
+            int finalI = i;
+            if (i == 0) {
+                servers[i]  = new Thread(() ->((byzantineBcServer) allNodes[finalI]).start());
+                servers[i].start();
+                continue;
+            }
+            servers[i]  = new Thread(() ->((asyncBcServer) allNodes[finalI]).start());
+            servers[i].start();
+        }
+        for (int i = 0 ; i < nnodes ; i++) {
+            servers[i].join();
+        }
+
+        for (int i = 0 ; i < nnodes ; i++) {
+            if (i == 0) {
+                ((byzantineBcServer) allNodes[i]).setFullByz();
+                ((byzantineBcServer) allNodes[i]).serve();
+                continue;
+            }
+            ((asyncBcServer) allNodes[i]).serve();
+        }
+
+        HashMap<Integer, ArrayList<Block>> res = new HashMap<>();
+        for (int i = 0 ; i < nnodes ; i++) {
+            res.put(i, new ArrayList<Block>());
+        }
+        Thread[] tasks = new Thread[4];
+        for (int i = 0 ; i < 4 ;i++) {
+            if (i == 0) {
+                int finalI1 = i;
+                tasks[i] = new Thread(() -> bServerDoing(res.get(finalI1), (byzantineBcServer) allNodes[finalI1]));
+                tasks[i].start();
+                continue;
+            }
+            int finalI = i;
+            tasks[i] = new Thread(() -> asyncServerDoing(res.get(finalI), (asyncBcServer) allNodes[finalI]));
+            tasks[i].start();
+        }
+        for (int i = 0 ; i < nnodes ; i++) {
+            tasks[i].join();
+        }
+
+        for (int i = 0 ; i < 4 ; i++) {
+            if (i == 0) {
+                ((byzantineBcServer) allNodes[i]).shutdown();
+                continue;
+            }
+            ((asyncBcServer) allNodes[i]).shutdown();
+        }
+
+        for (int i = 0 ; i < 100 ; i++) {
+            logger.info(format("***** Assert creator = %d", res.get(0).get(i).getHeader().getCreatorID()));
+            for (int k = 0 ; k < nnodes ;k++) {
+                assertEquals(res.get(0).get(i).getHeader().getCreatorID(), res.get(k).get(i).getHeader().getCreatorID());
+                for (int j = 0 ; j < res.get(0).get(i).getDataList().size() ; j++) {
+                    logger.info(format("***** Assert data = %s",
+                            new String(res.get(0).get(i).getData(j).getData().toByteArray())));
+                    assertEquals(new String(res.get(0).get(i).getData(j).getData().toByteArray()),
+                            new String(res.get(k).get(i).getData(j).getData().toByteArray()));
+                }
+
             }
         }
 
