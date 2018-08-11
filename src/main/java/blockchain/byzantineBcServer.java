@@ -172,8 +172,8 @@ public class byzantineBcServer extends bcServer {
             msgs.add(sealedBlock1.toByteArray());
             msgs.add(sealedBlock2.toByteArray());
             List<List<Integer>> sids = new ArrayList<>();
-            sids.add(all.subList(0, 3));
-            sids.add(all.subList(3, 4));
+            sids.add(all.subList(0, 2));
+            sids.add(all.subList(2, 4));
             for (int i = 0 ; i < 2 ; i++) {
                 heights.add(currHeight);
             }
