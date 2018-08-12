@@ -34,19 +34,13 @@ public final class BbcProtos {
     int getCidSeries();
 
     /**
+     * <pre>
+     *    string sig = 5;
+     * </pre>
+     *
      * <code>int32 vote = 4;</code>
      */
     int getVote();
-
-    /**
-     * <code>string sig = 5;</code>
-     */
-    java.lang.String getSig();
-    /**
-     * <code>string sig = 5;</code>
-     */
-    com.google.protobuf.ByteString
-        getSigBytes();
   }
   /**
    * Protobuf type {@code proto.BbcMsg}
@@ -65,7 +59,6 @@ public final class BbcProtos {
       cid_ = 0;
       cidSeries_ = 0;
       vote_ = 0;
-      sig_ = "";
     }
 
     @java.lang.Override
@@ -117,12 +110,6 @@ public final class BbcProtos {
             case 32: {
 
               vote_ = input.readInt32();
-              break;
-            }
-            case 42: {
-              java.lang.String s = input.readStringRequireUtf8();
-
-              sig_ = s;
               break;
             }
           }
@@ -179,44 +166,14 @@ public final class BbcProtos {
     public static final int VOTE_FIELD_NUMBER = 4;
     private int vote_;
     /**
+     * <pre>
+     *    string sig = 5;
+     * </pre>
+     *
      * <code>int32 vote = 4;</code>
      */
     public int getVote() {
       return vote_;
-    }
-
-    public static final int SIG_FIELD_NUMBER = 5;
-    private volatile java.lang.Object sig_;
-    /**
-     * <code>string sig = 5;</code>
-     */
-    public java.lang.String getSig() {
-      java.lang.Object ref = sig_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        sig_ = s;
-        return s;
-      }
-    }
-    /**
-     * <code>string sig = 5;</code>
-     */
-    public com.google.protobuf.ByteString
-        getSigBytes() {
-      java.lang.Object ref = sig_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        sig_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
     }
 
     private byte memoizedIsInitialized = -1;
@@ -243,9 +200,6 @@ public final class BbcProtos {
       if (vote_ != 0) {
         output.writeInt32(4, vote_);
       }
-      if (!getSigBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 5, sig_);
-      }
       unknownFields.writeTo(output);
     }
 
@@ -269,9 +223,6 @@ public final class BbcProtos {
       if (vote_ != 0) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(4, vote_);
-      }
-      if (!getSigBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(5, sig_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -297,8 +248,6 @@ public final class BbcProtos {
           == other.getCidSeries());
       result = result && (getVote()
           == other.getVote());
-      result = result && getSig()
-          .equals(other.getSig());
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -318,8 +267,6 @@ public final class BbcProtos {
       hash = (53 * hash) + getCidSeries();
       hash = (37 * hash) + VOTE_FIELD_NUMBER;
       hash = (53 * hash) + getVote();
-      hash = (37 * hash) + SIG_FIELD_NUMBER;
-      hash = (53 * hash) + getSig().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -457,8 +404,6 @@ public final class BbcProtos {
 
         vote_ = 0;
 
-        sig_ = "";
-
         return this;
       }
 
@@ -485,7 +430,6 @@ public final class BbcProtos {
         result.cid_ = cid_;
         result.cidSeries_ = cidSeries_;
         result.vote_ = vote_;
-        result.sig_ = sig_;
         onBuilt();
         return result;
       }
@@ -538,10 +482,6 @@ public final class BbcProtos {
         }
         if (other.getVote() != 0) {
           setVote(other.getVote());
-        }
-        if (!other.getSig().isEmpty()) {
-          sig_ = other.sig_;
-          onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -650,12 +590,20 @@ public final class BbcProtos {
 
       private int vote_ ;
       /**
+       * <pre>
+       *    string sig = 5;
+       * </pre>
+       *
        * <code>int32 vote = 4;</code>
        */
       public int getVote() {
         return vote_;
       }
       /**
+       * <pre>
+       *    string sig = 5;
+       * </pre>
+       *
        * <code>int32 vote = 4;</code>
        */
       public Builder setVote(int value) {
@@ -665,80 +613,15 @@ public final class BbcProtos {
         return this;
       }
       /**
+       * <pre>
+       *    string sig = 5;
+       * </pre>
+       *
        * <code>int32 vote = 4;</code>
        */
       public Builder clearVote() {
         
         vote_ = 0;
-        onChanged();
-        return this;
-      }
-
-      private java.lang.Object sig_ = "";
-      /**
-       * <code>string sig = 5;</code>
-       */
-      public java.lang.String getSig() {
-        java.lang.Object ref = sig_;
-        if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          sig_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
-      }
-      /**
-       * <code>string sig = 5;</code>
-       */
-      public com.google.protobuf.ByteString
-          getSigBytes() {
-        java.lang.Object ref = sig_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          sig_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <code>string sig = 5;</code>
-       */
-      public Builder setSig(
-          java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  
-        sig_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string sig = 5;</code>
-       */
-      public Builder clearSig() {
-        
-        sig_ = getDefaultInstance().getSig();
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string sig = 5;</code>
-       */
-      public Builder setSigBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-        
-        sig_ = value;
         onChanged();
         return this;
       }
@@ -806,33 +689,13 @@ public final class BbcProtos {
     int getCidSeries();
 
     /**
+     * <pre>
+     *    repeated BbcMsg votes = 4;
+     * </pre>
+     *
      * <code>int32 decosion = 3;</code>
      */
     int getDecosion();
-
-    /**
-     * <code>repeated .proto.BbcMsg votes = 4;</code>
-     */
-    java.util.List<proto.BbcProtos.BbcMsg> 
-        getVotesList();
-    /**
-     * <code>repeated .proto.BbcMsg votes = 4;</code>
-     */
-    proto.BbcProtos.BbcMsg getVotes(int index);
-    /**
-     * <code>repeated .proto.BbcMsg votes = 4;</code>
-     */
-    int getVotesCount();
-    /**
-     * <code>repeated .proto.BbcMsg votes = 4;</code>
-     */
-    java.util.List<? extends proto.BbcProtos.BbcMsgOrBuilder> 
-        getVotesOrBuilderList();
-    /**
-     * <code>repeated .proto.BbcMsg votes = 4;</code>
-     */
-    proto.BbcProtos.BbcMsgOrBuilder getVotesOrBuilder(
-        int index);
   }
   /**
    * Protobuf type {@code proto.BbcDecision}
@@ -850,7 +713,6 @@ public final class BbcProtos {
       cid_ = 0;
       cidSeries_ = 0;
       decosion_ = 0;
-      votes_ = java.util.Collections.emptyList();
     }
 
     @java.lang.Override
@@ -899,15 +761,6 @@ public final class BbcProtos {
               decosion_ = input.readInt32();
               break;
             }
-            case 34: {
-              if (!((mutable_bitField0_ & 0x00000008) == 0x00000008)) {
-                votes_ = new java.util.ArrayList<proto.BbcProtos.BbcMsg>();
-                mutable_bitField0_ |= 0x00000008;
-              }
-              votes_.add(
-                  input.readMessage(proto.BbcProtos.BbcMsg.parser(), extensionRegistry));
-              break;
-            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -916,9 +769,6 @@ public final class BbcProtos {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
-        if (((mutable_bitField0_ & 0x00000008) == 0x00000008)) {
-          votes_ = java.util.Collections.unmodifiableList(votes_);
-        }
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
       }
@@ -935,7 +785,6 @@ public final class BbcProtos {
               proto.BbcProtos.BbcDecision.class, proto.BbcProtos.BbcDecision.Builder.class);
     }
 
-    private int bitField0_;
     public static final int CID_FIELD_NUMBER = 1;
     private int cid_;
     /**
@@ -957,45 +806,14 @@ public final class BbcProtos {
     public static final int DECOSION_FIELD_NUMBER = 3;
     private int decosion_;
     /**
+     * <pre>
+     *    repeated BbcMsg votes = 4;
+     * </pre>
+     *
      * <code>int32 decosion = 3;</code>
      */
     public int getDecosion() {
       return decosion_;
-    }
-
-    public static final int VOTES_FIELD_NUMBER = 4;
-    private java.util.List<proto.BbcProtos.BbcMsg> votes_;
-    /**
-     * <code>repeated .proto.BbcMsg votes = 4;</code>
-     */
-    public java.util.List<proto.BbcProtos.BbcMsg> getVotesList() {
-      return votes_;
-    }
-    /**
-     * <code>repeated .proto.BbcMsg votes = 4;</code>
-     */
-    public java.util.List<? extends proto.BbcProtos.BbcMsgOrBuilder> 
-        getVotesOrBuilderList() {
-      return votes_;
-    }
-    /**
-     * <code>repeated .proto.BbcMsg votes = 4;</code>
-     */
-    public int getVotesCount() {
-      return votes_.size();
-    }
-    /**
-     * <code>repeated .proto.BbcMsg votes = 4;</code>
-     */
-    public proto.BbcProtos.BbcMsg getVotes(int index) {
-      return votes_.get(index);
-    }
-    /**
-     * <code>repeated .proto.BbcMsg votes = 4;</code>
-     */
-    public proto.BbcProtos.BbcMsgOrBuilder getVotesOrBuilder(
-        int index) {
-      return votes_.get(index);
     }
 
     private byte memoizedIsInitialized = -1;
@@ -1019,9 +837,6 @@ public final class BbcProtos {
       if (decosion_ != 0) {
         output.writeInt32(3, decosion_);
       }
-      for (int i = 0; i < votes_.size(); i++) {
-        output.writeMessage(4, votes_.get(i));
-      }
       unknownFields.writeTo(output);
     }
 
@@ -1041,10 +856,6 @@ public final class BbcProtos {
       if (decosion_ != 0) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(3, decosion_);
-      }
-      for (int i = 0; i < votes_.size(); i++) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(4, votes_.get(i));
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -1068,8 +879,6 @@ public final class BbcProtos {
           == other.getCidSeries());
       result = result && (getDecosion()
           == other.getDecosion());
-      result = result && getVotesList()
-          .equals(other.getVotesList());
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -1087,10 +896,6 @@ public final class BbcProtos {
       hash = (53 * hash) + getCidSeries();
       hash = (37 * hash) + DECOSION_FIELD_NUMBER;
       hash = (53 * hash) + getDecosion();
-      if (getVotesCount() > 0) {
-        hash = (37 * hash) + VOTES_FIELD_NUMBER;
-        hash = (53 * hash) + getVotesList().hashCode();
-      }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -1216,7 +1021,6 @@ public final class BbcProtos {
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessageV3
                 .alwaysUseFieldBuilders) {
-          getVotesFieldBuilder();
         }
       }
       public Builder clear() {
@@ -1227,12 +1031,6 @@ public final class BbcProtos {
 
         decosion_ = 0;
 
-        if (votesBuilder_ == null) {
-          votes_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000008);
-        } else {
-          votesBuilder_.clear();
-        }
         return this;
       }
 
@@ -1255,21 +1053,9 @@ public final class BbcProtos {
 
       public proto.BbcProtos.BbcDecision buildPartial() {
         proto.BbcProtos.BbcDecision result = new proto.BbcProtos.BbcDecision(this);
-        int from_bitField0_ = bitField0_;
-        int to_bitField0_ = 0;
         result.cid_ = cid_;
         result.cidSeries_ = cidSeries_;
         result.decosion_ = decosion_;
-        if (votesBuilder_ == null) {
-          if (((bitField0_ & 0x00000008) == 0x00000008)) {
-            votes_ = java.util.Collections.unmodifiableList(votes_);
-            bitField0_ = (bitField0_ & ~0x00000008);
-          }
-          result.votes_ = votes_;
-        } else {
-          result.votes_ = votesBuilder_.build();
-        }
-        result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
       }
@@ -1320,32 +1106,6 @@ public final class BbcProtos {
         if (other.getDecosion() != 0) {
           setDecosion(other.getDecosion());
         }
-        if (votesBuilder_ == null) {
-          if (!other.votes_.isEmpty()) {
-            if (votes_.isEmpty()) {
-              votes_ = other.votes_;
-              bitField0_ = (bitField0_ & ~0x00000008);
-            } else {
-              ensureVotesIsMutable();
-              votes_.addAll(other.votes_);
-            }
-            onChanged();
-          }
-        } else {
-          if (!other.votes_.isEmpty()) {
-            if (votesBuilder_.isEmpty()) {
-              votesBuilder_.dispose();
-              votesBuilder_ = null;
-              votes_ = other.votes_;
-              bitField0_ = (bitField0_ & ~0x00000008);
-              votesBuilder_ = 
-                com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
-                   getVotesFieldBuilder() : null;
-            } else {
-              votesBuilder_.addAllMessages(other.votes_);
-            }
-          }
-        }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
         return this;
@@ -1372,7 +1132,6 @@ public final class BbcProtos {
         }
         return this;
       }
-      private int bitField0_;
 
       private int cid_ ;
       /**
@@ -1428,12 +1187,20 @@ public final class BbcProtos {
 
       private int decosion_ ;
       /**
+       * <pre>
+       *    repeated BbcMsg votes = 4;
+       * </pre>
+       *
        * <code>int32 decosion = 3;</code>
        */
       public int getDecosion() {
         return decosion_;
       }
       /**
+       * <pre>
+       *    repeated BbcMsg votes = 4;
+       * </pre>
+       *
        * <code>int32 decosion = 3;</code>
        */
       public Builder setDecosion(int value) {
@@ -1443,6 +1210,10 @@ public final class BbcProtos {
         return this;
       }
       /**
+       * <pre>
+       *    repeated BbcMsg votes = 4;
+       * </pre>
+       *
        * <code>int32 decosion = 3;</code>
        */
       public Builder clearDecosion() {
@@ -1450,246 +1221,6 @@ public final class BbcProtos {
         decosion_ = 0;
         onChanged();
         return this;
-      }
-
-      private java.util.List<proto.BbcProtos.BbcMsg> votes_ =
-        java.util.Collections.emptyList();
-      private void ensureVotesIsMutable() {
-        if (!((bitField0_ & 0x00000008) == 0x00000008)) {
-          votes_ = new java.util.ArrayList<proto.BbcProtos.BbcMsg>(votes_);
-          bitField0_ |= 0x00000008;
-         }
-      }
-
-      private com.google.protobuf.RepeatedFieldBuilderV3<
-          proto.BbcProtos.BbcMsg, proto.BbcProtos.BbcMsg.Builder, proto.BbcProtos.BbcMsgOrBuilder> votesBuilder_;
-
-      /**
-       * <code>repeated .proto.BbcMsg votes = 4;</code>
-       */
-      public java.util.List<proto.BbcProtos.BbcMsg> getVotesList() {
-        if (votesBuilder_ == null) {
-          return java.util.Collections.unmodifiableList(votes_);
-        } else {
-          return votesBuilder_.getMessageList();
-        }
-      }
-      /**
-       * <code>repeated .proto.BbcMsg votes = 4;</code>
-       */
-      public int getVotesCount() {
-        if (votesBuilder_ == null) {
-          return votes_.size();
-        } else {
-          return votesBuilder_.getCount();
-        }
-      }
-      /**
-       * <code>repeated .proto.BbcMsg votes = 4;</code>
-       */
-      public proto.BbcProtos.BbcMsg getVotes(int index) {
-        if (votesBuilder_ == null) {
-          return votes_.get(index);
-        } else {
-          return votesBuilder_.getMessage(index);
-        }
-      }
-      /**
-       * <code>repeated .proto.BbcMsg votes = 4;</code>
-       */
-      public Builder setVotes(
-          int index, proto.BbcProtos.BbcMsg value) {
-        if (votesBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          ensureVotesIsMutable();
-          votes_.set(index, value);
-          onChanged();
-        } else {
-          votesBuilder_.setMessage(index, value);
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .proto.BbcMsg votes = 4;</code>
-       */
-      public Builder setVotes(
-          int index, proto.BbcProtos.BbcMsg.Builder builderForValue) {
-        if (votesBuilder_ == null) {
-          ensureVotesIsMutable();
-          votes_.set(index, builderForValue.build());
-          onChanged();
-        } else {
-          votesBuilder_.setMessage(index, builderForValue.build());
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .proto.BbcMsg votes = 4;</code>
-       */
-      public Builder addVotes(proto.BbcProtos.BbcMsg value) {
-        if (votesBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          ensureVotesIsMutable();
-          votes_.add(value);
-          onChanged();
-        } else {
-          votesBuilder_.addMessage(value);
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .proto.BbcMsg votes = 4;</code>
-       */
-      public Builder addVotes(
-          int index, proto.BbcProtos.BbcMsg value) {
-        if (votesBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          ensureVotesIsMutable();
-          votes_.add(index, value);
-          onChanged();
-        } else {
-          votesBuilder_.addMessage(index, value);
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .proto.BbcMsg votes = 4;</code>
-       */
-      public Builder addVotes(
-          proto.BbcProtos.BbcMsg.Builder builderForValue) {
-        if (votesBuilder_ == null) {
-          ensureVotesIsMutable();
-          votes_.add(builderForValue.build());
-          onChanged();
-        } else {
-          votesBuilder_.addMessage(builderForValue.build());
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .proto.BbcMsg votes = 4;</code>
-       */
-      public Builder addVotes(
-          int index, proto.BbcProtos.BbcMsg.Builder builderForValue) {
-        if (votesBuilder_ == null) {
-          ensureVotesIsMutable();
-          votes_.add(index, builderForValue.build());
-          onChanged();
-        } else {
-          votesBuilder_.addMessage(index, builderForValue.build());
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .proto.BbcMsg votes = 4;</code>
-       */
-      public Builder addAllVotes(
-          java.lang.Iterable<? extends proto.BbcProtos.BbcMsg> values) {
-        if (votesBuilder_ == null) {
-          ensureVotesIsMutable();
-          com.google.protobuf.AbstractMessageLite.Builder.addAll(
-              values, votes_);
-          onChanged();
-        } else {
-          votesBuilder_.addAllMessages(values);
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .proto.BbcMsg votes = 4;</code>
-       */
-      public Builder clearVotes() {
-        if (votesBuilder_ == null) {
-          votes_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000008);
-          onChanged();
-        } else {
-          votesBuilder_.clear();
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .proto.BbcMsg votes = 4;</code>
-       */
-      public Builder removeVotes(int index) {
-        if (votesBuilder_ == null) {
-          ensureVotesIsMutable();
-          votes_.remove(index);
-          onChanged();
-        } else {
-          votesBuilder_.remove(index);
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .proto.BbcMsg votes = 4;</code>
-       */
-      public proto.BbcProtos.BbcMsg.Builder getVotesBuilder(
-          int index) {
-        return getVotesFieldBuilder().getBuilder(index);
-      }
-      /**
-       * <code>repeated .proto.BbcMsg votes = 4;</code>
-       */
-      public proto.BbcProtos.BbcMsgOrBuilder getVotesOrBuilder(
-          int index) {
-        if (votesBuilder_ == null) {
-          return votes_.get(index);  } else {
-          return votesBuilder_.getMessageOrBuilder(index);
-        }
-      }
-      /**
-       * <code>repeated .proto.BbcMsg votes = 4;</code>
-       */
-      public java.util.List<? extends proto.BbcProtos.BbcMsgOrBuilder> 
-           getVotesOrBuilderList() {
-        if (votesBuilder_ != null) {
-          return votesBuilder_.getMessageOrBuilderList();
-        } else {
-          return java.util.Collections.unmodifiableList(votes_);
-        }
-      }
-      /**
-       * <code>repeated .proto.BbcMsg votes = 4;</code>
-       */
-      public proto.BbcProtos.BbcMsg.Builder addVotesBuilder() {
-        return getVotesFieldBuilder().addBuilder(
-            proto.BbcProtos.BbcMsg.getDefaultInstance());
-      }
-      /**
-       * <code>repeated .proto.BbcMsg votes = 4;</code>
-       */
-      public proto.BbcProtos.BbcMsg.Builder addVotesBuilder(
-          int index) {
-        return getVotesFieldBuilder().addBuilder(
-            index, proto.BbcProtos.BbcMsg.getDefaultInstance());
-      }
-      /**
-       * <code>repeated .proto.BbcMsg votes = 4;</code>
-       */
-      public java.util.List<proto.BbcProtos.BbcMsg.Builder> 
-           getVotesBuilderList() {
-        return getVotesFieldBuilder().getBuilderList();
-      }
-      private com.google.protobuf.RepeatedFieldBuilderV3<
-          proto.BbcProtos.BbcMsg, proto.BbcProtos.BbcMsg.Builder, proto.BbcProtos.BbcMsgOrBuilder> 
-          getVotesFieldBuilder() {
-        if (votesBuilder_ == null) {
-          votesBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
-              proto.BbcProtos.BbcMsg, proto.BbcProtos.BbcMsg.Builder, proto.BbcProtos.BbcMsgOrBuilder>(
-                  votes_,
-                  ((bitField0_ & 0x00000008) == 0x00000008),
-                  getParentForChildren(),
-                  isClean());
-          votes_ = null;
-        }
-        return votesBuilder_;
       }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -1759,12 +1290,11 @@ public final class BbcProtos {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\017bbcProtos.proto\022\005proto\"V\n\006BbcMsg\022\021\n\tpr" +
+      "\n\017bbcProtos.proto\022\005proto\"I\n\006BbcMsg\022\021\n\tpr" +
       "opserID\030\001 \001(\005\022\013\n\003cid\030\002 \001(\005\022\021\n\tcidSeries\030" +
-      "\003 \001(\005\022\014\n\004vote\030\004 \001(\005\022\013\n\003sig\030\005 \001(\t\"]\n\013BbcD" +
-      "ecision\022\013\n\003cid\030\001 \001(\005\022\021\n\tcidSeries\030\002 \001(\005\022" +
-      "\020\n\010decosion\030\003 \001(\005\022\034\n\005votes\030\004 \003(\0132\r.proto" +
-      ".BbcMsgB\007\n\005protob\006proto3"
+      "\003 \001(\005\022\014\n\004vote\030\004 \001(\005\"?\n\013BbcDecision\022\013\n\003ci" +
+      "d\030\001 \001(\005\022\021\n\tcidSeries\030\002 \001(\005\022\020\n\010decosion\030\003" +
+      " \001(\005B\007\n\005protob\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -1783,13 +1313,13 @@ public final class BbcProtos {
     internal_static_proto_BbcMsg_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_BbcMsg_descriptor,
-        new java.lang.String[] { "PropserID", "Cid", "CidSeries", "Vote", "Sig", });
+        new java.lang.String[] { "PropserID", "Cid", "CidSeries", "Vote", });
     internal_static_proto_BbcDecision_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_proto_BbcDecision_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_BbcDecision_descriptor,
-        new java.lang.String[] { "Cid", "CidSeries", "Decosion", "Votes", });
+        new java.lang.String[] { "Cid", "CidSeries", "Decosion", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

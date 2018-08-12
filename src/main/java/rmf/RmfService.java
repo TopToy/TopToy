@@ -6,7 +6,6 @@ import com.google.protobuf.ByteString;
 import config.Node;
 //import consensus.bbc.bbcClient;
 import consensus.bbc.bbcService;
-import crypto.bbcDigSig;
 import crypto.pkiUtils;
 import crypto.rmfDigSig;
 import io.grpc.ManagedChannel;
@@ -138,15 +137,15 @@ public class RmfService extends RmfGrpc.RmfImplBase {
 //    // TODO: Bug alert!!
     private void bbcMissedConsensus() throws InterruptedException {
         while (!stopped) {
-            Thread.sleep(5 * 1000); // TODO: Hard code timeout, should it changed? (we probably can do it by notifications)
+            Thread.sleep(2 * 1000); // TODO: Hard code timeout, should it changed? (we probably can do it by notifications)
             synchronized (fastBbcCons) {
                 if (fastBbcCons.rowKeySet().isEmpty()) {
-                    logger.info(format("[#%d] There are no fast bbc", id));
+                    logger.debug(format("[#%d] There are no fast bbc", id));
                     continue;
                 }
                 int fcidSeries = Collections.max(fastBbcCons.rowKeySet());
                 int fcid = Collections.max(fastBbcCons.row(fcidSeries).keySet());
-                logger.info(format("[#%d] Trying re-participate [cidSeries=%d ; cid=%d]", id, fcidSeries, fcid));
+                logger.debug(format("[#%d] Trying re-participate [cidSeries=%d ; cid=%d]", id, fcidSeries, fcid));
                 bbcService.periodicallyVoteMissingConsensus(fastBbcCons.get(fcidSeries, fcid));
             }
 
@@ -346,7 +345,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                 return;
             }
             fVotes.get(cidSeries, cid).voters.add(request.getPropserID());
-            fVotes.get(cidSeries, cid).dec.addVotes(request);
+//            fVotes.get(cidSeries, cid).dec.addVotes(request);
             if (fVotes.get(cidSeries, cid).voters.size() == n) {
                 logger.info(format("[#%d] fastVote has been detected [cidSeries=%d ; cid=%d]", id, cidSeries, cid));
                 synchronized (fastBbcCons) {
@@ -414,7 +413,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             if (pendingMsg.contains(cidSeries, cid)) {
                 BbcProtos.BbcMsg.Builder bv = BbcProtos.BbcMsg
                         .newBuilder().setCid(cid).setCidSeries(cidSeries).setPropserID(id).setVote(1);
-                bv.setSig(bbcDigSig.sign(bv));
+//                bv.setSig(bbcDigSig.sign(bv));
                 broadcastFastVoteMessage(bv.build());
 //                localFastVote(bv.build());
             }

@@ -10,7 +10,7 @@ import bftsmart.tom.core.messages.TOMMessageType;
 import bftsmart.tom.server.defaultservices.DefaultSingleRecoverable;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
-import crypto.bbcDigSig;
+//import crypto.bbcDigSig;
 import crypto.pkiUtils;
 import org.omg.PortableInterceptor.INACTIVE;
 import proto.BbcProtos;
@@ -128,7 +128,7 @@ public class bbcService extends DefaultSingleRecoverable {
                         curr.neg++;
                     }
                 }
-                curr.dec.addVotes(msg);
+//                curr.dec.addVotes(msg);
                 if (curr.neg + curr.pos == quorumSize) {
                     logger.debug(format("[#%d] notify on  [cid=%d]", id, cid));
                     globalLock.notify();
@@ -188,7 +188,7 @@ public class bbcService extends DefaultSingleRecoverable {
         b.setCid(cid);
         b.setCidSeries(cidSeries);
         b.setVote(vote);
-        b.setSig(bbcDigSig.sign(b));
+//        b.setSig(bbcDigSig.sign(b));
         BbcProtos.BbcMsg msg= b.build();
         byte[] data = msg.toByteArray();
         bbcProxy.invokeAsynchRequest(data, new ReplyListener() {

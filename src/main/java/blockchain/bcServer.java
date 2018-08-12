@@ -192,6 +192,7 @@ public abstract class bcServer extends Node {
                 // TODO: validate meta info (if the meta isn't match we should treat it as a Byz behaviour
 //                if (recBlock.getHeader().getHeight() != currHeight ||
 //                        recBlock.getHeader().getCreatorID() != currLeader ||
+                // TODO: This may cause a problem for the fork proof! (the siganture isn't the original one, as the data) we should handle it carefully
                 if(!bc.validateBlockData(recBlock)) {
                     logger.warn(format("[#%d] received an invalid data in a valid block, creating an empty block [height=%d]", getID(), currHeight));
                     recBlock = Block.newBuilder(). // creates emptyBlock
