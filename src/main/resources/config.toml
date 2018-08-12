@@ -17,24 +17,12 @@ title = "configuration"
     ip = "127.0.0.1"
     rmfPort = 20000
     syncPort = 30000
-    privateKey = """MIICXAIBAAKBgQCZlLGnX6NqN1ZpwcN+5aN7r9n56H5/b24NcA2RKN4XX1Y26hDZ
-                    cA4Nl+Fu4NbVhg/kpOHJ2EstMKRlJKOIJ+0yUSLiLnGUMt+LesVjO5rY0tyyWLW1
-                    pMAnmreI0R2ZLuJv6R4rtGwe7Pj/mrgYGHa218gax7qWcpdiHou1lE5hNwIDAQAB
-                    AoGANGrrt5SM0dPRSoc3kjgOdEiwvPr9McF2bl+wQbsREikX4+Y/mfcE1N7hslZK
-                    /NWk1wTvi1SnU+UmNt8qcW4vJlXwh+yBJlqIdLLTaEC7Qnl88GbMKbkcLi3wVBUg
-                    N6/APdcRVYZMUoMn/nx5ZELjizMimEmEMQuzmrBKQPWRJQECQQDG/deyAZMJWOGj
-                    8AHZWcX6AFkorztv21sJRcW3ZQNbiVrNMjsi+pX7HyIaetcd/CuwAWQ5qKY5c3yx
-                    vZ+ZidNDAkEAxZRmz9X4DkFFLYn95yh/v5jY9jL4IcgmLjYK0hKIdVE8ZVyYxFRR
-                    dzlvNlotnEQt3xpzZRd+gfff4wsM01+I/QJAA17NRnCMYv4kZDhub5X7qm5TFENT
-                    iGN4uUF7Rc3qLqS26v7MzZzc6XHvi+9EsXdR7hs37VoT5qk0FXaWu20ALQJAaavM
-                    LP5IM/+OqyNxa29Km8N4znxGH3M3kGGQ+fe1ieFPxvp2LhLWm0hZhZ1HZZtFWVyB
-                    OSEOpR5YXMrtKiOfVQJBALegCoV9OV38jbOISCzaqI3bysjE6d8qIJB5/cvhND/b
-                    xeNekVH4jz9Fsx8eJp8KLVF0GI/EG2uxWVaF2gULuAA="""
+    privateKey = """MIGNAgEAMBAGByqGSM49AgEGBSuBBAAKBHYwdAIBAQQg/ngTdAL+eZOyh4lilm6djqsl
+                    RDHT5C60eLxRcEoNjAGgBwYFK4EEAAqhRANCAASeFQqtyOwJcJtYceofW2TeNg7rJBlW
+                    L28GZn+tk32fz95JqVS3+iF6JdoM1clkRFLliyXSxEnS1iO4wzRKGQwm"""
 
-    publicKey = """MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCZlLGnX6NqN1ZpwcN+5aN7r9n5
-                   6H5/b24NcA2RKN4XX1Y26hDZcA4Nl+Fu4NbVhg/kpOHJ2EstMKRlJKOIJ+0yUSLi
-                   LnGUMt+LesVjO5rY0tyyWLW1pMAnmreI0R2ZLuJv6R4rtGwe7Pj/mrgYGHa218ga
-                   x7qWcpdiHou1lE5hNwIDAQAB"""
+    publicKey = """MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                    N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
 
 [[cluster]]
 
@@ -43,38 +31,28 @@ title = "configuration"
         ip = "127.0.0.1"
         rmfPort = 20000
         syncPort = 30000
-        publicKey = """MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCZlLGnX6NqN1ZpwcN+5aN7r9n5
-                       6H5/b24NcA2RKN4XX1Y26hDZcA4Nl+Fu4NbVhg/kpOHJ2EstMKRlJKOIJ+0yUSLi
-                       LnGUMt+LesVjO5rY0tyyWLW1pMAnmreI0R2ZLuJv6R4rtGwe7Pj/mrgYGHa218ga
-                       x7qWcpdiHou1lE5hNwIDAQAB"""
+        publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                       N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
 
     [cluster.s1]
         id = 1
         ip = "127.0.0.1"
         rmfPort = 20010
         syncPort = 30010
-        publicKey = """MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCZlLGnX6NqN1ZpwcN+5aN7r9n5
-                       6H5/b24NcA2RKN4XX1Y26hDZcA4Nl+Fu4NbVhg/kpOHJ2EstMKRlJKOIJ+0yUSLi
-                       LnGUMt+LesVjO5rY0tyyWLW1pMAnmreI0R2ZLuJv6R4rtGwe7Pj/mrgYGHa218ga
-                       x7qWcpdiHou1lE5hNwIDAQAB"""
-
+        publicKey = """MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                        N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
     [cluster.s2]
         id = 2
         ip = "127.0.0.1"
         rmfPort = 20020
         syncPort = 30020
-        publicKey = """MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCZlLGnX6NqN1ZpwcN+5aN7r9n5
-                       6H5/b24NcA2RKN4XX1Y26hDZcA4Nl+Fu4NbVhg/kpOHJ2EstMKRlJKOIJ+0yUSLi
-                       LnGUMt+LesVjO5rY0tyyWLW1pMAnmreI0R2ZLuJv6R4rtGwe7Pj/mrgYGHa218ga
-                       x7qWcpdiHou1lE5hNwIDAQAB"""
+        publicKey = """MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                        N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
 
     [cluster.s3]
         id = 3
         ip = "127.0.0.1"
         rmfPort = 20030
         syncPort = 30030
-        publicKey="""MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCZlLGnX6NqN1ZpwcN+5aN7r9n5
-                     6H5/b24NcA2RKN4XX1Y26hDZcA4Nl+Fu4NbVhg/kpOHJ2EstMKRlJKOIJ+0yUSLi
-                     LnGUMt+LesVjO5rY0tyyWLW1pMAnmreI0R2ZLuJv6R4rtGwe7Pj/mrgYGHa218ga
-                     x7qWcpdiHou1lE5hNwIDAQAB"""
-
+        publicKey="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                      N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""

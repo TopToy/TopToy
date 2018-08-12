@@ -2,11 +2,28 @@ package crypto;
 
 import config.Config;
 import org.bouncycastle.asn1.*;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.cryptopro.ECGOST3410NamedCurves;
+import org.bouncycastle.asn1.nist.NISTNamedCurves;
+import org.bouncycastle.asn1.sec.SECNamedCurves;
+import org.bouncycastle.asn1.teletrust.TeleTrusTNamedCurves;
+import org.bouncycastle.asn1.x9.X962NamedCurves;
+import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPrivateKey;
+import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPublicKey;
+import org.bouncycastle.jce.ECNamedCurveTable;
+import org.bouncycastle.jce.ECPointUtil;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec;
+import org.bouncycastle.jce.spec.ECNamedCurveSpec;
+import org.bouncycastle.jce.spec.ECPrivateKeySpec;
+import org.bouncycastle.jce.spec.ECPublicKeySpec;
 
 import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.security.*;
+//import java.security.spec.*;
+import java.security.spec.ECGenParameterSpec;
+import java.security.spec.ECPoint;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
@@ -24,38 +41,41 @@ public class pkiUtils {
     static {
         KeyFactory kf = null;
         try {
-            kf = KeyFactory.getInstance("RSA");
-            byte[] key = addpkcs8data(Base64.getDecoder().decode(Config.getPrivateKey().replaceAll("\\s+","")));
-            PKCS8EncodedKeySpec keySpecPKCS8 = new PKCS8EncodedKeySpec(key);
-
-            privKey = kf.generatePrivate(keySpecPKCS8);
-//            X509EncodedKeySpec keySpecX509 = new X509EncodedKeySpec(Base64.getDecoder().decode(Config.getPublicKey().replaceAll("\\s+","")));
-//            pubKey = kf.generatePublic(keySpecX509);
+            Security.addProvider(new BouncyCastleProvider());
+//            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("EC", "BC");
+//            keyPairGenerator.initialize(new ECGenParameterSpec("secp256k1"), new SecureRandom());
+//            java.security.KeyPair keyPair = keyPairGenerator.generateKeyPair();
+//            PrivateKey privateKey = keyPair.getPrivate();
+//            System.out.println(privateKey.getFormat());
+//            PublicKey publicKey = keyPair.getPublic();
+//            System.out.println(publicKey.getFormat());
+            KeyFactory ecKeyFac = KeyFactory.getInstance("ECDSA", "BC");
+            PKCS8EncodedKeySpec pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec(Base64.getDecoder().
+                    decode(Config.getPrivateKey().replaceAll("\\s+","")));
+            privKey = ecKeyFac.generatePrivate(pkcs8EncodedKeySpec);
             HashMap<Integer, String> keys = Config.getClusterPubKeys();
             for (int i : keys.keySet()) {
                 X509EncodedKeySpec spec = new X509EncodedKeySpec(Base64.getDecoder().decode(keys.get(i).replaceAll("\\s+","")));
-                clusterPubKeys.put(i,  kf.generatePublic(spec));
+              clusterPubKeys.put(i, ecKeyFac.generatePublic(spec));
             }
         } catch (Exception e) {
             logger.fatal("Unable to generate rsa keys", e);
         }
     }
-
-    static byte[] addpkcs8data(byte[] key) throws IOException {
-        ASN1EncodableVector v = new ASN1EncodableVector();
-        v.add(new ASN1Integer(0));
-        ASN1EncodableVector v2 = new ASN1EncodableVector();
-        v2.add(new ASN1ObjectIdentifier(PKCSObjectIdentifiers.rsaEncryption.getId()));
-        v2.add(DERNull.INSTANCE);
-        v.add(new DERSequence(v2));
-        v.add(new DEROctetString(key));
-        ASN1Sequence seq = new DERSequence(v);
-        return seq.getEncoded("DER");
+    // TODO: We should extract it out of this class
+    static void generateKeyPair() throws NoSuchProviderException, NoSuchAlgorithmException, InvalidAlgorithmParameterException {
+        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("ECDSA", "BC");
+        keyPairGenerator.initialize(new ECGenParameterSpec("secp256k1"), new SecureRandom());
+        java.security.KeyPair keyPair = keyPairGenerator.generateKeyPair();
+        PrivateKey privateKey = keyPair.getPrivate();
+        System.out.println(new String(Base64.getEncoder().encode(privateKey.getEncoded())));
+        PublicKey publicKey = keyPair.getPublic();
+        System.out.println(new String(Base64.getEncoder().encode(publicKey.getEncoded())));
     }
     static public String sign(String plainText) {
         Signature privateSignature = null;
         try {
-            privateSignature = Signature.getInstance("SHA256withRSA");
+            privateSignature = Signature.getInstance("SHA256withECDSA");
             privateSignature.initSign(privKey);
             privateSignature.update(plainText.getBytes(UTF_8));
             byte[] signature = privateSignature.sign();
@@ -69,7 +89,7 @@ public class pkiUtils {
    static public boolean verify(int id, String plainText, String signature)  {
         Signature publicSignature = null;
         try {
-            publicSignature = Signature.getInstance("SHA256withRSA");
+            publicSignature = Signature.getInstance("SHA256withECDSA");
             publicSignature.initVerify(clusterPubKeys.get(id));
             publicSignature.update(plainText.getBytes(UTF_8));
 
