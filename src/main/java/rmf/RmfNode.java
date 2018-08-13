@@ -5,13 +5,17 @@ import config.Config;
 import config.Node;
 import crypto.pkiUtils;
 import crypto.rmfDigSig;
+import crypto.sslUtils;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
+import io.grpc.netty.NettyServerBuilder;
 import proto.Data;
 import proto.Meta;
 import proto.RmfResult;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 import static java.lang.String.format;
@@ -31,13 +35,22 @@ public class RmfNode extends Node{
 
     private void startGrpcServer() {
         try {
-            rmfServer = ServerBuilder.
+            String serverCertPath = Paths.get("src", "main", "resources", "sslConfig", "rootCA.crt").toString();
+            String clientCertPath = Paths.get("src", "main", "resources", "sslConfig", "rootCA.crt").toString();
+            String serverKey =  Paths.get("src", "main", "resources", "sslConfig", "rootCA.pem").toString();
+            rmfServer = NettyServerBuilder.
                     forPort(getRmfPort()).
+                    sslContext(sslUtils.buildSslContextForServer(serverCertPath, clientCertPath, serverKey)).
                     addService(rmfService).
                     build().
                     start();
+//            rmfServer = ServerBuilder.forPort(getRmfPort())
+//                    // Enable TLS
+//                    .useTransportSecurity(new File(serverCertPath), new File(serverKey))
+//                    .addService(rmfService)
+//                    .build().start();
         } catch (IOException e) {
-            logger.error("", e);
+            logger.fatal("", e);
         }
 
         Runtime.getRuntime().addShutdownHook(new Thread() {

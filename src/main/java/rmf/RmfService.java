@@ -8,12 +8,15 @@ import config.Node;
 import consensus.bbc.bbcService;
 import crypto.pkiUtils;
 import crypto.rmfDigSig;
+import crypto.sslUtils;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.Server;
 import io.grpc.stub.StreamObserver;
 import proto.*;
 
+import javax.net.ssl.SSLException;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
@@ -44,10 +47,19 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         RmfGrpc.RmfStub stub;
 
         peer(Node node) {
-            channel = ManagedChannelBuilder.
-                    forAddress(node.getAddr(), node.getRmfPort()).
-                    usePlaintext().
-                    build();
+            String clientCertPath = Paths.get("src", "main", "resources", "sslConfig", "rootCA.crt").toString();
+            String clientKey =  Paths.get("src", "main", "resources", "sslConfig", "rootCA.pem").toString();
+            String caCert =  Paths.get("src", "main", "resources", "sslConfig", "rootCA.crt").toString();
+            try {
+                channel = sslUtils.buildSslChannel(node.getAddr(), node.getRmfPort(),
+                        sslUtils.buildSslContextForClient(caCert, clientCertPath, clientKey));
+            } catch (SSLException e) {
+                logger.fatal("", e);
+            }
+//            channel = ManagedChannelBuilder.
+//                    forAddress(node.getAddr(), node.getRmfPort()).
+//                    usePlaintext().
+//                    build();
             stub = RmfGrpc.newStub(channel);
         }
 
@@ -120,7 +132,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             try {
                 bbcMissedConsensus();
             } catch (InterruptedException e) {
-                logger.error(format("[#%d]", e));
+                logger.error(format("[#%d]", id), e);
             }
         });
         bbcMissedConsensusThread.start();

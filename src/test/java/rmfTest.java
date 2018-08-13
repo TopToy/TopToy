@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class rmfTest {
     int cidSeires = 0;
-    private int timeToWaitBetweenTests =1000 * 15;
+    private int timeToWaitBetweenTests = 1; //1000 * 15;
     static Config conf = new Config();
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(rmfTest.class);
     private String localHost = "127.0.0.1";
@@ -77,7 +77,7 @@ public class rmfTest {
         ((RmfNode) rn[0]).start();
         String msg = "hello world";
         ((RmfNode) rn[0]).broadcast(cidSeires, cid, msg.getBytes(), 0);
-        assertEquals(msg, new String(((RmfNode) rn[0]).deliver(cidSeires, cid, 0, 0, 1000).getData().toByteArray()));
+        assertEquals(msg, new String(((RmfNode) rn[0]).deliver(cidSeires, cid, 0, 0, 10 * 60 * 1000).getData().toByteArray()));
         ((RmfNode) rn[0]).stop();
 
     }
