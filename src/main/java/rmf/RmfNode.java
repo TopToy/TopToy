@@ -35,18 +35,19 @@ public class RmfNode extends Node{
 
     private void startGrpcServer() {
         try {
-            String serverCertPath = Paths.get("src", "main", "resources", "sslConfig", "rootCA.crt").toString();
-            String clientCertPath = Paths.get("src", "main", "resources", "sslConfig", "rootCA.crt").toString();
-            String serverKey =  Paths.get("src", "main", "resources", "sslConfig", "rootCA.pem").toString();
+            String serverCertPath = Paths.get("src", "main", "resources", "sslConfig", "server.crt").toString();
+            String caCertPath = Paths.get("src", "main", "resources", "sslConfig", "ca.crt").toString();
+            String serverKey =  Paths.get("src", "main", "resources", "sslConfig", "server.pem").toString();
+
             rmfServer = NettyServerBuilder.
                     forPort(getRmfPort()).
-                    sslContext(sslUtils.buildSslContextForServer(serverCertPath, clientCertPath, serverKey)).
+                    sslContext(sslUtils.buildSslContextForServer(serverCertPath, caCertPath, serverKey)).
                     addService(rmfService).
                     build().
                     start();
 //            rmfServer = ServerBuilder.forPort(getRmfPort())
 //                    // Enable TLS
-//                    .useTransportSecurity(new File(serverCertPath), new File(serverKey))
+////                    .useTransportSecurity(new File(serverCertPath), new File(serverKey))
 //                    .addService(rmfService)
 //                    .build().start();
         } catch (IOException e) {

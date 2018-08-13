@@ -21,25 +21,26 @@ public class sslUtils {
         return GrpcSslContexts.
                 forClient().
                 trustManager(new File(caCertFilePath)).
-//                keyManager(new File(clientCertFilePath), new File(clientPrivateKeyFilePath)).
+                keyManager(new File(clientCertFilePath), new File(clientPrivateKeyFilePath)).
                 build();
     }
 
     public static ManagedChannel buildSslChannel(String host, int port, SslContext ctx) {
         return NettyChannelBuilder.forAddress(host, port)
-//                .negotiationType(NegotiationType.TLS)
+                .negotiationType(NegotiationType.TLS)
 //                .usePlaintext()
                 .sslContext(ctx)
                 .build();
     }
 
     public static SslContext buildSslContextForServer(String serverCertFilePath,
-                                                      String clientCertFilePath,
+                                                      String caCertPath,
                                                       String serverPrivateKeyFilePath) throws SSLException {
-        return GrpcSslContexts.
+        return GrpcSslContexts.configure(GrpcSslContexts.
                 forServer(new File(serverCertFilePath), new File(serverPrivateKeyFilePath)).
-//                trustManager(new File(clientCertFilePath)).
-//                clientAuth(ClientAuth.NONE).
+                trustManager(new File(caCertPath)).
+                clientAuth(ClientAuth.REQUIRE)
+        , SslProvider.OPENSSL).
                 build();
     }
 }

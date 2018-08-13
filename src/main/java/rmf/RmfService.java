@@ -47,12 +47,12 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         RmfGrpc.RmfStub stub;
 
         peer(Node node) {
-            String clientCertPath = Paths.get("src", "main", "resources", "sslConfig", "rootCA.crt").toString();
-            String clientKey =  Paths.get("src", "main", "resources", "sslConfig", "rootCA.pem").toString();
-            String caCert =  Paths.get("src", "main", "resources", "sslConfig", "rootCA.crt").toString();
+            String serverCertPath = Paths.get("src", "main", "resources", "sslConfig", "server.crt").toString();
+            String caCertPath = Paths.get("src", "main", "resources", "sslConfig", "ca.crt").toString();
+            String serverKey =  Paths.get("src", "main", "resources", "sslConfig", "server.pem").toString();
             try {
                 channel = sslUtils.buildSslChannel(node.getAddr(), node.getRmfPort(),
-                        sslUtils.buildSslContextForClient(caCert, clientCertPath, clientKey));
+                        sslUtils.buildSslContextForClient(caCertPath, serverCertPath, serverKey));
             } catch (SSLException e) {
                 logger.fatal("", e);
             }

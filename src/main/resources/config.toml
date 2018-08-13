@@ -14,7 +14,7 @@ title = "configuration"
 
 [server]
     id = 0
-    ip = "127.0.0.1"
+    ip = "localhost"
     rmfPort = 20000
     syncPort = 30000
     privateKey = """MIGNAgEAMBAGByqGSM49AgEGBSuBBAAKBHYwdAIBAQQg/ngTdAL+eZOyh4lilm6djqsl
@@ -28,7 +28,7 @@ title = "configuration"
 
     [cluster.s0]
         id = 0
-        ip = "127.0.0.1"
+        ip = "localhost"
         rmfPort = 20000
         syncPort = 30000
         publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
@@ -36,14 +36,14 @@ title = "configuration"
 
     [cluster.s1]
         id = 1
-        ip = "127.0.0.1"
+        ip = "localhost"
         rmfPort = 20010
         syncPort = 30010
         publicKey = """MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
                         N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
     [cluster.s2]
         id = 2
-        ip = "127.0.0.1"
+        ip = "localhost"
         rmfPort = 20020
         syncPort = 30020
         publicKey = """MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
@@ -51,7 +51,7 @@ title = "configuration"
 
     [cluster.s3]
         id = 3
-        ip = "127.0.0.1"
+        ip = "localhost"
         rmfPort = 20030
         syncPort = 30030
         publicKey="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ

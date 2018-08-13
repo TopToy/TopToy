@@ -21,7 +21,7 @@ public class rmfTest {
     private int timeToWaitBetweenTests = 1; //1000 * 15;
     static Config conf = new Config();
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(rmfTest.class);
-    private String localHost = "127.0.0.1";
+    private String localHost = "localhost";
     private int[] rmfPorts = {20000, 20010, 20020, 20030};
     private Node s0= new Node(localHost, rmfPorts[0], -1, 0);
     private Node s1= new Node(localHost, rmfPorts[1], -1, 1);

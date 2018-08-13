@@ -211,12 +211,11 @@
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/io.netty/netty-tcnative-boringssl-static -->
-        <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-tcnative-boringssl-static</artifactId>
-            <version>2.0.12.Final</version>
-        </dependency>
-
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-tcnative-boringssl-static</artifactId>
+                <version>2.0.7.Final</version>
+            </dependency>
 
         <!--&lt;!&ndash; https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-iostreams &ndash;&gt;-->
         <!--<dependency>-->
