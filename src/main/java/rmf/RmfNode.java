@@ -27,21 +27,6 @@ public class RmfNode extends Node{
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(RmfNode.class);
 
     class authInterceptor implements ServerInterceptor {
-
-//        public final Context.Key<SSLSession> SSL_SESSION_CONTEXT = Context.key("SSLSession");
-
-//        @Override
-//        public <ReqT, RespT> ServerCall.Listener<ReqT> interceptCall(ServerCall<RespT> call,
-//                                                                     Metadata headers, ServerCallHandler<ReqT, RespT> next) {
-//            SSLSession sslSession = call.attributes().get(Grpc.TRANSPORT_ATTR_SSL_SESSION);
-//            if (sslSession == null) {
-//                return next.startCall(call, headers)
-//            }
-//        serverCall.getAttributes().get(Grpc.TRANSPORT_ATTR_REMOTE_ADDR).toString().contains("127.0.0.1")
-//            return Contexts.interceptCall(
-//                    Context.current().withValue(SSL_SESSION_CONTEXT, clientContext), call, headers, next);
-//        }
-
         @Override
         public <ReqT, RespT> ServerCall.Listener<ReqT> interceptCall(ServerCall<ReqT, RespT> serverCall,
                                                                      Metadata metadata,
@@ -63,16 +48,10 @@ public class RmfNode extends Node{
 
         }
     }
-//            serverCall.close(Status.PERMISSION_DENIED.withDescription("incorrect ip"), metadata);
-////            return serverCallHandler.startCall(serverCall, metadata);
-//            return new ServerCall.Listener() {};
-//        }
-//    }
 
     protected boolean stopped = false;
     protected RmfService rmfService;
     protected Server rmfServer;
-//    protected int cid = 0;
 
     public RmfNode(int id, String addr, int rmfPort, int f , ArrayList<Node> nodes, String bbcConfig) {
         super(addr, rmfPort, -1,  id);
@@ -82,13 +61,10 @@ public class RmfNode extends Node{
 
     private void startGrpcServer() {
         try {
-            String serverCertPath = Paths.get("src", "main", "resources", "sslConfig", "server.crt").toString();
-            String caCertPath = Paths.get("src", "main", "resources", "sslConfig", "ca.crt").toString();
-            String serverKey =  Paths.get("src", "main", "resources", "sslConfig", "server.pem").toString();
-
             rmfServer = NettyServerBuilder.
                     forPort(getRmfPort()).
-                    sslContext(sslUtils.buildSslContextForServer(serverCertPath, caCertPath, serverKey)).
+                    sslContext(sslUtils.buildSslContextForServer(Config.getServerCrtPath(),
+                            Config.getCaRootPath(), Config.getServerTlsPrivKeyPath())).
                     addService(rmfService).
                     intercept(new authInterceptor()).
                     build().

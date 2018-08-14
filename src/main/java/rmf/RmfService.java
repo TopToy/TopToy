@@ -3,6 +3,7 @@ package rmf;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import com.google.protobuf.ByteString;
+import config.Config;
 import config.Node;
 //import consensus.bbc.bbcClient;
 import consensus.bbc.bbcService;
@@ -63,12 +64,10 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         RmfGrpc.RmfStub stub;
 
         peer(Node node) {
-            String serverCertPath = Paths.get("src", "main", "resources", "sslConfig", "server.crt").toString();
-            String caCertPath = Paths.get("src", "main", "resources", "sslConfig", "ca.crt").toString();
-            String serverKey =  Paths.get("src", "main", "resources", "sslConfig", "server.pem").toString();
             try {
                 channel = sslUtils.buildSslChannel(node.getAddr(), node.getRmfPort(),
-                        sslUtils.buildSslContextForClient(caCertPath, serverCertPath, serverKey)).
+                        sslUtils.buildSslContextForClient(Config.getCaRootPath(),
+                                Config.getServerCrtPath(), Config.getServerTlsPrivKeyPath())).
                         intercept(new clientTlsIntercepter()).build();
             } catch (SSLException e) {
                 logger.fatal("", e);
@@ -166,7 +165,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
 //    // TODO: Bug alert!!
     private void bbcMissedConsensus() throws InterruptedException {
         while (!stopped) {
-            Thread.sleep(2 * 1000); // TODO: Hard code timeout, should it changed? (we probably can do it by notifications)
+            Thread.sleep(200); // TODO: Hard code timeout, should it changed? (we probably can do it by notifications)
             synchronized (fastBbcCons) {
                 if (fastBbcCons.rowKeySet().isEmpty()) {
                     logger.debug(format("[#%d] There are no fast bbc", id));
