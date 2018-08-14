@@ -24,7 +24,6 @@ public abstract class bcServer extends Node {
     }
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(bcServer.class);
     protected RmfNode rmfServer;
-//    private syncService syncServ;
     protected RBrodcastService panicRB;
     protected RBrodcastService syncRB;
     protected blockchain bc; // TODO: Currently implement as basicBlockchain but we will make it dynamically (using config file)
@@ -44,10 +43,9 @@ public abstract class bcServer extends Node {
     protected Thread panicThread;
     int cid = 0;
     int cidSeries = 0;
-//    protected final List<Integer> cids;
     protected final HashMap<Integer, fpEntry> fp;
     protected HashMap<Integer, ArrayList<subChainVersion>> scVersions;
-    final Object panicLock = new Object();
+    protected final ArrayList<Transaction> transactionsPool = new ArrayList<>();
 
     // TODO: Currently nodes, f, tmoInterval, tmo and configHome are coded but we will turn it into configuration file
     public bcServer(String addr, int rmfPort, int syncPort, int id) {
@@ -57,7 +55,6 @@ public abstract class bcServer extends Node {
         n = Config.getN();
         rmfServer = new RmfNode(id, addr, rmfPort, Config.getF(),
                 Config.getCluster(), Config.getRMFbbcConfigHome());
-//        this.syncServ = new syncService(getID(), f, syncPort, Config.getCluster());
         panicRB = new RBrodcastService(id, Config.getPanicRBConfigHome());
         syncRB = new RBrodcastService(id, Config.getSyncRBConfigHome());
         bc = initBC(id);
@@ -70,7 +67,6 @@ public abstract class bcServer extends Node {
         tmoInterval = Config.getTMOInterval();
         initTmo = tmo;
         this.maxTransactionInBlock = Config.getMaxTransactionsInBlock();
-//        cids = new ArrayList<>();
         fp = new HashMap<>();
         scVersions = new HashMap<>();
         mainThread = new Thread(this::mainLoop);
@@ -81,10 +77,8 @@ public abstract class bcServer extends Node {
     public void start() {
         rmfServer.start();
         logger.info(format("[#%d] rmf server is up", getID()));
-//        syncServ.start();
         syncRB.start();
         logger.info(format("[#%d] sync server is up", getID()));
-//        syncRB.start();
         panicRB.start();
         logger.info(format("[#%d] panic server is up", getID()));
         logger.info(format("[#%d] has been initialized successfully", getID()));
@@ -107,7 +101,6 @@ public abstract class bcServer extends Node {
             logger.error("", e);
         }
         rmfServer.stop();
-//        syncServ.shutdown();
         panicRB.shutdown();
         syncRB.shutdown();
         panicThread.interrupt();
@@ -116,7 +109,6 @@ public abstract class bcServer extends Node {
         } catch (InterruptedException e) {
             logger.error("", e);
         }
-//        syncRB.shutdown();
         logger.info(format("[#%d] has been shutdown successfully", getID()));
     }
     private void updateLeaderAndHeight() {
@@ -139,18 +131,6 @@ public abstract class bcServer extends Node {
 
                 }
             }
-//            synchronized (panicLock) {
-//            byte[] panicMsg = panicRB.nonBlockingDeliver();
-//            if (panicMsg != null) {
-//                try {
-//                    ForkProof p = ForkProof.parseFrom(panicMsg);
-//                    handleFork(p);
-//                } catch (InvalidProtocolBufferException e) {
-//                    logger.warn("", e);
-//                    continue;
-//                }
-//            }
-
             try {
                 leaderImpl();
             } catch (InterruptedException e) {
@@ -164,96 +144,66 @@ public abstract class bcServer extends Node {
                 logger.info(format("[#%d] main thread has been interrupted on rmf deliver", getID()));
                 continue;
             }
-//                if (new String(msg.getData().toByteArray()).equals("I")) { // rmf server was interrupted (possibly by the panic mechanism)
-//                    continue;
-//                }
-                byte[] recData = msg.getData().toByteArray();
-                int cid = msg.getCid();
-                int cidSeries = msg.getCidSeries();
-//                if (cid == -1) { // TODO: What happens if Byz process sends a cid = -1 (to part of the network)
-//                    logger.info(format("[#%d] deliver was interrupted", getID()));
-//                    continue;
-//                }
-                if (recData.length == 0) {
-                    tmo += tmoInterval;
-                    logger.info(format("[#%d] Unable to receive block, timeout increased to [%d] ms", getID(), tmo));
-                    updateLeaderAndHeight();
-                    continue;
-                }
-                Block recBlock;
-                try {
-                    recBlock = Block.parseFrom(recData);
-                } catch (InvalidProtocolBufferException e) {
-                    logger.warn("Unable to parse received block", e);
-                    updateLeaderAndHeight();
-                    continue;
-                    // TODO: Here also we should create an empty block!
-                }
-                // TODO: validate meta info (if the meta isn't match we should treat it as a Byz behaviour
-//                if (recBlock.getHeader().getHeight() != currHeight ||
-//                        recBlock.getHeader().getCreatorID() != currLeader ||
-                // TODO: This may cause a problem for the fork proof! (the siganture isn't the original one, as the data) we should handle it carefully
-                if(!bc.validateBlockData(recBlock)) {
-                    logger.warn(format("[#%d] received an invalid data in a valid block, creating an empty block [height=%d]", getID(), currHeight));
-                    recBlock = Block.newBuilder(). // creates emptyBlock
-                            setHeader(BlockHeader.
-                            newBuilder().
-                            setCreatorID(currLeader).
-                            setHeight(currHeight).
-                            setPrev(ByteString.copyFrom(DigestMethod.
-                                    hash(bc.getBlock(currHeight - 1).getHeader().toByteArray())))).
-                            build();
-                }
-//                recBlock.getHeader().toBuilder().setCid(cid).build();
-                recBlock = recBlock.
-                        toBuilder().
-                        setHeader(recBlock.
-                                getHeader().
-                                toBuilder().
-                                setCid(cid).
-                                setCidSeries(cidSeries).
-                                build()).
-                        build();
-                if (!bc.validateBlockHash(recBlock)) {
-                    announceFork(recBlock);
-                    continue;
-                }
-                if (!bc.validateBlockCreator(recBlock, f)) {
-                    updateLeaderAndHeight();
-                    tmo += tmoInterval;
-                    continue;
-                }
-//                if (bc.getHeight() + 1 >= f && bc.getBlocks(bc.getHeight() +1 - f, bc.getHeight() + 1).
-//                        stream().
-//                        map(b -> b.getHeader().getCreatorID()).
-//                        collect(Collectors.toList()).
-//                        contains(recBlock.getHeader().getCreatorID())) {
-//                    logger.info(format("[#%d] Unable to receive block, sender is in the last f blocks", getID()));
-//                    tmo += tmoInterval;
-//                    logger.info(format("[#%d] Unable to receive block, timeout increased to [%d] ms", getID(), tmo));
-////                    updateLeader();
-//                    continue;
-//                }
-
-
-                tmo = initTmo;
-                synchronized (newBlockNotifyer) {
-//                    synchronized (cids) {
-//                        cids.add(cid);
-                    bc.addBlock(recBlock);
-                    logger.info(String.format("[#%d] adds new block with [height=%d] [cidSeries=%d ; cid=%d]",
-                            getID(), recBlock.getHeader().getHeight(), cidSeries, cid));
-                    newBlockNotifyer.notify();
-//                    }
-                }
+            byte[] recData = msg.getData().toByteArray();
+            int cid = msg.getCid();
+            int cidSeries = msg.getCidSeries();
+            if (recData.length == 0) {
+                tmo += tmoInterval;
+                logger.info(format("[#%d] Unable to receive block, timeout increased to [%d] ms", getID(), tmo));
                 updateLeaderAndHeight();
-
-//                currHeight++;
-//                updateLeader();
-//            currHeight = bc.getHeight() + 1;
-//            currLeader = bc.getBlock(currHeight - 1).getHeader().getCreatorID() + 1 % n;
+                continue;
             }
-//        }
+            Block recBlock;
+            try {
+                recBlock = Block.parseFrom(recData);
+            } catch (InvalidProtocolBufferException e) {
+                logger.warn("Unable to parse received block", e);
+                updateLeaderAndHeight();
+                continue;
+                // TODO: Here also we should create an empty block!
+            }
+            // TODO: validate meta info (if the meta isn't match we should treat it as a Byz behaviour
+            // TODO: This may cause a problem for the fork proof! (the siganture isn't the original one, as the data) we should handle it carefully
+            if(!bc.validateBlockData(recBlock)) {
+                logger.warn(format("[#%d] received an invalid data in a valid block, creating an empty block [height=%d]", getID(), currHeight));
+                recBlock = Block.newBuilder(). // creates emptyBlock
+                        setHeader(BlockHeader.
+                        newBuilder().
+                        setCreatorID(currLeader).
+                        setHeight(currHeight).
+                        setPrev(ByteString.copyFrom(DigestMethod.
+                                hash(bc.getBlock(currHeight - 1).getHeader().toByteArray())))).
+                        build();
+            }
+            recBlock = recBlock.
+                    toBuilder().
+                    setHeader(recBlock.
+                            getHeader().
+                            toBuilder().
+                            setCid(cid).
+                            setCidSeries(cidSeries).
+                            build()).
+                    build();
+            if (!bc.validateBlockHash(recBlock)) {
+                announceFork(recBlock);
+                continue;
+            }
+            if (!bc.validateBlockCreator(recBlock, f)) {
+                updateLeaderAndHeight();
+                tmo += tmoInterval;
+                continue;
+            }
+
+
+            tmo = initTmo;
+            synchronized (newBlockNotifyer) {
+                bc.addBlock(recBlock);
+                logger.info(String.format("[#%d] adds new block with [height=%d] [cidSeries=%d ; cid=%d]",
+                        getID(), recBlock.getHeader().getHeight(), cidSeries, cid));
+                newBlockNotifyer.notify();
+            }
+            updateLeaderAndHeight();
+        }
     }
 
     abstract void leaderImpl() throws InterruptedException;
@@ -263,21 +213,28 @@ public abstract class bcServer extends Node {
     abstract blockchain getBC(int start, int end);
 
 
-    public boolean addTransaction(byte[] data, int clientID) {
+    public void addTransaction(byte[] data, int clientID) {
         Transaction t = Transaction.newBuilder().setClientID(clientID).setData(ByteString.copyFrom(data)).build();
-        synchronized (blockLock) {
-            if (currBlock.getTransactionCount() >= maxTransactionInBlock) {
-                logger.info(format("[#%d] can't add new transaction from [client=%d], due to lack of space", getID(), t.getClientID()));
-                return false;
-            }
-            if (!currBlock.validateTransaction(t)) {
-                logger.info(format("[#%d] received an invalid transaction from [client=%d]", getID(), t.getClientID()));
-                return false;
-            }
-            currBlock.addTransaction(t);
-            return true;
+        synchronized (transactionsPool) {
+            logger.info(format("[#%d] add transaction from [client=%d]", getID(), t.getClientID()));
+            transactionsPool.add(t);
         }
+    }
 
+    protected void addTransactionsToCurrBlock() {
+        synchronized (transactionsPool) {
+            if (transactionsPool.isEmpty()) return;
+            while ((!transactionsPool.isEmpty()) && currBlock.getTransactionCount() < maxTransactionInBlock) {
+                Transaction t = transactionsPool.get(0);
+                transactionsPool.remove(0);
+                if (!currBlock.validateTransaction(t)) {
+                    logger.info(format("[#%d] detect an invalid transaction from [client=%d]", getID(), t.getClientID()));
+                    continue;
+                }
+                currBlock.addTransaction(t);
+
+            }
+        }
     }
 
     private int validateForkProof(ForkProof p)  {
