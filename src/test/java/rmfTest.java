@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class rmfTest {
     int cidSeires = 0;
-    private int timeToWaitBetweenTests = 1; //1000 * 15;
+    private int timeToWaitBetweenTests = 1000 * 15;
     static Config conf = new Config();
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(rmfTest.class);
     private String localHost = "localhost";

@@ -4,6 +4,7 @@ title = "configuration"
     n = 4
     f = 1
 
+
 [setting]
     tmo = 1000
     tmoInterval = 100
@@ -11,6 +12,7 @@ title = "configuration"
     panicRBroadcastConfigPath = "src/main/resources/panicRBConfig"
     syncRBroadcastConfigPath = "src/main/resources/syncRBConfig"
     maxTransactionInBlock = 2
+    caRootPath = "src/main/resources/sslConfig/ca.crt"
 
 [server]
     id = 0
@@ -24,6 +26,8 @@ title = "configuration"
     publicKey = """MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
                     N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
 
+    TlsPrivKeyPath = "src/main/resources/sslConfig/server.pem"
+    TlsCertPath = "src/main/resources/sslConfig/server.crt"
 [[cluster]]
 
     [cluster.s0]

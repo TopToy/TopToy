@@ -3,6 +3,7 @@ package rmf;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import com.google.protobuf.ByteString;
+import config.Config;
 import config.Node;
 //import consensus.bbc.bbcClient;
 import consensus.bbc.bbcService;
@@ -10,11 +11,14 @@ import crypto.pkiUtils;
 import crypto.rmfDigSig;
 import crypto.sslUtils;
 import io.grpc.*;
+import io.grpc.netty.NettyServerBuilder;
 import io.grpc.stub.StreamObserver;
 import org.checkerframework.checker.units.qual.A;
 import proto.*;
 import static io.grpc.Metadata.ASCII_STRING_MARSHALLER;
 import javax.net.ssl.SSLException;
+import javax.net.ssl.SSLPeerUnverifiedException;
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
@@ -35,6 +39,29 @@ TODO:
  */
 public class RmfService extends RmfGrpc.RmfImplBase {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(RmfService.class);
+
+    class authInterceptor implements ServerInterceptor {
+        @Override
+        public <ReqT, RespT> ServerCall.Listener<ReqT> interceptCall(ServerCall<ReqT, RespT> serverCall,
+                                                                     Metadata metadata,
+                                                                     ServerCallHandler<ReqT, RespT> serverCallHandler) {
+            ServerCall.Listener res = new ServerCall.Listener() {};
+            try {
+                String peerDomain = serverCall.getAttributes()
+                        .get(Grpc.TRANSPORT_ATTR_SSL_SESSION).getPeerPrincipal().getName().split("=")[1];
+                int peerId = Integer.parseInt(Objects.requireNonNull(metadata.get
+                        (Metadata.Key.of("id", ASCII_STRING_MARSHALLER))));
+                if (nodes.get(peerId).getAddr().equals(peerDomain)) {
+                    res = serverCallHandler.startCall(serverCall, metadata);
+                }
+            } catch (SSLPeerUnverifiedException e) {
+                logger.error("", e);
+            } finally {
+                return res;
+            }
+
+        }
+    }
 
     class clientTlsIntercepter implements ClientInterceptor {
 
@@ -63,12 +90,10 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         RmfGrpc.RmfStub stub;
 
         peer(Node node) {
-            String serverCertPath = Paths.get("src", "main", "resources", "sslConfig", "server.crt").toString();
-            String caCertPath = Paths.get("src", "main", "resources", "sslConfig", "ca.crt").toString();
-            String serverKey =  Paths.get("src", "main", "resources", "sslConfig", "server.pem").toString();
             try {
                 channel = sslUtils.buildSslChannel(node.getAddr(), node.getRmfPort(),
-                        sslUtils.buildSslContextForClient(caCertPath, serverCertPath, serverKey)).
+                        sslUtils.buildSslContextForClient(Config.getCaRootPath(),
+                                Config.getServerCrtPath(), Config.getServerTlsPrivKeyPath())).
                         intercept(new clientTlsIntercepter()).build();
             } catch (SSLException e) {
                 logger.fatal("", e);
@@ -113,6 +138,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
     private String bbcConfig;
     private final Table<Integer, Integer, BbcProtos.BbcDecision> regBbcCons;
     private boolean stopped = false;
+    protected Server rmfServer;
 
     public RmfService(int id, int f, ArrayList<Node> nodes, String bbcConfig) {
         this.bbcConfig = bbcConfig;
@@ -129,6 +155,29 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         this.nodes = nodes;
         this.fastBbcCons =  HashBasedTable.create();
         this.regBbcCons = HashBasedTable.create();
+        startGrpcServer();
+    }
+
+
+    private void startGrpcServer() {
+        try {
+            rmfServer = NettyServerBuilder.
+                    forPort(nodes.get(id).getRmfPort()).
+                    sslContext(sslUtils.buildSslContextForServer(Config.getServerCrtPath(),
+                            Config.getCaRootPath(), Config.getServerTlsPrivKeyPath())).
+                    addService(this).
+                    intercept(new authInterceptor()).
+                    build().
+                    start();
+//            rmfServer = ServerBuilder.forPort(getRmfPort())
+//                    // Enable TLS
+////                    .useTransportSecurity(new File(serverCertPath), new File(serverKey))
+//                    .addService(rmfService)
+//                    .build().start();
+        } catch (IOException e) {
+            logger.fatal("", e);
+        }
+
     }
 
     public void start() {
@@ -162,11 +211,22 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             peers.put(n.getID(), new peer(n));
         }
         logger.info(format("[#%d] Initiated grpc client", id));
+
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                if (stopped) return;
+                // Use stderr here since the logger may have been reset by its JVM shutdown hook.
+                logger.warn("*** shutting down rmf service since JVM is shutting down");
+                shutdown();
+                logger.warn("*** service shut down");
+            }
+        });
     }
 //    // TODO: Bug alert!!
     private void bbcMissedConsensus() throws InterruptedException {
         while (!stopped) {
-            Thread.sleep(2 * 1000); // TODO: Hard code timeout, should it changed? (we probably can do it by notifications)
+            Thread.sleep(200); // TODO: Hard code timeout, should it changed? (we probably can do it by notifications)
             synchronized (fastBbcCons) {
                 if (fastBbcCons.rowKeySet().isEmpty()) {
                     logger.debug(format("[#%d] There are no fast bbc", id));
@@ -204,6 +264,9 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             }
         } catch (InterruptedException e) {
             logger.error("", e);
+        }
+        if (rmfServer != null) {
+            rmfServer.shutdown();
         }
         logger.info(format("[#%d] bbc server has been shutdown", id));
     }

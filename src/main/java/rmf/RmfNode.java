@@ -26,107 +26,83 @@ import static java.lang.String.format;
 public class RmfNode extends Node{
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(RmfNode.class);
 
-    class authInterceptor implements ServerInterceptor {
-
-//        public final Context.Key<SSLSession> SSL_SESSION_CONTEXT = Context.key("SSLSession");
-
+//    class authInterceptor implements ServerInterceptor {
 //        @Override
-//        public <ReqT, RespT> ServerCall.Listener<ReqT> interceptCall(ServerCall<RespT> call,
-//                                                                     Metadata headers, ServerCallHandler<ReqT, RespT> next) {
-//            SSLSession sslSession = call.attributes().get(Grpc.TRANSPORT_ATTR_SSL_SESSION);
-//            if (sslSession == null) {
-//                return next.startCall(call, headers)
+//        public <ReqT, RespT> ServerCall.Listener<ReqT> interceptCall(ServerCall<ReqT, RespT> serverCall,
+//                                                                     Metadata metadata,
+//                                                                     ServerCallHandler<ReqT, RespT> serverCallHandler) {
+//            ServerCall.Listener res = new ServerCall.Listener() {};
+//            try {
+//                String peerDomain = serverCall.getAttributes()
+//                        .get(Grpc.TRANSPORT_ATTR_SSL_SESSION).getPeerPrincipal().getName().split("=")[1];
+//                int peerId = Integer.parseInt(Objects.requireNonNull(metadata.get
+//                        (Metadata.Key.of("id", ASCII_STRING_MARSHALLER))));
+//                if (rmfService.nodes.get(peerId).getAddr().equals(peerDomain)) {
+//                    res = serverCallHandler.startCall(serverCall, metadata);
+//                }
+//            } catch (SSLPeerUnverifiedException e) {
+//                logger.error("", e);
+//            } finally {
+//                return res;
 //            }
-//        serverCall.getAttributes().get(Grpc.TRANSPORT_ATTR_REMOTE_ADDR).toString().contains("127.0.0.1")
-//            return Contexts.interceptCall(
-//                    Context.current().withValue(SSL_SESSION_CONTEXT, clientContext), call, headers, next);
-//        }
-
-        @Override
-        public <ReqT, RespT> ServerCall.Listener<ReqT> interceptCall(ServerCall<ReqT, RespT> serverCall,
-                                                                     Metadata metadata,
-                                                                     ServerCallHandler<ReqT, RespT> serverCallHandler) {
-            ServerCall.Listener res = new ServerCall.Listener() {};
-            try {
-                String peerDomain = serverCall.getAttributes()
-                        .get(Grpc.TRANSPORT_ATTR_SSL_SESSION).getPeerPrincipal().getName().split("=")[1];
-                int peerId = Integer.parseInt(Objects.requireNonNull(metadata.get
-                        (Metadata.Key.of("id", ASCII_STRING_MARSHALLER))));
-                if (rmfService.nodes.get(peerId).getAddr().equals(peerDomain)) {
-                    res = serverCallHandler.startCall(serverCall, metadata);
-                }
-            } catch (SSLPeerUnverifiedException e) {
-                logger.error("", e);
-            } finally {
-                return res;
-            }
-
-        }
-    }
-//            serverCall.close(Status.PERMISSION_DENIED.withDescription("incorrect ip"), metadata);
-////            return serverCallHandler.startCall(serverCall, metadata);
-//            return new ServerCall.Listener() {};
+//
 //        }
 //    }
 
     protected boolean stopped = false;
     protected RmfService rmfService;
-    protected Server rmfServer;
-//    protected int cid = 0;
+//    protected Server rmfServer;
 
     public RmfNode(int id, String addr, int rmfPort, int f , ArrayList<Node> nodes, String bbcConfig) {
         super(addr, rmfPort, -1,  id);
         rmfService = new RmfService(id, f, nodes, bbcConfig);
-        startGrpcServer();
+//        startGrpcServer();
     }
-
-    private void startGrpcServer() {
-        try {
-            String serverCertPath = Paths.get("src", "main", "resources", "sslConfig", "server.crt").toString();
-            String caCertPath = Paths.get("src", "main", "resources", "sslConfig", "ca.crt").toString();
-            String serverKey =  Paths.get("src", "main", "resources", "sslConfig", "server.pem").toString();
-
-            rmfServer = NettyServerBuilder.
-                    forPort(getRmfPort()).
-                    sslContext(sslUtils.buildSslContextForServer(serverCertPath, caCertPath, serverKey)).
-                    addService(rmfService).
-                    intercept(new authInterceptor()).
-                    build().
-                    start();
-//            rmfServer = ServerBuilder.forPort(getRmfPort())
-//                    // Enable TLS
-////                    .useTransportSecurity(new File(serverCertPath), new File(serverKey))
-//                    .addService(rmfService)
-//                    .build().start();
-        } catch (IOException e) {
-            logger.fatal("", e);
-        }
-
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                if (stopped) return;
-                // Use stderr here since the logger may have been reset by its JVM shutdown hook.
-                logger.warn("*** shutting down gRPC server since JVM is shutting down");
-                RmfNode.this.stop();
-                logger.warn("*** server shut down");
-            }
-        });
-    }
+//
+//    private void startGrpcServer() {
+//        try {
+//            rmfServer = NettyServerBuilder.
+//                    forPort(getRmfPort()).
+//                    sslContext(sslUtils.buildSslContextForServer(Config.getServerCrtPath(),
+//                            Config.getCaRootPath(), Config.getServerTlsPrivKeyPath())).
+//                    addService(rmfService).
+//                    intercept(new authInterceptor()).
+//                    build().
+//                    start();
+////            rmfServer = ServerBuilder.forPort(getRmfPort())
+////                    // Enable TLS
+//////                    .useTransportSecurity(new File(serverCertPath), new File(serverKey))
+////                    .addService(rmfService)
+////                    .build().start();
+//        } catch (IOException e) {
+//            logger.fatal("", e);
+//        }
+//
+//        Runtime.getRuntime().addShutdownHook(new Thread() {
+//            @Override
+//            public void run() {
+//                if (stopped) return;
+//                // Use stderr here since the logger may have been reset by its JVM shutdown hook.
+//                logger.warn("*** shutting down gRPC server since JVM is shutting down");
+//                RmfNode.this.stop();
+//                logger.warn("*** server shut down");
+//            }
+//        });
+//    }
 
     public void stop() {
         stopped = true;
         if (rmfService != null)
             rmfService.shutdown();
-        if (rmfServer != null)
-            rmfServer.shutdown();
+//        if (rmfServer != null)
+//            rmfServer.shutdown();
     }
 
     public void blockUntilShutdown() throws InterruptedException {
         rmfService.shutdown();
-        if (rmfServer != null) {
-            rmfServer.awaitTermination();
-        }
+//        if (rmfServer != null) {
+//            rmfServer.awaitTermination();
+//        }
 
     }
 

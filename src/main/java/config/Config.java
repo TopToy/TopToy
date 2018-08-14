@@ -24,6 +24,8 @@ public class Config {
         String SERVER_IP_KEY = "server.ip";
         String SERVER_RMFPORT_KEY = "server.rmfPort";
         String SERVER_SYNCPORT_KEY = "server.syncPort";
+        String SERVER_CRT_PATH = "server.TlsCertPath";
+        String SERVER_TLS_PRIV_KEY_PATH = "server.TlsPrivKeyPath";
         String RMFCLUSTER_KEY = "cluster";
         String RMFCLUSTER_SERVER_KEY = "cluster.s";
         String SETTING_KEY = "setting";
@@ -33,6 +35,7 @@ public class Config {
         String SETTING_PAINCRBCONFIG_PATH = "setting.panicRBroadcastConfigPath";
         String SETTING_SYNCRBCONFIG_PATH = "setting.syncRBroadcastConfigPath";
         String SETTING_MAXTRANSACTIONSINBLOCK_KEY = "setting.maxTransactionInBlock";
+        String SETTING_CA_ROOT_PATH = "setting.caRootPath";
         String SERVER_PRIVKEY = "server.privateKey";
         String SERVER_PUBKEY = "server.publicKey";
     }
@@ -147,6 +150,12 @@ public class Config {
     public static String getPrivateKey() {
         return conf.getString(tKeys.SERVER_PRIVKEY);
     }
+
+    public static String getCaRootPath() {return conf.getString(tKeys.SETTING_CA_ROOT_PATH); }
+
+    public static String getServerCrtPath() { return conf.getString(tKeys.SERVER_CRT_PATH); }
+
+    public static String getServerTlsPrivKeyPath() { return conf.getString(tKeys.SERVER_TLS_PRIV_KEY_PATH); }
 
 
 }
