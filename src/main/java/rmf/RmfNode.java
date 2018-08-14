@@ -1,27 +1,74 @@
 package rmf;
 
+import afu.org.checkerframework.checker.oigj.qual.O;
 import com.google.protobuf.ByteString;
 import config.Config;
 import config.Node;
 import crypto.pkiUtils;
 import crypto.rmfDigSig;
 import crypto.sslUtils;
-import io.grpc.Server;
-import io.grpc.ServerBuilder;
+import io.grpc.*;
 import io.grpc.netty.NettyServerBuilder;
 import proto.Data;
 import proto.Meta;
 import proto.RmfResult;
 
-import java.io.File;
+import javax.net.ssl.SSLPeerUnverifiedException;
+import javax.net.ssl.SSLSession;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Objects;
 
+import static io.grpc.Metadata.ASCII_STRING_MARSHALLER;
 import static java.lang.String.format;
 
 public class RmfNode extends Node{
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(RmfNode.class);
+
+    class authInterceptor implements ServerInterceptor {
+
+//        public final Context.Key<SSLSession> SSL_SESSION_CONTEXT = Context.key("SSLSession");
+
+//        @Override
+//        public <ReqT, RespT> ServerCall.Listener<ReqT> interceptCall(ServerCall<RespT> call,
+//                                                                     Metadata headers, ServerCallHandler<ReqT, RespT> next) {
+//            SSLSession sslSession = call.attributes().get(Grpc.TRANSPORT_ATTR_SSL_SESSION);
+//            if (sslSession == null) {
+//                return next.startCall(call, headers)
+//            }
+//        serverCall.getAttributes().get(Grpc.TRANSPORT_ATTR_REMOTE_ADDR).toString().contains("127.0.0.1")
+//            return Contexts.interceptCall(
+//                    Context.current().withValue(SSL_SESSION_CONTEXT, clientContext), call, headers, next);
+//        }
+
+        @Override
+        public <ReqT, RespT> ServerCall.Listener<ReqT> interceptCall(ServerCall<ReqT, RespT> serverCall,
+                                                                     Metadata metadata,
+                                                                     ServerCallHandler<ReqT, RespT> serverCallHandler) {
+            ServerCall.Listener res = new ServerCall.Listener() {};
+            try {
+                String peerDomain = serverCall.getAttributes()
+                        .get(Grpc.TRANSPORT_ATTR_SSL_SESSION).getPeerPrincipal().getName().split("=")[1];
+                int peerId = Integer.parseInt(Objects.requireNonNull(metadata.get
+                        (Metadata.Key.of("id", ASCII_STRING_MARSHALLER))));
+                if (rmfService.nodes.get(peerId).getAddr().equals(peerDomain)) {
+                    res = serverCallHandler.startCall(serverCall, metadata);
+                }
+            } catch (SSLPeerUnverifiedException e) {
+                logger.error("", e);
+            } finally {
+                return res;
+            }
+
+        }
+    }
+//            serverCall.close(Status.PERMISSION_DENIED.withDescription("incorrect ip"), metadata);
+////            return serverCallHandler.startCall(serverCall, metadata);
+//            return new ServerCall.Listener() {};
+//        }
+//    }
+
     protected boolean stopped = false;
     protected RmfService rmfService;
     protected Server rmfServer;
@@ -43,6 +90,7 @@ public class RmfNode extends Node{
                     forPort(getRmfPort()).
                     sslContext(sslUtils.buildSslContextForServer(serverCertPath, caCertPath, serverKey)).
                     addService(rmfService).
+                    intercept(new authInterceptor()).
                     build().
                     start();
 //            rmfServer = ServerBuilder.forPort(getRmfPort())

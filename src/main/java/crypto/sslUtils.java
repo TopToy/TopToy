@@ -1,6 +1,7 @@
 package crypto;
 
 import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
 import io.grpc.netty.GrpcSslContexts;
 import io.grpc.netty.NegotiationType;
 import io.grpc.netty.NettyChannelBuilder;
@@ -25,12 +26,11 @@ public class sslUtils {
                 build();
     }
 
-    public static ManagedChannel buildSslChannel(String host, int port, SslContext ctx) {
+    public static ManagedChannelBuilder buildSslChannel(String host, int port, SslContext ctx) {
         return NettyChannelBuilder.forAddress(host, port)
                 .negotiationType(NegotiationType.TLS)
 //                .usePlaintext()
-                .sslContext(ctx)
-                .build();
+                .sslContext(ctx);
     }
 
     public static SslContext buildSslContextForServer(String serverCertFilePath,

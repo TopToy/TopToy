@@ -9,12 +9,11 @@ import consensus.bbc.bbcService;
 import crypto.pkiUtils;
 import crypto.rmfDigSig;
 import crypto.sslUtils;
-import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
-import io.grpc.Server;
+import io.grpc.*;
 import io.grpc.stub.StreamObserver;
+import org.checkerframework.checker.units.qual.A;
 import proto.*;
-
+import static io.grpc.Metadata.ASCII_STRING_MARSHALLER;
 import javax.net.ssl.SSLException;
 import java.nio.file.Paths;
 import java.util.*;
@@ -36,6 +35,23 @@ TODO:
  */
 public class RmfService extends RmfGrpc.RmfImplBase {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(RmfService.class);
+
+    class clientTlsIntercepter implements ClientInterceptor {
+
+        @Override
+        public <ReqT, RespT> ClientCall<ReqT, RespT> interceptCall(MethodDescriptor<ReqT, RespT> methodDescriptor,
+                                                                   CallOptions callOptions,
+                                                                   Channel channel) {
+            return new ForwardingClientCall.
+                    SimpleForwardingClientCall<ReqT, RespT>(channel.newCall(methodDescriptor, callOptions)) {
+                        @Override
+                        public void start(Listener<RespT> responseListener, Metadata headers) {
+                            headers.put( Metadata.Key.of("id", ASCII_STRING_MARSHALLER), String.valueOf(id));
+                            super.start(responseListener, headers);
+                }
+            };
+        }
+    }
     class fvote {
         int cid;
         int cidSeries;
@@ -52,7 +68,8 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             String serverKey =  Paths.get("src", "main", "resources", "sslConfig", "server.pem").toString();
             try {
                 channel = sslUtils.buildSslChannel(node.getAddr(), node.getRmfPort(),
-                        sslUtils.buildSslContextForClient(caCertPath, serverCertPath, serverKey));
+                        sslUtils.buildSslContextForClient(caCertPath, serverCertPath, serverKey)).
+                        intercept(new clientTlsIntercepter()).build();
             } catch (SSLException e) {
                 logger.fatal("", e);
             }
