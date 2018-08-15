@@ -2,30 +2,22 @@ package rmf;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
-import com.google.protobuf.ByteString;
 import config.Config;
 import config.Node;
-//import consensus.bbc.bbcClient;
 import consensus.bbc.bbcService;
-import crypto.pkiUtils;
 import crypto.rmfDigSig;
 import crypto.sslUtils;
 import io.grpc.*;
 import io.grpc.netty.NettyServerBuilder;
 import io.grpc.stub.StreamObserver;
-import org.checkerframework.checker.units.qual.A;
 import proto.*;
 import static io.grpc.Metadata.ASCII_STRING_MARSHALLER;
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLPeerUnverifiedException;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
-
-import static java.lang.String.copyValueOf;
 import static java.lang.String.format;
 
 /*
@@ -114,36 +106,29 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         }
     }
     protected int id;
-    int n;
+    private int n;
     protected int f;
-    protected bbcService bbcService;
-    final Object globalLock = new Object();
-    final Object bbcLock = new Object();
+    private bbcService bbcService;
+    private final Object globalLock = new Object();
 
-    // TODO: change to CountDownLatch??
-    protected Semaphore receivedSem;
-    final protected Table<Integer, Integer, Data> recMsg;
+    private final Table<Integer, Integer, Data> recMsg;
 
-    final Table<Integer, Integer, fvote> fVotes;
-    final Table<Integer, Integer, Data> pendingMsg;
-    final Table<Integer, Integer, BbcProtos.BbcDecision> fastBbcCons;
+    private final Table<Integer, Integer, fvote> fVotes;
+    private final Table<Integer, Integer, Data> pendingMsg;
+    private final Table<Integer, Integer, BbcProtos.BbcDecision> fastBbcCons;
 
-    protected Map<Integer, peer> peers;
-    protected List<Node> nodes;
-    boolean onSync = false;
-    final Object syncLock = new Object();
+    Map<Integer, peer> peers;
+    private List<Node> nodes;
     private Thread bbcServiceThread;
     private Thread bbcMissedConsensusThread;
     protected Server server;
     private String bbcConfig;
     private final Table<Integer, Integer, BbcProtos.BbcDecision> regBbcCons;
     private boolean stopped = false;
-    protected Server rmfServer;
+    private Server rmfServer;
 
     public RmfService(int id, int f, ArrayList<Node> nodes, String bbcConfig) {
         this.bbcConfig = bbcConfig;
-        this.receivedSem = new Semaphore(0, true);
-
         this.fVotes = HashBasedTable.create();
         this.pendingMsg =  HashBasedTable.create();
         this.recMsg =  HashBasedTable.create();
@@ -169,11 +154,6 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                     intercept(new authInterceptor()).
                     build().
                     start();
-//            rmfServer = ServerBuilder.forPort(getRmfPort())
-//                    // Enable TLS
-////                    .useTransportSecurity(new File(serverCertPath), new File(serverKey))
-//                    .addService(rmfService)
-//                    .build().start();
         } catch (IOException e) {
             logger.fatal("", e);
         }
@@ -212,16 +192,13 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         }
         logger.info(format("[#%d] Initiated grpc client", id));
 
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                if (stopped) return;
-                // Use stderr here since the logger may have been reset by its JVM shutdown hook.
-                logger.warn("*** shutting down rmf service since JVM is shutting down");
-                shutdown();
-                logger.warn("*** service shut down");
-            }
-        });
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            if (stopped) return;
+            // Use stderr here since the logger may have been reset by its JVM shutdown hook.
+            logger.warn("*** shutting down rmf service since JVM is shutting down");
+            shutdown();
+            logger.warn("*** service shut down");
+        }));
     }
 //    // TODO: Bug alert!!
     private void bbcMissedConsensus() throws InterruptedException {
@@ -273,7 +250,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
 
     // TODO: This should be called by only one process per round.
 
-    protected void sendDataMessage(RmfGrpc.RmfStub stub, Data msg) {
+    void sendDataMessage(RmfGrpc.RmfStub stub, Data msg) {
         stub.disseminateMessage(msg, new StreamObserver<Empty>() {
             @Override
             public void onNext(Empty ans) {
@@ -292,7 +269,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         });
     }
 
-    protected void sendFastVoteMessage(RmfGrpc.RmfStub stub, BbcProtos.BbcMsg v) {
+    private void sendFastVoteMessage(RmfGrpc.RmfStub stub, BbcProtos.BbcMsg v) {
         stub.fastVote(v, new StreamObserver<Empty>() {
             @Override
             public void onNext(Empty empty) {
@@ -315,7 +292,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             and insert it again. We will probably handle it by adding some cleanup mechanism.
       */
 
-    protected void sendReqMessage(RmfGrpc.RmfStub stub, Req req, int cidSeries,  int cid, int sender, int height) {
+    private void sendReqMessage(RmfGrpc.RmfStub stub, Req req, int cidSeries, int cid, int sender, int height) {
         stub.reqMessage(req, new StreamObserver<Res>() {
             @Override
             public void onNext(Res res) {
@@ -348,21 +325,20 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             }
         });
     }
-    protected void broadcastReqMsg(Req req, int cidSeries, int cid, int sender, int height) {
+    private void broadcastReqMsg(Req req, int cidSeries, int cid, int sender, int height) {
         logger.info(format("[#%d] broadcast request message [cidSeries=%d ; cid=%d]", id, cidSeries, cid));
         for (int p : peers.keySet()) {
             if (p == id) continue;
             sendReqMessage(peers.get(p).stub, req, cidSeries, cid, sender, height);
         }
     }
-    protected void broadcastFastVoteMessage(BbcProtos.BbcMsg v) {
+    private void broadcastFastVoteMessage(BbcProtos.BbcMsg v) {
         for (int p : peers.keySet()) {
-//            if (p == id) continue;
             sendFastVoteMessage(peers.get(p).stub, v);
         }
     }
 
-    public void rmfBroadcast(Data msg) {
+    void rmfBroadcast(Data msg) {
         for (peer p : peers.values()) {
             sendDataMessage(p.stub, msg);
         }
@@ -370,7 +346,6 @@ public class RmfService extends RmfGrpc.RmfImplBase {
 
     @Override
     public void disseminateMessage(Data request, StreamObserver<Empty> responseObserver) {
-        int height = request.getMeta().getHeight();
         int sender = request.getMeta().getSender();
         int cid = request.getMeta().getCid();
         int cidSeries = request.getMeta().getCidSeries();
@@ -382,36 +357,10 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             pendingMsg.put(cidSeries, cid, request);
             logger.info(format("[#%d] received data message from [%d], [cidSeries=%d ; cid=%d]", id,
                     sender, cidSeries, cid));
-//            BbcProtos.BbcMsg.Builder v = BbcProtos.BbcMsg
-//                    .newBuilder().setId(cid).setPropserID(id).setVote(1);
-//            v.setSig(bbcDigSig.sign(v));
-//
-//            broadcastFastVoteMessage(v.build());
             globalLock.notify();
         }
     }
 
-//    void localFastVote(BbcProtos.BbcMsg request) {
-//        int cid = request.getId();
-//        if (regBbcCons.containsKey(cid)) return;
-//        if (fastBbcCons.containsKey(cid)) return; // Against byzantine activity
-//        if (!fVotes.containsKey(cid)) {
-//            fvote v = new fvote();
-//            v.dec.setConsID(cid);
-//            v.cid = cid;
-//            v.count = 0;
-//            fVotes.put(cid, v);
-//        }
-//
-//        fVotes.get(cid).count++;
-//        fVotes.get(cid).dec.addVotes(request);
-//        if (fVotes.get(cid).count == n) {
-//            logger.info(format("[#%d] fastVote has been detected [cid=%d]", id, cid));
-//            fastBbcCons.put(cid, fVotes.get(cid).dec.setDecosion(1).build());
-//            globalLock.notify();
-//        }
-//
-//    }
     @Override
     public void fastVote(BbcProtos.BbcMsg request, StreamObserver<Empty> responeObserver) {
         synchronized (globalLock) {
@@ -437,7 +386,6 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                 return;
             }
             fVotes.get(cidSeries, cid).voters.add(request.getPropserID());
-//            fVotes.get(cidSeries, cid).dec.addVotes(request);
             if (fVotes.get(cidSeries, cid).voters.size() == n) {
                 logger.info(format("[#%d] fastVote has been detected [cidSeries=%d ; cid=%d]", id, cidSeries, cid));
                 synchronized (fastBbcCons) {
@@ -482,46 +430,24 @@ public class RmfService extends RmfGrpc.RmfImplBase {
 
     // TODO: Review this method again
     public Data deliver(int cidSeries, int cid, int tmo, int sender, int height) throws InterruptedException {
-//        if (id == 0) {
-//            int a = 1;
-//        }
-//        missedBbcConsensus();
         int cVotes = 0;
         int v = 0;
         synchronized (globalLock) {
             long startTime = System.currentTimeMillis();
             if (!pendingMsg.contains(cidSeries, cid)) {
-//                try {
-                    globalLock.wait(tmo);
-//                } catch (InterruptedException e) {
-//                    logger.error("", e);
-//                    return Data.newBuilder().
-//                            setMeta(Meta.newBuilder().setCid(-1).build()).
-//                            build();
-////                    return null;
-//                }
+                globalLock.wait(tmo);
             }
             long estimatedTime = System.currentTimeMillis() - startTime;
             if (pendingMsg.contains(cidSeries, cid)) {
                 BbcProtos.BbcMsg.Builder bv = BbcProtos.BbcMsg
                         .newBuilder().setCid(cid).setCidSeries(cidSeries).setPropserID(id).setVote(1);
-//                bv.setSig(bbcDigSig.sign(bv));
                 broadcastFastVoteMessage(bv.build());
-//                localFastVote(bv.build());
             }
             if (fVotes.contains(cidSeries, cid)) {
                 cVotes = fVotes.get(cidSeries, cid).voters.size();
             }
             if (cVotes < n) {
-//                try {
-                    globalLock.wait(Math.max(tmo - estimatedTime, 1));
-//                } catch (InterruptedException e) {
-//                    logger.error("", e);
-//                    return Data.newBuilder().
-//                            setMeta(Meta.newBuilder().setCid(-1).build()).
-//                            build();
-////                    return null;
-//                }
+                globalLock.wait(Math.max(tmo - estimatedTime, 1));
             }
 
             if (pendingMsg.contains(cidSeries, cid)) {
@@ -557,32 +483,17 @@ public class RmfService extends RmfGrpc.RmfImplBase {
 
 
     }
-//    protected void missedBbcConsensus() {
-//        ArrayList<Integer> done = new ArrayList<>(fastBbcCons.keySet());
-//        ArrayList<Integer> last =  bbcService.getConsensusInstance(done);
-//        if (last == null) return;
-//        for (int mcid : last) {
-//            logger.info(format("[#%d] have found missed bbc [cid=%d]", id, mcid));
-//            fullBbcConsensus(fastBbcCons.get(mcid).getDecosion(), mcid);
-//        }
-//    }
+
     // TODO: We have a little bug here... note that if a process wish to perform a bbc it doesn't mean that other processes know about it. [solved??]
-    protected int fullBbcConsensus(int vote, int cidSeries, int cid) throws InterruptedException {
-//        synchronized (bbcLock) {
-//        if (regBbcCons.containsKey(cid)) {
-//            return regBbcCons.get(cid).getDecosion();
-//        }
+    private int fullBbcConsensus(int vote, int cidSeries, int cid) throws InterruptedException {
         logger.info(format("[#%d] Initiates full bbc instance [cidSeries=%d ; cid=%d], [vote:%d]", id, cidSeries, cid, vote));
         bbcService.propose(vote, cidSeries, cid);
         BbcProtos.BbcDecision dec = bbcService.decide(cidSeries, cid);
         if (dec != null) regBbcCons.put(cidSeries, cid, dec);
         return dec != null ? dec.getDecosion() : -1; // TODO: On shutting down null might expected
-//        }
-
-
     }
 
-    protected void requestData(int cidSeries, int cid, int sender, int height) throws InterruptedException {
+    private void requestData(int cidSeries, int cid, int sender, int height) throws InterruptedException {
         if (pendingMsg.contains(cidSeries, cid)) return;
         Meta meta = Meta.
                 newBuilder().
@@ -597,7 +508,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         }
     }
 
-    public String getMessageSig(int cidSeries, int cid) {
+    String getMessageSig(int cidSeries, int cid) {
         if (recMsg.contains(cidSeries, cid)) {
             return recMsg.get(cidSeries, cid).getSig();
         }
@@ -610,18 +521,4 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         }
         return null;
     }
-
-//    protected void cleanBuffers(int cid) {
-//        synchronized (globalLock) {
-//            pendingMsg.remove(cid);
-//            recMsg.remove(cid);
-//            fVotes.remove(cid);
-//            synchronized (bbcLock) {
-//                regBbcCons.remove(cid);
-//                fastBbcCons.remove(cid);
-//            }
-//            bbcService.cleanBuffers(cid);
-//        }
-//
-//    }
 }

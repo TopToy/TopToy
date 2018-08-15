@@ -8,16 +8,10 @@ import bftsmart.tom.ServiceReplica;
 import bftsmart.tom.core.messages.TOMMessage;
 import bftsmart.tom.core.messages.TOMMessageType;
 import bftsmart.tom.server.defaultservices.DefaultSingleRecoverable;
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Table;
 import com.google.protobuf.ByteString;
-import com.google.protobuf.InvalidProtocolBufferException;
 import proto.RBrodcast;
 
-import java.io.File;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import static java.lang.String.format;
@@ -26,7 +20,6 @@ public class RBrodcastService extends DefaultSingleRecoverable {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(RBrodcastService.class);
     private int id;
     private List<RBrodcast.RBMsg> recMsg;
-//        private List<RBrodcast.RBMsg> delivered;
     private AsynchServiceProxy RBProxy;
     private ServiceReplica sr;
     private String configHome;
@@ -38,24 +31,11 @@ public class RBrodcastService extends DefaultSingleRecoverable {
         this.configHome = configHome;
         sr = null;
         recMsg = new ArrayList<>();
-//            delivered = new ArrayList<>();
     }
 
 
-//    private static void deleteViewIfExist(String configHome){
-//        File file2 = new File(Paths.get(configHome, "currentView").toString());
-//        if (file2.exists()) {
-//            logger.info("Saved view found in " + file2.getAbsolutePath() + " deleting...");
-//            if (file2.delete()) {
-//                logger.info(file2.getName() + " has been deleted");
-//            } else {
-//                logger.warn(file2.getName() + " could not be deleted");
-//            }
-//        }
-//    }
 
     public void start() {
-//        deleteViewIfExist(configHome);
         sr = new ServiceReplica(id, this, this, configHome);
         RBProxy = new AsynchServiceProxy(id, configHome);
 
@@ -118,7 +98,6 @@ public class RBrodcastService extends DefaultSingleRecoverable {
             }
             RBrodcast.RBMsg msg = recMsg.get(0);
             recMsg.remove(0);
-//                delivered.add(msg);
             return msg.getData().toByteArray();
         }
     }

@@ -44,7 +44,6 @@ public class bbcService extends DefaultSingleRecoverable {
     private int quorumSize;
     private String configHome;
     private ServiceReplica sr;
-//    private final List<Integer> consNotify;
     private Table<Integer, Integer, fastVotePart> fastVote = HashBasedTable.create();
     public bbcService(int id, int quorumSize, String configHome) {
         this.id = id;
@@ -52,7 +51,6 @@ public class bbcService extends DefaultSingleRecoverable {
         sr = null;
         this.quorumSize = quorumSize;
         this.configHome = configHome;
-//        consNotify = new ArrayList<>();
     }
 
     public void start() {
@@ -83,9 +81,6 @@ public class bbcService extends DefaultSingleRecoverable {
         synchronized (globalLock) {
             globalLock.notifyAll();
         }
-//        synchronized (consNotify) {
-//            consNotify.notifyAll();
-//        }
     }
     @Override
     public void installSnapshot(byte[] state) {
@@ -128,18 +123,11 @@ public class bbcService extends DefaultSingleRecoverable {
                         curr.neg++;
                     }
                 }
-//                curr.dec.addVotes(msg);
                 if (curr.neg + curr.pos == quorumSize) {
                     logger.debug(format("[#%d] notify on  [cid=%d]", id, cid));
                     globalLock.notify();
                 }
             }
-//            synchronized (consNotify) {
-//                if (!consNotify.contains(cid)) {
-//                    consNotify.add(cid);
-//                    consNotify.notify();
-//                }
-//            }
         } catch (Exception e) {
             logger.error("", e);
         }
@@ -154,33 +142,12 @@ public class bbcService extends DefaultSingleRecoverable {
     public BbcProtos.BbcDecision decide(int cidSeries, int cid) throws InterruptedException {
         synchronized (globalLock) {
             while (!rec.contains(cidSeries, cid) || rec.get(cidSeries, cid).pos + rec.get(cidSeries, cid).neg < quorumSize) {
-//                try {
-                    globalLock.wait();
-//                } catch (InterruptedException e) {
-//                    logger.error("", e);
-//                    return null;
-//                }
+                globalLock.wait();
             }
             return (rec.get(cidSeries, cid).pos > rec.get(cidSeries, cid).neg ?
                     rec.get(cidSeries, cid).dec.setDecosion(1).build() : rec.get(cidSeries, cid).dec.setDecosion(0).build());
         }
     }
-
-//    public ArrayList<Integer> getConsensusInstance(List<Integer> req)  {
-//        if (req.size() == 0) return new ArrayList<>();
-//        List<Integer> ret;
-//        synchronized (consNotify) {
-//            if (consNotify.isEmpty()) {
-//                return null;
-//            }
-//            ret = consNotify.stream().filter(
-//                    req::contains).
-//            collect(Collectors.toList());
-//            consNotify.removeAll(req);
-//            // TODO: Handle the list size!
-//        }
-//        return (ArrayList<Integer>) ret;
-//    }
 
     public int propose(int vote, int cidSeries, int cid) {
         BbcProtos.BbcMsg.Builder b = BbcProtos.BbcMsg.newBuilder();
@@ -188,7 +155,6 @@ public class bbcService extends DefaultSingleRecoverable {
         b.setCid(cid);
         b.setCidSeries(cidSeries);
         b.setVote(vote);
-//        b.setSig(bbcDigSig.sign(b));
         BbcProtos.BbcMsg msg= b.build();
         byte[] data = msg.toByteArray();
         bbcProxy.invokeAsynchRequest(data, new ReplyListener() {
@@ -205,14 +171,6 @@ public class bbcService extends DefaultSingleRecoverable {
         return 0;
     }
 
-//    public void cleanBuffers(int cid) {
-//        synchronized (globalLock) {
-////            consNotify.removeAll(consNotify.stream().filter(c -> c == cid).collect(Collectors.toList()));
-//            rec.remove(cid);
-//            fastVote.remove(cid);
-//
-//        }
-//    }
 
     public void updateFastVote(BbcProtos.BbcDecision b) {
         synchronized (globalLock) {

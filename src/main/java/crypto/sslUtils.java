@@ -29,7 +29,6 @@ public class sslUtils {
     public static ManagedChannelBuilder buildSslChannel(String host, int port, SslContext ctx) {
         return NettyChannelBuilder.forAddress(host, port)
                 .negotiationType(NegotiationType.TLS)
-//                .usePlaintext()
                 .sslContext(ctx);
     }
 

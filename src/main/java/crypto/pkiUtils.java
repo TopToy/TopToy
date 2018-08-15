@@ -34,21 +34,12 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class pkiUtils {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(pkiUtils.class);
-//    private static PublicKey pubKey;
     private static PrivateKey privKey;
     private static HashMap<Integer, PublicKey> clusterPubKeys = new HashMap<>();
 
     static {
-        KeyFactory kf = null;
         try {
             Security.addProvider(new BouncyCastleProvider());
-//            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("EC", "BC");
-//            keyPairGenerator.initialize(new ECGenParameterSpec("secp256k1"), new SecureRandom());
-//            java.security.KeyPair keyPair = keyPairGenerator.generateKeyPair();
-//            PrivateKey privateKey = keyPair.getPrivate();
-//            System.out.println(privateKey.getFormat());
-//            PublicKey publicKey = keyPair.getPublic();
-//            System.out.println(publicKey.getFormat());
             KeyFactory ecKeyFac = KeyFactory.getInstance("ECDSA", "BC");
             PKCS8EncodedKeySpec pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec(Base64.getDecoder().
                     decode(Config.getPrivateKey().replaceAll("\\s+","")));
