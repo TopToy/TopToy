@@ -37,6 +37,19 @@ public final class Types {
      * <code>int32 vote = 4;</code>
      */
     int getVote();
+
+    /**
+     * <code>.proto.Data next = 5;</code>
+     */
+    boolean hasNext();
+    /**
+     * <code>.proto.Data next = 5;</code>
+     */
+    proto.Types.Data getNext();
+    /**
+     * <code>.proto.Data next = 5;</code>
+     */
+    proto.Types.DataOrBuilder getNextOrBuilder();
   }
   /**
    * Protobuf type {@code proto.BbcMsg}
@@ -108,6 +121,19 @@ public final class Types {
               vote_ = input.readInt32();
               break;
             }
+            case 42: {
+              proto.Types.Data.Builder subBuilder = null;
+              if (next_ != null) {
+                subBuilder = next_.toBuilder();
+              }
+              next_ = input.readMessage(proto.Types.Data.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(next_);
+                next_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -168,6 +194,27 @@ public final class Types {
       return vote_;
     }
 
+    public static final int NEXT_FIELD_NUMBER = 5;
+    private proto.Types.Data next_;
+    /**
+     * <code>.proto.Data next = 5;</code>
+     */
+    public boolean hasNext() {
+      return next_ != null;
+    }
+    /**
+     * <code>.proto.Data next = 5;</code>
+     */
+    public proto.Types.Data getNext() {
+      return next_ == null ? proto.Types.Data.getDefaultInstance() : next_;
+    }
+    /**
+     * <code>.proto.Data next = 5;</code>
+     */
+    public proto.Types.DataOrBuilder getNextOrBuilder() {
+      return getNext();
+    }
+
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -191,6 +238,9 @@ public final class Types {
       }
       if (vote_ != 0) {
         output.writeInt32(4, vote_);
+      }
+      if (next_ != null) {
+        output.writeMessage(5, getNext());
       }
       unknownFields.writeTo(output);
     }
@@ -216,6 +266,10 @@ public final class Types {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(4, vote_);
       }
+      if (next_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(5, getNext());
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -240,6 +294,11 @@ public final class Types {
           == other.getCidSeries());
       result = result && (getVote()
           == other.getVote());
+      result = result && (hasNext() == other.hasNext());
+      if (hasNext()) {
+        result = result && getNext()
+            .equals(other.getNext());
+      }
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -259,6 +318,10 @@ public final class Types {
       hash = (53 * hash) + getCidSeries();
       hash = (37 * hash) + VOTE_FIELD_NUMBER;
       hash = (53 * hash) + getVote();
+      if (hasNext()) {
+        hash = (37 * hash) + NEXT_FIELD_NUMBER;
+        hash = (53 * hash) + getNext().hashCode();
+      }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -396,6 +459,12 @@ public final class Types {
 
         vote_ = 0;
 
+        if (nextBuilder_ == null) {
+          next_ = null;
+        } else {
+          next_ = null;
+          nextBuilder_ = null;
+        }
         return this;
       }
 
@@ -422,6 +491,11 @@ public final class Types {
         result.cid_ = cid_;
         result.cidSeries_ = cidSeries_;
         result.vote_ = vote_;
+        if (nextBuilder_ == null) {
+          result.next_ = next_;
+        } else {
+          result.next_ = nextBuilder_.build();
+        }
         onBuilt();
         return result;
       }
@@ -474,6 +548,9 @@ public final class Types {
         }
         if (other.getVote() != 0) {
           setVote(other.getVote());
+        }
+        if (other.hasNext()) {
+          mergeNext(other.getNext());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -604,6 +681,123 @@ public final class Types {
         vote_ = 0;
         onChanged();
         return this;
+      }
+
+      private proto.Types.Data next_ = null;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          proto.Types.Data, proto.Types.Data.Builder, proto.Types.DataOrBuilder> nextBuilder_;
+      /**
+       * <code>.proto.Data next = 5;</code>
+       */
+      public boolean hasNext() {
+        return nextBuilder_ != null || next_ != null;
+      }
+      /**
+       * <code>.proto.Data next = 5;</code>
+       */
+      public proto.Types.Data getNext() {
+        if (nextBuilder_ == null) {
+          return next_ == null ? proto.Types.Data.getDefaultInstance() : next_;
+        } else {
+          return nextBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>.proto.Data next = 5;</code>
+       */
+      public Builder setNext(proto.Types.Data value) {
+        if (nextBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          next_ = value;
+          onChanged();
+        } else {
+          nextBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <code>.proto.Data next = 5;</code>
+       */
+      public Builder setNext(
+          proto.Types.Data.Builder builderForValue) {
+        if (nextBuilder_ == null) {
+          next_ = builderForValue.build();
+          onChanged();
+        } else {
+          nextBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <code>.proto.Data next = 5;</code>
+       */
+      public Builder mergeNext(proto.Types.Data value) {
+        if (nextBuilder_ == null) {
+          if (next_ != null) {
+            next_ =
+              proto.Types.Data.newBuilder(next_).mergeFrom(value).buildPartial();
+          } else {
+            next_ = value;
+          }
+          onChanged();
+        } else {
+          nextBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <code>.proto.Data next = 5;</code>
+       */
+      public Builder clearNext() {
+        if (nextBuilder_ == null) {
+          next_ = null;
+          onChanged();
+        } else {
+          next_ = null;
+          nextBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <code>.proto.Data next = 5;</code>
+       */
+      public proto.Types.Data.Builder getNextBuilder() {
+        
+        onChanged();
+        return getNextFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.proto.Data next = 5;</code>
+       */
+      public proto.Types.DataOrBuilder getNextOrBuilder() {
+        if (nextBuilder_ != null) {
+          return nextBuilder_.getMessageOrBuilder();
+        } else {
+          return next_ == null ?
+              proto.Types.Data.getDefaultInstance() : next_;
+        }
+      }
+      /**
+       * <code>.proto.Data next = 5;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          proto.Types.Data, proto.Types.Data.Builder, proto.Types.DataOrBuilder> 
+          getNextFieldBuilder() {
+        if (nextBuilder_ == null) {
+          nextBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              proto.Types.Data, proto.Types.Data.Builder, proto.Types.DataOrBuilder>(
+                  getNext(),
+                  getParentForChildren(),
+                  isClean());
+          next_ = null;
+        }
+        return nextBuilder_;
       }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -8835,6 +9029,16 @@ public final class Types {
      * <code>bytes data = 3;</code>
      */
     com.google.protobuf.ByteString getData();
+
+    /**
+     * <code>string type = 4;</code>
+     */
+    java.lang.String getType();
+    /**
+     * <code>string type = 4;</code>
+     */
+    com.google.protobuf.ByteString
+        getTypeBytes();
   }
   /**
    * Protobuf type {@code proto.RmfResult}
@@ -8852,6 +9056,7 @@ public final class Types {
       cid_ = 0;
       cidSeries_ = 0;
       data_ = com.google.protobuf.ByteString.EMPTY;
+      type_ = "";
     }
 
     @java.lang.Override
@@ -8898,6 +9103,12 @@ public final class Types {
             case 26: {
 
               data_ = input.readBytes();
+              break;
+            }
+            case 34: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              type_ = s;
               break;
             }
           }
@@ -8951,6 +9162,40 @@ public final class Types {
       return data_;
     }
 
+    public static final int TYPE_FIELD_NUMBER = 4;
+    private volatile java.lang.Object type_;
+    /**
+     * <code>string type = 4;</code>
+     */
+    public java.lang.String getType() {
+      java.lang.Object ref = type_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        type_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string type = 4;</code>
+     */
+    public com.google.protobuf.ByteString
+        getTypeBytes() {
+      java.lang.Object ref = type_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        type_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -8972,6 +9217,9 @@ public final class Types {
       if (!data_.isEmpty()) {
         output.writeBytes(3, data_);
       }
+      if (!getTypeBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 4, type_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -8991,6 +9239,9 @@ public final class Types {
       if (!data_.isEmpty()) {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(3, data_);
+      }
+      if (!getTypeBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, type_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -9014,6 +9265,8 @@ public final class Types {
           == other.getCidSeries());
       result = result && getData()
           .equals(other.getData());
+      result = result && getType()
+          .equals(other.getType());
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -9031,6 +9284,8 @@ public final class Types {
       hash = (53 * hash) + getCidSeries();
       hash = (37 * hash) + DATA_FIELD_NUMBER;
       hash = (53 * hash) + getData().hashCode();
+      hash = (37 * hash) + TYPE_FIELD_NUMBER;
+      hash = (53 * hash) + getType().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -9166,6 +9421,8 @@ public final class Types {
 
         data_ = com.google.protobuf.ByteString.EMPTY;
 
+        type_ = "";
+
         return this;
       }
 
@@ -9191,6 +9448,7 @@ public final class Types {
         result.cid_ = cid_;
         result.cidSeries_ = cidSeries_;
         result.data_ = data_;
+        result.type_ = type_;
         onBuilt();
         return result;
       }
@@ -9240,6 +9498,10 @@ public final class Types {
         }
         if (other.getData() != com.google.protobuf.ByteString.EMPTY) {
           setData(other.getData());
+        }
+        if (!other.getType().isEmpty()) {
+          type_ = other.type_;
+          onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -9345,6 +9607,75 @@ public final class Types {
       public Builder clearData() {
         
         data_ = getDefaultInstance().getData();
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object type_ = "";
+      /**
+       * <code>string type = 4;</code>
+       */
+      public java.lang.String getType() {
+        java.lang.Object ref = type_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          type_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string type = 4;</code>
+       */
+      public com.google.protobuf.ByteString
+          getTypeBytes() {
+        java.lang.Object ref = type_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          type_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string type = 4;</code>
+       */
+      public Builder setType(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        type_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string type = 4;</code>
+       */
+      public Builder clearType() {
+        
+        type_ = getDefaultInstance().getType();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string type = 4;</code>
+       */
+      public Builder setTypeBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        type_ = value;
         onChanged();
         return this;
       }
@@ -11950,35 +12281,36 @@ public final class Types {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\013types.proto\022\005proto\"I\n\006BbcMsg\022\021\n\tpropse" +
+      "\n\013types.proto\022\005proto\"d\n\006BbcMsg\022\021\n\tpropse" +
       "rID\030\001 \001(\005\022\013\n\003cid\030\002 \001(\005\022\021\n\tcidSeries\030\003 \001(" +
-      "\005\022\014\n\004vote\030\004 \001(\005\"?\n\013BbcDecision\022\013\n\003cid\030\001 " +
-      "\001(\005\022\021\n\tcidSeries\030\002 \001(\005\022\020\n\010decosion\030\003 \001(\005" +
-      "\"w\n\013BlockHeader\022\014\n\004prev\030\001 \001(\014\022\021\n\tcreator" +
-      "ID\030\002 \001(\005\022\016\n\006height\030\003 \001(\005\022\027\n\017transactionH" +
-      "ash\030\004 \001(\014\022\013\n\003cid\030\005 \001(\005\022\021\n\tcidSeries\030\006 \001(" +
-      "\005\"M\n\005Block\022\"\n\006header\030\001 \001(\0132\022.proto.Block" +
-      "Header\022 \n\004data\030\002 \003(\0132\022.proto.Transaction" +
-      "\"-\n\013Transaction\022\020\n\010clientID\030\001 \001(\005\022\014\n\004dat" +
-      "a\030\002 \001(\014\"\034\n\010accepted\022\020\n\010accepted\030\001 \001(\010\"u\n" +
-      "\tForkProof\022\016\n\006sender\030\001 \001(\005\022\032\n\004curr\030\002 \001(\013" +
-      "2\014.proto.Block\022\017\n\007currSig\030\003 \001(\t\022\032\n\004prev\030" +
-      "\004 \001(\0132\014.proto.Block\022\017\n\007prevSig\030\005 \001(\t\".\n\005" +
-      "RBMsg\022\n\n\002id\030\001 \001(\005\022\013\n\003cid\030\002 \001(\005\022\014\n\004data\030\003" +
-      " \001(\014\"\007\n\005Empty\"F\n\004Meta\022\016\n\006sender\030\001 \001(\005\022\016\n" +
-      "\006height\030\002 \001(\005\022\013\n\003cid\030\003 \001(\005\022\021\n\tcidSeries\030" +
-      "\004 \001(\005\"=\n\004Data\022\032\n\005_meta\030\001 \001(\0132\013.proto.Met" +
-      "a\022\014\n\004data\030\002 \001(\014\022\013\n\003sig\030\003 \001(\t\"!\n\003Req\022\032\n\005_" +
-      "meta\030\001 \001(\0132\013.proto.Meta\"=\n\003Res\022\032\n\005_meta\030" +
-      "\001 \001(\0132\013.proto.Meta\022\032\n\005_data\030\002 \001(\0132\013.prot" +
-      "o.Data\"9\n\tRmfResult\022\013\n\003cid\030\001 \001(\005\022\021\n\tcidS" +
-      "eries\030\002 \001(\005\022\014\n\004data\030\003 \001(\014\"A\n\014proofedBloc" +
-      "k\022\027\n\001b\030\001 \001(\0132\014.proto.Block\022\013\n\003cid\030\002 \001(\005\022" +
-      "\013\n\003Sig\030\003 \001(\t\"g\n\017subChainVersion\022\021\n\tforkP" +
-      "oint\030\001 \001(\005\022\021\n\tsuggested\030\002 \001(\005\022\036\n\001v\030\003 \003(\013" +
-      "2\023.proto.proofedBlock\022\016\n\006sender\030\004 \001(\005\"9\n" +
-      "\007VpbcMsg\022\020\n\010clientID\030\001 \001(\005\022\016\n\006consID\030\002 \001" +
-      "(\005\022\014\n\004data\030\003 \001(\014B\007\n\005protob\006proto3"
+      "\005\022\014\n\004vote\030\004 \001(\005\022\031\n\004next\030\005 \001(\0132\013.proto.Da" +
+      "ta\"?\n\013BbcDecision\022\013\n\003cid\030\001 \001(\005\022\021\n\tcidSer" +
+      "ies\030\002 \001(\005\022\020\n\010decosion\030\003 \001(\005\"w\n\013BlockHead" +
+      "er\022\014\n\004prev\030\001 \001(\014\022\021\n\tcreatorID\030\002 \001(\005\022\016\n\006h" +
+      "eight\030\003 \001(\005\022\027\n\017transactionHash\030\004 \001(\014\022\013\n\003" +
+      "cid\030\005 \001(\005\022\021\n\tcidSeries\030\006 \001(\005\"M\n\005Block\022\"\n" +
+      "\006header\030\001 \001(\0132\022.proto.BlockHeader\022 \n\004dat" +
+      "a\030\002 \003(\0132\022.proto.Transaction\"-\n\013Transacti" +
+      "on\022\020\n\010clientID\030\001 \001(\005\022\014\n\004data\030\002 \001(\014\"\034\n\010ac" +
+      "cepted\022\020\n\010accepted\030\001 \001(\010\"u\n\tForkProof\022\016\n" +
+      "\006sender\030\001 \001(\005\022\032\n\004curr\030\002 \001(\0132\014.proto.Bloc" +
+      "k\022\017\n\007currSig\030\003 \001(\t\022\032\n\004prev\030\004 \001(\0132\014.proto" +
+      ".Block\022\017\n\007prevSig\030\005 \001(\t\".\n\005RBMsg\022\n\n\002id\030\001" +
+      " \001(\005\022\013\n\003cid\030\002 \001(\005\022\014\n\004data\030\003 \001(\014\"\007\n\005Empty" +
+      "\"F\n\004Meta\022\016\n\006sender\030\001 \001(\005\022\016\n\006height\030\002 \001(\005" +
+      "\022\013\n\003cid\030\003 \001(\005\022\021\n\tcidSeries\030\004 \001(\005\"=\n\004Data" +
+      "\022\032\n\005_meta\030\001 \001(\0132\013.proto.Meta\022\014\n\004data\030\002 \001" +
+      "(\014\022\013\n\003sig\030\003 \001(\t\"!\n\003Req\022\032\n\005_meta\030\001 \001(\0132\013." +
+      "proto.Meta\"=\n\003Res\022\032\n\005_meta\030\001 \001(\0132\013.proto" +
+      ".Meta\022\032\n\005_data\030\002 \001(\0132\013.proto.Data\"G\n\tRmf" +
+      "Result\022\013\n\003cid\030\001 \001(\005\022\021\n\tcidSeries\030\002 \001(\005\022\014" +
+      "\n\004data\030\003 \001(\014\022\014\n\004type\030\004 \001(\t\"A\n\014proofedBlo" +
+      "ck\022\027\n\001b\030\001 \001(\0132\014.proto.Block\022\013\n\003cid\030\002 \001(\005" +
+      "\022\013\n\003Sig\030\003 \001(\t\"g\n\017subChainVersion\022\021\n\tfork" +
+      "Point\030\001 \001(\005\022\021\n\tsuggested\030\002 \001(\005\022\036\n\001v\030\003 \003(" +
+      "\0132\023.proto.proofedBlock\022\016\n\006sender\030\004 \001(\005\"9" +
+      "\n\007VpbcMsg\022\020\n\010clientID\030\001 \001(\005\022\016\n\006consID\030\002 " +
+      "\001(\005\022\014\n\004data\030\003 \001(\014B\007\n\005protob\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -11997,7 +12329,7 @@ public final class Types {
     internal_static_proto_BbcMsg_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_BbcMsg_descriptor,
-        new java.lang.String[] { "PropserID", "Cid", "CidSeries", "Vote", });
+        new java.lang.String[] { "PropserID", "Cid", "CidSeries", "Vote", "Next", });
     internal_static_proto_BbcDecision_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_proto_BbcDecision_fieldAccessorTable = new
@@ -12075,7 +12407,7 @@ public final class Types {
     internal_static_proto_RmfResult_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_RmfResult_descriptor,
-        new java.lang.String[] { "Cid", "CidSeries", "Data", });
+        new java.lang.String[] { "Cid", "CidSeries", "Data", "Type", });
     internal_static_proto_proofedBlock_descriptor =
       getDescriptor().getMessageTypes().get(14);
     internal_static_proto_proofedBlock_fieldAccessorTable = new

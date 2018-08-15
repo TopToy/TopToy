@@ -12,7 +12,7 @@ public class RmfNode extends Node{
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(RmfNode.class);
 
     protected boolean stopped = false;
-    protected RmfService rmfService;
+    RmfService rmfService;
 
     public RmfNode(int id, String addr, int rmfPort, int f , ArrayList<Node> nodes, String bbcConfig) {
         super(addr, rmfPort,  id);
@@ -34,8 +34,7 @@ public class RmfNode extends Node{
         rmfService.start();
     }
 
-    public void broadcast(int cidSeries, int cid, byte[] msg, int height) {
-        logger.info(format("[#%d] broadcast data message with [height=%d]", getID(), height));
+    Data buildData(byte[] msg, int cidSeries, int cid, int height) {
         Meta metaMsg = Meta.
                 newBuilder().
                 setSender(getID()).
@@ -47,19 +46,28 @@ public class RmfNode extends Node{
                 newBuilder().
                 setData(ByteString.copyFrom(msg)).
                 setMeta(metaMsg);
-        rmfService.rmfBroadcast(dataMsg.setSig(rmfDigSig.sign(dataMsg)).build());
+        return dataMsg.setSig(rmfDigSig.sign(dataMsg)).build();
+    }
+    public void broadcast(int cidSeries, int cid, byte[] msg, int height) {
+        logger.info(format("[#%d] broadcast data message with [height=%d]", getID(), height));
+
+        rmfService.rmfBroadcast(buildData(msg, cidSeries, cid, height));
     }
 
-    public RmfResult deliver(int cidSeries, int cid, int height, int sender, int tmo) throws InterruptedException {
-        Data data = rmfService.deliver(cidSeries, cid, tmo, sender, height);
-        if (data != null && data.getMeta().getCid() == -1) {
-            return RmfResult.newBuilder().setCid(-1).build();
+    public RmfResult deliver(int cidSeries, int cid, int height, int sender, int tmo, byte[] msg) throws InterruptedException {
+        Data dMsg = null;
+        if (msg != null) {
+            dMsg = buildData(msg, cidSeries, cid, height);
         }
+        RmfService.Tdec td = rmfService.deliver(cidSeries, cid, tmo, sender, height, dMsg);
+        Data data = (td == null ? null : td.d);
+        String type = (data == null ? "FULL" : td.t.name());
         return RmfResult.
                 newBuilder().
                 setCid(cid).
                 setCidSeries(cidSeries).
                 setData(data == null ? ByteString.EMPTY : data.getData()).
+                setType(type).
                 build();
     }
 

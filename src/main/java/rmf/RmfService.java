@@ -30,10 +30,20 @@ TODO:
 4. prevBbcConsensus can grow infinitely (and some more, analyze it!!)
 5. change maps to list
 6. Handle the case in which byzantine node sends its message twice
+7. Validate that a given cid is match to the expected sender and height
  */
+
+enum Ctype {
+    FAST,
+    FULL,
+    NB
+}
 public class RmfService extends RmfGrpc.RmfImplBase {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(RmfService.class);
-
+    class Tdec {
+        Data d;
+        Ctype t;
+    }
     class authInterceptor implements ServerInterceptor {
         @Override
         public <ReqT, RespT> ServerCall.Listener<ReqT> interceptCall(ServerCall<ReqT, RespT> serverCall,
@@ -345,20 +355,26 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             sendDataMessage(p.stub, msg);
         }
     }
+    private void addToPendings(Data request) {
+        int sender = request.getMeta().getSender();
+        int cid = request.getMeta().getCid();
+        int cidSeries = request.getMeta().getCidSeries();
+        if (pendingMsg.contains(cidSeries, cid) || recMsg.contains(cidSeries, cid)) return;
+        pendingMsg.put(cidSeries, cid, request);
+        logger.info(format("[#%d] received data message from [%d], [cidSeries=%d ; cid=%d]", id,
+                sender, cidSeries, cid));
+    }
 
     @Override
     public void disseminateMessage(Data request, StreamObserver<Empty> responseObserver) {
-        int sender = request.getMeta().getSender();
+
         int cid = request.getMeta().getCid();
         int cidSeries = request.getMeta().getCidSeries();
         synchronized (globalLock) {
             synchronized (fastBbcCons) {
                 if (fastBbcCons.contains(cidSeries, cid) || regBbcCons.contains(cidSeries, cid)) return;
             }
-            if (pendingMsg.contains(cidSeries, cid) || recMsg.contains(cidSeries, cid)) return;
-            pendingMsg.put(cidSeries, cid, request);
-            logger.info(format("[#%d] received data message from [%d], [cidSeries=%d ; cid=%d]", id,
-                    sender, cidSeries, cid));
+            addToPendings(request);
             globalLock.notify();
         }
     }
@@ -388,6 +404,9 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                 return;
             }
             fVotes.get(cidSeries, cid).voters.add(request.getPropserID());
+            if (request.getNext() != null) {
+                addToPendings(request.getNext());
+            }
             if (fVotes.get(cidSeries, cid).voters.size() == n) {
                 logger.info(format("[#%d] fastVote has been detected [cidSeries=%d ; cid=%d]", id, cidSeries, cid));
                 synchronized (fastBbcCons) {
@@ -431,7 +450,9 @@ public class RmfService extends RmfGrpc.RmfImplBase {
 
 
     // TODO: Review this method again
-    public Data deliver(int cidSeries, int cid, int tmo, int sender, int height) throws InterruptedException {
+    public Tdec deliver(int cidSeries, int cid, int tmo, int sender, int height, Data next) throws InterruptedException {
+        Tdec td = new Tdec();
+        td.t = Ctype.FAST;
         int cVotes = 0;
         int v = 0;
         synchronized (globalLock) {
@@ -443,6 +464,9 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             if (pendingMsg.contains(cidSeries, cid)) {
                 BbcMsg.Builder bv = BbcMsg
                         .newBuilder().setCid(cid).setCidSeries(cidSeries).setPropserID(id).setVote(1);
+                if (next != null) {
+                    bv.setNext(next);
+                }
                 broadcastFastVoteMessage(bv.build());
             }
             if (fVotes.contains(cidSeries, cid)) {
@@ -460,17 +484,13 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             }
 
             if (cVotes < n) {
+                td.t = Ctype.FULL;
                 logger.info(format("[#%d] cvotes is [%d] for [cidSeries=%d ; cid=%d]", id, cVotes,cidSeries, cid));
                 int dec = fullBbcConsensus(v, cidSeries, cid);
                 logger.info(format("[#%d] bbc returned [%d] for [cidSeries=%d ; cid=%d]", id, dec, cidSeries, cid));
                 if (dec == 0) {
                     pendingMsg.remove(cidSeries, cid);
                     return null;
-                }
-                if (dec == -1) {
-                    return Data.newBuilder().
-                            setMeta(Meta.newBuilder().setCid(-1).build()).
-                            build();
                 }
             } else {
                 logger.info(format("[#%d] deliver by fast vote [cidSeries=%d ; cid=%d]", id, cidSeries, cid));
@@ -480,7 +500,8 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                 msg = pendingMsg.get(cidSeries, cid);
                 recMsg.put(cidSeries, cid, msg);
                 pendingMsg.remove(cidSeries, cid);
-            return msg;
+            td.d = msg;
+            return td;
         }
 
 
@@ -517,9 +538,12 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         return null;
     }
 
-    public Data nonBlockingDeliver(int cidSeries, int cid) {
+    public Tdec nonBlockingDeliver(int cidSeries, int cid) {
         if (recMsg.contains(cidSeries, cid)) {
-            return recMsg.get(cidSeries, cid);
+            Tdec td = new Tdec();
+            td.t =Ctype.NB;
+            td.d = recMsg.get(cidSeries, cid);
+            return td;
         }
         return null;
     }
