@@ -20,8 +20,8 @@ import static java.lang.String.format;
 public class asyncBcServer extends bcServer {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(asyncBcServer.class);
 
-    public asyncBcServer(String addr, int rmfPort, int syncPort, int id) {
-        super(addr, rmfPort, syncPort, id);
+    public asyncBcServer(String addr, int rmfPort,  int id) {
+        super(addr, rmfPort,  id);
     }
 
      void leaderImpl() throws InterruptedException {

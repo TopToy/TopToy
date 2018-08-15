@@ -16,7 +16,7 @@ public class RmfNode extends Node{
     protected RmfService rmfService;
 
     public RmfNode(int id, String addr, int rmfPort, int f , ArrayList<Node> nodes, String bbcConfig) {
-        super(addr, rmfPort, -1,  id);
+        super(addr, rmfPort,  id);
         rmfService = new RmfService(id, f, nodes, bbcConfig);
     }
 

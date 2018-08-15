@@ -7,8 +7,8 @@ import static java.lang.String.format;
 public class cbcServer extends bcServer {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(cbcServer.class);
 
-    public cbcServer(String addr, int rmfPort, int syncPort, int id) {
-        super(addr, rmfPort, syncPort, id);
+    public cbcServer(String addr, int rmfPort, int id) {
+        super(addr, rmfPort, id);
     }
 
     void leaderImpl() {

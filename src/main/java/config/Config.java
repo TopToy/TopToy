@@ -11,7 +11,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 
 
 public class Config {
@@ -23,7 +22,7 @@ public class Config {
         String SERVER_ID_KEY = "server.id";
         String SERVER_IP_KEY = "server.ip";
         String SERVER_RMFPORT_KEY = "server.rmfPort";
-        String SERVER_SYNCPORT_KEY = "server.syncPort";
+//        String SERVER_SYNCPORT_KEY = "server.syncPort";
         String SERVER_CRT_PATH = "server.TlsCertPath";
         String SERVER_TLS_PRIV_KEY_PATH = "server.TlsPrivKeyPath";
         String RMFCLUSTER_KEY = "cluster";
@@ -76,12 +75,12 @@ public class Config {
         return Math.toIntExact(conf.getLong(tKeys.SYSTEM_F_KEY));
     }
 
-    public static Node getNodeConf() {
-        return new Node(conf.getString(tKeys.SERVER_IP_KEY),
-                Math.toIntExact(conf.getLong(tKeys.SERVER_RMFPORT_KEY)),
-                Math.toIntExact(conf.getLong(tKeys.SERVER_SYNCPORT_KEY)),
-                Math.toIntExact(conf.getLong(tKeys.SERVER_ID_KEY)));
-    }
+//    public static Node getNodeConf() {
+//        return new Node(conf.getString(tKeys.SERVER_IP_KEY),
+//                Math.toIntExact(conf.getLong(tKeys.SERVER_RMFPORT_KEY)),
+////                Math.toIntExact(conf.getLong(tKeys.SERVER_SYNCPORT_KEY)),
+//                Math.toIntExact(conf.getLong(tKeys.SERVER_ID_KEY)));
+//    }
 
     public static int getTMO() {
         return Math.toIntExact(conf.getLong(tKeys.SETTING_TMO_KEY));
@@ -98,24 +97,11 @@ public class Config {
             Toml node = t.getTable("s" + i);
             ret.add(new Node(node.getString("ip"),
                     Math.toIntExact(node.getLong("rmfPort")),
-                    Math.toIntExact(node.getLong("syncPort")),
+//                    Math.toIntExact(node.getLong("syncPort")),
                     Math.toIntExact(node.getLong("id"))));
         }
         return ret;
     }
-
-//    public static ArrayList<Node> getSynccluster() {
-//        Toml t = conf.getTables(tKeys.RMFCLUSTER_KEY).get(0);
-//        ArrayList<Node> ret = new ArrayList<>();
-//        for (int i = 0 ; i < getN() ; i++) {
-//            Toml node = t.getTable("s" + i);
-//            ret.add(new Node(node.getString("ip"),
-//                    Math.toIntExact(node.getLong("rmfPort")),
-//                    Math.toIntExact(node.getLong("syncPort")),
-//                    Math.toIntExact(node.getLong("id"))));
-//        }
-//        return ret;
-//    }
 
     public static HashMap<Integer, String> getClusterPubKeys() {
         Toml t = conf.getTables(tKeys.RMFCLUSTER_KEY).get(0);

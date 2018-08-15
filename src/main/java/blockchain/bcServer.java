@@ -46,9 +46,9 @@ public abstract class bcServer extends Node {
     private final ArrayList<Transaction> transactionsPool = new ArrayList<>();
 
     // TODO: Currently nodes, f, tmoInterval, tmo and configHome are coded but we will turn it into configuration file
-    bcServer(String addr, int rmfPort, int syncPort, int id) {
+    bcServer(String addr, int rmfPort, int id) {
 
-        super(addr, rmfPort, syncPort, id); // TODO: Should be changed according to Config!
+        super(addr, rmfPort, id); // TODO: Should be changed according to Config!
         this.f = Config.getF();
         n = Config.getN();
         rmfServer = new RmfNode(id, addr, rmfPort, Config.getF(),

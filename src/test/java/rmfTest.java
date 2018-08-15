@@ -23,10 +23,10 @@ public class rmfTest {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(rmfTest.class);
     private String localHost = "localhost";
     private int[] rmfPorts = {20000, 20010, 20020, 20030};
-    private Node s0= new Node(localHost, rmfPorts[0], -1, 0);
-    private Node s1= new Node(localHost, rmfPorts[1], -1, 1);
-    private Node s2= new Node(localHost, rmfPorts[2], -1, 2);
-    private Node s3= new Node(localHost, rmfPorts[3], -1, 3);
+    private Node s0= new Node(localHost, rmfPorts[0], 0);
+    private Node s1= new Node(localHost, rmfPorts[1], 1);
+    private Node s2= new Node(localHost, rmfPorts[2], 2);
+    private Node s3= new Node(localHost, rmfPorts[3], 3);
     private ArrayList<Node> nodes = new ArrayList<Node>() {{add(s0); add(s1); add(s2); add(s3);}};
 
     private static void deleteViewIfExist(String configHome){
