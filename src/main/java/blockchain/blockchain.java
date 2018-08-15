@@ -29,7 +29,7 @@ public abstract class blockchain {
 
     abstract void createGenesis();
 
-    public boolean validateBlockCreator(Block b, int f) {
+    boolean validateBlockCreator(Block b, int f) {
         if (blocks.size() >= f && blocks.subList(blocks.size() - f, blocks.size()).
         stream().
         map(bl -> bl.getHeader().getCreatorID()).
@@ -43,7 +43,7 @@ public abstract class blockchain {
 
     public abstract boolean validateBlockData(Block b);
 
-    public void setBlocks(List<Block> Nblocks, int start) {
+    void setBlocks(List<Block> Nblocks, int start) {
         for (int i = start ; i < start + Nblocks.size() ; i++) {
             if (blocks.size() <= i) {
                 blocks.add(Nblocks.get(i - start));
@@ -53,25 +53,25 @@ public abstract class blockchain {
 
         }
     }
-    public boolean validateBlockHash(Block b) {
+    boolean validateBlockHash(Block b) {
         byte[] d = DigestMethod.hash(blocks.get(b.getHeader().getHeight() - 1).getHeader().toByteArray());
         return DigestMethod.validate(b.getHeader().getPrev().toByteArray(),
                 Objects.requireNonNull(d));
     }
 
-    public void addBlock(Block b) {
+    void addBlock(Block b) {
         synchronized (blocks) {
             blocks.add(b);
         }
     }
 
-    public Block getBlock(int index) {
+    Block getBlock(int index) {
         synchronized (blocks) {
             return blocks.get(index);
         }
     }
 
-    public List<Block> getBlocks(int start, int end) {
+    List<Block> getBlocks(int start, int end) {
         synchronized (blocks) {
             return blocks.subList(start, end);
         }
@@ -83,11 +83,7 @@ public abstract class blockchain {
         }
     }
 
-    public int getCreatorID() {
-        return creatorID;
-    }
-
-    public void removeBlock(int index) {
+    void removeBlock(int index) {
         blocks.remove(index);
     }
 
