@@ -1,8 +1,5 @@
 package blockchain;
-
-import com.google.protobuf.ByteString;
-import proto.Block;
-import proto.Crypto;
+import proto.Types;
 
 public class basicBlockchain extends blockchain {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(basicBlockchain.class);
@@ -26,7 +23,7 @@ public class basicBlockchain extends blockchain {
     }
 
     @Override
-    public boolean validateBlockData(Block b) {
+    public boolean validateBlockData(Types.Block b) {
         return true;
     }
 }

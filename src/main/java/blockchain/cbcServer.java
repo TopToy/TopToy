@@ -1,7 +1,8 @@
 package blockchain;
 
 import crypto.DigestMethod;
-import proto.*;
+
+import proto.Types.*;
 import static java.lang.String.format;
 
 public class cbcServer extends bcServer {

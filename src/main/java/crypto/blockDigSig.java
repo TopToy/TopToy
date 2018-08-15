@@ -1,6 +1,7 @@
 package crypto;
 
-import proto.Block;
+
+import proto.Types.Block;
 
 public class blockDigSig implements digitalSignature {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(blockDigSig.class);

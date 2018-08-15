@@ -1,6 +1,6 @@
 package crypto;
 
-import proto.Data;
+import proto.Types.Data;
 
 
 public class rmfDigSig implements digitalSignature {

@@ -5,7 +5,8 @@ import config.Config;
 import config.Node;
 import org.apache.commons.lang.ArrayUtils;
 import org.junit.jupiter.api.Test;
-import proto.Block;
+
+import proto.Types.*;
 
 import java.io.File;
 import java.nio.file.Paths;

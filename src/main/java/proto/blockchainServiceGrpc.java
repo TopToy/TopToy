@@ -16,14 +16,10 @@ import static io.grpc.stub.ServerCalls.asyncUnimplementedStreamingCall;
 import static io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall;
 
 /**
- * <pre>
- *message empty {
- *}
- * </pre>
  */
 @javax.annotation.Generated(
     value = "by gRPC proto compiler (version 1.13.1)",
-    comments = "Source: blockchain.proto")
+    comments = "Source: blockchainService.proto")
 public final class blockchainServiceGrpc {
 
   private blockchainServiceGrpc() {}
@@ -31,25 +27,25 @@ public final class blockchainServiceGrpc {
   public static final String SERVICE_NAME = "proto.blockchainService";
 
   // Static method descriptors that strictly reflect the proto.
-  private static volatile io.grpc.MethodDescriptor<proto.Transaction,
-      proto.accepted> getAddTransactionMethod;
+  private static volatile io.grpc.MethodDescriptor<proto.Types.Transaction,
+      proto.Types.accepted> getAddTransactionMethod;
 
-  public static io.grpc.MethodDescriptor<proto.Transaction,
-      proto.accepted> getAddTransactionMethod() {
-    io.grpc.MethodDescriptor<proto.Transaction, proto.accepted> getAddTransactionMethod;
+  public static io.grpc.MethodDescriptor<proto.Types.Transaction,
+      proto.Types.accepted> getAddTransactionMethod() {
+    io.grpc.MethodDescriptor<proto.Types.Transaction, proto.Types.accepted> getAddTransactionMethod;
     if ((getAddTransactionMethod = blockchainServiceGrpc.getAddTransactionMethod) == null) {
       synchronized (blockchainServiceGrpc.class) {
         if ((getAddTransactionMethod = blockchainServiceGrpc.getAddTransactionMethod) == null) {
           blockchainServiceGrpc.getAddTransactionMethod = getAddTransactionMethod = 
-              io.grpc.MethodDescriptor.<proto.Transaction, proto.accepted>newBuilder()
+              io.grpc.MethodDescriptor.<proto.Types.Transaction, proto.Types.accepted>newBuilder()
               .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
               .setFullMethodName(generateFullMethodName(
                   "proto.blockchainService", "addTransaction"))
               .setSampledToLocalTracing(true)
               .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
-                  proto.Transaction.getDefaultInstance()))
+                  proto.Types.Transaction.getDefaultInstance()))
               .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
-                  proto.accepted.getDefaultInstance()))
+                  proto.Types.accepted.getDefaultInstance()))
                   .setSchemaDescriptor(new blockchainServiceMethodDescriptorSupplier("addTransaction"))
                   .build();
           }
@@ -82,10 +78,6 @@ public final class blockchainServiceGrpc {
   }
 
   /**
-   * <pre>
-   *message empty {
-   *}
-   * </pre>
    */
   public static abstract class blockchainServiceImplBase implements io.grpc.BindableService {
 
@@ -94,8 +86,8 @@ public final class blockchainServiceGrpc {
      * BLocking call for client!
      * </pre>
      */
-    public void addTransaction(proto.Transaction request,
-        io.grpc.stub.StreamObserver<proto.accepted> responseObserver) {
+    public void addTransaction(proto.Types.Transaction request,
+        io.grpc.stub.StreamObserver<proto.Types.accepted> responseObserver) {
       asyncUnimplementedUnaryCall(getAddTransactionMethod(), responseObserver);
     }
 
@@ -105,18 +97,14 @@ public final class blockchainServiceGrpc {
             getAddTransactionMethod(),
             asyncUnaryCall(
               new MethodHandlers<
-                proto.Transaction,
-                proto.accepted>(
+                proto.Types.Transaction,
+                proto.Types.accepted>(
                   this, METHODID_ADD_TRANSACTION)))
           .build();
     }
   }
 
   /**
-   * <pre>
-   *message empty {
-   *}
-   * </pre>
    */
   public static final class blockchainServiceStub extends io.grpc.stub.AbstractStub<blockchainServiceStub> {
     private blockchainServiceStub(io.grpc.Channel channel) {
@@ -139,18 +127,14 @@ public final class blockchainServiceGrpc {
      * BLocking call for client!
      * </pre>
      */
-    public void addTransaction(proto.Transaction request,
-        io.grpc.stub.StreamObserver<proto.accepted> responseObserver) {
+    public void addTransaction(proto.Types.Transaction request,
+        io.grpc.stub.StreamObserver<proto.Types.accepted> responseObserver) {
       asyncUnaryCall(
           getChannel().newCall(getAddTransactionMethod(), getCallOptions()), request, responseObserver);
     }
   }
 
   /**
-   * <pre>
-   *message empty {
-   *}
-   * </pre>
    */
   public static final class blockchainServiceBlockingStub extends io.grpc.stub.AbstractStub<blockchainServiceBlockingStub> {
     private blockchainServiceBlockingStub(io.grpc.Channel channel) {
@@ -173,17 +157,13 @@ public final class blockchainServiceGrpc {
      * BLocking call for client!
      * </pre>
      */
-    public proto.accepted addTransaction(proto.Transaction request) {
+    public proto.Types.accepted addTransaction(proto.Types.Transaction request) {
       return blockingUnaryCall(
           getChannel(), getAddTransactionMethod(), getCallOptions(), request);
     }
   }
 
   /**
-   * <pre>
-   *message empty {
-   *}
-   * </pre>
    */
   public static final class blockchainServiceFutureStub extends io.grpc.stub.AbstractStub<blockchainServiceFutureStub> {
     private blockchainServiceFutureStub(io.grpc.Channel channel) {
@@ -206,8 +186,8 @@ public final class blockchainServiceGrpc {
      * BLocking call for client!
      * </pre>
      */
-    public com.google.common.util.concurrent.ListenableFuture<proto.accepted> addTransaction(
-        proto.Transaction request) {
+    public com.google.common.util.concurrent.ListenableFuture<proto.Types.accepted> addTransaction(
+        proto.Types.Transaction request) {
       return futureUnaryCall(
           getChannel().newCall(getAddTransactionMethod(), getCallOptions()), request);
     }
@@ -233,8 +213,8 @@ public final class blockchainServiceGrpc {
     public void invoke(Req request, io.grpc.stub.StreamObserver<Resp> responseObserver) {
       switch (methodId) {
         case METHODID_ADD_TRANSACTION:
-          serviceImpl.addTransaction((proto.Transaction) request,
-              (io.grpc.stub.StreamObserver<proto.accepted>) responseObserver);
+          serviceImpl.addTransaction((proto.Types.Transaction) request,
+              (io.grpc.stub.StreamObserver<proto.Types.accepted>) responseObserver);
           break;
         default:
           throw new AssertionError();
@@ -258,7 +238,7 @@ public final class blockchainServiceGrpc {
 
     @java.lang.Override
     public com.google.protobuf.Descriptors.FileDescriptor getFileDescriptor() {
-      return proto.Blockchain.getDescriptor();
+      return proto.BlockchainService.getDescriptor();
     }
 
     @java.lang.Override

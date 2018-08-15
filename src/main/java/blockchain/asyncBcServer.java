@@ -5,9 +5,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import config.Config;
 import config.Node;
 import crypto.DigestMethod;
-import proto.Block;
-import proto.BlockHeader;
-import proto.Transaction;
+import proto.Types;
 import rmf.RmfNode;
 
 import java.util.Arrays;
@@ -35,7 +33,7 @@ public class asyncBcServer extends bcServer {
         synchronized (blockLock) {
             addTransactionsToCurrBlock();
 //            logger.info(format("[#%d] [heigh1=%d", getID(), currHeight, ));
-            Block sealedBlock = currBlock.construct(getID(), currHeight, DigestMethod.hash(bc.getBlock(currHeight - 1).getHeader().toByteArray()));
+            Types.Block sealedBlock = currBlock.construct(getID(), currHeight, DigestMethod.hash(bc.getBlock(currHeight - 1).getHeader().toByteArray()));
             currBlock = bc.createNewBLock();
             rmfServer.broadcast(cidSeries, cid, sealedBlock.toByteArray(), currHeight);
         }

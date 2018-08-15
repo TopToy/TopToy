@@ -9,7 +9,9 @@ import crypto.rmfDigSig;
 import crypto.sslUtils;
 import io.grpc.*;
 import io.grpc.netty.NettyServerBuilder;
+
 import io.grpc.stub.StreamObserver;
+import proto.Types.*;
 import proto.*;
 import static io.grpc.Metadata.ASCII_STRING_MARSHALLER;
 import javax.net.ssl.SSLException;
@@ -75,7 +77,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         int cid;
         int cidSeries;
         ArrayList<Integer> voters;
-        BbcProtos.BbcDecision.Builder dec = BbcProtos.BbcDecision.newBuilder();
+        BbcDecision.Builder dec = BbcDecision.newBuilder();
     }
     class peer {
         ManagedChannel channel;
@@ -115,7 +117,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
 
     private final Table<Integer, Integer, fvote> fVotes;
     private final Table<Integer, Integer, Data> pendingMsg;
-    private final Table<Integer, Integer, BbcProtos.BbcDecision> fastBbcCons;
+    private final Table<Integer, Integer, BbcDecision> fastBbcCons;
 
     Map<Integer, peer> peers;
     private List<Node> nodes;
@@ -123,7 +125,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
     private Thread bbcMissedConsensusThread;
     protected Server server;
     private String bbcConfig;
-    private final Table<Integer, Integer, BbcProtos.BbcDecision> regBbcCons;
+    private final Table<Integer, Integer, BbcDecision> regBbcCons;
     private boolean stopped = false;
     private Server rmfServer;
 
@@ -269,7 +271,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         });
     }
 
-    private void sendFastVoteMessage(RmfGrpc.RmfStub stub, BbcProtos.BbcMsg v) {
+    private void sendFastVoteMessage(RmfGrpc.RmfStub stub, BbcMsg v) {
         stub.fastVote(v, new StreamObserver<Empty>() {
             @Override
             public void onNext(Empty empty) {
@@ -332,7 +334,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             sendReqMessage(peers.get(p).stub, req, cidSeries, cid, sender, height);
         }
     }
-    private void broadcastFastVoteMessage(BbcProtos.BbcMsg v) {
+    private void broadcastFastVoteMessage(BbcMsg v) {
         for (int p : peers.keySet()) {
             sendFastVoteMessage(peers.get(p).stub, v);
         }
@@ -362,7 +364,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
     }
 
     @Override
-    public void fastVote(BbcProtos.BbcMsg request, StreamObserver<Empty> responeObserver) {
+    public void fastVote(BbcMsg request, StreamObserver<Empty> responeObserver) {
         synchronized (globalLock) {
             int cid = request.getCid();
             int cidSeries = request.getCidSeries();
@@ -397,7 +399,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         }
     }
     @Override
-    public void reqMessage(proto.Req request,  StreamObserver<proto.Res> responseObserver)  {
+    public void reqMessage(Req request,  StreamObserver<Res> responseObserver)  {
         Data msg;
         int cid = request.getMeta().getCid();
         int cidSeries = request.getMeta().getCidSeries();
@@ -439,7 +441,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             }
             long estimatedTime = System.currentTimeMillis() - startTime;
             if (pendingMsg.contains(cidSeries, cid)) {
-                BbcProtos.BbcMsg.Builder bv = BbcProtos.BbcMsg
+                BbcMsg.Builder bv = BbcMsg
                         .newBuilder().setCid(cid).setCidSeries(cidSeries).setPropserID(id).setVote(1);
                 broadcastFastVoteMessage(bv.build());
             }
@@ -488,7 +490,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
     private int fullBbcConsensus(int vote, int cidSeries, int cid) throws InterruptedException {
         logger.info(format("[#%d] Initiates full bbc instance [cidSeries=%d ; cid=%d], [vote:%d]", id, cidSeries, cid, vote));
         bbcService.propose(vote, cidSeries, cid);
-        BbcProtos.BbcDecision dec = bbcService.decide(cidSeries, cid);
+        BbcDecision dec = bbcService.decide(cidSeries, cid);
         if (dec != null) regBbcCons.put(cidSeries, cid, dec);
         return dec != null ? dec.getDecosion() : -1; // TODO: On shutting down null might expected
     }

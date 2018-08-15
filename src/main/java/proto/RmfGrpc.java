@@ -27,25 +27,25 @@ public final class RmfGrpc {
   public static final String SERVICE_NAME = "proto.Rmf";
 
   // Static method descriptors that strictly reflect the proto.
-  private static volatile io.grpc.MethodDescriptor<proto.Data,
-      proto.Empty> getDisseminateMessageMethod;
+  private static volatile io.grpc.MethodDescriptor<proto.Types.Data,
+      proto.Types.Empty> getDisseminateMessageMethod;
 
-  public static io.grpc.MethodDescriptor<proto.Data,
-      proto.Empty> getDisseminateMessageMethod() {
-    io.grpc.MethodDescriptor<proto.Data, proto.Empty> getDisseminateMessageMethod;
+  public static io.grpc.MethodDescriptor<proto.Types.Data,
+      proto.Types.Empty> getDisseminateMessageMethod() {
+    io.grpc.MethodDescriptor<proto.Types.Data, proto.Types.Empty> getDisseminateMessageMethod;
     if ((getDisseminateMessageMethod = RmfGrpc.getDisseminateMessageMethod) == null) {
       synchronized (RmfGrpc.class) {
         if ((getDisseminateMessageMethod = RmfGrpc.getDisseminateMessageMethod) == null) {
           RmfGrpc.getDisseminateMessageMethod = getDisseminateMessageMethod = 
-              io.grpc.MethodDescriptor.<proto.Data, proto.Empty>newBuilder()
+              io.grpc.MethodDescriptor.<proto.Types.Data, proto.Types.Empty>newBuilder()
               .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
               .setFullMethodName(generateFullMethodName(
                   "proto.Rmf", "DisseminateMessage"))
               .setSampledToLocalTracing(true)
               .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
-                  proto.Data.getDefaultInstance()))
+                  proto.Types.Data.getDefaultInstance()))
               .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
-                  proto.Empty.getDefaultInstance()))
+                  proto.Types.Empty.getDefaultInstance()))
                   .setSchemaDescriptor(new RmfMethodDescriptorSupplier("DisseminateMessage"))
                   .build();
           }
@@ -54,25 +54,25 @@ public final class RmfGrpc {
      return getDisseminateMessageMethod;
   }
 
-  private static volatile io.grpc.MethodDescriptor<proto.BbcProtos.BbcMsg,
-      proto.Empty> getFastVoteMethod;
+  private static volatile io.grpc.MethodDescriptor<proto.Types.BbcMsg,
+      proto.Types.Empty> getFastVoteMethod;
 
-  public static io.grpc.MethodDescriptor<proto.BbcProtos.BbcMsg,
-      proto.Empty> getFastVoteMethod() {
-    io.grpc.MethodDescriptor<proto.BbcProtos.BbcMsg, proto.Empty> getFastVoteMethod;
+  public static io.grpc.MethodDescriptor<proto.Types.BbcMsg,
+      proto.Types.Empty> getFastVoteMethod() {
+    io.grpc.MethodDescriptor<proto.Types.BbcMsg, proto.Types.Empty> getFastVoteMethod;
     if ((getFastVoteMethod = RmfGrpc.getFastVoteMethod) == null) {
       synchronized (RmfGrpc.class) {
         if ((getFastVoteMethod = RmfGrpc.getFastVoteMethod) == null) {
           RmfGrpc.getFastVoteMethod = getFastVoteMethod = 
-              io.grpc.MethodDescriptor.<proto.BbcProtos.BbcMsg, proto.Empty>newBuilder()
+              io.grpc.MethodDescriptor.<proto.Types.BbcMsg, proto.Types.Empty>newBuilder()
               .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
               .setFullMethodName(generateFullMethodName(
                   "proto.Rmf", "FastVote"))
               .setSampledToLocalTracing(true)
               .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
-                  proto.BbcProtos.BbcMsg.getDefaultInstance()))
+                  proto.Types.BbcMsg.getDefaultInstance()))
               .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
-                  proto.Empty.getDefaultInstance()))
+                  proto.Types.Empty.getDefaultInstance()))
                   .setSchemaDescriptor(new RmfMethodDescriptorSupplier("FastVote"))
                   .build();
           }
@@ -81,25 +81,25 @@ public final class RmfGrpc {
      return getFastVoteMethod;
   }
 
-  private static volatile io.grpc.MethodDescriptor<proto.Req,
-      proto.Res> getReqMessageMethod;
+  private static volatile io.grpc.MethodDescriptor<proto.Types.Req,
+      proto.Types.Res> getReqMessageMethod;
 
-  public static io.grpc.MethodDescriptor<proto.Req,
-      proto.Res> getReqMessageMethod() {
-    io.grpc.MethodDescriptor<proto.Req, proto.Res> getReqMessageMethod;
+  public static io.grpc.MethodDescriptor<proto.Types.Req,
+      proto.Types.Res> getReqMessageMethod() {
+    io.grpc.MethodDescriptor<proto.Types.Req, proto.Types.Res> getReqMessageMethod;
     if ((getReqMessageMethod = RmfGrpc.getReqMessageMethod) == null) {
       synchronized (RmfGrpc.class) {
         if ((getReqMessageMethod = RmfGrpc.getReqMessageMethod) == null) {
           RmfGrpc.getReqMessageMethod = getReqMessageMethod = 
-              io.grpc.MethodDescriptor.<proto.Req, proto.Res>newBuilder()
+              io.grpc.MethodDescriptor.<proto.Types.Req, proto.Types.Res>newBuilder()
               .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
               .setFullMethodName(generateFullMethodName(
                   "proto.Rmf", "reqMessage"))
               .setSampledToLocalTracing(true)
               .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
-                  proto.Req.getDefaultInstance()))
+                  proto.Types.Req.getDefaultInstance()))
               .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
-                  proto.Res.getDefaultInstance()))
+                  proto.Types.Res.getDefaultInstance()))
                   .setSchemaDescriptor(new RmfMethodDescriptorSupplier("reqMessage"))
                   .build();
           }
@@ -137,22 +137,22 @@ public final class RmfGrpc {
 
     /**
      */
-    public void disseminateMessage(proto.Data request,
-        io.grpc.stub.StreamObserver<proto.Empty> responseObserver) {
+    public void disseminateMessage(proto.Types.Data request,
+        io.grpc.stub.StreamObserver<proto.Types.Empty> responseObserver) {
       asyncUnimplementedUnaryCall(getDisseminateMessageMethod(), responseObserver);
     }
 
     /**
      */
-    public void fastVote(proto.BbcProtos.BbcMsg request,
-        io.grpc.stub.StreamObserver<proto.Empty> responseObserver) {
+    public void fastVote(proto.Types.BbcMsg request,
+        io.grpc.stub.StreamObserver<proto.Types.Empty> responseObserver) {
       asyncUnimplementedUnaryCall(getFastVoteMethod(), responseObserver);
     }
 
     /**
      */
-    public void reqMessage(proto.Req request,
-        io.grpc.stub.StreamObserver<proto.Res> responseObserver) {
+    public void reqMessage(proto.Types.Req request,
+        io.grpc.stub.StreamObserver<proto.Types.Res> responseObserver) {
       asyncUnimplementedUnaryCall(getReqMessageMethod(), responseObserver);
     }
 
@@ -162,22 +162,22 @@ public final class RmfGrpc {
             getDisseminateMessageMethod(),
             asyncUnaryCall(
               new MethodHandlers<
-                proto.Data,
-                proto.Empty>(
+                proto.Types.Data,
+                proto.Types.Empty>(
                   this, METHODID_DISSEMINATE_MESSAGE)))
           .addMethod(
             getFastVoteMethod(),
             asyncUnaryCall(
               new MethodHandlers<
-                proto.BbcProtos.BbcMsg,
-                proto.Empty>(
+                proto.Types.BbcMsg,
+                proto.Types.Empty>(
                   this, METHODID_FAST_VOTE)))
           .addMethod(
             getReqMessageMethod(),
             asyncUnaryCall(
               new MethodHandlers<
-                proto.Req,
-                proto.Res>(
+                proto.Types.Req,
+                proto.Types.Res>(
                   this, METHODID_REQ_MESSAGE)))
           .build();
     }
@@ -203,24 +203,24 @@ public final class RmfGrpc {
 
     /**
      */
-    public void disseminateMessage(proto.Data request,
-        io.grpc.stub.StreamObserver<proto.Empty> responseObserver) {
+    public void disseminateMessage(proto.Types.Data request,
+        io.grpc.stub.StreamObserver<proto.Types.Empty> responseObserver) {
       asyncUnaryCall(
           getChannel().newCall(getDisseminateMessageMethod(), getCallOptions()), request, responseObserver);
     }
 
     /**
      */
-    public void fastVote(proto.BbcProtos.BbcMsg request,
-        io.grpc.stub.StreamObserver<proto.Empty> responseObserver) {
+    public void fastVote(proto.Types.BbcMsg request,
+        io.grpc.stub.StreamObserver<proto.Types.Empty> responseObserver) {
       asyncUnaryCall(
           getChannel().newCall(getFastVoteMethod(), getCallOptions()), request, responseObserver);
     }
 
     /**
      */
-    public void reqMessage(proto.Req request,
-        io.grpc.stub.StreamObserver<proto.Res> responseObserver) {
+    public void reqMessage(proto.Types.Req request,
+        io.grpc.stub.StreamObserver<proto.Types.Res> responseObserver) {
       asyncUnaryCall(
           getChannel().newCall(getReqMessageMethod(), getCallOptions()), request, responseObserver);
     }
@@ -246,21 +246,21 @@ public final class RmfGrpc {
 
     /**
      */
-    public proto.Empty disseminateMessage(proto.Data request) {
+    public proto.Types.Empty disseminateMessage(proto.Types.Data request) {
       return blockingUnaryCall(
           getChannel(), getDisseminateMessageMethod(), getCallOptions(), request);
     }
 
     /**
      */
-    public proto.Empty fastVote(proto.BbcProtos.BbcMsg request) {
+    public proto.Types.Empty fastVote(proto.Types.BbcMsg request) {
       return blockingUnaryCall(
           getChannel(), getFastVoteMethod(), getCallOptions(), request);
     }
 
     /**
      */
-    public proto.Res reqMessage(proto.Req request) {
+    public proto.Types.Res reqMessage(proto.Types.Req request) {
       return blockingUnaryCall(
           getChannel(), getReqMessageMethod(), getCallOptions(), request);
     }
@@ -286,24 +286,24 @@ public final class RmfGrpc {
 
     /**
      */
-    public com.google.common.util.concurrent.ListenableFuture<proto.Empty> disseminateMessage(
-        proto.Data request) {
+    public com.google.common.util.concurrent.ListenableFuture<proto.Types.Empty> disseminateMessage(
+        proto.Types.Data request) {
       return futureUnaryCall(
           getChannel().newCall(getDisseminateMessageMethod(), getCallOptions()), request);
     }
 
     /**
      */
-    public com.google.common.util.concurrent.ListenableFuture<proto.Empty> fastVote(
-        proto.BbcProtos.BbcMsg request) {
+    public com.google.common.util.concurrent.ListenableFuture<proto.Types.Empty> fastVote(
+        proto.Types.BbcMsg request) {
       return futureUnaryCall(
           getChannel().newCall(getFastVoteMethod(), getCallOptions()), request);
     }
 
     /**
      */
-    public com.google.common.util.concurrent.ListenableFuture<proto.Res> reqMessage(
-        proto.Req request) {
+    public com.google.common.util.concurrent.ListenableFuture<proto.Types.Res> reqMessage(
+        proto.Types.Req request) {
       return futureUnaryCall(
           getChannel().newCall(getReqMessageMethod(), getCallOptions()), request);
     }
@@ -331,16 +331,16 @@ public final class RmfGrpc {
     public void invoke(Req request, io.grpc.stub.StreamObserver<Resp> responseObserver) {
       switch (methodId) {
         case METHODID_DISSEMINATE_MESSAGE:
-          serviceImpl.disseminateMessage((proto.Data) request,
-              (io.grpc.stub.StreamObserver<proto.Empty>) responseObserver);
+          serviceImpl.disseminateMessage((proto.Types.Data) request,
+              (io.grpc.stub.StreamObserver<proto.Types.Empty>) responseObserver);
           break;
         case METHODID_FAST_VOTE:
-          serviceImpl.fastVote((proto.BbcProtos.BbcMsg) request,
-              (io.grpc.stub.StreamObserver<proto.Empty>) responseObserver);
+          serviceImpl.fastVote((proto.Types.BbcMsg) request,
+              (io.grpc.stub.StreamObserver<proto.Types.Empty>) responseObserver);
           break;
         case METHODID_REQ_MESSAGE:
-          serviceImpl.reqMessage((proto.Req) request,
-              (io.grpc.stub.StreamObserver<proto.Res>) responseObserver);
+          serviceImpl.reqMessage((proto.Types.Req) request,
+              (io.grpc.stub.StreamObserver<proto.Types.Res>) responseObserver);
           break;
         default:
           throw new AssertionError();

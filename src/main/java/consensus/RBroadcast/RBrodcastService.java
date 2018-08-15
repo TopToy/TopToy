@@ -9,7 +9,8 @@ import bftsmart.tom.core.messages.TOMMessage;
 import bftsmart.tom.core.messages.TOMMessageType;
 import bftsmart.tom.server.defaultservices.DefaultSingleRecoverable;
 import com.google.protobuf.ByteString;
-import proto.RBrodcast;
+
+import proto.Types.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +20,7 @@ import static java.lang.String.format;
 public class RBrodcastService extends DefaultSingleRecoverable {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(RBrodcastService.class);
     private int id;
-    private List<RBrodcast.RBMsg> recMsg;
+    private List<RBMsg> recMsg;
     private AsynchServiceProxy RBProxy;
     private ServiceReplica sr;
     private String configHome;
@@ -74,7 +75,7 @@ public class RBrodcastService extends DefaultSingleRecoverable {
     @Override
     public byte[] appExecuteOrdered(byte[] command, MessageContext msgCtx) {
         try {
-            RBrodcast.RBMsg msg = RBrodcast.RBMsg.parseFrom(command);
+            RBMsg msg = RBMsg.parseFrom(command);
             synchronized (globalLock) {
                 recMsg.add(msg);
                 globalLock.notify();
@@ -96,7 +97,7 @@ public class RBrodcastService extends DefaultSingleRecoverable {
             while (recMsg.isEmpty()) {
                 globalLock.wait();
             }
-            RBrodcast.RBMsg msg = recMsg.get(0);
+            RBMsg msg = recMsg.get(0);
             recMsg.remove(0);
             return msg.getData().toByteArray();
         }
@@ -115,16 +116,15 @@ public class RBrodcastService extends DefaultSingleRecoverable {
             if(recMsg.isEmpty()) {
                 return null;
             }
-            RBrodcast.RBMsg msg = recMsg.get(0);
+            RBMsg msg = recMsg.get(0);
             recMsg.remove(0);
-//                delivered.add(msg);
             return msg.getData().toByteArray();
         }
     }
 
 
     public int broadcast(byte[] m, int id) {
-        RBrodcast.RBMsg msg = RBrodcast.RBMsg.
+        RBMsg msg = RBMsg.
                 newBuilder().
                 setCid(cid).
                 setId(id).

@@ -10,13 +10,8 @@ import bftsmart.tom.core.messages.TOMMessageType;
 import bftsmart.tom.server.defaultservices.DefaultSingleRecoverable;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
-//import crypto.bbcDigSig;
-import crypto.pkiUtils;
-import org.omg.PortableInterceptor.INACTIVE;
-import proto.BbcProtos;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import proto.Types.*;
 
 import static java.lang.String.format;
 
@@ -28,11 +23,11 @@ public class bbcService extends DefaultSingleRecoverable {
     class consVote {
         int pos = 0;
         int neg = 0;
-        BbcProtos.BbcDecision.Builder dec = BbcProtos.BbcDecision.newBuilder();
+        BbcDecision.Builder dec = BbcDecision.newBuilder();
     }
 
     class fastVotePart {
-        BbcProtos.BbcDecision d;
+        BbcDecision d;
         boolean done;
     }
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(bbcService.class);
@@ -98,7 +93,7 @@ public class bbcService extends DefaultSingleRecoverable {
         int cid;
         try {
             synchronized (globalLock) {
-            BbcProtos.BbcMsg msg = BbcProtos.BbcMsg.parseFrom(command);
+            BbcMsg msg = BbcMsg.parseFrom(command);
             cid = msg.getCid();
             int cidSeries = msg.getCidSeries();
             logger.debug(format("[#%d] received bbc message from [#%d]", id, msg.getPropserID()));
@@ -139,7 +134,7 @@ public class bbcService extends DefaultSingleRecoverable {
         return new byte[1];
     }
 
-    public BbcProtos.BbcDecision decide(int cidSeries, int cid) throws InterruptedException {
+    public BbcDecision decide(int cidSeries, int cid) throws InterruptedException {
         synchronized (globalLock) {
             while (!rec.contains(cidSeries, cid) || rec.get(cidSeries, cid).pos + rec.get(cidSeries, cid).neg < quorumSize) {
                 globalLock.wait();
@@ -150,12 +145,12 @@ public class bbcService extends DefaultSingleRecoverable {
     }
 
     public int propose(int vote, int cidSeries, int cid) {
-        BbcProtos.BbcMsg.Builder b = BbcProtos.BbcMsg.newBuilder();
+        BbcMsg.Builder b = BbcMsg.newBuilder();
         b.setPropserID(id);
         b.setCid(cid);
         b.setCidSeries(cidSeries);
         b.setVote(vote);
-        BbcProtos.BbcMsg msg= b.build();
+        BbcMsg msg= b.build();
         byte[] data = msg.toByteArray();
         bbcProxy.invokeAsynchRequest(data, new ReplyListener() {
             @Override
@@ -172,7 +167,7 @@ public class bbcService extends DefaultSingleRecoverable {
     }
 
 
-    public void updateFastVote(BbcProtos.BbcDecision b) {
+    public void updateFastVote(BbcDecision b) {
         synchronized (globalLock) {
             int fcid = b.getCid();
             int fcidSeries = b.getCidSeries();
@@ -185,7 +180,7 @@ public class bbcService extends DefaultSingleRecoverable {
         }
     }
 
-    public void periodicallyVoteMissingConsensus(BbcProtos.BbcDecision b) {
+    public void periodicallyVoteMissingConsensus(BbcDecision b) {
         synchronized (globalLock) {
             int fcid = b.getCid();
             int fcidSeries = b.getCidSeries();

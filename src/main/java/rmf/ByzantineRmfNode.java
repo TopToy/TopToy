@@ -2,18 +2,10 @@ package rmf;
 
 import com.google.protobuf.ByteString;
 import config.Node;
-import crypto.pkiUtils;
 import crypto.rmfDigSig;
-import io.grpc.Server;
-import io.grpc.ServerBuilder;
-import org.apache.commons.lang.ArrayUtils;
-import proto.Data;
-import proto.Meta;
-import proto.RmfResult;
 
-import java.io.IOException;
+import proto.Types.*;
 import java.util.*;
-import java.util.stream.Collector;
 
 /*
     TODO:

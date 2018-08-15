@@ -2,10 +2,7 @@ package blockchain;
 
 import com.google.protobuf.ByteString;
 import crypto.DigestMethod;
-import proto.Block;
-import proto.BlockHeader;
-import proto.Crypto;
-import proto.Transaction;
+import proto.Types.*;
 
 import java.util.ArrayList;
 import java.util.List;

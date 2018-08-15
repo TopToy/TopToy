@@ -2,7 +2,8 @@ package blockchain;
 
 import config.Config;
 import crypto.DigestMethod;
-import proto.Block;
+
+import proto.Types.*;
 import rmf.ByzantineRmfNode;
 
 import java.util.*;

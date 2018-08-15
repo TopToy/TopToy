@@ -9,6 +9,7 @@ import crypto.DigestMethod;
 import crypto.blockDigSig;
 import proto.*;
 import rmf.RmfNode;
+import proto.Types.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -42,8 +43,8 @@ public abstract class bcServer extends Node {
     int cid = 0;
     int cidSeries = 0;
     private final HashMap<Integer, fpEntry> fp;
-    private HashMap<Integer, ArrayList<subChainVersion>> scVersions;
-    private final ArrayList<Transaction> transactionsPool = new ArrayList<>();
+    private HashMap<Integer, ArrayList<Types.subChainVersion>> scVersions;
+    private final ArrayList<Types.Transaction> transactionsPool = new ArrayList<>();
 
     // TODO: Currently nodes, f, tmoInterval, tmo and configHome are coded but we will turn it into configuration file
     bcServer(String addr, int rmfPort, int id) {

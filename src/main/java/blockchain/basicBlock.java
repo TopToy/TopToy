@@ -1,11 +1,12 @@
 package blockchain;
 
-import proto.Transaction;
+
+import proto.Types;
 
 public class basicBlock extends block {
 
     @Override
-    boolean validateTransaction(Transaction t) {
+    boolean validateTransaction(Types.Transaction t) {
         return true;
     }
 }

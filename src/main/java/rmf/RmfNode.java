@@ -3,9 +3,8 @@ package rmf;
 import com.google.protobuf.ByteString;
 import config.Node;
 import crypto.rmfDigSig;
-import proto.Data;
-import proto.Meta;
-import proto.RmfResult;
+
+import proto.Types.*;
 import java.util.ArrayList;
 import static java.lang.String.format;
 

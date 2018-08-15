@@ -1,8 +1,8 @@
 package blockchain;
 
 import crypto.DigestMethod;
-import proto.Block;
-import proto.Crypto;
+
+import proto.Types.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
