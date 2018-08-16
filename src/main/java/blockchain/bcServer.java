@@ -31,7 +31,7 @@ public abstract class bcServer extends Node {
     protected int n;
     int currLeader;
     protected boolean stopped;
-    final Object blockLock = new Object();
+//    final Object blockLock = new Object();
     block currBlock; // TODO: As any server should disseminates its block once in an epoch, currently a block is shipped as soon the server turn is coming.
     private final Object newBlockNotifyer = new Object();
     private int maxTransactionInBlock; // TODO: Should be done by configuration
@@ -57,7 +57,7 @@ public abstract class bcServer extends Node {
         panicRB = new RBrodcastService(id, Config.getPanicRBConfigHome());
         syncRB = new RBrodcastService(id, Config.getSyncRBConfigHome());
         bc = initBC(id);
-        currBlock = bc.createNewBLock();
+        currBlock = null;
 
         stopped = false;
         currHeight = 1; // starts from 1 due to the genesis block
@@ -138,7 +138,7 @@ public abstract class bcServer extends Node {
             }
             RmfResult msg;
             try {
-                msg = rmfServer.deliver(cidSeries, cid, currHeight, currLeader, tmo);
+                msg = rmfServer.deliver(cidSeries, cid, currHeight, currLeader, tmo, null);
             } catch (InterruptedException e) {
                 logger.info(format("[#%d] main thread has been interrupted on rmf deliver", getID()));
                 continue;
@@ -151,6 +151,9 @@ public abstract class bcServer extends Node {
                 logger.info(format("[#%d] Unable to receive block, timeout increased to [%d] ms", getID(), tmo));
                 updateLeaderAndHeight();
                 continue;
+            }
+            if (currLeader == getID()) {
+                currBlock = null;
             }
             Block recBlock;
             try {
@@ -221,6 +224,8 @@ public abstract class bcServer extends Node {
     }
 
     void addTransactionsToCurrBlock() {
+        if (currBlock != null) return;
+        currBlock = bc.createNewBLock();
         synchronized (transactionsPool) {
             if (transactionsPool.isEmpty()) return;
             while ((!transactionsPool.isEmpty()) && currBlock.getTransactionCount() < maxTransactionInBlock) {

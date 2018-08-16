@@ -30,13 +30,13 @@ public class asyncBcServer extends bcServer {
 
         if (currLeader != getID()) return;
          logger.info(format("[#%d] prepare to disseminate a new block of [height=%d]", getID(), currHeight));
-        synchronized (blockLock) {
+//        synchronized (blockLock) {
             addTransactionsToCurrBlock();
 //            logger.info(format("[#%d] [heigh1=%d", getID(), currHeight, ));
             Types.Block sealedBlock = currBlock.construct(getID(), currHeight, DigestMethod.hash(bc.getBlock(currHeight - 1).getHeader().toByteArray()));
-            currBlock = bc.createNewBLock();
+//            currBlock = bc.createNewBLock();
             rmfServer.broadcast(cidSeries, cid, sealedBlock.toByteArray(), currHeight);
-        }
+//        }
 
 
     }

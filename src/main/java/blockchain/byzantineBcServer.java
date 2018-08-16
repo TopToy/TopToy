@@ -1,5 +1,6 @@
 package blockchain;
 
+import com.google.protobuf.ByteString;
 import config.Config;
 import crypto.DigestMethod;
 
@@ -27,15 +28,17 @@ public class byzantineBcServer extends bcServer {
         }
         logger.info(format("[#%d] prepare to disseminate a new block of [height=%d]", getID(), currHeight));
 
-        synchronized (blockLock) {
+//        synchronized (blockLock) {
             addTransactionsToCurrBlock();
             Block sealedBlock1 = currBlock.construct(getID(), currHeight,
                     DigestMethod.hash(bc.getBlock(currHeight - 1).getHeader().toByteArray()));
             String msg = "Hello Byz";
-            addTransaction(msg.getBytes(), getID());
+            Transaction t = Transaction.newBuilder().setClientID(getID()).
+                    setData(ByteString.copyFrom(msg.getBytes())).build();
+            currBlock.addTransaction(t);
             Block sealedBlock2 = currBlock.construct(getID(), currHeight,
                     DigestMethod.hash(bc.getBlock(currHeight - 1).getHeader().toByteArray()));
-            currBlock = bc.createNewBLock();
+//            currBlock = bc.createNewBLock();
             List<Integer> all = new ArrayList<>();
             for (int i = 0 ; i < n ;i++) {
                 all.add(i);
@@ -56,7 +59,7 @@ public class byzantineBcServer extends bcServer {
             } else {
                 ((ByzantineRmfNode)rmfServer).selectiveBroadcast(cidSeries, cid, sealedBlock1.toByteArray(), currHeight, all.subList(0, n/2));
             }
-        }
+//        }
     }
 
     @Override

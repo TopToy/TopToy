@@ -133,7 +133,7 @@ public class blockchainTest {
         for (int i = 0 ; i < nnodes ; i++) {
             int finalI = i;
             tasks[i] = new Thread(()-> {
-                ret[finalI] = new String(((cbcServer) allNodes[finalI]).deliver(2).getData(0).getData().toByteArray());
+                ret[finalI] = new String(((cbcServer) allNodes[finalI]).deliver(1).getData(0).getData().toByteArray());
             });
             tasks[i].start();
         }
