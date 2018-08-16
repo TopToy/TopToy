@@ -12,18 +12,37 @@ public class cbcServer extends bcServer {
         super(addr, rmfPort, id);
     }
 
-    void leaderImpl() {
-        if (currLeader != getID()) {
-            return;
+    byte[] leaderImpl() {
+        if (!configuredFastMode) {
+            return normalLeaderPhase();
         }
-        logger.info(format("[#%d] prepare to disseminate a new block of [height=%d]", getID(), currHeight));
+        if (currHeight == 1 || !fastMode) {
+            normalLeaderPhase();
+        }
+        return fastModePhase();
+    }
 
-//        synchronized (blockLock) {
-            addTransactionsToCurrBlock();
-            Block sealedBlock = currBlock.construct(getID(), currHeight, DigestMethod.hash(bc.getBlock(currHeight - 1).getHeader().toByteArray()));
-//            currBlock = bc.createNewBLock();
-            rmfServer.broadcast(cidSeries, cid, sealedBlock.toByteArray(), currHeight);
-//        }
+    byte[] normalLeaderPhase() {
+        if (currLeader != getID()) {
+            return null;
+        }
+        logger.info(format("[#%d] prepare to disseminate a new block of [height=%d] [cidSeries=%d ; cid=%d]",
+                getID(), currHeight, cidSeries, cid));
+        addTransactionsToCurrBlock();
+        Block sealedBlock = currBlock.construct(getID(), currHeight, DigestMethod.hash(bc.getBlock(currHeight - 1).getHeader().toByteArray()));
+        rmfServer.broadcast(cidSeries, cid, sealedBlock.toByteArray(), currHeight);
+        return null;
+    }
+
+    byte[] fastModePhase() {
+        if ((currLeader + 1) % n != getID()) {
+            return null;
+        }
+        logger.info(format("[#%d] prepare fast mode phase for [height=%d] [cidSeries=%d ; cid=%d]",
+                getID(), currHeight + 1, cidSeries, cid + 1));
+        addTransactionsToCurrBlock();
+        return currBlock.construct(getID(), currHeight,
+                DigestMethod.hash(bc.getBlock(currHeight - 1).getHeader().toByteArray())).toByteArray();
     }
 
     @Override

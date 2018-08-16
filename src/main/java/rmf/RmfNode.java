@@ -57,7 +57,7 @@ public class RmfNode extends Node{
     public RmfResult deliver(int cidSeries, int cid, int height, int sender, int tmo, byte[] msg) throws InterruptedException {
         Data dMsg = null;
         if (msg != null) {
-            dMsg = buildData(msg, cidSeries, cid, height);
+            dMsg = buildData(msg, cidSeries, cid + 1, height + 1);
         }
         RmfService.Tdec td = rmfService.deliver(cidSeries, cid, tmo, sender, height, dMsg);
         Data data = (td == null ? null : td.d);

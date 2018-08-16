@@ -465,6 +465,8 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                 BbcMsg.Builder bv = BbcMsg
                         .newBuilder().setCid(cid).setCidSeries(cidSeries).setPropserID(id).setVote(1);
                 if (next != null) {
+                    logger.info(format("[#%d] broadcast [height=%d], [cidSeries=%d ; cid=%d] via fast mode",
+                            id, next.getMeta().getHeight(), next.getMeta().getCidSeries(), next.getMeta().getCid()));
                     bv.setNext(next);
                 }
                 broadcastFastVoteMessage(bv.build());
@@ -547,4 +549,5 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         }
         return null;
     }
+    
 }

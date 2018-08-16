@@ -45,6 +45,8 @@ public abstract class bcServer extends Node {
     private final HashMap<Integer, fpEntry> fp;
     private HashMap<Integer, ArrayList<Types.subChainVersion>> scVersions;
     private final ArrayList<Types.Transaction> transactionsPool = new ArrayList<>();
+    boolean configuredFastMode = true;
+    boolean fastMode = configuredFastMode;
 
     // TODO: Currently nodes, f, tmoInterval, tmo and configHome are coded but we will turn it into configuration file
     bcServer(String addr, int rmfPort, int id) {
@@ -130,18 +132,23 @@ public abstract class bcServer extends Node {
 
                 }
             }
+            byte[] next;
             try {
-                leaderImpl();
+                next = leaderImpl();
             } catch (InterruptedException e) {
                 logger.info(format("[#%d] main thread has been interrupted on leader impl", getID()));
                 continue;
             }
             RmfResult msg;
             try {
-                msg = rmfServer.deliver(cidSeries, cid, currHeight, currLeader, tmo, null);
+                msg = rmfServer.deliver(cidSeries, cid, currHeight, currLeader, tmo, next);
             } catch (InterruptedException e) {
                 logger.info(format("[#%d] main thread has been interrupted on rmf deliver", getID()));
                 continue;
+            }
+            fastMode = configuredFastMode;
+            if ((currLeader + 1) % n == getID()) {
+                fastMode = msg.getType().equalsIgnoreCase("FAST");
             }
             byte[] recData = msg.getData().toByteArray();
             int cid = msg.getCid();
@@ -208,7 +215,7 @@ public abstract class bcServer extends Node {
         }
     }
 
-    abstract void leaderImpl() throws InterruptedException;
+    abstract byte[] leaderImpl() throws InterruptedException;
 
     abstract blockchain initBC(int id);
 

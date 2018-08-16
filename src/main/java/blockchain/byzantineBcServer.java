@@ -22,9 +22,9 @@ public class byzantineBcServer extends bcServer {
                 Config.getCluster(), Config.getRMFbbcConfigHome());
     }
 
-     void leaderImpl() {
+     byte[] leaderImpl() {
         if (currLeader != getID()) {
-            return;
+            return null;
         }
         logger.info(format("[#%d] prepare to disseminate a new block of [height=%d]", getID(), currHeight));
 
@@ -60,6 +60,7 @@ public class byzantineBcServer extends bcServer {
                 ((ByzantineRmfNode)rmfServer).selectiveBroadcast(cidSeries, cid, sealedBlock1.toByteArray(), currHeight, all.subList(0, n/2));
             }
 //        }
+         return null;
     }
 
     @Override

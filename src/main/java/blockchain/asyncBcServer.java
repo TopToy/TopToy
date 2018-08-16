@@ -22,24 +22,40 @@ public class asyncBcServer extends bcServer {
         super(addr, rmfPort,  id);
     }
 
-     void leaderImpl() throws InterruptedException {
+    byte[] leaderImpl() throws InterruptedException {
         Random rand = new Random();
-            int x = rand.nextInt(1500) + 1;
-            logger.info(format("[#%d] sleeps for %d ms",getID(), x));
-             Thread.sleep(x);
-
-        if (currLeader != getID()) return;
-         logger.info(format("[#%d] prepare to disseminate a new block of [height=%d]", getID(), currHeight));
-//        synchronized (blockLock) {
-            addTransactionsToCurrBlock();
-//            logger.info(format("[#%d] [heigh1=%d", getID(), currHeight, ));
-            Types.Block sealedBlock = currBlock.construct(getID(), currHeight, DigestMethod.hash(bc.getBlock(currHeight - 1).getHeader().toByteArray()));
-//            currBlock = bc.createNewBLock();
-            rmfServer.broadcast(cidSeries, cid, sealedBlock.toByteArray(), currHeight);
-//        }
-
-
+        int x = rand.nextInt(1500) + 1;
+        logger.info(format("[#%d] sleeps for %d ms",getID(), x));
+        Thread.sleep(x);
+        if (!configuredFastMode) {
+            return normalLeaderPhase();
+        }
+        if (currHeight == 1 || !fastMode) {
+            normalLeaderPhase();
+        }
+        return fastModePhase();
     }
+
+    byte[] normalLeaderPhase() {
+        if (currLeader != getID()) {
+            return null;
+        }
+        logger.info(format("[#%d] prepare to disseminate a new block of [height=%d]", getID(), currHeight));
+        addTransactionsToCurrBlock();
+        Types.Block sealedBlock = currBlock.construct(getID(), currHeight, DigestMethod.hash(bc.getBlock(currHeight - 1).getHeader().toByteArray()));
+        rmfServer.broadcast(cidSeries, cid, sealedBlock.toByteArray(), currHeight);
+        return null;
+    }
+
+    byte[] fastModePhase() {
+        if ((currLeader + 1) % n != getID()) {
+            return null;
+        }
+        addTransactionsToCurrBlock();
+        return currBlock.construct(getID(), currHeight,
+                DigestMethod.hash(bc.getBlock(currHeight - 1).getHeader().toByteArray())).toByteArray();
+    }
+
     @Override
     blockchain initBC(int id) {
         return new basicBlockchain(id);
