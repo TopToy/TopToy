@@ -2,9 +2,12 @@ package rmf;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
+import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
 import config.Config;
 import config.Node;
 import consensus.bbc.bbcService;
+import crypto.DigestMethod;
 import crypto.rmfDigSig;
 import crypto.sslUtils;
 import io.grpc.*;
@@ -32,18 +35,18 @@ TODO:
 6. Handle the case in which byzantine node sends its message twice
 7. Validate that a given cid is match to the expected sender and height
  */
-
-enum Ctype {
-    FAST,
-    FULL,
-    NB
-}
+//
+//enum Ctype {
+//    FAST,
+//    FULL,
+//    NB
+//}
 public class RmfService extends RmfGrpc.RmfImplBase {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(RmfService.class);
-    class Tdec {
-        Data d;
-        Ctype t;
-    }
+//    class Tdec {
+//        Data d;
+//        Ctype t;
+//    }
     class authInterceptor implements ServerInterceptor {
         @Override
         public <ReqT, RespT> ServerCall.Listener<ReqT> interceptCall(ServerCall<ReqT, RespT> serverCall,
@@ -404,7 +407,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                 return;
             }
             fVotes.get(cidSeries, cid).voters.add(request.getPropserID());
-            if (request.getNext() != null) {
+            if (request.hasNext()) {
                 addToPendings(request.getNext());
             }
             if (fVotes.get(cidSeries, cid).voters.size() == n) {
@@ -450,9 +453,9 @@ public class RmfService extends RmfGrpc.RmfImplBase {
 
 
     // TODO: Review this method again
-    public Tdec deliver(int cidSeries, int cid, int tmo, int sender, int height, Data next) throws InterruptedException {
-        Tdec td = new Tdec();
-        td.t = Ctype.FAST;
+    public Data deliver(int cidSeries, int cid, int tmo, int sender, int height, Data next) throws InterruptedException {
+//        Tdec td = new Tdec();
+//        td.t = Ctype.FAST;
         int cVotes = 0;
         int v = 0;
         synchronized (globalLock) {
@@ -467,7 +470,11 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                 if (next != null) {
                     logger.info(format("[#%d] broadcast [height=%d], [cidSeries=%d ; cid=%d] via fast mode",
                             id, next.getMeta().getHeight(), next.getMeta().getCidSeries(), next.getMeta().getCid()));
-                    bv.setNext(next);
+                    try {
+                        bv.setNext(setFastModeData(pendingMsg.get(cidSeries, cid), next));
+                    } catch (InvalidProtocolBufferException e) {
+                        logger.error(format("[#%d]", id), e);
+                    }
                 }
                 broadcastFastVoteMessage(bv.build());
             }
@@ -486,7 +493,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             }
 
             if (cVotes < n) {
-                td.t = Ctype.FULL;
+//                td.t = Ctype.FULL;
                 logger.info(format("[#%d] cvotes is [%d] for [cidSeries=%d ; cid=%d]", id, cVotes,cidSeries, cid));
                 int dec = fullBbcConsensus(v, cidSeries, cid);
                 logger.info(format("[#%d] bbc returned [%d] for [cidSeries=%d ; cid=%d]", id, dec, cidSeries, cid));
@@ -502,8 +509,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                 msg = pendingMsg.get(cidSeries, cid);
                 recMsg.put(cidSeries, cid, msg);
                 pendingMsg.remove(cidSeries, cid);
-            td.d = msg;
-            return td;
+            return msg;
         }
 
 
@@ -540,14 +546,37 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         return null;
     }
 
-    public Tdec nonBlockingDeliver(int cidSeries, int cid) {
+    public Data nonBlockingDeliver(int cidSeries, int cid) {
         if (recMsg.contains(cidSeries, cid)) {
-            Tdec td = new Tdec();
-            td.t =Ctype.NB;
-            td.d = recMsg.get(cidSeries, cid);
-            return td;
+            return recMsg.get(cidSeries, cid);
         }
         return null;
+    }
+
+    private Data setFastModeData(Data curr, Data next) throws InvalidProtocolBufferException {
+        Block currBlock = Block.parseFrom(curr.getData());
+        Block nextBlock = Block.parseFrom(next.getData());
+//        if (nextBlock.getHeader().getHeight() == 3) {
+//            int a = 1;
+//        }
+        nextBlock = nextBlock
+                .toBuilder()
+                .setHeader(nextBlock
+                        .getHeader()
+                        .toBuilder()
+                        .setPrev((ByteString.copyFrom(DigestMethod
+                                .hash(currBlock
+                                        .getHeader()
+                                        .toByteArray()))))
+                .build())
+                .build();
+        logger.info(format("[#%d] prev is: [%s]", id, Arrays.toString(DigestMethod
+                .hash(currBlock
+                        .getHeader()
+                        .toByteArray()))));
+        next = next.toBuilder().setData(ByteString.copyFrom(nextBlock.toByteArray())).build();
+        return next.toBuilder().setSig(rmfDigSig.sign(next.toBuilder())).build();
+
     }
     
 }

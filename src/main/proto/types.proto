@@ -81,12 +81,12 @@ message Res {
     Data _data = 2;
 }
 
-message RmfResult {
-    int32 cid = 1;
-    int32 cidSeries = 2;
-    bytes data = 3;
-    string type = 4;
-}
+//message RmfResult {
+////    int32 cid = 1;
+////    int32 cidSeries = 2;
+//    bytes data = 1;
+//    string type = 2;
+//}
 
 message proofedBlock {
     Block b = 1;

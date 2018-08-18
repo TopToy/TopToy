@@ -38,7 +38,7 @@ public abstract class block {
         blockBuilder.removeData(index);
     }
 
-    public Block construct(int creatorID, int height, byte[] prevHash) {
+    public Block construct(int creatorID, int height, int cidSeries, int cid, byte[] prevHash) {
         byte[] tHash = new byte[0];
         for (Transaction t : blockBuilder.getDataList()) {
             tHash = DigestMethod.hash(t.toByteArray());
@@ -47,6 +47,8 @@ public abstract class block {
                 getHeaderBuilder().
                     setCreatorID(creatorID).
                     setHeight(height).
+                    setCidSeries(cidSeries).
+                    setCid(cid).
                     setPrev(ByteString.copyFrom(prevHash)).
                     setTransactionHash(ByteString.copyFrom(tHash))).
                 build();

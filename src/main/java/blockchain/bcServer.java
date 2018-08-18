@@ -128,6 +128,7 @@ public abstract class bcServer extends Node {
                         logger.info(format("[#%d] have found a panic message [height=%d] [fp=%d]", getID(), currHeight, key));
                         handleFork(pe.fp);
                         fp.get(key).done = true;
+                        fastMode = false;
                     }
 
                 }
@@ -139,7 +140,7 @@ public abstract class bcServer extends Node {
                 logger.info(format("[#%d] main thread has been interrupted on leader impl", getID()));
                 continue;
             }
-            RmfResult msg;
+            byte[] msg;
             try {
                 msg = rmfServer.deliver(cidSeries, cid, currHeight, currLeader, tmo, next);
             } catch (InterruptedException e) {
@@ -147,24 +148,25 @@ public abstract class bcServer extends Node {
                 continue;
             }
             fastMode = configuredFastMode;
-            if ((currLeader + 1) % n == getID()) {
-                fastMode = msg.getType().equalsIgnoreCase("FAST");
-            }
-            byte[] recData = msg.getData().toByteArray();
-            int cid = msg.getCid();
-            int cidSeries = msg.getCidSeries();
-            if (recData.length == 0) {
+//            byte[] recData = msg.getData().toByteArray();
+//            int mcid = msg.getCid();
+//            int mcidSeries = msg.getCidSeries();
+            if (msg == null) {
                 tmo += tmoInterval;
                 logger.info(format("[#%d] Unable to receive block, timeout increased to [%d] ms", getID(), tmo));
                 updateLeaderAndHeight();
+                fastMode = false;
+                cid++;
                 continue;
             }
             if (currLeader == getID()) {
+                logger.info(format("[#%d] nullify currBlock [height=%d] [cidSeries=%d, cid=%d]", getID(), currHeight,
+                        cidSeries, cid));
                 currBlock = null;
             }
             Block recBlock;
             try {
-                recBlock = Block.parseFrom(recData);
+                recBlock = Block.parseFrom(msg);
             } catch (InvalidProtocolBufferException e) {
                 logger.warn("Unable to parse received block", e);
                 updateLeaderAndHeight();
@@ -180,21 +182,25 @@ public abstract class bcServer extends Node {
                         newBuilder().
                         setCreatorID(currLeader).
                         setHeight(currHeight).
+                        setCidSeries(cidSeries).
+                        setCid(cid).
                         setPrev(ByteString.copyFrom(DigestMethod.
                                 hash(bc.getBlock(currHeight - 1).getHeader().toByteArray())))).
                         build();
             }
-            recBlock = recBlock.
-                    toBuilder().
-                    setHeader(recBlock.
-                            getHeader().
-                            toBuilder().
-                            setCid(cid).
-                            setCidSeries(cidSeries).
-                            build()).
-                    build();
+//            recBlock = recBlock.
+//                    toBuilder().
+//                    setHeader(recBlock.
+//                            getHeader().
+//                            toBuilder().
+//                            setCid(mcid).
+//                            setCidSeries(mcidSeries).
+//                            build()).
+//                    build();
             if (!bc.validateBlockHash(recBlock)) {
+                bc.validateBlockHash(recBlock);
                 announceFork(recBlock);
+                fastMode = false;
                 continue;
             }
             if (!bc.validateBlockCreator(recBlock, f)) {
@@ -265,21 +271,21 @@ public abstract class bcServer extends Node {
             return -1;
         }
 
-        Block currAsInRmf = curr;
-        currAsInRmf = currAsInRmf.toBuilder().
-                setHeader(curr.getHeader().toBuilder().setCid(0).setCidSeries(0).build()).
-                build();
+//        Block currAsInRmf = curr;
+////        currAsInRmf = currAsInRmf.toBuilder().
+//                setHeader(curr.getHeader().toBuilder().setCid(0).setCidSeries(0).build()).
+//                build();
         if (!blockDigSig.verify(curr.getHeader().getCreatorID(), p.getCurr().getHeader().getCidSeries()
-                , p.getCurr().getHeader().getCid(), p.getCurrSig(), currAsInRmf)) {
+                , p.getCurr().getHeader().getCid(), p.getCurrSig(), curr)) {
             return -1;
         }
 
-        Block prevAsInRmf = prev;
-        prevAsInRmf = prevAsInRmf.toBuilder().
-                setHeader(prev.getHeader().toBuilder().setCid(0).setCidSeries(0).build()).
-                build();
+//        Block prevAsInRmf = prev;
+//        prevAsInRmf = prevAsInRmf.toBuilder().
+//                setHeader(prev.getHeader().toBuilder().setCid(0).setCidSeries(0).build()).
+//                build();
         if (!blockDigSig.verify(prev.getHeader().getCreatorID(), p.getPrev().getHeader().getCidSeries(),
-                p.getPrev().getHeader().getCid(), p.getPrevSig(), prevAsInRmf)) {
+                p.getPrev().getHeader().getCid(), p.getPrevSig(), prev)) {
 //            blockDigSig.verify(prev.getHeader().getCreatorID(), p.getPrev().getHeader().getCid(), p.getPrevSig(), prevAsInRmf);
                 return -1;
         }
@@ -395,12 +401,12 @@ public abstract class bcServer extends Node {
             return false;
         }
         for (proofedBlock pb : v.getVList()) {
-            Block bAsInRmf = pb.getB();
-            bAsInRmf = bAsInRmf.toBuilder().
-                    setHeader(bAsInRmf.getHeader().toBuilder().setCid(0).setCidSeries(0).build()).
-                    build();
+//            Block bAsInRmf = pb.getB();
+//            bAsInRmf = bAsInRmf.toBuilder().
+//                    setHeader(bAsInRmf.getHeader().toBuilder().setCid(0).setCidSeries(0).build()).
+//                    build();
             if (!blockDigSig.verify(pb.getB().getHeader().getCreatorID(),
-                    pb.getB().getHeader().getCidSeries(), pb.getB().getHeader().getCid(), pb.getSig(), bAsInRmf)) {
+                    pb.getB().getHeader().getCidSeries(), pb.getB().getHeader().getCid(), pb.getSig(), pb.getB())) {
                 logger.info(format("[#%d] invalid #2 [fp=%d]]", getID(), forkPoint));
                 return false;
             }

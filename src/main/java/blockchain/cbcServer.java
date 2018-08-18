@@ -29,7 +29,7 @@ public class cbcServer extends bcServer {
         logger.info(format("[#%d] prepare to disseminate a new block of [height=%d] [cidSeries=%d ; cid=%d]",
                 getID(), currHeight, cidSeries, cid));
         addTransactionsToCurrBlock();
-        Block sealedBlock = currBlock.construct(getID(), currHeight, DigestMethod.hash(bc.getBlock(currHeight - 1).getHeader().toByteArray()));
+        Block sealedBlock = currBlock.construct(getID(), currHeight, cidSeries, cid, DigestMethod.hash(bc.getBlock(currHeight - 1).getHeader().toByteArray()));
         rmfServer.broadcast(cidSeries, cid, sealedBlock.toByteArray(), currHeight);
         return null;
     }
@@ -41,8 +41,7 @@ public class cbcServer extends bcServer {
         logger.info(format("[#%d] prepare fast mode phase for [height=%d] [cidSeries=%d ; cid=%d]",
                 getID(), currHeight + 1, cidSeries, cid + 1));
         addTransactionsToCurrBlock();
-        return currBlock.construct(getID(), currHeight,
-                DigestMethod.hash(bc.getBlock(currHeight - 1).getHeader().toByteArray())).toByteArray();
+        return currBlock.construct(getID(), currHeight + 1, cidSeries, cid + 1, new byte[0]).toByteArray();
     }
 
     @Override

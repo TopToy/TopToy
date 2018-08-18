@@ -30,13 +30,13 @@ public class byzantineBcServer extends bcServer {
 
 //        synchronized (blockLock) {
             addTransactionsToCurrBlock();
-            Block sealedBlock1 = currBlock.construct(getID(), currHeight,
+            Block sealedBlock1 = currBlock.construct(getID(), currHeight, cidSeries, cid,
                     DigestMethod.hash(bc.getBlock(currHeight - 1).getHeader().toByteArray()));
             String msg = "Hello Byz";
             Transaction t = Transaction.newBuilder().setClientID(getID()).
                     setData(ByteString.copyFrom(msg.getBytes())).build();
             currBlock.addTransaction(t);
-            Block sealedBlock2 = currBlock.construct(getID(), currHeight,
+            Block sealedBlock2 = currBlock.construct(getID(), currHeight, cidSeries, cid,
                     DigestMethod.hash(bc.getBlock(currHeight - 1).getHeader().toByteArray()));
 //            currBlock = bc.createNewBLock();
             List<Integer> all = new ArrayList<>();

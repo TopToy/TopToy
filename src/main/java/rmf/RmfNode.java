@@ -54,21 +54,22 @@ public class RmfNode extends Node{
         rmfService.rmfBroadcast(buildData(msg, cidSeries, cid, height));
     }
 
-    public RmfResult deliver(int cidSeries, int cid, int height, int sender, int tmo, byte[] msg) throws InterruptedException {
+    public byte[] deliver(int cidSeries, int cid, int height, int sender, int tmo, byte[] msg) throws InterruptedException {
         Data dMsg = null;
         if (msg != null) {
             dMsg = buildData(msg, cidSeries, cid + 1, height + 1);
         }
-        RmfService.Tdec td = rmfService.deliver(cidSeries, cid, tmo, sender, height, dMsg);
-        Data data = (td == null ? null : td.d);
-        String type = (data == null ? "FULL" : td.t.name());
-        return RmfResult.
-                newBuilder().
-                setCid(cid).
-                setCidSeries(cidSeries).
-                setData(data == null ? ByteString.EMPTY : data.getData()).
-                setType(type).
-                build();
+        Data m = rmfService.deliver(cidSeries, cid, tmo, sender, height, dMsg);
+        return (m == null ? null : m.getData().toByteArray());
+//        Data data = (td == null ? null : td.d);
+//        String type = (data == null ? "FULL" : td.t.name());
+//        return RmfResult.
+//                newBuilder().
+//                setCid(cid).
+//                setCidSeries(cidSeries).
+//                setData(data == null ? ByteString.EMPTY : data.getData()).
+//                setType(type).
+//                build();
     }
 
     public String getRmfDataSig(int cidSeries, int cid) {

@@ -77,7 +77,7 @@ public class rmfTest {
         ((RmfNode) rn[0]).start();
         String msg = "hello world";
         ((RmfNode) rn[0]).broadcast(cidSeires, cid, msg.getBytes(), 0);
-        assertEquals(msg, new String(((RmfNode) rn[0]).deliver(cidSeires, cid, 0, 0, 10 * 60 * 1000, null).getData().toByteArray()));
+        assertEquals(msg, new String(((RmfNode) rn[0]).deliver(cidSeires, cid, 0, 0, 10 * 60 * 1000, null)));
         ((RmfNode) rn[0]).stop();
 
     }
@@ -108,7 +108,7 @@ public class rmfTest {
             int finalI = i;
             tasks[i] = new Thread(()-> {
                 try {
-                    ret[finalI] = new String(((RmfNode) allNodes[finalI]).deliver(0, 0, height, 0, 1000, null).getData().toByteArray());
+                    ret[finalI] = new String(((RmfNode) allNodes[finalI]).deliver(0, 0, height, 0, 1000, null));
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -156,7 +156,7 @@ public class rmfTest {
                 tasks[i] = new Thread(()-> {
                     try {
                         ret[finalI] = new String(((RmfNode) allNodes[finalI]).deliver(cidSeires, finalK, finalK,
-                                finalK % 4, 1* 1000, null).getData().toByteArray());
+                                finalK % 4, 1* 1000, null));
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -203,7 +203,7 @@ public class rmfTest {
                 byte[] res = new byte[0];
                 try {
                     res = ((RmfNode) allNodes[finalI]).deliver(0, 0, height, 0, 1000,
-                            null).getData().toByteArray();
+                            null);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -259,11 +259,11 @@ public class rmfTest {
                     byte[] res = new byte[0];
                     try {
                         res = ((ByzantineRmfNode) allNodes[finalI]).deliver(0, 0, height, 0, 1000,
-                                null).getData().toByteArray();
+                                null);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    ret[finalI] = (res.length == 0 ? null : new String(res));
+                    ret[finalI] = (res == null ? null : new String(res));
                 });
 
             } else {
@@ -271,11 +271,11 @@ public class rmfTest {
                     byte[] res = new byte[0];
                     try {
                         res = ((RmfNode) allNodes[finalI]).deliver(0, 0, height, 0, 1000,
-                                null).getData().toByteArray();
+                                null);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    ret[finalI] = (res.length == 0 ? null : new String(res));
+                    ret[finalI] = (res == null ? null : new String(res));
                 });
             }
 
@@ -337,11 +337,11 @@ public class rmfTest {
                         byte[] res = new byte[0];
                         try {
                             res = ((ByzantineRmfNode) allNodes[finalI]).deliver(0, finalK, finalK, 0, 1000,
-                                    null).getData().toByteArray();
+                                    null);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
-                        ret[finalI] = (res.length == 0 ? null : new String(res));
+                        ret[finalI] = (res == null ? null : new String(res));
                     });
 
                 } else {
@@ -350,11 +350,11 @@ public class rmfTest {
                         byte[] res = new byte[0];
                         try {
                             res = ((RmfNode) allNodes[finalI]).deliver(0, finalK1, finalK1, 0, 1000,
-                                    null).getData().toByteArray();
+                                    null);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
-                        ret[finalI] = (res.length == 0 ? null : new String(res));
+                        ret[finalI] = (res == null ? null : new String(res));
                     });
                 }
 
@@ -393,7 +393,7 @@ public class rmfTest {
                 node.broadcast(0, i, msg.getBytes(), i);
             }
             byte[] ret = node.deliver(0, i, i, i % 4, 1000,
-                    null).getData().toByteArray();
+                    null);
             res[i] = (ret == null ? null : new String(ret));
             if (i == 99) {
                 logger.info(format("[#%d] i=99", node.getID()));
