@@ -45,7 +45,7 @@ public abstract class bcServer extends Node {
     private final HashMap<Integer, fpEntry> fp;
     private HashMap<Integer, ArrayList<Types.subChainVersion>> scVersions;
     private final ArrayList<Types.Transaction> transactionsPool = new ArrayList<>();
-    boolean configuredFastMode = true;
+    boolean configuredFastMode = Config.getFastMode();
     boolean fastMode = configuredFastMode;
 
     // TODO: Currently nodes, f, tmoInterval, tmo and configHome are coded but we will turn it into configuration file

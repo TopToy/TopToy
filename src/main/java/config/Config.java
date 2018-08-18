@@ -34,6 +34,7 @@ public class Config {
         String SETTING_SYNCRBCONFIG_PATH = "setting.syncRBroadcastConfigPath";
         String SETTING_MAXTRANSACTIONSINBLOCK_KEY = "setting.maxTransactionInBlock";
         String SETTING_CA_ROOT_PATH = "setting.caRootPath";
+        String SETTING_FAST_MODE = "setting.fastMode";
         String SERVER_PRIVKEY = "server.privateKey";
         String SERVER_PUBKEY = "server.publicKey";
     }
@@ -128,6 +129,8 @@ public class Config {
     public static String getServerCrtPath() { return conf.getString(tKeys.SERVER_CRT_PATH); }
 
     public static String getServerTlsPrivKeyPath() { return conf.getString(tKeys.SERVER_TLS_PRIV_KEY_PATH); }
+
+    public static boolean getFastMode() { return conf.getBoolean(tKeys.SETTING_FAST_MODE); }
 
 
 }

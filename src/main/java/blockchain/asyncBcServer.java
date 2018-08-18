@@ -1,17 +1,8 @@
 package blockchain;
 
-import com.google.protobuf.ByteString;
-import com.google.protobuf.InvalidProtocolBufferException;
-import config.Config;
-import config.Node;
 import crypto.DigestMethod;
 import proto.Types;
-import rmf.RmfNode;
-
-import java.util.Arrays;
-import java.util.Objects;
 import java.util.Random;
-import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 

@@ -13,6 +13,7 @@ title = "configuration"
     syncRBroadcastConfigPath = "src/main/resources/syncRBConfig"
     maxTransactionInBlock = 2
     caRootPath = "src/main/resources/sslConfig/ca.crt"
+    fastMode = true
 
 [server]
     id = 0
