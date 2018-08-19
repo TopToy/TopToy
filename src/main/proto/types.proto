@@ -103,8 +103,8 @@ message subChainVersion {
     int32 sender = 4;
 }
 
-message VpbcMsg {
-    int32 clientID = 1;
-    int32 consID = 2;
-    bytes data = 3;
-}
+//message VpbcMsg {
+//    int32 clientID = 1;
+//    int32 consID = 2;
+//    bytes data = 3;
+//}

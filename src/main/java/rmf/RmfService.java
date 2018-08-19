@@ -62,7 +62,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                     res = serverCallHandler.startCall(serverCall, metadata);
                 }
             } catch (SSLPeerUnverifiedException e) {
-                logger.error("", e);
+                logger.error(format("[#%d]", id), e);
             } finally {
                 return res;
             }
@@ -103,7 +103,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                                 Config.getServerCrtPath(), Config.getServerTlsPrivKeyPath())).
                         intercept(new clientTlsIntercepter()).build();
             } catch (SSLException e) {
-                logger.fatal("", e);
+                logger.fatal(format("[#%d]", id), e);
             }
 //            channel = ManagedChannelBuilder.
 //                    forAddress(node.getAddr(), node.getRmfPort()).
@@ -116,7 +116,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             try {
                 channel.shutdown().awaitTermination(3, TimeUnit.SECONDS);
             } catch (InterruptedException e) {
-                logger.error("", e);
+                logger.fatal(format("[#%d]", id), e);
             }
         }
     }
@@ -170,7 +170,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                     build().
                     start();
         } catch (IOException e) {
-            logger.fatal("", e);
+            logger.fatal(format("[#%d]", id), e);
         }
 
     }
@@ -183,7 +183,6 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                     Note that in case that there is more than one bbc server this call blocks until all servers are up.
                  */
             this.bbcService.start();
-            logger.info(format("[#%d] bbc server is up", id));
             latch.countDown();
         }
         );
@@ -205,14 +204,14 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         for (Node n : nodes) {
             peers.put(n.getID(), new peer(n));
         }
-        logger.info(format("[#%d] Initiated grpc client", id));
+        logger.debug(format("[#%d] initiates grpc clients", id));
+        logger.debug(format("[#%d] starting rmf service", id));
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             if (stopped) return;
             // Use stderr here since the logger may have been reset by its JVM shutdown hook.
-            logger.warn("*** shutting down rmf service since JVM is shutting down");
+            logger.warn(format("[#%d] *** shutting down rmf service since JVM is shutting down", id));
             shutdown();
-            logger.warn("*** service shut down");
         }));
     }
 //    // TODO: Bug alert!!
@@ -221,7 +220,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             Thread.sleep(200); // TODO: Hard code timeout, should it changed? (we probably can do it by notifications)
             synchronized (fastBbcCons) {
                 if (fastBbcCons.rowKeySet().isEmpty()) {
-                    logger.debug(format("[#%d] There are no fast bbc", id));
+//                    logger.debug(format("[#%d] There are no fast bbc", id));
                     continue;
                 }
                 int fcidSeries = Collections.max(fastBbcCons.rowKeySet());
@@ -238,17 +237,14 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         for (peer p : peers.values()) {
             p.shutdown();
         }
-        logger.info(format("[#%d] Connections has been shutdown", id));
+        logger.debug(format("[#%d] shutting sown rmf clients", id));
         if (bbcService != null) {
             bbcService.shutdown();
         }
         try {
-            // TODO: Do we really have to interrupt the threads?
-            logger.info(format("[#%d] wait for bbcServiceThread", id));
             if (bbcServiceThread != null) {
                 bbcServiceThread.interrupt();
                 bbcServiceThread.join();
-                logger.info(format("[#%d] wait for bbcMissedConsensusThread", id));
             }
             if (bbcMissedConsensusThread != null) {
                 bbcMissedConsensusThread.interrupt();
@@ -260,7 +256,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         if (rmfServer != null) {
             rmfServer.shutdown();
         }
-        logger.info(format("[#%d] bbc server has been shutdown", id));
+        logger.info(format("[#%d] shutting down rmf service", id));
     }
 
     // TODO: This should be called by only one process per round.
@@ -316,11 +312,11 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                     synchronized (globalLock) {
                         if (!pendingMsg.contains(cidSeries, cid) && !recMsg.contains(cidSeries, cid)) {
                             if (!rmfDigSig.verify(sender, res.getData())) {
-                                logger.info(format("[#%d] has received invalid response message from [#%d] for [cidSeries=%d ; cid=%d]",
+                                logger.debug(format("[#%d] has received invalid response message from [#%d] for [cidSeries=%d ; cid=%d]",
                                         id, res.getMeta().getSender(), cidSeries, cid));
                                 return;
                             }
-                            logger.info(format("[#%d] has received response message from [#%d] for [cidSeries=%d ; cid=%d]",
+                            logger.debug(format("[#%d] has received response message from [#%d] for [cidSeries=%d ; cid=%d]",
                                     id, res.getMeta().getSender(), cidSeries,  cid));
                             pendingMsg.put(cidSeries, cid, res.getData());
                             globalLock.notify();
@@ -341,7 +337,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         });
     }
     private void broadcastReqMsg(Req req, int cidSeries, int cid, int sender, int height) {
-        logger.info(format("[#%d] broadcast request message [cidSeries=%d ; cid=%d]", id, cidSeries, cid));
+        logger.debug(format("[#%d] broadcasts request message [cidSeries=%d ; cid=%d]", id, cidSeries, cid));
         for (int p : peers.keySet()) {
             if (p == id) continue;
             sendReqMessage(peers.get(p).stub, req, cidSeries, cid, sender, height);
@@ -364,7 +360,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         int cidSeries = request.getMeta().getCidSeries();
         if (pendingMsg.contains(cidSeries, cid) || recMsg.contains(cidSeries, cid)) return;
         pendingMsg.put(cidSeries, cid, request);
-        logger.info(format("[#%d] received data message from [%d], [cidSeries=%d ; cid=%d]", id,
+        logger.debug(format("[#%d] has received data message from [%d], [cidSeries=%d ; cid=%d]", id,
                 sender, cidSeries, cid));
     }
 
@@ -402,7 +398,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             }
 
             if (fVotes.get(cidSeries, cid).voters.contains(request.getPropserID())) {
-                logger.info(format("[#%d] received duplicate vote from [%d] for [cidSeries=%d ; cid=%d]",
+                logger.debug(format("[#%d] has received duplicate vote from [%d] for [cidSeries=%d ; cid=%d]",
                         id, request.getPropserID(), cidSeries, cid));
                 return;
             }
@@ -411,7 +407,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                 addToPendings(request.getNext());
             }
             if (fVotes.get(cidSeries, cid).voters.size() == n) {
-                logger.info(format("[#%d] fastVote has been detected [cidSeries=%d ; cid=%d]", id, cidSeries, cid));
+                logger.debug(format("[#%d] fastVote has been detected [cidSeries=%d ; cid=%d]", id, cidSeries, cid));
                 synchronized (fastBbcCons) {
                     fastBbcCons.put(cidSeries, cid, fVotes.get(cidSeries, cid).dec.setDecosion(1).build());
                 }
@@ -433,7 +429,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
 
         }
         if (msg != null) {
-            logger.info(format("[#%d] has received request message from [#%d] of [cidSeries=%d ; cid=%d]",
+            logger.debug(format("[#%d] has received request message from [#%d] of [cidSeries=%d ; cid=%d]",
                     id, request.getMeta().getSender(), cidSeries, cid));
             Meta meta = Meta.newBuilder().
                     setSender(id).
@@ -446,7 +442,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                     setMeta(meta).
                     build());
         } else {
-            logger.info(format("[#%d] has received request message from [#%d] of [cidSeries=%d ; cid=%d] but buffers are empty",
+            logger.debug(format("[#%d] has received request message from [#%d] of [cidSeries=%d ; cid=%d] but buffers are empty",
                     id, request.getMeta().getSender(), cidSeries, cid));
         }
     }
@@ -454,8 +450,6 @@ public class RmfService extends RmfGrpc.RmfImplBase {
 
     // TODO: Review this method again
     public Data deliver(int cidSeries, int cid, int tmo, int sender, int height, Data next) throws InterruptedException {
-//        Tdec td = new Tdec();
-//        td.t = Ctype.FAST;
         int cVotes = 0;
         int v = 0;
         synchronized (globalLock) {
@@ -468,7 +462,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                 BbcMsg.Builder bv = BbcMsg
                         .newBuilder().setCid(cid).setCidSeries(cidSeries).setPropserID(id).setVote(1);
                 if (next != null) {
-                    logger.info(format("[#%d] broadcast [height=%d], [cidSeries=%d ; cid=%d] via fast mode",
+                    logger.debug(format("[#%d] broadcasts [height=%d], [cidSeries=%d ; cid=%d] via fast mode",
                             id, next.getMeta().getHeight(), next.getMeta().getCidSeries(), next.getMeta().getCid()));
                     try {
                         bv.setNext(setFastModeData(pendingMsg.get(cidSeries, cid), next));
@@ -494,15 +488,15 @@ public class RmfService extends RmfGrpc.RmfImplBase {
 
             if (cVotes < n) {
 //                td.t = Ctype.FULL;
-                logger.info(format("[#%d] cvotes is [%d] for [cidSeries=%d ; cid=%d]", id, cVotes,cidSeries, cid));
+                logger.debug(format("[#%d] cvotes is [%d] for [cidSeries=%d ; cid=%d]", id, cVotes,cidSeries, cid));
                 int dec = fullBbcConsensus(v, cidSeries, cid);
-                logger.info(format("[#%d] bbc returned [%d] for [cidSeries=%d ; cid=%d]", id, dec, cidSeries, cid));
+                logger.debug(format("[#%d] bbc returned [%d] for [cidSeries=%d ; cid=%d]", id, dec, cidSeries, cid));
                 if (dec == 0) {
                     pendingMsg.remove(cidSeries, cid);
                     return null;
                 }
             } else {
-                logger.info(format("[#%d] deliver by fast vote [cidSeries=%d ; cid=%d]", id, cidSeries, cid));
+                logger.debug(format("[#%d] delivered by fast vote [cidSeries=%d ; cid=%d]", id, cidSeries, cid));
             }
             requestData(cidSeries, cid, sender, height);
             Data msg;
@@ -517,7 +511,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
 
     // TODO: We have a little bug here... note that if a process wish to perform a bbc it doesn't mean that other processes know about it. [solved??]
     private int fullBbcConsensus(int vote, int cidSeries, int cid) throws InterruptedException {
-        logger.info(format("[#%d] Initiates full bbc instance [cidSeries=%d ; cid=%d], [vote:%d]", id, cidSeries, cid, vote));
+        logger.debug(format("[#%d] Initiates full bbc instance [cidSeries=%d ; cid=%d], [vote:%d]", id, cidSeries, cid, vote));
         bbcService.propose(vote, cidSeries, cid);
         BbcDecision dec = bbcService.decide(cidSeries, cid);
         if (dec != null) regBbcCons.put(cidSeries, cid, dec);
@@ -570,10 +564,6 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                                         .toByteArray()))))
                 .build())
                 .build();
-        logger.info(format("[#%d] prev is: [%s]", id, Arrays.toString(DigestMethod
-                .hash(currBlock
-                        .getHeader()
-                        .toByteArray()))));
         next = next.toBuilder().setData(ByteString.copyFrom(nextBlock.toByteArray())).build();
         return next.toBuilder().setSig(rmfDigSig.sign(next.toBuilder())).build();
 

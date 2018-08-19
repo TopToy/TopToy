@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static java.lang.String.format;
+
 public abstract class blockchain {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(blockchain.class);
     private final List<Block> blocks = new ArrayList<>();
@@ -35,7 +37,7 @@ public abstract class blockchain {
         map(bl -> bl.getHeader().getCreatorID()).
         collect(Collectors.toList()).
         contains(b.getHeader().getCreatorID())) {
-            logger.info("Invalid block");
+            logger.debug(format("[#%d] invalid block", creatorID));
             return false;
         }
         return true;

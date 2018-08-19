@@ -27,7 +27,7 @@ public final class RmfService {
       "\001\n\003Rmf\0221\n\022DisseminateMessage\022\013.proto.Dat" +
       "a\032\014.proto.Empty\"\000\022)\n\010FastVote\022\r.proto.Bb" +
       "cMsg\032\014.proto.Empty\"\000\022&\n\nreqMessage\022\n.pro" +
-      "to.Req\032\n.proto.Res\"\000B\t\n\005protoP\001b\006proto3"
+      "to.Req\032\n.proto.Res\"\000B\007\n\005protob\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

@@ -34,7 +34,7 @@ public class ByzantineRmfNode extends RmfNode {
         Data dmsg = dataMsg.setSig(rmfDigSig.sign(dataMsg)).build();
         for (Map.Entry<Integer, RmfService.peer>  p: rmfService.peers.entrySet()) {
             if (ids.contains(p.getKey())) {
-                logger.info("sending message " + Arrays.toString(msg) + " to " + p.getKey() + " with height of " + height);
+                logger.debug("sending message " + Arrays.toString(msg) + " to " + p.getKey() + " with height of " + height);
                 rmfService.sendDataMessage(p.getValue().stub, dmsg);
             }
 

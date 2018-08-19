@@ -49,7 +49,7 @@ public class RmfNode extends Node{
         return dataMsg.setSig(rmfDigSig.sign(dataMsg)).build();
     }
     public void broadcast(int cidSeries, int cid, byte[] msg, int height) {
-        logger.info(format("[#%d] broadcast data message with [height=%d]", getID(), height));
+        logger.debug(format("[#%d] broadcasts data message with [height=%d]", getID(), height));
 
         rmfService.rmfBroadcast(buildData(msg, cidSeries, cid, height));
     }

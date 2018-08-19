@@ -12,9 +12,6 @@ public abstract class block {
 
     abstract boolean validateTransaction(Transaction t);
 
-//    public Crypto.Digest getPrevHash() {
-//        return blockBuilder.getHeader().getPrev();
-//    }
 
     public Transaction getTransaction(int index) {
         return blockBuilder.getData(index);
@@ -26,9 +23,6 @@ public abstract class block {
         return ret;
     }
 
-//    public int getCreatorID() {
-//        return blockBuilder.getHeader().getCreatorID();
-//    }
 
     void addTransaction(Transaction t) {
             blockBuilder.addData(t);

@@ -26,7 +26,7 @@ public final class BlockchainService {
       "\n\027blockchainService.proto\022\005proto\032\013types." +
       "proto2L\n\021blockchainService\0227\n\016addTransac" +
       "tion\022\022.proto.Transaction\032\017.proto.accepte" +
-      "d\"\000B\t\n\005protoP\001b\006proto3"
+      "d\"\000B\007\n\005protob\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

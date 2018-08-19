@@ -26,7 +26,7 @@ public class cbcServer extends bcServer {
         if (currLeader != getID()) {
             return null;
         }
-        logger.info(format("[#%d] prepare to disseminate a new block of [height=%d] [cidSeries=%d ; cid=%d]",
+        logger.debug(format("[#%d] prepare to disseminate a new block of [height=%d] [cidSeries=%d ; cid=%d]",
                 getID(), currHeight, cidSeries, cid));
         addTransactionsToCurrBlock();
         Block sealedBlock = currBlock.construct(getID(), currHeight, cidSeries, cid, DigestMethod.hash(bc.getBlock(currHeight - 1).getHeader().toByteArray()));
@@ -38,7 +38,7 @@ public class cbcServer extends bcServer {
         if ((currLeader + 1) % n != getID()) {
             return null;
         }
-        logger.info(format("[#%d] prepare fast mode phase for [height=%d] [cidSeries=%d ; cid=%d]",
+        logger.debug(format("[#%d] prepare fast mode phase for [height=%d] [cidSeries=%d ; cid=%d]",
                 getID(), currHeight + 1, cidSeries, cid + 1));
         addTransactionsToCurrBlock();
         return currBlock.construct(getID(), currHeight + 1, cidSeries, cid + 1, new byte[0]).toByteArray();

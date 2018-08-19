@@ -159,7 +159,7 @@ public class blockchainTest {
             }
             res.add(s.deliver(i));
         }
-//        logger.info("******************" + s.getID() + "****************************");
+        logger.info("******************" + s.getID() + "****************************");
     }
     @Test
     void TestStressFourServersNoFailures() throws InterruptedException {

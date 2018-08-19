@@ -24,7 +24,7 @@ public class RBrodcastService extends DefaultSingleRecoverable {
     private AsynchServiceProxy RBProxy;
     private ServiceReplica sr;
     private String configHome;
-    final Object globalLock = new Object();
+    private final Object globalLock = new Object();
     private int cid = 0;
 
     public RBrodcastService(int id, String configHome) {
@@ -49,26 +49,33 @@ public class RBrodcastService extends DefaultSingleRecoverable {
         }));
     }
     public void shutdown() {
-        logger.info(format("[#%d] shutting down bbc server", id));
+        releaseWaiting();
         if (RBProxy != null) {
             RBProxy.close();
-            logger.info(format("[#%d] shut down bbc client successfully", id));
+            logger.debug(format("[#%d] shut down rb client", id));
         }
         if (sr != null) {
             sr.kill();
-            logger.info(format("[#%d] bbc server has been shutting down successfully", id));
+            logger.debug(format("[#%d] shutting sown rb server", id));
             sr = null;
+        }
+        logger.info(format("[#%d] shutting down rb service", id));
+    }
+
+    private void releaseWaiting() {
+        synchronized (globalLock) {
+            globalLock.notifyAll();
         }
     }
 
     @Override
     public void installSnapshot(byte[] state) {
-        logger.info(format("[#%d] installSnapshot called", id));
+        logger.debug(format("[#%d] installSnapshot called", id));
     }
 
     @Override
     public byte[] getSnapshot() {
-        logger.info(format("[#%d] getSnapshot called", id));
+        logger.debug(format("[#%d] getSnapshot called", id));
         return new byte[1];
     }
 
@@ -81,7 +88,7 @@ public class RBrodcastService extends DefaultSingleRecoverable {
                 globalLock.notify();
             }
         } catch (Exception e) {
-            logger.error("", e);
+            logger.error(format("[#%d]"), e);
         }
 
         return new byte[0];

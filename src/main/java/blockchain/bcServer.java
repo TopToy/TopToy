@@ -77,20 +77,21 @@ public abstract class bcServer extends Node {
 
     public void start() {
         rmfServer.start();
-        logger.info(format("[#%d] rmf server is up", getID()));
+        logger.debug(format("[#%d] rmf server is up", getID()));
         syncRB.start();
-        logger.info(format("[#%d] sync server is up", getID()));
+        logger.debug(format("[#%d] sync server is up", getID()));
         panicRB.start();
-        logger.info(format("[#%d] panic server is up", getID()));
-        logger.info(format("[#%d] has been initialized successfully", getID()));
+        logger.debug(format("[#%d] panic server is up", getID()));
+        logger.info(format("[#%d] is up", getID()));
     }
 
     public void serve() {
         // TODO: did a problem might occur if not all servers starts at once?
         panicThread.start();
-        logger.info(format("[#%d] started panic thread", getID()));
+        logger.debug(format("[#%d] starts panic thread", getID()));
         mainThread.start();
-        logger.info(format("[#%d] started main thread", getID()));
+        logger.debug(format("[#%d] starts main thread", getID()));
+        logger.info(format("[#%d] starts serving", getID()));
     }
 
     public void shutdown() {
@@ -99,7 +100,7 @@ public abstract class bcServer extends Node {
         try {
             mainThread.join();
         } catch (InterruptedException e) {
-            logger.error("", e);
+            logger.error(format("[#%d]", getID()), e);
         }
         rmfServer.stop();
         panicRB.shutdown();
@@ -108,9 +109,9 @@ public abstract class bcServer extends Node {
         try {
             panicThread.join();
         } catch (InterruptedException e) {
-            logger.error("", e);
+            logger.error(format("[#%d]", getID()), e);
         }
-        logger.info(format("[#%d] has been shutdown successfully", getID()));
+        logger.info(format("[#%d] shutdown bc server", getID()));
     }
     private void updateLeaderAndHeight() {
         currHeight = bc.getHeight() + 1;
@@ -125,7 +126,7 @@ public abstract class bcServer extends Node {
                 for (Integer key : fp.keySet().stream().filter(k -> k < currHeight).collect(Collectors.toList())) {
                     fpEntry pe = fp.get(key);
                     if (!pe.done) {
-                        logger.info(format("[#%d] have found a panic message [height=%d] [fp=%d]", getID(), currHeight, key));
+                        logger.debug(format("[#%d] have found panic message [height=%d] [fp=%d]", getID(), currHeight, key));
                         handleFork(pe.fp);
                         fp.get(key).done = true;
                         fastMode = false;
@@ -137,14 +138,14 @@ public abstract class bcServer extends Node {
             try {
                 next = leaderImpl();
             } catch (InterruptedException e) {
-                logger.info(format("[#%d] main thread has been interrupted on leader impl", getID()));
+                logger.debug(format("[#%d] main thread has been interrupted on leader impl", getID()));
                 continue;
             }
             byte[] msg;
             try {
                 msg = rmfServer.deliver(cidSeries, cid, currHeight, currLeader, tmo, next);
             } catch (InterruptedException e) {
-                logger.info(format("[#%d] main thread has been interrupted on rmf deliver", getID()));
+                logger.debug(format("[#%d] main thread has been interrupted on rmf deliver", getID()));
                 continue;
             }
             fastMode = configuredFastMode;
@@ -153,14 +154,14 @@ public abstract class bcServer extends Node {
 //            int mcidSeries = msg.getCidSeries();
             if (msg == null) {
                 tmo += tmoInterval;
-                logger.info(format("[#%d] Unable to receive block, timeout increased to [%d] ms", getID(), tmo));
+                logger.debug(format("[#%d] Unable to receive block, timeout increased to [%d] ms", getID(), tmo));
                 updateLeaderAndHeight();
                 fastMode = false;
                 cid++;
                 continue;
             }
             if (currLeader == getID()) {
-                logger.info(format("[#%d] nullify currBlock [height=%d] [cidSeries=%d, cid=%d]", getID(), currHeight,
+                logger.debug(format("[#%d] nullifies currBlock [height=%d] [cidSeries=%d, cid=%d]", getID(), currHeight,
                         cidSeries, cid));
                 currBlock = null;
             }
@@ -213,7 +214,7 @@ public abstract class bcServer extends Node {
             tmo = initTmo;
             synchronized (newBlockNotifyer) {
                 bc.addBlock(recBlock);
-                logger.info(String.format("[#%d] adds new block with [height=%d] [cidSeries=%d ; cid=%d]",
+                logger.debug(String.format("[#%d] adds new block with [height=%d] [cidSeries=%d ; cid=%d]",
                         getID(), recBlock.getHeader().getHeight(), cidSeries, cid));
                 newBlockNotifyer.notify();
             }
@@ -231,7 +232,7 @@ public abstract class bcServer extends Node {
     public void addTransaction(byte[] data, int clientID) {
         Transaction t = Transaction.newBuilder().setClientID(clientID).setData(ByteString.copyFrom(data)).build();
         synchronized (transactionsPool) {
-            logger.info(format("[#%d] add transaction from [client=%d]", getID(), t.getClientID()));
+            logger.debug(format("[#%d] adds transaction from [client=%d]", getID(), t.getClientID()));
             transactionsPool.add(t);
         }
     }
@@ -245,7 +246,7 @@ public abstract class bcServer extends Node {
                 Transaction t = transactionsPool.get(0);
                 transactionsPool.remove(0);
                 if (!currBlock.validateTransaction(t)) {
-                    logger.info(format("[#%d] detect an invalid transaction from [client=%d]", getID(), t.getClientID()));
+                    logger.debug(format("[#%d] detects an invalid transaction from [client=%d]", getID(), t.getClientID()));
                     continue;
                 }
                 currBlock.addTransaction(t);
@@ -290,7 +291,7 @@ public abstract class bcServer extends Node {
                 return -1;
         }
 
-        logger.info(format("[#%d] panic for fork is valid [fp=%d]", getID(), p.getCurr().getHeader().getHeight()));
+        logger.debug(format("[#%d] panic for fork is valid [fp=%d]", getID(), p.getCurr().getHeader().getHeight()));
         return prev.getHeader().getHeight();
     }
 
@@ -310,7 +311,7 @@ public abstract class bcServer extends Node {
                     fpe.done = false;
                     fpe.fp = p;
                     fp.put(pHeight, fpe);
-                    logger.info(format("[#%d] interrupts the main thread", getID()));
+                    logger.debug(format("[#%d] interrupts the main thread", getID()));
                     mainThread.interrupt();
                 }
             }
@@ -318,9 +319,8 @@ public abstract class bcServer extends Node {
     }
     // TODO: We should handle the case where cid = 0 (edge case, not critical for correctness)
     private void announceFork(Block b) {
-        logger.warn(format("[#%d] possible fork! [height=%d] [%s] : [%s]",
-                getID(), currHeight, Arrays.toString(b.getHeader().getPrev().toByteArray()),
-                Arrays.toString(Objects.requireNonNull(DigestMethod.hash(bc.getBlock(b.getHeader().getHeight() - 1).getHeader().toByteArray())))));
+        logger.warn(format("[#%d] possible fork! [height=%d]",
+                getID(), currHeight));
         int prevCid = bc.getBlock(bc.getHeight()).getHeader().getCid();
         int prevCidSeries = bc.getBlock(bc.getHeight()).getHeader().getCidSeries();
 // = cids.get(bc.getHeight() - 1);
@@ -351,7 +351,8 @@ public abstract class bcServer extends Node {
                 try {
                     newBlockNotifyer.wait();
                 } catch (InterruptedException e) {
-                    logger.error("Servers returned tentative block", e);
+                    logger.error(format("[#%d] Servers has been interrupted while trying to deliver [index=%d]",
+                            getID(), index), e);
                     return null;
                 }
             }
@@ -362,7 +363,7 @@ public abstract class bcServer extends Node {
     private void handleFork(ForkProof p) {
         if (validateForkProof(p) == -1) return;
         int fpoint = p.getCurr().getHeader().getHeight();
-        logger.info(format("[#%d] handleFork has been called", getID()));
+        logger.debug(format("[#%d] handleFork has been called", getID()));
         try {
             sync(fpoint);
             synchronized (fp) {
@@ -397,7 +398,8 @@ public abstract class bcServer extends Node {
     private boolean validateSubChainVersion(subChainVersion v, int forkPoint) {
         int lowIndex = v.getV(0).getB().getHeader().getHeight();
         if (lowIndex != forkPoint - f) {
-            logger.info(format("[#%d] invalid #1 [fp=%d]]", getID(), forkPoint));
+            logger.debug(format("[#%d] invalid sub chain version, [lowIndex=%d != forkPoint -f=%d] [fp=%d ; sender=%d]",
+                    getID(), lowIndex, forkPoint - f, forkPoint, v.getSender()));
             return false;
         }
         for (proofedBlock pb : v.getVList()) {
@@ -407,27 +409,33 @@ public abstract class bcServer extends Node {
 //                    build();
             if (!blockDigSig.verify(pb.getB().getHeader().getCreatorID(),
                     pb.getB().getHeader().getCidSeries(), pb.getB().getHeader().getCid(), pb.getSig(), pb.getB())) {
-                logger.info(format("[#%d] invalid #2 [fp=%d]]", getID(), forkPoint));
+                logger.debug(format("[#%d] invalid sub chain version, block [height=%d] digital signature is invalid " +
+                        "[fp=%d ; sender=%d]", getID(), pb.getB().getHeader().getHeight(), forkPoint, v.getSender()));
                 return false;
             }
         }
+        // TODO: Handle the case in which the fork point is less then f blocks from the genessis block (maybe start with f genesis blocks!)
         if (v.getVList().size() < f) {
-            logger.info(format("[#%d] invalid #3 [fp=%d]]", getID(), forkPoint));
+            logger.debug(format("[#%d] invalid sub chain version, block list size is smaller then f [size=%d] [fp=%d]",
+                    getID(), v.getVList().size(), forkPoint));
             return false;
         }
         blockchain lastSyncBC = getBC(0, lowIndex); // TODO: Should be more generic (configuration file and reflection??)
         for (proofedBlock pb : v.getVList()) {
             Block curr = pb.getB();
             if (!lastSyncBC.validateBlockData(curr)) {
-                logger.info(format("[#%d] invalid #4 [fp=%d]]", getID(), forkPoint));
+                logger.debug(format("[#%d] invalid sub chain version, block data is invalid [height=%d] [fp=%d]",
+                        getID(), curr.getHeader().getHeight(), forkPoint));
                 return false;
             }
             if (!lastSyncBC.validateBlockHash(curr)) {
-                logger.info(format("[#%d] invalid #5 [fp=%d]]", getID(), forkPoint));
+                logger.debug(format("[#%d] invalid sub chain version, block hash is invalid [height=%d] [fp=%d]",
+                        getID(), curr.getHeader().getHeight(), forkPoint));
                 return false;
             }
             if (!lastSyncBC.validateBlockCreator(curr, f)) {
-                logger.info(format("[#%d] invalid #6 [fp=%d]]", getID(), forkPoint));
+                logger.debug(format("[#%d] invalid invalid sub chain version, block creator is invalid [height=%d] [fp=%d]",
+                        getID(), curr.getHeader().getHeight(), forkPoint));
                 return false;
             }
             lastSyncBC.addBlock(curr);
@@ -436,7 +444,7 @@ public abstract class bcServer extends Node {
     }
 
     private void sync(int forkPoint) throws InvalidProtocolBufferException {
-        logger.info(format("[#%d] start sync method with [fp=%d]", getID(), forkPoint));
+        logger.debug(format("[#%d] start sync method with [fp=%d]", getID(), forkPoint));
         disseminateChainVersion(forkPoint);
         while (!scVersions.containsKey(forkPoint) || scVersions.get(forkPoint).size() < 2*f + 1) {
             subChainVersion v;
@@ -444,18 +452,19 @@ public abstract class bcServer extends Node {
                 v = subChainVersion.parseFrom(syncRB.deliver());
             } catch (InterruptedException e) {
                 if (!stopped) {
-                    logger.info(format("[#%d] sync operation has been interrupted, try again...", getID()));
+                    // might interrupted if more then one panic message received.
+                    logger.debug(format("[#%d] sync operation has been interrupted, try again...", getID()));
                     continue;
                 } else {
                     return;
                 }
             }
             if (v == null) {
-                logger.info(format("[#%d Unable to parse sub chain version [fp=%d]]", getID(), forkPoint));
+                logger.debug(format("[#%d Unable to parse sub chain version [fp=%d]]", getID(), forkPoint));
                 continue;
             }
             if (!validateSubChainVersion(v, v.getForkPoint())) {
-                logger.info(format("[#%d] Sub chain version is invalid [fp=%d]]", getID(), v.getForkPoint()));
+                logger.debug(format("[#%d] Sub chain version is invalid [fp=%d]]", getID(), v.getForkPoint()));
                 continue;
             }
             ArrayList<subChainVersion> l = new ArrayList<>();
@@ -473,12 +482,12 @@ public abstract class bcServer extends Node {
                 stream().
                 filter(v -> v.getV(v.getVCount() - 1).getB().getHeader().getHeight() == max).
                 findFirst().get();
-        logger.info(format("[#%d] adopt a version of [length=%d] from [#%d]", getID(), choosen.getVList().size(), choosen.getSender()));
+        logger.debug(format("[#%d] adopts sub chain version [length=%d] from [#%d]", getID(), choosen.getVList().size(), choosen.getSender()));
         synchronized (newBlockNotifyer) {
             bc.setBlocks(choosen.getVList().stream().map(proofedBlock::getB).collect(Collectors.toList()), forkPoint - 1);
             if (!bc.validateBlockHash(bc.getBlock(bc.getHeight())) ||
                     !bc.validateBlockData(bc.getBlock(bc.getHeight()))) {
-                logger.info(format("[#%d] deleted a block [height=%d]", getID(), bc.getHeight()));
+                logger.debug(format("[#%d] deletes a block [height=%d]", getID(), bc.getHeight()));
                 bc.removeBlock(bc.getHeight()); // meant to handle the case in which the front is split between the to leading blocks
             }
             newBlockNotifyer.notify();
@@ -487,7 +496,7 @@ public abstract class bcServer extends Node {
         currHeight = bc.getHeight() + 1;
         cid = 0;
         cidSeries++;
-        logger.info(format("[#%d] post sync: [cHeight=%d] [cLeader=%d] [cidSeries=%d]"
+        logger.debug(format("[#%d] post sync: [cHeight=%d] [cLeader=%d] [cidSeries=%d]"
                 , getID(), currHeight, currLeader, cidSeries));
     }
 

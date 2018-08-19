@@ -13,7 +13,7 @@ import static java.lang.String.format;
 
 public class byzantineBcServer extends bcServer {
 
-    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(cbcServer.class);
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(byzantineBcServer.class);
     private boolean fullByz = false;
     public byzantineBcServer(String addr, int rmfPort, int id) {
         super(addr, rmfPort, id);
@@ -26,7 +26,7 @@ public class byzantineBcServer extends bcServer {
         if (currLeader != getID()) {
             return null;
         }
-        logger.info(format("[#%d] prepare to disseminate a new block of [height=%d]", getID(), currHeight));
+        logger.debug(format("[#%d] prepare to disseminate a new block of [height=%d]", getID(), currHeight));
 
 //        synchronized (blockLock) {
             addTransactionsToCurrBlock();

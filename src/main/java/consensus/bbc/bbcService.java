@@ -51,6 +51,7 @@ public class bbcService extends DefaultSingleRecoverable {
     public void start() {
         sr = new ServiceReplica(id, this, this, configHome);
         bbcProxy = new AsynchServiceProxy(id, configHome);
+        logger.info(format("[#%d] bbc service is up", id));
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
          // Use stderr here since the logger may have been reset by its JVM shutdown hook.
@@ -59,17 +60,17 @@ public class bbcService extends DefaultSingleRecoverable {
         }));
     }
     public void shutdown() {
-        logger.info(format("[#%d] shutting down bbc server", id));
         releaseWaiting();
         if (bbcProxy != null) {
             bbcProxy.close();
-            logger.info(format("[#%d] shut down bbc client successfully", id));
+            logger.debug(format("[#%d] shutting down bbc client", id));
         }
         if (sr != null) {
             sr.kill();
-            logger.info(format("[#%d] bbc server has been shutting down successfully", id));
+            logger.info(format("[#%d] shutting down bbc server", id));
             sr = null;
         }
+        logger.debug(format("[#%d] shutting down bbc service", id));
     }
 
     private void releaseWaiting() {
@@ -79,12 +80,12 @@ public class bbcService extends DefaultSingleRecoverable {
     }
     @Override
     public void installSnapshot(byte[] state) {
-        logger.info(format("[#%d] installSnapshot called", id));
+        logger.debug(format("[#%d] installSnapshot called", id));
     }
 
     @Override
     public byte[] getSnapshot() {
-        logger.info(format("[#%d] getSnapshot called", id));
+        logger.debug(format("[#%d] getSnapshot called", id));
         return new byte[1];
     }
 
@@ -96,10 +97,10 @@ public class bbcService extends DefaultSingleRecoverable {
             BbcMsg msg = BbcMsg.parseFrom(command);
             cid = msg.getCid();
             int cidSeries = msg.getCidSeries();
-            logger.debug(format("[#%d] received bbc message from [#%d]", id, msg.getPropserID()));
+            logger.debug(format("[#%d] has received bbc message from [#%d]", id, msg.getPropserID()));
                 if (fastVote.contains(cidSeries, cid) && !fastVote.get(cidSeries, cid).done) {
                     if (msg.getPropserID() != id) {
-                        logger.info(format("[#%d] re-participate in a consensus [cidSeries=%d ; cid=%d]", id, cidSeries, cid));
+                        logger.debug(format("[#%d] re-participating in a consensus [cidSeries=%d ; cid=%d]", id, cidSeries, cid));
                         propose(fastVote.get(cidSeries, cid).d.getDecosion(), cidSeries, cid);
                         fastVote.get(cidSeries, cid).done = true;
                     }
@@ -119,12 +120,12 @@ public class bbcService extends DefaultSingleRecoverable {
                     }
                 }
                 if (curr.neg + curr.pos == quorumSize) {
-                    logger.debug(format("[#%d] notify on  [cid=%d]", id, cid));
+                    logger.debug(format("[#%d] notifies on  [cid=%d]", id, cid));
                     globalLock.notify();
                 }
             }
         } catch (Exception e) {
-            logger.error("", e);
+            logger.error(format("[#%d]", id), e);
         }
         return new byte[0];
     }
@@ -192,7 +193,7 @@ public class bbcService extends DefaultSingleRecoverable {
                     fastVote.put(fcidSeries, fcid, fv);
                 }
                 if (!fastVote.get(fcidSeries, fcid).done) {
-                    logger.info(format("[#%d] re-participate in a consensus (periodicallyVoteMissingConsensus) " +
+                    logger.debug(format("[#%d] re-participating in a consensus (periodicallyVoteMissingConsensus) " +
                             "[cidSeries=%d ; cid=%d]", id, fcidSeries, fcid));
                     propose(b.getDecosion(), fcidSeries, fcid);
                     fastVote.get(fcidSeries, fcid).done = true;
