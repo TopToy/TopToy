@@ -376,7 +376,7 @@ public abstract class bcServer extends Node {
 
     private boolean validateSubChainVersion(subChainVersion v, int forkPoint) {
         int lowIndex = v.getV(0).getB().getHeader().getHeight();
-        if (lowIndex != forkPoint - f) {
+        if (lowIndex != forkPoint - f && forkPoint >= f) {
             logger.debug(format("[#%d] invalid sub chain version, [lowIndex=%d != forkPoint -f=%d] [fp=%d ; sender=%d]",
                     getID(), lowIndex, forkPoint - f, forkPoint, v.getSender()));
             return false;
@@ -393,7 +393,7 @@ public abstract class bcServer extends Node {
                 return false;
             }
         }
-        if (v.getVList().size() < f) {
+        if (v.getVList().size() < f && forkPoint >= f) {
             logger.debug(format("[#%d] invalid sub chain version, block list size is smaller then f [size=%d] [fp=%d]",
                     getID(), v.getVList().size(), forkPoint));
             return false;
