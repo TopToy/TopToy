@@ -428,7 +428,9 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                 globalLock.wait(tmo);
             }
             long estimatedTime = System.currentTimeMillis() - startTime;
-            if (pendingMsg.contains(cidSeries, cid)) {
+            if (pendingMsg.contains(cidSeries, cid) &&
+                    pendingMsg.get(cidSeries, cid).getMeta().getSender() == sender &&
+                    pendingMsg.get(cidSeries, cid).getMeta().getHeight() == height) {
                 BbcMsg.Builder bv = BbcMsg
                         .newBuilder().setCid(cid).setCidSeries(cidSeries).setPropserID(id).setVote(1);
                 if (next != null) {
@@ -449,7 +451,9 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                 globalLock.wait(Math.max(tmo - estimatedTime, 1));
             }
 
-            if (pendingMsg.contains(cidSeries, cid)) {
+            if (pendingMsg.contains(cidSeries, cid) &&
+                    pendingMsg.get(cidSeries, cid).getMeta().getSender() == sender &&
+                    pendingMsg.get(cidSeries, cid).getMeta().getHeight() == height) {
                 v = 1;
             }
             if (fVotes.contains(cidSeries, cid)) {
@@ -487,7 +491,10 @@ public class RmfService extends RmfGrpc.RmfImplBase {
     }
 
     private void requestData(int cidSeries, int cid, int sender, int height) throws InterruptedException {
-        if (pendingMsg.contains(cidSeries, cid)) return;
+        if (pendingMsg.contains(cidSeries, cid) &&
+                pendingMsg.get(cidSeries, cid).getMeta().getSender() == sender &&
+                pendingMsg.get(cidSeries, cid).getMeta().getHeight() == height) return;
+        pendingMsg.remove(cidSeries, cid);
         Meta meta = Meta.
                 newBuilder().
                 setCid(cid).
@@ -496,7 +503,10 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                 build();
         Req req = Req.newBuilder().setMeta(meta).build();
         broadcastReqMsg(req, cidSeries, cid, sender, height);
-        while (!pendingMsg.contains(cidSeries, cid)) {
+        while ((!pendingMsg.contains(cidSeries, cid)) ||
+                pendingMsg.get(cidSeries, cid).getMeta().getSender() != sender ||
+                pendingMsg.get(cidSeries, cid).getMeta().getHeight() != height) {
+            pendingMsg.remove(cidSeries, cid);
             globalLock.wait();
         }
     }
