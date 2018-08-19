@@ -25,16 +25,16 @@ public abstract class bcServer extends Node {
     RmfNode rmfServer;
     private RBrodcastService panicRB;
     private RBrodcastService syncRB;
-    blockchain bc; // TODO: Currently implement as basicBlockchain but we will make it dynamically (using config file)
+    blockchain bc;
     int currHeight;
     protected int f;
     protected int n;
     int currLeader;
     protected boolean stopped;
 //    final Object blockLock = new Object();
-    block currBlock; // TODO: As any server should disseminates its block once in an epoch, currently a block is shipped as soon the server turn is coming.
+    block currBlock;
     private final Object newBlockNotifyer = new Object();
-    private int maxTransactionInBlock; // TODO: Should be done by configuration
+    private int maxTransactionInBlock;
     private int tmo;
     private int tmoInterval;
     private int initTmo;
@@ -48,10 +48,9 @@ public abstract class bcServer extends Node {
     boolean configuredFastMode = Config.getFastMode();
     boolean fastMode = configuredFastMode;
 
-    // TODO: Currently nodes, f, tmoInterval, tmo and configHome are coded but we will turn it into configuration file
     bcServer(String addr, int rmfPort, int id) {
 
-        super(addr, rmfPort, id); // TODO: Should be changed according to Config!
+        super(addr, rmfPort, id);
         this.f = Config.getF();
         n = Config.getN();
         rmfServer = new RmfNode(id, addr, rmfPort, Config.getF(),
@@ -86,7 +85,6 @@ public abstract class bcServer extends Node {
     }
 
     public void serve() {
-        // TODO: did a problem might occur if not all servers starts at once?
         panicThread.start();
         logger.debug(format("[#%d] starts panic thread", getID()));
         mainThread.start();
@@ -172,32 +170,14 @@ public abstract class bcServer extends Node {
                 logger.warn("Unable to parse received block", e);
                 updateLeaderAndHeight();
                 continue;
-                // TODO: Here also we should create an empty block!
+                /*
+                    We should create an empty block to the case in which a byzantine leader sends valid block to
+                    part of the network and invalid one to the other part.
+                    But, creating an empty block requires to change the fork proof mechanism (as the signature is not the
+                    original one). Hence currently we leave it to a later development.
+                 */
             }
-            // TODO: validate meta info (if the meta isn't match we should treat it as a Byz behaviour
-            // TODO: This may cause a problem for the fork proof! (the siganture isn't the original one, as the data) we should handle it carefully
-            if(!bc.validateBlockData(recBlock)) {
-                logger.warn(format("[#%d] received an invalid data in a valid block, creating an empty block [height=%d]", getID(), currHeight));
-                recBlock = Block.newBuilder(). // creates emptyBlock
-                        setHeader(BlockHeader.
-                        newBuilder().
-                        setCreatorID(currLeader).
-                        setHeight(currHeight).
-                        setCidSeries(cidSeries).
-                        setCid(cid).
-                        setPrev(ByteString.copyFrom(DigestMethod.
-                                hash(bc.getBlock(currHeight - 1).getHeader().toByteArray())))).
-                        build();
-            }
-//            recBlock = recBlock.
-//                    toBuilder().
-//                    setHeader(recBlock.
-//                            getHeader().
-//                            toBuilder().
-//                            setCid(mcid).
-//                            setCidSeries(mcidSeries).
-//                            build()).
-//                    build();
+
             if (!bc.validateBlockHash(recBlock)) {
                 bc.validateBlockHash(recBlock);
                 announceFork(recBlock);
@@ -317,7 +297,6 @@ public abstract class bcServer extends Node {
             }
         }
     }
-    // TODO: We should handle the case where cid = 0 (edge case, not critical for correctness)
     private void announceFork(Block b) {
         logger.warn(format("[#%d] possible fork! [height=%d]",
                 getID(), currHeight));
@@ -414,20 +393,19 @@ public abstract class bcServer extends Node {
                 return false;
             }
         }
-        // TODO: Handle the case in which the fork point is less then f blocks from the genessis block (maybe start with f genesis blocks!)
         if (v.getVList().size() < f) {
             logger.debug(format("[#%d] invalid sub chain version, block list size is smaller then f [size=%d] [fp=%d]",
                     getID(), v.getVList().size(), forkPoint));
             return false;
         }
-        blockchain lastSyncBC = getBC(0, lowIndex); // TODO: Should be more generic (configuration file and reflection??)
+        blockchain lastSyncBC = getBC(0, lowIndex);
         for (proofedBlock pb : v.getVList()) {
             Block curr = pb.getB();
-            if (!lastSyncBC.validateBlockData(curr)) {
-                logger.debug(format("[#%d] invalid sub chain version, block data is invalid [height=%d] [fp=%d]",
-                        getID(), curr.getHeader().getHeight(), forkPoint));
-                return false;
-            }
+//            if (!lastSyncBC.validateBlockData(curr)) {
+//                logger.debug(format("[#%d] invalid sub chain version, block data is invalid [height=%d] [fp=%d]",
+//                        getID(), curr.getHeader().getHeight(), forkPoint));
+//                return false;
+//            }
             if (!lastSyncBC.validateBlockHash(curr)) {
                 logger.debug(format("[#%d] invalid sub chain version, block hash is invalid [height=%d] [fp=%d]",
                         getID(), curr.getHeader().getHeight(), forkPoint));
@@ -485,8 +463,8 @@ public abstract class bcServer extends Node {
         logger.debug(format("[#%d] adopts sub chain version [length=%d] from [#%d]", getID(), choosen.getVList().size(), choosen.getSender()));
         synchronized (newBlockNotifyer) {
             bc.setBlocks(choosen.getVList().stream().map(proofedBlock::getB).collect(Collectors.toList()), forkPoint - 1);
-            if (!bc.validateBlockHash(bc.getBlock(bc.getHeight())) ||
-                    !bc.validateBlockData(bc.getBlock(bc.getHeight()))) {
+            if (!bc.validateBlockHash(bc.getBlock(bc.getHeight()))) { //||
+//                    !bc.validateBlockData(bc.getBlock(bc.getHeight()))) {
                 logger.debug(format("[#%d] deletes a block [height=%d]", getID(), bc.getHeight()));
                 bc.removeBlock(bc.getHeight()); // meant to handle the case in which the front is split between the to leading blocks
             }

@@ -15,10 +15,6 @@ import proto.Types.*;
 
 import static java.lang.String.format;
 
-/*
-    TODO:
-    1. Truncate the executed consensuses (or swap them to db)
- */
 public class bbcService extends DefaultSingleRecoverable {
     class consVote {
         int pos = 0;

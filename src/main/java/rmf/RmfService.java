@@ -25,28 +25,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import static java.lang.String.format;
 
-/*
-TODO:
-1. the recMsg can grow infinitely.
-2. Do need to validate the sender identity?? (currently not)
-3. When to reset the timer
-4. prevBbcConsensus can grow infinitely (and some more, analyze it!!)
-5. change maps to list
-6. Handle the case in which byzantine node sends its message twice
-7. Validate that a given cid is match to the expected sender and height
- */
-//
-//enum Ctype {
-//    FAST,
-//    FULL,
-//    NB
-//}
 public class RmfService extends RmfGrpc.RmfImplBase {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(RmfService.class);
-//    class Tdec {
-//        Data d;
-//        Ctype t;
-//    }
     class authInterceptor implements ServerInterceptor {
         @Override
         public <ReqT, RespT> ServerCall.Listener<ReqT> interceptCall(ServerCall<ReqT, RespT> serverCall,
@@ -214,10 +194,10 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             shutdown();
         }));
     }
-//    // TODO: Bug alert!!
+
     private void bbcMissedConsensus() throws InterruptedException {
         while (!stopped) {
-            Thread.sleep(200); // TODO: Hard code timeout, should it changed? (we probably can do it by notifications)
+            Thread.sleep(200);
             synchronized (fastBbcCons) {
                 if (fastBbcCons.rowKeySet().isEmpty()) {
 //                    logger.debug(format("[#%d] There are no fast bbc", id));
@@ -259,8 +239,6 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         logger.info(format("[#%d] shutting down rmf service", id));
     }
 
-    // TODO: This should be called by only one process per round.
-
     void sendDataMessage(RmfGrpc.RmfStub stub, Data msg) {
         stub.disseminateMessage(msg, new StreamObserver<Empty>() {
             @Override
@@ -298,16 +276,10 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             }
         });
     }
-    /*
-     TODO: currently it is possible that after the message was pulled from pending another server sends Res message
-            and insert it again. We will probably handle it by adding some cleanup mechanism.
-      */
-
     private void sendReqMessage(RmfGrpc.RmfStub stub, Req req, int cidSeries, int cid, int sender, int height) {
         stub.reqMessage(req, new StreamObserver<Res>() {
             @Override
             public void onNext(Res res) {
-                // TODO: We should validate the answer
                 if (res.getData().getMeta().getCid() == cid && res.getData().getMeta().getCidSeries() == cidSeries) {
                     synchronized (globalLock) {
                         if (!pendingMsg.contains(cidSeries, cid) && !recMsg.contains(cidSeries, cid)) {
@@ -447,8 +419,6 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         }
     }
 
-
-    // TODO: Review this method again
     public Data deliver(int cidSeries, int cid, int tmo, int sender, int height, Data next) throws InterruptedException {
         int cVotes = 0;
         int v = 0;
@@ -508,14 +478,12 @@ public class RmfService extends RmfGrpc.RmfImplBase {
 
 
     }
-
-    // TODO: We have a little bug here... note that if a process wish to perform a bbc it doesn't mean that other processes know about it. [solved??]
     private int fullBbcConsensus(int vote, int cidSeries, int cid) throws InterruptedException {
         logger.debug(format("[#%d] Initiates full bbc instance [cidSeries=%d ; cid=%d], [vote:%d]", id, cidSeries, cid, vote));
         bbcService.propose(vote, cidSeries, cid);
         BbcDecision dec = bbcService.decide(cidSeries, cid);
-        if (dec != null) regBbcCons.put(cidSeries, cid, dec);
-        return dec != null ? dec.getDecosion() : -1; // TODO: On shutting down null might expected
+        regBbcCons.put(cidSeries, cid, dec);
+        return dec.getDecosion();
     }
 
     private void requestData(int cidSeries, int cid, int sender, int height) throws InterruptedException {

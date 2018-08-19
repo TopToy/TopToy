@@ -33,7 +33,7 @@ public class pkiUtils {
             logger.fatal("Unable to generate rsa keys", e);
         }
     }
-    // TODO: We should extract it out of this class
+
     static void generateKeyPair() throws NoSuchProviderException, NoSuchAlgorithmException, InvalidAlgorithmParameterException {
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("ECDSA", "BC");
         keyPairGenerator.initialize(new ECGenParameterSpec("secp256k1"), new SecureRandom());

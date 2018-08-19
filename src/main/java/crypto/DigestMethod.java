@@ -2,7 +2,8 @@ package crypto;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
- // TODO: Replace signature module??
+
+
 public class DigestMethod {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(DigestMethod.class);
 

@@ -7,10 +7,6 @@ import crypto.rmfDigSig;
 import proto.Types.*;
 import java.util.*;
 
-/*
-    TODO:
-    1. Currently we still don't support a byzantine behaviour in the bbc inner protocol.
- */
 public class ByzantineRmfNode extends RmfNode {
 //    private boolean stopped = false;
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ByzantineRmfNode.class);

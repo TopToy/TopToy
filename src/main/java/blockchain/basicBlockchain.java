@@ -22,8 +22,8 @@ public class basicBlockchain extends blockchain {
                 .construct(-1, 0, -1, -1, new byte[0]));
     }
 
-    @Override
-    public boolean validateBlockData(Types.Block b) {
-        return true;
-    }
+//    @Override
+//    public boolean validateBlockData(Types.Block b) {
+//        return true;
+//    }
 }

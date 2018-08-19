@@ -43,7 +43,7 @@ public abstract class blockchain {
         return true;
     }
 
-    public abstract boolean validateBlockData(Block b);
+//    public abstract boolean validateBlockData(Block b);
 
     void setBlocks(List<Block> Nblocks, int start) {
         for (int i = start ; i < start + Nblocks.size() ; i++) {
