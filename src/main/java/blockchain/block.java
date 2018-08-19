@@ -2,6 +2,7 @@ package blockchain;
 
 import com.google.protobuf.ByteString;
 import crypto.DigestMethod;
+import crypto.blockDigSig;
 import proto.Types.*;
 
 import java.util.ArrayList;
@@ -37,15 +38,24 @@ public abstract class block {
         for (Transaction t : blockBuilder.getDataList()) {
             tHash = DigestMethod.hash(t.toByteArray());
         }
-        return blockBuilder.setHeader(blockBuilder.
+        blockBuilder.setHeader(blockBuilder.
                 getHeaderBuilder().
                     setCreatorID(creatorID).
                     setHeight(height).
                     setCidSeries(cidSeries).
                     setCid(cid).
                     setPrev(ByteString.copyFrom(prevHash)).
-                    setTransactionHash(ByteString.copyFrom(tHash))).
-                build();
+                    setTransactionHash(ByteString.copyFrom(tHash)));
+        if (creatorID == -1) {
+            return blockBuilder.build();
+        }
+        return blockBuilder
+                .setHeader(blockBuilder
+                        .getHeader()
+                        .toBuilder()
+                        .setProof(blockDigSig.sign(blockBuilder))
+                        .build())
+                .build();
     }
 
     public int getTransactionCount() {

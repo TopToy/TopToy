@@ -68,7 +68,7 @@ public class pkiUtils {
 
             return publicSignature.verify(signatureBytes);
         } catch (Exception e) {
-            logger.fatal("Unable to generate rsa keys", e);
+            logger.fatal("Unable to validate message", e);
         }
         return false;
     }

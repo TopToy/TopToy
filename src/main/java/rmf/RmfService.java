@@ -205,7 +205,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                 }
                 int fcidSeries = Collections.max(fastBbcCons.rowKeySet());
                 int fcid = Collections.max(fastBbcCons.row(fcidSeries).keySet());
-                logger.debug(format("[#%d] Trying re-participate [cidSeries=%d ; cid=%d]", id, fcidSeries, fcid));
+//                logger.debug(format("[#%d] Trying re-participate [cidSeries=%d ; cid=%d]", id, fcidSeries, fcid));
                 bbcService.periodicallyVoteMissingConsensus(fastBbcCons.get(fcidSeries, fcid));
             }
 
@@ -528,9 +528,6 @@ public class RmfService extends RmfGrpc.RmfImplBase {
     private Data setFastModeData(Data curr, Data next) throws InvalidProtocolBufferException {
         Block currBlock = Block.parseFrom(curr.getData());
         Block nextBlock = Block.parseFrom(next.getData());
-//        if (nextBlock.getHeader().getHeight() == 3) {
-//            int a = 1;
-//        }
         nextBlock = nextBlock
                 .toBuilder()
                 .setHeader(nextBlock
@@ -539,6 +536,8 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                         .setPrev((ByteString.copyFrom(DigestMethod
                                 .hash(currBlock
                                         .getHeader()
+                                        .toBuilder()
+                                        .build()
                                         .toByteArray()))))
                 .build())
                 .build();

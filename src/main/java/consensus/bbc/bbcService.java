@@ -96,7 +96,7 @@ public class bbcService extends DefaultSingleRecoverable {
             BbcMsg msg = BbcMsg.parseFrom(command);
             cid = msg.getCid();
             int cidSeries = msg.getCidSeries();
-            logger.debug(format("[#%d] has received bbc message from [#%d]", id, msg.getPropserID()));
+//            logger.debug(format("[#%d] has received bbc message from [#%d]", id, msg.getPropserID()));
                 if (fastVote.contains(cidSeries, cid) && !fastVote.get(cidSeries, cid).done) {
                     if (msg.getPropserID() != id) {
                         logger.debug(format("[#%d] re-participating in a consensus [cidSeries=%d ; cid=%d]", id, cidSeries, cid));
@@ -120,7 +120,7 @@ public class bbcService extends DefaultSingleRecoverable {
                         curr.neg++;
                     }
                     if (curr.neg + curr.pos == quorumSize) {
-                        logger.debug(format("[#%d] notifies on  [cid=%d]", id, cid));
+                        logger.debug(format("[#%d] notifies on  [cidSeries=%d ; cid=%d]", id, cidSeries, cid));
                         globalLock.notify();
                     }
                 }

@@ -6,6 +6,8 @@ import crypto.rmfDigSig;
 
 import proto.Types.*;
 import java.util.ArrayList;
+import java.util.Base64;
+
 import static java.lang.String.format;
 
 public class RmfNode extends Node{
@@ -54,13 +56,14 @@ public class RmfNode extends Node{
         rmfService.rmfBroadcast(buildData(msg, cidSeries, cid, height));
     }
 
-    public byte[] deliver(int cidSeries, int cid, int height, int sender, int tmo, byte[] msg) throws InterruptedException {
+    public byte[][] deliver(int cidSeries, int cid, int height, int sender, int tmo, byte[] msg) throws InterruptedException {
         Data dMsg = null;
         if (msg != null) {
             dMsg = buildData(msg, cidSeries, cid + 1, height + 1);
         }
         Data m = rmfService.deliver(cidSeries, cid, tmo, sender, height, dMsg);
-        return (m == null ? null : m.getData().toByteArray());
+        return (m == null ? new byte[][] {null, null} :
+                new byte[][] {m.getData().toByteArray(), Base64.getDecoder().decode(m.getSig())});
 //        Data data = (td == null ? null : td.d);
 //        String type = (data == null ? "FULL" : td.t.name());
 //        return RmfResult.

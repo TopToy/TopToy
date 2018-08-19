@@ -139,13 +139,14 @@ public abstract class bcServer extends Node {
                 logger.debug(format("[#%d] main thread has been interrupted on leader impl", getID()));
                 continue;
             }
-            byte[] msg;
+            byte[][] pmsg;
             try {
-                msg = rmfServer.deliver(cidSeries, cid, currHeight, currLeader, tmo, next);
+                pmsg = rmfServer.deliver(cidSeries, cid, currHeight, currLeader, tmo, next);
             } catch (InterruptedException e) {
                 logger.debug(format("[#%d] main thread has been interrupted on rmf deliver", getID()));
                 continue;
             }
+            byte[] msg = pmsg[0];
             fastMode = configuredFastMode;
 //            byte[] recData = msg.getData().toByteArray();
 //            int mcid = msg.getCid();
@@ -163,6 +164,7 @@ public abstract class bcServer extends Node {
                         cidSeries, cid));
                 currBlock = null;
             }
+            String msgSign = Base64.getEncoder().encodeToString(pmsg[1]);
             Block recBlock;
             try {
                 recBlock = Block.parseFrom(msg);
@@ -177,7 +179,14 @@ public abstract class bcServer extends Node {
                     original one). Hence currently we leave it to a later development.
                  */
             }
-
+//            recBlock = recBlock
+//                    .toBuilder()
+//                    .setHeader(recBlock
+//                            .getHeader()
+//                            .toBuilder()
+////                            .setProof(msgSign)
+//                            .build())
+//                    .build();
             if (!bc.validateBlockHash(recBlock)) {
                 bc.validateBlockHash(recBlock);
                 announceFork(recBlock);
@@ -241,6 +250,7 @@ public abstract class bcServer extends Node {
         int prevBlockH = prev.getHeader().getHeight();
 
         if (bc.getBlock(prevBlockH).getHeader().getCreatorID() != prev.getHeader().getCreatorID()) {
+            logger.debug(format("[#%d] invalid fork proof #1", getID()));
             return -1;
         }
 
@@ -249,26 +259,17 @@ public abstract class bcServer extends Node {
             currCreator = bc.getBlock(curr.getHeader().getHeight()).getHeader().getCreatorID();
         }
         if (currCreator != curr.getHeader().getCreatorID()) {
+            logger.debug(format("[#%d] invalid fork proof #2", getID()));
+            return -1;
+        }
+        if (!blockDigSig.verify(curr.getHeader().getCreatorID(), curr)) {
+            logger.debug(format("[#%d] invalid fork proof #3", getID()));
             return -1;
         }
 
-//        Block currAsInRmf = curr;
-////        currAsInRmf = currAsInRmf.toBuilder().
-//                setHeader(curr.getHeader().toBuilder().setCid(0).setCidSeries(0).build()).
-//                build();
-        if (!blockDigSig.verify(curr.getHeader().getCreatorID(), p.getCurr().getHeader().getCidSeries()
-                , p.getCurr().getHeader().getCid(), p.getCurrSig(), curr)) {
+        if (!blockDigSig.verify(prev.getHeader().getCreatorID(), prev)) {
+            logger.debug(format("[#%d] invalid fork proof #4", getID()));
             return -1;
-        }
-
-//        Block prevAsInRmf = prev;
-//        prevAsInRmf = prevAsInRmf.toBuilder().
-//                setHeader(prev.getHeader().toBuilder().setCid(0).setCidSeries(0).build()).
-//                build();
-        if (!blockDigSig.verify(prev.getHeader().getCreatorID(), p.getPrev().getHeader().getCidSeries(),
-                p.getPrev().getHeader().getCid(), p.getPrevSig(), prev)) {
-//            blockDigSig.verify(prev.getHeader().getCreatorID(), p.getPrev().getHeader().getCid(), p.getPrevSig(), prevAsInRmf);
-                return -1;
         }
 
         logger.debug(format("[#%d] panic for fork is valid [fp=%d]", getID(), p.getCurr().getHeader().getHeight()));
@@ -300,15 +301,14 @@ public abstract class bcServer extends Node {
     private void announceFork(Block b) {
         logger.warn(format("[#%d] possible fork! [height=%d]",
                 getID(), currHeight));
-        int prevCid = bc.getBlock(bc.getHeight()).getHeader().getCid();
-        int prevCidSeries = bc.getBlock(bc.getHeight()).getHeader().getCidSeries();
-// = cids.get(bc.getHeight() - 1);
+//        int prevCid = bc.getBlock(bc.getHeight()).getHeader().getCid();
+//        int prevCidSeries = bc.getBlock(bc.getHeight()).getHeader().getCidSeries();
         ForkProof p = ForkProof.
                 newBuilder().
                 setCurr(b).
-                setCurrSig(rmfServer.getRmfDataSig(b.getHeader().getCidSeries(), b.getHeader().getCid())).
+//                setCurrSig(rmfServer.getRmfDataSig(b.getHeader().getCidSeries(), b.getHeader().getCid())).
                 setPrev(bc.getBlock(bc.getHeight())).
-                setPrevSig(rmfServer.getRmfDataSig(prevCidSeries, prevCid)).
+//                setPrevSig(rmfServer.getRmfDataSig(prevCidSeries, prevCid)).
                 setSender(getID()).
                 build();
         synchronized (fp) {
@@ -356,17 +356,17 @@ public abstract class bcServer extends Node {
 
     private int disseminateChainVersion(int forkPoint) {
         subChainVersion.Builder sv = subChainVersion.newBuilder();
-            int low = forkPoint - f;
+            int low = Math.max(forkPoint - f, 1);
             int high = bc.getHeight() + 1;
             for (Block b : bc.getBlocks(low, high)) {
-                int cid = b.getHeader().getCid();
-                int cidSeries = b.getHeader().getCidSeries();
-                proofedBlock pb = proofedBlock.newBuilder().
-                        setCid(cid).
-                        setSig(rmfServer.getRmfDataSig(cidSeries, cid)).
-                        setB(b).
-                        build();
-                sv.addV(pb);
+//                int cid = b.getHeader().getCid();
+//                int cidSeries = b.getHeader().getCidSeries();
+//                proofedBlock pb = proofedBlock.newBuilder().
+////                        setCid(cid).
+//                        setSig(rmfServer.getRmfDataSig(cidSeries, cid)).
+//                        setB(b).
+//                        build();
+                sv.addV(b);
             }
             sv.setSuggested(1);
             sv.setSender(getID());
@@ -375,48 +375,46 @@ public abstract class bcServer extends Node {
     }
 
     private boolean validateSubChainVersion(subChainVersion v, int forkPoint) {
-        int lowIndex = v.getV(0).getB().getHeader().getHeight();
+        int lowIndex = v.getV(0).getHeader().getHeight();
         if (lowIndex != forkPoint - f && forkPoint >= f) {
             logger.debug(format("[#%d] invalid sub chain version, [lowIndex=%d != forkPoint -f=%d] [fp=%d ; sender=%d]",
                     getID(), lowIndex, forkPoint - f, forkPoint, v.getSender()));
             return false;
         }
-        for (proofedBlock pb : v.getVList()) {
-//            Block bAsInRmf = pb.getB();
-//            bAsInRmf = bAsInRmf.toBuilder().
-//                    setHeader(bAsInRmf.getHeader().toBuilder().setCid(0).setCidSeries(0).build()).
-//                    build();
-            if (!blockDigSig.verify(pb.getB().getHeader().getCreatorID(),
-                    pb.getB().getHeader().getCidSeries(), pb.getB().getHeader().getCid(), pb.getSig(), pb.getB())) {
-                logger.debug(format("[#%d] invalid sub chain version, block [height=%d] digital signature is invalid " +
-                        "[fp=%d ; sender=%d]", getID(), pb.getB().getHeader().getHeight(), forkPoint, v.getSender()));
-                return false;
-            }
-        }
+
         if (v.getVList().size() < f && forkPoint >= f) {
             logger.debug(format("[#%d] invalid sub chain version, block list size is smaller then f [size=%d] [fp=%d]",
                     getID(), v.getVList().size(), forkPoint));
             return false;
         }
+
         blockchain lastSyncBC = getBC(0, lowIndex);
-        for (proofedBlock pb : v.getVList()) {
-            Block curr = pb.getB();
-//            if (!lastSyncBC.validateBlockData(curr)) {
+        for (Block pb : v.getVList()) {
+            Block b = pb;
+            if (b.hasOrig()) {
+                b = b.getOrig(); // To handle self created empty block
+            }
+            if (!blockDigSig.verify(pb.getHeader().getCreatorID(), b)) {
+                logger.debug(format("[#%d] invalid sub chain version, block [height=%d] digital signature is invalid " +
+                        "[fp=%d ; sender=%d]", getID(), pb.getHeader().getHeight(), forkPoint, v.getSender()));
+                return false;
+            }
+            //            if (!lastSyncBC.validateBlockData(curr)) {
 //                logger.debug(format("[#%d] invalid sub chain version, block data is invalid [height=%d] [fp=%d]",
 //                        getID(), curr.getHeader().getHeight(), forkPoint));
 //                return false;
 //            }
-            if (!lastSyncBC.validateBlockHash(curr)) {
+            if (!lastSyncBC.validateBlockHash(pb)) {
                 logger.debug(format("[#%d] invalid sub chain version, block hash is invalid [height=%d] [fp=%d]",
-                        getID(), curr.getHeader().getHeight(), forkPoint));
+                        getID(), pb.getHeader().getHeight(), forkPoint));
                 return false;
             }
-            if (!lastSyncBC.validateBlockCreator(curr, f)) {
+            if (!lastSyncBC.validateBlockCreator(pb, f)) {
                 logger.debug(format("[#%d] invalid invalid sub chain version, block creator is invalid [height=%d] [fp=%d]",
-                        getID(), curr.getHeader().getHeight(), forkPoint));
+                        getID(), pb.getHeader().getHeight(), forkPoint));
                 return false;
             }
-            lastSyncBC.addBlock(curr);
+            lastSyncBC.addBlock(pb);
         }
         return true;
     }
@@ -453,16 +451,16 @@ public abstract class bcServer extends Node {
         }
         int max = scVersions.get(forkPoint).
                 stream().
-                mapToInt(v -> v.getV(v.getVCount() - 1).getB().getHeader().getHeight()).
+                mapToInt(v -> v.getV(v.getVCount() - 1).getHeader().getHeight()).
                 max().getAsInt();
         subChainVersion choosen = scVersions.
                 get(forkPoint).
                 stream().
-                filter(v -> v.getV(v.getVCount() - 1).getB().getHeader().getHeight() == max).
+                filter(v -> v.getV(v.getVCount() - 1).getHeader().getHeight() == max).
                 findFirst().get();
         logger.debug(format("[#%d] adopts sub chain version [length=%d] from [#%d]", getID(), choosen.getVList().size(), choosen.getSender()));
         synchronized (newBlockNotifyer) {
-            bc.setBlocks(choosen.getVList().stream().map(proofedBlock::getB).collect(Collectors.toList()), forkPoint - 1);
+            bc.setBlocks(choosen.getVList(), forkPoint - 1);
             if (!bc.validateBlockHash(bc.getBlock(bc.getHeight()))) { //||
 //                    !bc.validateBlockData(bc.getBlock(bc.getHeight()))) {
                 logger.debug(format("[#%d] deletes a block [height=%d]", getID(), bc.getHeight()));

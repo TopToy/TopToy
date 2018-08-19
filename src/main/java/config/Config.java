@@ -1,6 +1,8 @@
 package config;
 
 import com.moandjiezana.toml.Toml;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -52,6 +54,8 @@ public class Config {
 
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Config.class);
     public Config() {
+        Logger.getLogger("io.netty").setLevel(Level.OFF);
+        Logger.getLogger("io.grpc").setLevel(Level.OFF);
         logger.debug("logger is configured");
     }
 
