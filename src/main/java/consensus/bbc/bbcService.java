@@ -13,13 +13,16 @@ import com.google.common.collect.Table;
 
 import proto.Types.*;
 
+import java.util.ArrayList;
+
 import static java.lang.String.format;
 
 public class bbcService extends DefaultSingleRecoverable {
     class consVote {
         int pos = 0;
         int neg = 0;
-        BbcDecision.Builder dec = BbcDecision.newBuilder();
+//        BbcDecision.Builder dec = BbcDecision.newBuilder();
+        ArrayList<Integer> proposers = new ArrayList<>();
     }
 
     class fastVotePart {
@@ -103,22 +106,25 @@ public class bbcService extends DefaultSingleRecoverable {
                 }
                 if (!rec.contains(cidSeries, cid)) {
                     consVote v = new consVote();
-                    v.dec.setCid(cid);
-                    v.dec.setCidSeries(cidSeries);
+//                    v.dec.setCid(cid);
+//                    v.dec.setCidSeries(cidSeries);
                     rec.put(cidSeries, cid, v);
                 }
                 consVote curr = rec.get(cidSeries, cid);
+                if (curr.proposers.contains(msg.getPropserID())) return new byte[0];
                 if (curr.neg +  curr.pos < quorumSize) {
+                    curr.proposers.add(msg.getPropserID());
                     if (msg.getVote() == 1) {
                         curr.pos++;
                     } else {
                         curr.neg++;
                     }
+                    if (curr.neg + curr.pos == quorumSize) {
+                        logger.debug(format("[#%d] notifies on  [cid=%d]", id, cid));
+                        globalLock.notify();
+                    }
                 }
-                if (curr.neg + curr.pos == quorumSize) {
-                    logger.debug(format("[#%d] notifies on  [cid=%d]", id, cid));
-                    globalLock.notify();
-                }
+
             }
         } catch (Exception e) {
             logger.error(format("[#%d]", id), e);
@@ -136,8 +142,12 @@ public class bbcService extends DefaultSingleRecoverable {
             while (!rec.contains(cidSeries, cid) || rec.get(cidSeries, cid).pos + rec.get(cidSeries, cid).neg < quorumSize) {
                 globalLock.wait();
             }
-            return (rec.get(cidSeries, cid).pos > rec.get(cidSeries, cid).neg ?
-                    rec.get(cidSeries, cid).dec.setDecosion(1).build() : rec.get(cidSeries, cid).dec.setDecosion(0).build());
+            return BbcDecision.newBuilder()
+                    .setCidSeries(cidSeries)
+                    .setCid(cid)
+                    .setDecosion(rec.get(cidSeries, cid).pos > rec.get(cidSeries, cid).neg ? 1: 0)
+                    .build();
+
         }
     }
 

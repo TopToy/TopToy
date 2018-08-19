@@ -8,7 +8,7 @@ title = "configuration"
 [setting]
     tmo = 1000
     tmoInterval = 100
-    rmfBbcConfigPath = "config/bbcConfig/bbcFourServers"
+    rmfBbcConfigPath = "src/main/resources/bbcConfig"
     panicRBroadcastConfigPath = "src/main/resources/panicRBConfig"
     syncRBroadcastConfigPath = "src/main/resources/syncRBConfig"
     maxTransactionInBlock = 2
