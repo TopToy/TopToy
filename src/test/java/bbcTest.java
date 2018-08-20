@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class bbcTest {
     int cidSeries = 0;
-    private int timeToWaitBetweenTest = 15 * 1000;
+    private int timeToWaitBetweenTest = 1; //15 * 1000;
     static Config conf = new Config();
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(bbcTest.class);
     private static Path SingleServerconfigHome = Paths.get("config", "bbcConfig", "bbcSingleServer");
