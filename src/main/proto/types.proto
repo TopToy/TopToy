@@ -30,7 +30,7 @@ message BlockHeader {
 message Block {
     BlockHeader header = 1;
     repeated Transaction data = 2;
-    Block orig = 3; // Enable to cerate an empty block
+    bytes orig = 3; // Enable to cerate an empty block
 }
 
 //TODO: Adding: client signature, client public key etc.
@@ -63,9 +63,9 @@ message Empty {
 
 message Meta {
     int32 sender = 1;
-    int32 height = 2;
-    int32 cid = 3;
-    int32 cidSeries = 4;
+//    int32 height = 2;
+    int32 cid = 2;
+    int32 cidSeries = 3;
 }
 
 message Data {

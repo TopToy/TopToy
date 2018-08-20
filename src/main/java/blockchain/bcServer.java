@@ -7,6 +7,7 @@ import config.Node;
 import consensus.RBroadcast.RBrodcastService;
 import crypto.DigestMethod;
 import crypto.blockDigSig;
+import crypto.rmfDigSig;
 import proto.*;
 import rmf.RmfNode;
 import proto.Types.*;
@@ -170,8 +171,19 @@ public abstract class bcServer extends Node {
                 recBlock = Block.parseFrom(msg);
             } catch (InvalidProtocolBufferException e) {
                 logger.warn("Unable to parse received block", e);
-                updateLeaderAndHeight();
-                continue;
+//                updateLeaderAndHeight();
+//                continue;
+                recBlock = Block.newBuilder()
+                        .setHeader(BlockHeader.newBuilder()
+                                .setCreatorID(currLeader)
+                                .setHeight(currHeight)
+                                .setCidSeries(cidSeries)
+                                .setCid(cid)
+                                .setPrev(ByteString.copyFrom(new byte[0]))
+                                .setProof(msgSign)
+                                .build())
+                        .setOrig(ByteString.copyFrom(msg))
+                        .build();
                 /*
                     We should create an empty block to the case in which a byzantine leader sends valid block to
                     part of the network and invalid one to the other part.
@@ -262,7 +274,24 @@ public abstract class bcServer extends Node {
             logger.debug(format("[#%d] invalid fork proof #2", getID()));
             return -1;
         }
-        if (!blockDigSig.verify(curr.getHeader().getCreatorID(), curr)) {
+        if (!curr.getOrig().isEmpty()) {
+            Data asInRmf = Data
+                    .newBuilder()
+                    .setMeta(Meta
+                            .newBuilder()
+                          //  .setHeight(curr.getHeader().getHeight())
+                            .setSender(curr.getHeader().getCreatorID())
+                            .setCidSeries(curr.getHeader().getCidSeries())
+                            .setCid(curr.getHeader().getCid())
+                            .build())
+                    .setData(curr.getOrig())
+                    .setSig(curr.getHeader().getProof())
+                    .build();
+            if (!rmfDigSig.verify(curr.getHeader().getCreatorID(), asInRmf)) {
+                logger.debug(format("[#%d] invalid fork proof #6", getID()));
+                return -1;
+            }
+        } else if (!blockDigSig.verify(curr.getHeader().getCreatorID(), curr)) {
             logger.debug(format("[#%d] invalid fork proof #3", getID()));
             return -1;
         }
@@ -390,11 +419,11 @@ public abstract class bcServer extends Node {
 
         blockchain lastSyncBC = getBC(0, lowIndex);
         for (Block pb : v.getVList()) {
-            Block b = pb;
-            if (b.hasOrig()) {
-                b = b.getOrig(); // To handle self created empty block
-            }
-            if (!blockDigSig.verify(pb.getHeader().getCreatorID(), b)) {
+//            Block b = pb;
+//            if (b.hasOrig()) {
+//                b = b.getOrig(); // To handle self created empty block
+//            }
+            if (!blockDigSig.verify(pb.getHeader().getCreatorID(), pb)) {
                 logger.debug(format("[#%d] invalid sub chain version, block [height=%d] digital signature is invalid " +
                         "[fp=%d ; sender=%d]", getID(), pb.getHeader().getHeight(), forkPoint, v.getSender()));
                 return false;
@@ -468,7 +497,7 @@ public abstract class bcServer extends Node {
             }
             newBlockNotifyer.notify();
         }
-        currLeader = (bc.getBlock(bc.getHeight()).getHeader().getCreatorID() + 1) % n;
+        currLeader = (bc.getBlock(bc.getHeight()).getHeader().getCreatorID() + 2) % n;
         currHeight = bc.getHeight() + 1;
         cid = 0;
         cidSeries++;

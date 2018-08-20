@@ -19,7 +19,7 @@ public class ByzantineRmfNode extends RmfNode {
         Meta metaMsg = Meta.
                 newBuilder().
                 setSender(getID()).
-                setHeight(height).
+              //  setHeight(height).
                 setCid(cid).
                 setCidSeries(cidSeries).
                 build();

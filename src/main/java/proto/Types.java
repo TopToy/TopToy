@@ -2380,25 +2380,9 @@ public final class Types {
      * Enable to cerate an empty block
      * </pre>
      *
-     * <code>.proto.Block orig = 3;</code>
+     * <code>bytes orig = 3;</code>
      */
-    boolean hasOrig();
-    /**
-     * <pre>
-     * Enable to cerate an empty block
-     * </pre>
-     *
-     * <code>.proto.Block orig = 3;</code>
-     */
-    proto.Types.Block getOrig();
-    /**
-     * <pre>
-     * Enable to cerate an empty block
-     * </pre>
-     *
-     * <code>.proto.Block orig = 3;</code>
-     */
-    proto.Types.BlockOrBuilder getOrigOrBuilder();
+    com.google.protobuf.ByteString getOrig();
   }
   /**
    * Protobuf type {@code proto.Block}
@@ -2414,6 +2398,7 @@ public final class Types {
     }
     private Block() {
       data_ = java.util.Collections.emptyList();
+      orig_ = com.google.protobuf.ByteString.EMPTY;
     }
 
     @java.lang.Override
@@ -2470,16 +2455,8 @@ public final class Types {
               break;
             }
             case 26: {
-              proto.Types.Block.Builder subBuilder = null;
-              if (orig_ != null) {
-                subBuilder = orig_.toBuilder();
-              }
-              orig_ = input.readMessage(proto.Types.Block.parser(), extensionRegistry);
-              if (subBuilder != null) {
-                subBuilder.mergeFrom(orig_);
-                orig_ = subBuilder.buildPartial();
-              }
 
+              orig_ = input.readBytes();
               break;
             }
           }
@@ -2567,36 +2544,16 @@ public final class Types {
     }
 
     public static final int ORIG_FIELD_NUMBER = 3;
-    private proto.Types.Block orig_;
+    private com.google.protobuf.ByteString orig_;
     /**
      * <pre>
      * Enable to cerate an empty block
      * </pre>
      *
-     * <code>.proto.Block orig = 3;</code>
+     * <code>bytes orig = 3;</code>
      */
-    public boolean hasOrig() {
-      return orig_ != null;
-    }
-    /**
-     * <pre>
-     * Enable to cerate an empty block
-     * </pre>
-     *
-     * <code>.proto.Block orig = 3;</code>
-     */
-    public proto.Types.Block getOrig() {
-      return orig_ == null ? proto.Types.Block.getDefaultInstance() : orig_;
-    }
-    /**
-     * <pre>
-     * Enable to cerate an empty block
-     * </pre>
-     *
-     * <code>.proto.Block orig = 3;</code>
-     */
-    public proto.Types.BlockOrBuilder getOrigOrBuilder() {
-      return getOrig();
+    public com.google.protobuf.ByteString getOrig() {
+      return orig_;
     }
 
     private byte memoizedIsInitialized = -1;
@@ -2617,8 +2574,8 @@ public final class Types {
       for (int i = 0; i < data_.size(); i++) {
         output.writeMessage(2, data_.get(i));
       }
-      if (orig_ != null) {
-        output.writeMessage(3, getOrig());
+      if (!orig_.isEmpty()) {
+        output.writeBytes(3, orig_);
       }
       unknownFields.writeTo(output);
     }
@@ -2636,9 +2593,9 @@ public final class Types {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(2, data_.get(i));
       }
-      if (orig_ != null) {
+      if (!orig_.isEmpty()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(3, getOrig());
+          .computeBytesSize(3, orig_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -2663,11 +2620,8 @@ public final class Types {
       }
       result = result && getDataList()
           .equals(other.getDataList());
-      result = result && (hasOrig() == other.hasOrig());
-      if (hasOrig()) {
-        result = result && getOrig()
-            .equals(other.getOrig());
-      }
+      result = result && getOrig()
+          .equals(other.getOrig());
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -2687,10 +2641,8 @@ public final class Types {
         hash = (37 * hash) + DATA_FIELD_NUMBER;
         hash = (53 * hash) + getDataList().hashCode();
       }
-      if (hasOrig()) {
-        hash = (37 * hash) + ORIG_FIELD_NUMBER;
-        hash = (53 * hash) + getOrig().hashCode();
-      }
+      hash = (37 * hash) + ORIG_FIELD_NUMBER;
+      hash = (53 * hash) + getOrig().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -2833,12 +2785,8 @@ public final class Types {
         } else {
           dataBuilder_.clear();
         }
-        if (origBuilder_ == null) {
-          orig_ = null;
-        } else {
-          orig_ = null;
-          origBuilder_ = null;
-        }
+        orig_ = com.google.protobuf.ByteString.EMPTY;
+
         return this;
       }
 
@@ -2877,11 +2825,7 @@ public final class Types {
         } else {
           result.data_ = dataBuilder_.build();
         }
-        if (origBuilder_ == null) {
-          result.orig_ = orig_;
-        } else {
-          result.orig_ = origBuilder_.build();
-        }
+        result.orig_ = orig_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -2953,8 +2897,8 @@ public final class Types {
             }
           }
         }
-        if (other.hasOrig()) {
-          mergeOrig(other.getOrig());
+        if (other.getOrig() != com.google.protobuf.ByteString.EMPTY) {
+          setOrig(other.getOrig());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -3341,51 +3285,31 @@ public final class Types {
         return dataBuilder_;
       }
 
-      private proto.Types.Block orig_ = null;
-      private com.google.protobuf.SingleFieldBuilderV3<
-          proto.Types.Block, proto.Types.Block.Builder, proto.Types.BlockOrBuilder> origBuilder_;
+      private com.google.protobuf.ByteString orig_ = com.google.protobuf.ByteString.EMPTY;
       /**
        * <pre>
        * Enable to cerate an empty block
        * </pre>
        *
-       * <code>.proto.Block orig = 3;</code>
+       * <code>bytes orig = 3;</code>
        */
-      public boolean hasOrig() {
-        return origBuilder_ != null || orig_ != null;
+      public com.google.protobuf.ByteString getOrig() {
+        return orig_;
       }
       /**
        * <pre>
        * Enable to cerate an empty block
        * </pre>
        *
-       * <code>.proto.Block orig = 3;</code>
+       * <code>bytes orig = 3;</code>
        */
-      public proto.Types.Block getOrig() {
-        if (origBuilder_ == null) {
-          return orig_ == null ? proto.Types.Block.getDefaultInstance() : orig_;
-        } else {
-          return origBuilder_.getMessage();
-        }
-      }
-      /**
-       * <pre>
-       * Enable to cerate an empty block
-       * </pre>
-       *
-       * <code>.proto.Block orig = 3;</code>
-       */
-      public Builder setOrig(proto.Types.Block value) {
-        if (origBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          orig_ = value;
-          onChanged();
-        } else {
-          origBuilder_.setMessage(value);
-        }
-
+      public Builder setOrig(com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        orig_ = value;
+        onChanged();
         return this;
       }
       /**
@@ -3393,105 +3317,13 @@ public final class Types {
        * Enable to cerate an empty block
        * </pre>
        *
-       * <code>.proto.Block orig = 3;</code>
-       */
-      public Builder setOrig(
-          proto.Types.Block.Builder builderForValue) {
-        if (origBuilder_ == null) {
-          orig_ = builderForValue.build();
-          onChanged();
-        } else {
-          origBuilder_.setMessage(builderForValue.build());
-        }
-
-        return this;
-      }
-      /**
-       * <pre>
-       * Enable to cerate an empty block
-       * </pre>
-       *
-       * <code>.proto.Block orig = 3;</code>
-       */
-      public Builder mergeOrig(proto.Types.Block value) {
-        if (origBuilder_ == null) {
-          if (orig_ != null) {
-            orig_ =
-              proto.Types.Block.newBuilder(orig_).mergeFrom(value).buildPartial();
-          } else {
-            orig_ = value;
-          }
-          onChanged();
-        } else {
-          origBuilder_.mergeFrom(value);
-        }
-
-        return this;
-      }
-      /**
-       * <pre>
-       * Enable to cerate an empty block
-       * </pre>
-       *
-       * <code>.proto.Block orig = 3;</code>
+       * <code>bytes orig = 3;</code>
        */
       public Builder clearOrig() {
-        if (origBuilder_ == null) {
-          orig_ = null;
-          onChanged();
-        } else {
-          orig_ = null;
-          origBuilder_ = null;
-        }
-
-        return this;
-      }
-      /**
-       * <pre>
-       * Enable to cerate an empty block
-       * </pre>
-       *
-       * <code>.proto.Block orig = 3;</code>
-       */
-      public proto.Types.Block.Builder getOrigBuilder() {
         
+        orig_ = getDefaultInstance().getOrig();
         onChanged();
-        return getOrigFieldBuilder().getBuilder();
-      }
-      /**
-       * <pre>
-       * Enable to cerate an empty block
-       * </pre>
-       *
-       * <code>.proto.Block orig = 3;</code>
-       */
-      public proto.Types.BlockOrBuilder getOrigOrBuilder() {
-        if (origBuilder_ != null) {
-          return origBuilder_.getMessageOrBuilder();
-        } else {
-          return orig_ == null ?
-              proto.Types.Block.getDefaultInstance() : orig_;
-        }
-      }
-      /**
-       * <pre>
-       * Enable to cerate an empty block
-       * </pre>
-       *
-       * <code>.proto.Block orig = 3;</code>
-       */
-      private com.google.protobuf.SingleFieldBuilderV3<
-          proto.Types.Block, proto.Types.Block.Builder, proto.Types.BlockOrBuilder> 
-          getOrigFieldBuilder() {
-        if (origBuilder_ == null) {
-          origBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-              proto.Types.Block, proto.Types.Block.Builder, proto.Types.BlockOrBuilder>(
-                  getOrig(),
-                  getParentForChildren(),
-                  isClean());
-          orig_ = null;
-        }
-        return origBuilder_;
+        return this;
       }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -6415,17 +6247,16 @@ public final class Types {
     int getSender();
 
     /**
-     * <code>int32 height = 2;</code>
-     */
-    int getHeight();
-
-    /**
-     * <code>int32 cid = 3;</code>
+     * <pre>
+     *    int32 height = 2;
+     * </pre>
+     *
+     * <code>int32 cid = 2;</code>
      */
     int getCid();
 
     /**
-     * <code>int32 cidSeries = 4;</code>
+     * <code>int32 cidSeries = 3;</code>
      */
     int getCidSeries();
   }
@@ -6443,7 +6274,6 @@ public final class Types {
     }
     private Meta() {
       sender_ = 0;
-      height_ = 0;
       cid_ = 0;
       cidSeries_ = 0;
     }
@@ -6486,15 +6316,10 @@ public final class Types {
             }
             case 16: {
 
-              height_ = input.readInt32();
-              break;
-            }
-            case 24: {
-
               cid_ = input.readInt32();
               break;
             }
-            case 32: {
+            case 24: {
 
               cidSeries_ = input.readInt32();
               break;
@@ -6532,28 +6357,23 @@ public final class Types {
       return sender_;
     }
 
-    public static final int HEIGHT_FIELD_NUMBER = 2;
-    private int height_;
-    /**
-     * <code>int32 height = 2;</code>
-     */
-    public int getHeight() {
-      return height_;
-    }
-
-    public static final int CID_FIELD_NUMBER = 3;
+    public static final int CID_FIELD_NUMBER = 2;
     private int cid_;
     /**
-     * <code>int32 cid = 3;</code>
+     * <pre>
+     *    int32 height = 2;
+     * </pre>
+     *
+     * <code>int32 cid = 2;</code>
      */
     public int getCid() {
       return cid_;
     }
 
-    public static final int CIDSERIES_FIELD_NUMBER = 4;
+    public static final int CIDSERIES_FIELD_NUMBER = 3;
     private int cidSeries_;
     /**
-     * <code>int32 cidSeries = 4;</code>
+     * <code>int32 cidSeries = 3;</code>
      */
     public int getCidSeries() {
       return cidSeries_;
@@ -6574,14 +6394,11 @@ public final class Types {
       if (sender_ != 0) {
         output.writeInt32(1, sender_);
       }
-      if (height_ != 0) {
-        output.writeInt32(2, height_);
-      }
       if (cid_ != 0) {
-        output.writeInt32(3, cid_);
+        output.writeInt32(2, cid_);
       }
       if (cidSeries_ != 0) {
-        output.writeInt32(4, cidSeries_);
+        output.writeInt32(3, cidSeries_);
       }
       unknownFields.writeTo(output);
     }
@@ -6595,17 +6412,13 @@ public final class Types {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(1, sender_);
       }
-      if (height_ != 0) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(2, height_);
-      }
       if (cid_ != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(3, cid_);
+          .computeInt32Size(2, cid_);
       }
       if (cidSeries_ != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(4, cidSeries_);
+          .computeInt32Size(3, cidSeries_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -6625,8 +6438,6 @@ public final class Types {
       boolean result = true;
       result = result && (getSender()
           == other.getSender());
-      result = result && (getHeight()
-          == other.getHeight());
       result = result && (getCid()
           == other.getCid());
       result = result && (getCidSeries()
@@ -6644,8 +6455,6 @@ public final class Types {
       hash = (19 * hash) + getDescriptor().hashCode();
       hash = (37 * hash) + SENDER_FIELD_NUMBER;
       hash = (53 * hash) + getSender();
-      hash = (37 * hash) + HEIGHT_FIELD_NUMBER;
-      hash = (53 * hash) + getHeight();
       hash = (37 * hash) + CID_FIELD_NUMBER;
       hash = (53 * hash) + getCid();
       hash = (37 * hash) + CIDSERIES_FIELD_NUMBER;
@@ -6781,8 +6590,6 @@ public final class Types {
         super.clear();
         sender_ = 0;
 
-        height_ = 0;
-
         cid_ = 0;
 
         cidSeries_ = 0;
@@ -6810,7 +6617,6 @@ public final class Types {
       public proto.Types.Meta buildPartial() {
         proto.Types.Meta result = new proto.Types.Meta(this);
         result.sender_ = sender_;
-        result.height_ = height_;
         result.cid_ = cid_;
         result.cidSeries_ = cidSeries_;
         onBuilt();
@@ -6856,9 +6662,6 @@ public final class Types {
         if (other == proto.Types.Meta.getDefaultInstance()) return this;
         if (other.getSender() != 0) {
           setSender(other.getSender());
-        }
-        if (other.getHeight() != 0) {
-          setHeight(other.getHeight());
         }
         if (other.getCid() != 0) {
           setCid(other.getCid());
@@ -6919,41 +6722,23 @@ public final class Types {
         return this;
       }
 
-      private int height_ ;
-      /**
-       * <code>int32 height = 2;</code>
-       */
-      public int getHeight() {
-        return height_;
-      }
-      /**
-       * <code>int32 height = 2;</code>
-       */
-      public Builder setHeight(int value) {
-        
-        height_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>int32 height = 2;</code>
-       */
-      public Builder clearHeight() {
-        
-        height_ = 0;
-        onChanged();
-        return this;
-      }
-
       private int cid_ ;
       /**
-       * <code>int32 cid = 3;</code>
+       * <pre>
+       *    int32 height = 2;
+       * </pre>
+       *
+       * <code>int32 cid = 2;</code>
        */
       public int getCid() {
         return cid_;
       }
       /**
-       * <code>int32 cid = 3;</code>
+       * <pre>
+       *    int32 height = 2;
+       * </pre>
+       *
+       * <code>int32 cid = 2;</code>
        */
       public Builder setCid(int value) {
         
@@ -6962,7 +6747,11 @@ public final class Types {
         return this;
       }
       /**
-       * <code>int32 cid = 3;</code>
+       * <pre>
+       *    int32 height = 2;
+       * </pre>
+       *
+       * <code>int32 cid = 2;</code>
        */
       public Builder clearCid() {
         
@@ -6973,13 +6762,13 @@ public final class Types {
 
       private int cidSeries_ ;
       /**
-       * <code>int32 cidSeries = 4;</code>
+       * <code>int32 cidSeries = 3;</code>
        */
       public int getCidSeries() {
         return cidSeries_;
       }
       /**
-       * <code>int32 cidSeries = 4;</code>
+       * <code>int32 cidSeries = 3;</code>
        */
       public Builder setCidSeries(int value) {
         
@@ -6988,7 +6777,7 @@ public final class Types {
         return this;
       }
       /**
-       * <code>int32 cidSeries = 4;</code>
+       * <code>int32 cidSeries = 3;</code>
        */
       public Builder clearCidSeries() {
         
@@ -10336,23 +10125,23 @@ public final class Types {
       "der\022\014\n\004prev\030\001 \001(\014\022\021\n\tcreatorID\030\002 \001(\005\022\016\n\006" +
       "height\030\003 \001(\005\022\027\n\017transactionHash\030\004 \001(\014\022\013\n" +
       "\003cid\030\005 \001(\005\022\021\n\tcidSeries\030\006 \001(\005\022\r\n\005proof\030\007" +
-      " \001(\t\"i\n\005Block\022\"\n\006header\030\001 \001(\0132\022.proto.Bl" +
+      " \001(\t\"[\n\005Block\022\"\n\006header\030\001 \001(\0132\022.proto.Bl" +
       "ockHeader\022 \n\004data\030\002 \003(\0132\022.proto.Transact" +
-      "ion\022\032\n\004orig\030\003 \001(\0132\014.proto.Block\"-\n\013Trans" +
-      "action\022\020\n\010clientID\030\001 \001(\005\022\014\n\004data\030\002 \001(\014\"\034" +
-      "\n\010accepted\022\020\n\010accepted\030\001 \001(\010\"S\n\tForkProo" +
-      "f\022\016\n\006sender\030\001 \001(\005\022\032\n\004curr\030\002 \001(\0132\014.proto." +
-      "Block\022\032\n\004prev\030\004 \001(\0132\014.proto.Block\".\n\005RBM" +
-      "sg\022\n\n\002id\030\001 \001(\005\022\013\n\003cid\030\002 \001(\005\022\014\n\004data\030\003 \001(" +
-      "\014\"\007\n\005Empty\"F\n\004Meta\022\016\n\006sender\030\001 \001(\005\022\016\n\006he" +
-      "ight\030\002 \001(\005\022\013\n\003cid\030\003 \001(\005\022\021\n\tcidSeries\030\004 \001" +
-      "(\005\"=\n\004Data\022\032\n\005_meta\030\001 \001(\0132\013.proto.Meta\022\014" +
-      "\n\004data\030\002 \001(\014\022\013\n\003sig\030\003 \001(\t\"!\n\003Req\022\032\n\005_met" +
-      "a\030\001 \001(\0132\013.proto.Meta\"=\n\003Res\022\032\n\005_meta\030\001 \001" +
-      "(\0132\013.proto.Meta\022\032\n\005_data\030\002 \001(\0132\013.proto.D" +
-      "ata\"`\n\017subChainVersion\022\021\n\tforkPoint\030\001 \001(" +
-      "\005\022\021\n\tsuggested\030\002 \001(\005\022\027\n\001v\030\003 \003(\0132\014.proto." +
-      "Block\022\016\n\006sender\030\004 \001(\005B\007\n\005protob\006proto3"
+      "ion\022\014\n\004orig\030\003 \001(\014\"-\n\013Transaction\022\020\n\010clie" +
+      "ntID\030\001 \001(\005\022\014\n\004data\030\002 \001(\014\"\034\n\010accepted\022\020\n\010" +
+      "accepted\030\001 \001(\010\"S\n\tForkProof\022\016\n\006sender\030\001 " +
+      "\001(\005\022\032\n\004curr\030\002 \001(\0132\014.proto.Block\022\032\n\004prev\030" +
+      "\004 \001(\0132\014.proto.Block\".\n\005RBMsg\022\n\n\002id\030\001 \001(\005" +
+      "\022\013\n\003cid\030\002 \001(\005\022\014\n\004data\030\003 \001(\014\"\007\n\005Empty\"6\n\004" +
+      "Meta\022\016\n\006sender\030\001 \001(\005\022\013\n\003cid\030\002 \001(\005\022\021\n\tcid" +
+      "Series\030\003 \001(\005\"=\n\004Data\022\032\n\005_meta\030\001 \001(\0132\013.pr" +
+      "oto.Meta\022\014\n\004data\030\002 \001(\014\022\013\n\003sig\030\003 \001(\t\"!\n\003R" +
+      "eq\022\032\n\005_meta\030\001 \001(\0132\013.proto.Meta\"=\n\003Res\022\032\n" +
+      "\005_meta\030\001 \001(\0132\013.proto.Meta\022\032\n\005_data\030\002 \001(\013" +
+      "2\013.proto.Data\"`\n\017subChainVersion\022\021\n\tfork" +
+      "Point\030\001 \001(\005\022\021\n\tsuggested\030\002 \001(\005\022\027\n\001v\030\003 \003(" +
+      "\0132\014.proto.Block\022\016\n\006sender\030\004 \001(\005B\007\n\005proto" +
+      "b\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -10425,7 +10214,7 @@ public final class Types {
     internal_static_proto_Meta_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_Meta_descriptor,
-        new java.lang.String[] { "Sender", "Height", "Cid", "CidSeries", });
+        new java.lang.String[] { "Sender", "Cid", "CidSeries", });
     internal_static_proto_Data_descriptor =
       getDescriptor().getMessageTypes().get(10);
     internal_static_proto_Data_fieldAccessorTable = new

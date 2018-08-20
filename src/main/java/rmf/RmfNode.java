@@ -40,7 +40,7 @@ public class RmfNode extends Node{
         Meta metaMsg = Meta.
                 newBuilder().
                 setSender(getID()).
-                setHeight(height).
+               // setHeight(height).
                 setCid(cid).
                 setCidSeries(cidSeries).
                 build();

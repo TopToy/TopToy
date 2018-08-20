@@ -405,7 +405,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                     id, request.getMeta().getSender(), cidSeries, cid));
             Meta meta = Meta.newBuilder().
                     setSender(id).
-                    setHeight(msg.getMeta().getHeight()).
+//                    setHeight(msg.getMeta().getHeight()).
                     setCid(cid).
                     setCidSeries(cid).
                     build();
@@ -429,13 +429,13 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             }
             long estimatedTime = System.currentTimeMillis() - startTime;
             if (pendingMsg.contains(cidSeries, cid) &&
-                    pendingMsg.get(cidSeries, cid).getMeta().getSender() == sender &&
-                    pendingMsg.get(cidSeries, cid).getMeta().getHeight() == height) {
+                    pendingMsg.get(cidSeries, cid).getMeta().getSender() == sender) { // &&
+//                    pendingMsg.get(cidSeries, cid).getMeta().getHeight() == height) {
                 BbcMsg.Builder bv = BbcMsg
                         .newBuilder().setCid(cid).setCidSeries(cidSeries).setPropserID(id).setVote(1);
                 if (next != null) {
-                    logger.debug(format("[#%d] broadcasts [height=%d], [cidSeries=%d ; cid=%d] via fast mode",
-                            id, next.getMeta().getHeight(), next.getMeta().getCidSeries(), next.getMeta().getCid()));
+                    logger.debug(format("[#%d] broadcasts [cidSeries=%d ; cid=%d] via fast mode",
+                            id,  next.getMeta().getCidSeries(), next.getMeta().getCid()));
                     try {
                         bv.setNext(setFastModeData(pendingMsg.get(cidSeries, cid), next));
                     } catch (InvalidProtocolBufferException e) {
@@ -452,8 +452,8 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             }
 
             if (pendingMsg.contains(cidSeries, cid) &&
-                    pendingMsg.get(cidSeries, cid).getMeta().getSender() == sender &&
-                    pendingMsg.get(cidSeries, cid).getMeta().getHeight() == height) {
+                    pendingMsg.get(cidSeries, cid).getMeta().getSender() == sender) { // &&
+                 //   pendingMsg.get(cidSeries, cid).getMeta().getHeight() == height) {
                 v = 1;
             }
             if (fVotes.contains(cidSeries, cid)) {
@@ -492,8 +492,8 @@ public class RmfService extends RmfGrpc.RmfImplBase {
 
     private void requestData(int cidSeries, int cid, int sender, int height) throws InterruptedException {
         if (pendingMsg.contains(cidSeries, cid) &&
-                pendingMsg.get(cidSeries, cid).getMeta().getSender() == sender &&
-                pendingMsg.get(cidSeries, cid).getMeta().getHeight() == height) return;
+                pendingMsg.get(cidSeries, cid).getMeta().getSender() == sender) return; //&&
+//                pendingMsg.get(cidSeries, cid).getMeta().getHeight() == height) return;
         pendingMsg.remove(cidSeries, cid);
         Meta meta = Meta.
                 newBuilder().
@@ -504,8 +504,8 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         Req req = Req.newBuilder().setMeta(meta).build();
         broadcastReqMsg(req, cidSeries, cid, sender, height);
         while ((!pendingMsg.contains(cidSeries, cid)) ||
-                pendingMsg.get(cidSeries, cid).getMeta().getSender() != sender ||
-                pendingMsg.get(cidSeries, cid).getMeta().getHeight() != height) {
+                pendingMsg.get(cidSeries, cid).getMeta().getSender() != sender) { // ||
+//                pendingMsg.get(cidSeries, cid).getMeta().getHeight() != height) {
             pendingMsg.remove(cidSeries, cid);
             globalLock.wait();
         }
