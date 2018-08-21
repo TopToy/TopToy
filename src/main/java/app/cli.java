@@ -17,7 +17,7 @@ public class cli {
             options.addOption("serve", "start the server\n" +
                     "Note that before lunching the command, all other servers has to be initialized first");
             options.addOption("stop", "terminate the server");
-            options.addOption("exit", "exit Toy terminal");
+            options.addOption("quit", "exit Toy terminal");
             options.addOption(Option.builder("tx")
                             .hasArg()
                             .desc("-a: add new transaction\n" +
@@ -51,7 +51,7 @@ public class cli {
                     System.out.println("Stopping server... [OK]");
                     return;
                 }
-                if (args[0].equals("exit")) {
+                if (args[0].equals("quit")) {
                     System.exit(0);
                     return;
                 }
@@ -93,11 +93,11 @@ public class cli {
 
         private void init() {
 
-            JToy.server = new cbcServer(Config.getAddress(), Config.getPort(), Config.getID());
+            JToy.server.start();
         }
 
         private void serve() {
-            JToy.server.start();
+
             JToy.server.serve();
         }
         private void stop() {

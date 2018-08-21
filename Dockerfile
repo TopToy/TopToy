@@ -1,0 +1,35 @@
+# Dockerfile
+
+#FROM phusion/baseimage:0.10.1
+FROM ubuntu
+MAINTAINER Yehonatan Buchnik <yon_b@cs.technion.ac.il>
+
+ENV TOY_HOME /JToy
+ENV LOGS /logs
+RUN echo "deb http://archive.ubuntu.com/ubuntu trusty main universe" >> /etc/apt/sources.list
+RUN apt-get -y update
+
+# Install Maven
+RUN apt-cache search maven
+RUN apt-get -y install maven
+
+#Install git
+RUN apt-get install -y git
+
+#Install java 10
+RUN apt-get -y install software-properties-common
+RUN add-apt-repository ppa:linuxuprising/java
+RUN apt-get -y update
+RUN echo "oracle-java10-installer shared/accepted-oracle-license-v1-1 select true" | debconf-set-selections
+RUN apt-get -y install oracle-java10-installer
+RUN apt-get -y install oracle-java10-set-default
+RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+#Clonie the repo (currently with my cradintials!)
+RUN git clone https://yontyon:y8o9ni89@github.com/yontyon/JToy.git
+
+#Shall we update the repo on every run? (I think not)
+RUN mkdir $LOGS
+RUN cd $TOY_HOME && mvn compile && mvn install
+
+ENTRYPOINT ["./JToy/run.sh"]
