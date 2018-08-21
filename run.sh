@@ -1,6 +1,7 @@
 #!/bin/bash
 
 if [[ $1 == "-b" ]] || [[ ! -d "./target" ]]; then
+    rm -r "./target"
     mvn compile
     mvn install
 fi

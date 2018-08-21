@@ -3384,11 +3384,21 @@ public final class Types {
     int getClientID();
 
     /**
+     * <code>string txID = 2;</code>
+     */
+    java.lang.String getTxID();
+    /**
+     * <code>string txID = 2;</code>
+     */
+    com.google.protobuf.ByteString
+        getTxIDBytes();
+
+    /**
      * <pre>
      * generic type of data
      * </pre>
      *
-     * <code>bytes data = 2;</code>
+     * <code>bytes data = 3;</code>
      */
     com.google.protobuf.ByteString getData();
   }
@@ -3410,6 +3420,7 @@ public final class Types {
     }
     private Transaction() {
       clientID_ = 0;
+      txID_ = "";
       data_ = com.google.protobuf.ByteString.EMPTY;
     }
 
@@ -3450,6 +3461,12 @@ public final class Types {
               break;
             }
             case 18: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              txID_ = s;
+              break;
+            }
+            case 26: {
 
               data_ = input.readBytes();
               break;
@@ -3487,14 +3504,48 @@ public final class Types {
       return clientID_;
     }
 
-    public static final int DATA_FIELD_NUMBER = 2;
+    public static final int TXID_FIELD_NUMBER = 2;
+    private volatile java.lang.Object txID_;
+    /**
+     * <code>string txID = 2;</code>
+     */
+    public java.lang.String getTxID() {
+      java.lang.Object ref = txID_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        txID_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string txID = 2;</code>
+     */
+    public com.google.protobuf.ByteString
+        getTxIDBytes() {
+      java.lang.Object ref = txID_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        txID_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int DATA_FIELD_NUMBER = 3;
     private com.google.protobuf.ByteString data_;
     /**
      * <pre>
      * generic type of data
      * </pre>
      *
-     * <code>bytes data = 2;</code>
+     * <code>bytes data = 3;</code>
      */
     public com.google.protobuf.ByteString getData() {
       return data_;
@@ -3515,8 +3566,11 @@ public final class Types {
       if (clientID_ != 0) {
         output.writeInt32(1, clientID_);
       }
+      if (!getTxIDBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, txID_);
+      }
       if (!data_.isEmpty()) {
-        output.writeBytes(2, data_);
+        output.writeBytes(3, data_);
       }
       unknownFields.writeTo(output);
     }
@@ -3530,9 +3584,12 @@ public final class Types {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(1, clientID_);
       }
+      if (!getTxIDBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, txID_);
+      }
       if (!data_.isEmpty()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(2, data_);
+          .computeBytesSize(3, data_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -3552,6 +3609,8 @@ public final class Types {
       boolean result = true;
       result = result && (getClientID()
           == other.getClientID());
+      result = result && getTxID()
+          .equals(other.getTxID());
       result = result && getData()
           .equals(other.getData());
       result = result && unknownFields.equals(other.unknownFields);
@@ -3567,6 +3626,8 @@ public final class Types {
       hash = (19 * hash) + getDescriptor().hashCode();
       hash = (37 * hash) + CLIENTID_FIELD_NUMBER;
       hash = (53 * hash) + getClientID();
+      hash = (37 * hash) + TXID_FIELD_NUMBER;
+      hash = (53 * hash) + getTxID().hashCode();
       hash = (37 * hash) + DATA_FIELD_NUMBER;
       hash = (53 * hash) + getData().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
@@ -3704,6 +3765,8 @@ public final class Types {
         super.clear();
         clientID_ = 0;
 
+        txID_ = "";
+
         data_ = com.google.protobuf.ByteString.EMPTY;
 
         return this;
@@ -3729,6 +3792,7 @@ public final class Types {
       public proto.Types.Transaction buildPartial() {
         proto.Types.Transaction result = new proto.Types.Transaction(this);
         result.clientID_ = clientID_;
+        result.txID_ = txID_;
         result.data_ = data_;
         onBuilt();
         return result;
@@ -3773,6 +3837,10 @@ public final class Types {
         if (other == proto.Types.Transaction.getDefaultInstance()) return this;
         if (other.getClientID() != 0) {
           setClientID(other.getClientID());
+        }
+        if (!other.getTxID().isEmpty()) {
+          txID_ = other.txID_;
+          onChanged();
         }
         if (other.getData() != com.google.protobuf.ByteString.EMPTY) {
           setData(other.getData());
@@ -3830,13 +3898,82 @@ public final class Types {
         return this;
       }
 
+      private java.lang.Object txID_ = "";
+      /**
+       * <code>string txID = 2;</code>
+       */
+      public java.lang.String getTxID() {
+        java.lang.Object ref = txID_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          txID_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string txID = 2;</code>
+       */
+      public com.google.protobuf.ByteString
+          getTxIDBytes() {
+        java.lang.Object ref = txID_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          txID_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string txID = 2;</code>
+       */
+      public Builder setTxID(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        txID_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string txID = 2;</code>
+       */
+      public Builder clearTxID() {
+        
+        txID_ = getDefaultInstance().getTxID();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string txID = 2;</code>
+       */
+      public Builder setTxIDBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        txID_ = value;
+        onChanged();
+        return this;
+      }
+
       private com.google.protobuf.ByteString data_ = com.google.protobuf.ByteString.EMPTY;
       /**
        * <pre>
        * generic type of data
        * </pre>
        *
-       * <code>bytes data = 2;</code>
+       * <code>bytes data = 3;</code>
        */
       public com.google.protobuf.ByteString getData() {
         return data_;
@@ -3846,7 +3983,7 @@ public final class Types {
        * generic type of data
        * </pre>
        *
-       * <code>bytes data = 2;</code>
+       * <code>bytes data = 3;</code>
        */
       public Builder setData(com.google.protobuf.ByteString value) {
         if (value == null) {
@@ -3862,7 +3999,7 @@ public final class Types {
        * generic type of data
        * </pre>
        *
-       * <code>bytes data = 2;</code>
+       * <code>bytes data = 3;</code>
        */
       public Builder clearData() {
         
@@ -10127,21 +10264,21 @@ public final class Types {
       "\003cid\030\005 \001(\005\022\021\n\tcidSeries\030\006 \001(\005\022\r\n\005proof\030\007" +
       " \001(\t\"[\n\005Block\022\"\n\006header\030\001 \001(\0132\022.proto.Bl" +
       "ockHeader\022 \n\004data\030\002 \003(\0132\022.proto.Transact" +
-      "ion\022\014\n\004orig\030\003 \001(\014\"-\n\013Transaction\022\020\n\010clie" +
-      "ntID\030\001 \001(\005\022\014\n\004data\030\002 \001(\014\"\034\n\010accepted\022\020\n\010" +
-      "accepted\030\001 \001(\010\"S\n\tForkProof\022\016\n\006sender\030\001 " +
-      "\001(\005\022\032\n\004curr\030\002 \001(\0132\014.proto.Block\022\032\n\004prev\030" +
-      "\004 \001(\0132\014.proto.Block\".\n\005RBMsg\022\n\n\002id\030\001 \001(\005" +
-      "\022\013\n\003cid\030\002 \001(\005\022\014\n\004data\030\003 \001(\014\"\007\n\005Empty\"6\n\004" +
-      "Meta\022\016\n\006sender\030\001 \001(\005\022\013\n\003cid\030\002 \001(\005\022\021\n\tcid" +
-      "Series\030\003 \001(\005\"=\n\004Data\022\032\n\005_meta\030\001 \001(\0132\013.pr" +
-      "oto.Meta\022\014\n\004data\030\002 \001(\014\022\013\n\003sig\030\003 \001(\t\"!\n\003R" +
-      "eq\022\032\n\005_meta\030\001 \001(\0132\013.proto.Meta\"=\n\003Res\022\032\n" +
-      "\005_meta\030\001 \001(\0132\013.proto.Meta\022\032\n\005_data\030\002 \001(\013" +
-      "2\013.proto.Data\"`\n\017subChainVersion\022\021\n\tfork" +
-      "Point\030\001 \001(\005\022\021\n\tsuggested\030\002 \001(\005\022\027\n\001v\030\003 \003(" +
-      "\0132\014.proto.Block\022\016\n\006sender\030\004 \001(\005B\007\n\005proto" +
-      "b\006proto3"
+      "ion\022\014\n\004orig\030\003 \001(\014\";\n\013Transaction\022\020\n\010clie" +
+      "ntID\030\001 \001(\005\022\014\n\004txID\030\002 \001(\t\022\014\n\004data\030\003 \001(\014\"\034" +
+      "\n\010accepted\022\020\n\010accepted\030\001 \001(\010\"S\n\tForkProo" +
+      "f\022\016\n\006sender\030\001 \001(\005\022\032\n\004curr\030\002 \001(\0132\014.proto." +
+      "Block\022\032\n\004prev\030\004 \001(\0132\014.proto.Block\".\n\005RBM" +
+      "sg\022\n\n\002id\030\001 \001(\005\022\013\n\003cid\030\002 \001(\005\022\014\n\004data\030\003 \001(" +
+      "\014\"\007\n\005Empty\"6\n\004Meta\022\016\n\006sender\030\001 \001(\005\022\013\n\003ci" +
+      "d\030\002 \001(\005\022\021\n\tcidSeries\030\003 \001(\005\"=\n\004Data\022\032\n\005_m" +
+      "eta\030\001 \001(\0132\013.proto.Meta\022\014\n\004data\030\002 \001(\014\022\013\n\003" +
+      "sig\030\003 \001(\t\"!\n\003Req\022\032\n\005_meta\030\001 \001(\0132\013.proto." +
+      "Meta\"=\n\003Res\022\032\n\005_meta\030\001 \001(\0132\013.proto.Meta\022" +
+      "\032\n\005_data\030\002 \001(\0132\013.proto.Data\"`\n\017subChainV" +
+      "ersion\022\021\n\tforkPoint\030\001 \001(\005\022\021\n\tsuggested\030\002" +
+      " \001(\005\022\027\n\001v\030\003 \003(\0132\014.proto.Block\022\016\n\006sender\030" +
+      "\004 \001(\005B\007\n\005protob\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -10184,7 +10321,7 @@ public final class Types {
     internal_static_proto_Transaction_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_Transaction_descriptor,
-        new java.lang.String[] { "ClientID", "Data", });
+        new java.lang.String[] { "ClientID", "TxID", "Data", });
     internal_static_proto_accepted_descriptor =
       getDescriptor().getMessageTypes().get(5);
     internal_static_proto_accepted_fieldAccessorTable = new

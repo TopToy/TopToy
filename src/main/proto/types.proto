@@ -36,7 +36,8 @@ message Block {
 //TODO: Adding: client signature, client public key etc.
 message Transaction {
     int32 clientID = 1;
-    bytes data = 2; // generic type of data
+    string txID = 2;
+    bytes data = 3; // generic type of data
 }
 
 message accepted {

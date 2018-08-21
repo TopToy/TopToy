@@ -8,10 +8,12 @@ import consensus.RBroadcast.RBrodcastService;
 import crypto.DigestMethod;
 import crypto.blockDigSig;
 import crypto.rmfDigSig;
+import org.apache.commons.lang.ArrayUtils;
 import proto.*;
 import rmf.RmfNode;
 import proto.Types.*;
 
+import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -26,7 +28,7 @@ public abstract class bcServer extends Node {
     RmfNode rmfServer;
     private RBrodcastService panicRB;
     private RBrodcastService syncRB;
-    blockchain bc;
+    final blockchain bc;
     int currHeight;
     protected int f;
     protected int n;
@@ -46,6 +48,8 @@ public abstract class bcServer extends Node {
     private final HashMap<Integer, fpEntry> fp;
     private HashMap<Integer, ArrayList<Types.subChainVersion>> scVersions;
     private final ArrayList<Types.Transaction> transactionsPool = new ArrayList<>();
+    private final ArrayList<String> proposedTx = new ArrayList<>();
+    private final HashMap<String, Transaction> approvedTx = new HashMap<>();
     boolean configuredFastMode = Config.getFastMode();
     boolean fastMode = configuredFastMode;
 
@@ -120,77 +124,73 @@ public abstract class bcServer extends Node {
 
     private void mainLoop() {
         while (!stopped) {
+//            synchronized (bc) {
+                synchronized (fp) {
+                    for (Integer key : fp.keySet().stream().filter(k -> k < currHeight).collect(Collectors.toList())) {
+                        fpEntry pe = fp.get(key);
+                        if (!pe.done) {
+                            logger.debug(format("[#%d] have found panic message [height=%d] [fp=%d]", getID(), currHeight, key));
+                            handleFork(pe.fp);
+                            fp.get(key).done = true;
+                            fastMode = false;
+                        }
 
-            synchronized (fp) {
-                for (Integer key : fp.keySet().stream().filter(k -> k < currHeight).collect(Collectors.toList())) {
-                    fpEntry pe = fp.get(key);
-                    if (!pe.done) {
-                        logger.debug(format("[#%d] have found panic message [height=%d] [fp=%d]", getID(), currHeight, key));
-                        handleFork(pe.fp);
-                        fp.get(key).done = true;
-                        fastMode = false;
                     }
-
                 }
-            }
-            byte[] next;
-            try {
-                next = leaderImpl();
-            } catch (InterruptedException e) {
-                logger.debug(format("[#%d] main thread has been interrupted on leader impl", getID()));
-                continue;
-            }
-            byte[][] pmsg;
-            try {
-                pmsg = rmfServer.deliver(cidSeries, cid, currHeight, currLeader, tmo, next);
-            } catch (InterruptedException e) {
-                logger.debug(format("[#%d] main thread has been interrupted on rmf deliver", getID()));
-                continue;
-            }
-            byte[] msg = pmsg[0];
-            fastMode = configuredFastMode;
+                byte[] next;
+                try {
+                    next = leaderImpl();
+                } catch (InterruptedException e) {
+                    logger.debug(format("[#%d] main thread has been interrupted on leader impl", getID()));
+                    continue;
+                }
+                byte[][] pmsg;
+                try {
+                    pmsg = rmfServer.deliver(cidSeries, cid, currHeight, currLeader, tmo, next);
+                } catch (InterruptedException e) {
+                    logger.debug(format("[#%d] main thread has been interrupted on rmf deliver", getID()));
+                    continue;
+                }
+                byte[] msg = pmsg[0];
+                fastMode = configuredFastMode;
 //            byte[] recData = msg.getData().toByteArray();
 //            int mcid = msg.getCid();
 //            int mcidSeries = msg.getCidSeries();
-            if (msg == null) {
-                tmo += tmoInterval;
-                logger.debug(format("[#%d] Unable to receive block, timeout increased to [%d] ms", getID(), tmo));
-                updateLeaderAndHeight();
-                fastMode = false;
-                cid++;
-                continue;
-            }
-            if (currLeader == getID()) {
-                logger.debug(format("[#%d] nullifies currBlock [height=%d] [cidSeries=%d, cid=%d]", getID(), currHeight,
-                        cidSeries, cid));
-                currBlock = null;
-            }
-            String msgSign = Base64.getEncoder().encodeToString(pmsg[1]);
-            Block recBlock;
-            try {
-                recBlock = Block.parseFrom(msg);
-            } catch (InvalidProtocolBufferException e) {
-                logger.warn("Unable to parse received block", e);
+                if (msg == null) {
+                    tmo += tmoInterval;
+                    logger.debug(format("[#%d] Unable to receive block, timeout increased to [%d] ms", getID(), tmo));
+                    updateLeaderAndHeight();
+                    fastMode = false;
+                    cid++;
+                    continue;
+                }
+
+                String msgSign = Base64.getEncoder().encodeToString(pmsg[1]);
+                Block recBlock;
+                try {
+                    recBlock = Block.parseFrom(msg);
+                } catch (InvalidProtocolBufferException e) {
+                    logger.warn("Unable to parse received block", e);
 //                updateLeaderAndHeight();
 //                continue;
-                recBlock = Block.newBuilder()
-                        .setHeader(BlockHeader.newBuilder()
-                                .setCreatorID(currLeader)
-                                .setHeight(currHeight)
-                                .setCidSeries(cidSeries)
-                                .setCid(cid)
-                                .setPrev(ByteString.copyFrom(new byte[0]))
-                                .setProof(msgSign)
-                                .build())
-                        .setOrig(ByteString.copyFrom(msg))
-                        .build();
+                    recBlock = Block.newBuilder()
+                            .setHeader(BlockHeader.newBuilder()
+                                    .setCreatorID(currLeader)
+                                    .setHeight(currHeight)
+                                    .setCidSeries(cidSeries)
+                                    .setCid(cid)
+                                    .setPrev(ByteString.copyFrom(new byte[0]))
+                                    .setProof(msgSign)
+                                    .build())
+                            .setOrig(ByteString.copyFrom(msg))
+                            .build();
                 /*
                     We should create an empty block to the case in which a byzantine leader sends valid block to
                     part of the network and invalid one to the other part.
                     But, creating an empty block requires to change the fork proof mechanism (as the signature is not the
                     original one). Hence currently we leave it to a later development.
                  */
-            }
+                }
 //            recBlock = recBlock
 //                    .toBuilder()
 //                    .setHeader(recBlock
@@ -199,28 +199,45 @@ public abstract class bcServer extends Node {
 ////                            .setProof(msgSign)
 //                            .build())
 //                    .build();
-            if (!bc.validateBlockHash(recBlock)) {
-                bc.validateBlockHash(recBlock);
-                announceFork(recBlock);
-                fastMode = false;
-                continue;
-            }
-            if (!bc.validateBlockCreator(recBlock, f)) {
+
+                if (currLeader == getID()) {
+                    logger.debug(format("[#%d] nullifies currBlock [height=%d] [cidSeries=%d, cid=%d]", getID(), currHeight,
+                            cidSeries, cid));
+                    currBlock = null;
+                }
+                if (!bc.validateBlockHash(recBlock)) {
+                    bc.validateBlockHash(recBlock);
+                    announceFork(recBlock);
+                    fastMode = false;
+                    continue;
+                }
+                if (!bc.validateBlockCreator(recBlock, f)) {
+                    updateLeaderAndHeight();
+                    tmo += tmoInterval;
+                    continue;
+                }
+
+
+                tmo = initTmo;
+                synchronized (newBlockNotifyer) {
+                    bc.addBlock(recBlock);
+                    logger.debug(String.format("[#%d] adds new block with [height=%d] [cidSeries=%d ; cid=%d]",
+                            getID(), recBlock.getHeader().getHeight(), cidSeries, cid));
+                    if (currHeight % 500 == 0) {
+                        logger.info(String.format("[#%d] adds new block with [height=%d] [cidSeries=%d ; cid=%d]",
+                                getID(), recBlock.getHeader().getHeight(), cidSeries, cid));
+                    }
+                    newBlockNotifyer.notify();
+                }
+                synchronized (approvedTx) {
+                    addApprovedTransactions(bc.getBlock(bc.getHeight() - f).getDataList());
+                }
+                if (currLeader == getID()) {
+                    removeFromProposed(recBlock.getDataList());
+                }
                 updateLeaderAndHeight();
-                tmo += tmoInterval;
-                continue;
             }
-
-
-            tmo = initTmo;
-            synchronized (newBlockNotifyer) {
-                bc.addBlock(recBlock);
-                logger.debug(String.format("[#%d] adds new block with [height=%d] [cidSeries=%d ; cid=%d]",
-                        getID(), recBlock.getHeader().getHeight(), cidSeries, cid));
-                newBlockNotifyer.notify();
-            }
-            updateLeaderAndHeight();
-        }
+//        }
     }
 
     abstract byte[] leaderImpl() throws InterruptedException;
@@ -230,14 +247,59 @@ public abstract class bcServer extends Node {
     abstract blockchain getBC(int start, int end);
 
 
-    public void addTransaction(byte[] data, int clientID) {
-        Transaction t = Transaction.newBuilder().setClientID(clientID).setData(ByteString.copyFrom(data)).build();
+    public String addTransaction(byte[] data, int clientID) {
+        Random rand = new Random();
+        int magic = rand.nextInt(1000000000);
+        String txID = new BigInteger(DigestMethod.hash(ArrayUtils.addAll(data, (String.valueOf(magic)).getBytes())))
+                .toString()
+                .replaceAll("-","N");
+        Transaction t = Transaction.newBuilder()
+                .setClientID(clientID)
+                .setTxID(txID)
+                .setData(ByteString.copyFrom(data))
+                .build();
         synchronized (transactionsPool) {
-            logger.debug(format("[#%d] adds transaction from [client=%d]", getID(), t.getClientID()));
+            logger.info(format("[#%d] adds transaction from [client=%d ; txID=%s]", getID(), t.getClientID(), t.getTxID()));
             transactionsPool.add(t);
         }
+        return txID;
     }
+    private void addApprovedTransactions(List<Transaction> txs) {
+        synchronized (approvedTx) {
+            for (Transaction tx :txs) {
+                approvedTx.put(tx.getTxID(), tx);
+            }
+        }
 
+    }
+    public int isTxPresent(String txID) {
+        synchronized (approvedTx) {
+            if (approvedTx.containsKey(txID)) {
+                return 2;
+            }
+        }
+        synchronized (transactionsPool) {
+            if (transactionsPool.stream().map(Transaction::getTxID).anyMatch(tid -> tid.equals(txID))) {
+                return 0;
+            }
+            if (proposedTx.contains(txID)) {
+                return 1;
+            }
+        }
+        ArrayList<Block> cbc;
+        synchronized (bc) {
+            cbc = new ArrayList<Block>(bc.getBlocks(bc.getHeight() - f + 1, bc.getHeight() + 1));
+        }
+        if (cbc.stream()
+                .map(Block::getDataList)
+                .anyMatch(tl -> tl
+                        .stream()
+                        .map(Transaction::getTxID)
+                        .anyMatch(tid -> tid.equals(txID)))) {
+            return 3;
+        }
+        return -1;
+    }
     void addTransactionsToCurrBlock() {
         if (currBlock != null) return;
         currBlock = bc.createNewBLock();
@@ -246,6 +308,7 @@ public abstract class bcServer extends Node {
             while ((!transactionsPool.isEmpty()) && currBlock.getTransactionCount() < maxTransactionInBlock) {
                 Transaction t = transactionsPool.get(0);
                 transactionsPool.remove(0);
+                proposedTx.add(t.getTxID());
                 if (!currBlock.validateTransaction(t)) {
                     logger.debug(format("[#%d] detects an invalid transaction from [client=%d]", getID(), t.getClientID()));
                     continue;
@@ -254,6 +317,10 @@ public abstract class bcServer extends Node {
 
             }
         }
+    }
+
+    void removeFromProposed(List<Transaction> txs) {
+        proposedTx.removeAll(txs.stream().map(Transaction::getTxID).collect(Collectors.toList()));
     }
 
     private int validateForkProof(ForkProof p)  {
