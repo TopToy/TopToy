@@ -38,6 +38,7 @@ public class bbcService extends DefaultSingleRecoverable {
     private int quorumSize;
     private String configHome;
     private ServiceReplica sr;
+    private boolean stopped = false;
     private Table<Integer, Integer, fastVotePart> fastVote = HashBasedTable.create();
     public bbcService(int id, int quorumSize, String configHome) {
         this.id = id;
@@ -53,12 +54,14 @@ public class bbcService extends DefaultSingleRecoverable {
         logger.info(format("[#%d] bbc service is up", id));
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            if (stopped) return;
          // Use stderr here since the logger may have been reset by its JVM shutdown hook.
          logger.warn(format("[#%d] shutting down bbc server since JVM is shutting down", id));
          shutdown();
         }));
     }
     public void shutdown() {
+        stopped = true;
         releaseWaiting();
         if (bbcProxy != null) {
             bbcProxy.close();

@@ -26,6 +26,7 @@ public class RBrodcastService extends DefaultSingleRecoverable {
     private String configHome;
     private final Object globalLock = new Object();
     private int cid = 0;
+    private boolean stopped = false;
 
     public RBrodcastService(int id, String configHome) {
         this.id = id;
@@ -42,6 +43,7 @@ public class RBrodcastService extends DefaultSingleRecoverable {
 
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            if (stopped) return;
             // Use stderr here since the logger may have been reset by its JVM shutdown hook.
             logger.warn(format("[#%d] shutting down RB server since JVM is shutting down", id));
             shutdown();
@@ -49,6 +51,7 @@ public class RBrodcastService extends DefaultSingleRecoverable {
         }));
     }
     public void shutdown() {
+        stopped = true;
         releaseWaiting();
         if (RBProxy != null) {
             RBProxy.close();

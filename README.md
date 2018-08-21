@@ -1,1 +1,1 @@
-# JToy
+# app.JToy

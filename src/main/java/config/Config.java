@@ -54,8 +54,9 @@ public class Config {
 
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Config.class);
     public Config() {
-        Logger.getLogger("io.netty").setLevel(Level.OFF);
-        Logger.getLogger("io.grpc").setLevel(Level.OFF);
+//        Logger.getLogger("io.netty").setLevel(Level.OFF);
+//        Logger.getLogger("io.grpc").setLevel(Level.OFF);
+        System.err.close();
         logger.debug("logger is configured");
     }
 
@@ -86,6 +87,12 @@ public class Config {
     public static int getTMOInterval() {
         return Math.toIntExact(conf.getLong(tKeys.SETTING_TMO_INTERVAL_KEY));
     }
+
+    public static String getAddress() {return conf.getString(tKeys.SERVER_IP_KEY); }
+
+    public static int getPort() {return Math.toIntExact(conf.getLong(tKeys.SERVER_RMFPORT_KEY)); }
+
+    public static int getID() { return Math.toIntExact(conf.getLong(tKeys.SERVER_ID_KEY)); }
 
     public static ArrayList<Node> getCluster() {
         Toml t = conf.getTables(tKeys.RMFCLUSTER_KEY).get(0);

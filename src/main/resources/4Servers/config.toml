@@ -1,8 +1,8 @@
 title = "configuration"
 
 [system]
-    n = 1
-    f = 0
+    n = 4
+    f = 1
 
 
 [setting]
@@ -37,3 +37,22 @@ title = "configuration"
         publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
                        N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
 
+    [cluster.s1]
+        id = 1
+        ip = "localhost"
+        rmfPort = 20010
+        publicKey = """MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                        N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    [cluster.s2]
+        id = 2
+        ip = "localhost"
+        rmfPort = 20020
+        publicKey = """MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                        N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+
+    [cluster.s3]
+        id = 3
+        ip = "localhost"
+        rmfPort = 20030
+        publicKey="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                      N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
