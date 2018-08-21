@@ -32,4 +32,4 @@ RUN git clone https://yontyon:y8o9ni89@github.com/yontyon/JToy.git
 RUN mkdir $LOGS
 RUN cd $TOY_HOME && mvn compile && mvn install
 
-ENTRYPOINT ["./JToy/run.sh"]
+CMD ["./JToy/run.sh"]

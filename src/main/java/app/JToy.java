@@ -10,9 +10,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class JToy {
+    static Config c = new Config();
     static cbcServer server = new cbcServer(Config.getAddress(), Config.getPort(), Config.getID());
     public static void main(String argv[]) {
-        new Config();
+//        new Config();
         cli parser = new cli();
         Scanner scan = new Scanner(System.in).useDelimiter("\\n");
         while (true) {
