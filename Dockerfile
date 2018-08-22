@@ -5,7 +5,10 @@ FROM ubuntu
 MAINTAINER Yehonatan Buchnik <yon_b@cs.technion.ac.il>
 
 ENV TOY_HOME /JToy
-ENV LOGS /logs
+ENV TOY_DATA /toy
+ENV TOY_CONF ${TOY_DATA}/conf
+ENV TOY_LOGS ${TOY_DATA}/logs
+ENV TOY_INST ${TOY_DATA}/inst
 RUN echo "deb http://archive.ubuntu.com/ubuntu trusty main universe" >> /etc/apt/sources.list
 RUN apt-get -y update
 
@@ -25,11 +28,33 @@ RUN apt-get -y install oracle-java10-installer
 RUN apt-get -y install oracle-java10-set-default
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-#Clonie the repo (currently with my cradintials!)
+#Clone the repo (currently with my cradintials!)
 RUN git clone https://yontyon:y8o9ni89@github.com/yontyon/JToy.git
 
-#Shall we update the repo on every run? (I think not)
-RUN mkdir $LOGS
-RUN cd $TOY_HOME && mvn compile && mvn install
+##Compile
+#RUN cd $TOY_HOME && mvn compile && mvn install
 
-CMD ["./JToy/run.sh"]
+#Create directories
+RUN mkdir -p ${TOY_LOGS}
+RUN mkdir -p ${TOY_CONF}
+RUN mkdir -p ${TOY_INST}
+
+VOLUME ${TOY_DATA}
+
+#exspose rmf port
+EXPOSE 20000
+#expose bbc port
+EXPOSE 15000
+#expose panic port
+EXPOSE 16000
+#expose sync port
+EXPOSE 17000
+
+#Copy configuration
+CMD ["cp -f ${TOY_CONF}/config.toml ${TOY_HOME}/src/main/resources"]
+#Compile
+CMD ["./JToy/build.sh"]
+#Clean
+CMD ["clear"]
+#Run
+CMD ["./JToy/run.sh < ${TOY_INST}/input.inst"]

@@ -56,7 +56,7 @@ public class Config {
     public Config() {
 //        Logger.getLogger("io.netty").setLevel(Level.OFF);
 //        Logger.getLogger("io.grpc").setLevel(Level.OFF);
-        System.err.close();
+//        System.err.close();
         logger.debug("logger is configured");
     }
 
