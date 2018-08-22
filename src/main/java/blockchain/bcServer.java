@@ -14,6 +14,7 @@ import rmf.RmfNode;
 import proto.Types.*;
 
 import java.math.BigInteger;
+import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -248,8 +249,8 @@ public abstract class bcServer extends Node {
 
 
     public String addTransaction(byte[] data, int clientID) {
-        Random rand = new Random();
-        int magic = rand.nextInt(1000000000);
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        long magic = timestamp.getTime();
         String txID = new BigInteger(DigestMethod.hash(ArrayUtils.addAll(data, (String.valueOf(magic)).getBytes())))
                 .toString()
                 .replaceAll("-","N");
