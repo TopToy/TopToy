@@ -31,7 +31,7 @@ title = "configuration"
 [[cluster]]
 
     [cluster.s0]
-        id = 1
+        id = 0
         ip = "localhost"
         rmfPort = 20000
         publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ

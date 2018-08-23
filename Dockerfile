@@ -4,23 +4,24 @@
 FROM ubuntu
 MAINTAINER Yehonatan Buchnik <yon_b@cs.technion.ac.il>
 
-ARG HOST_TOY_DATA
+#ARG HOST_TOY_DATA
 ENV TOY_HOME /JToy
 ENV TOY_DATA /toy
 #ENV TOY_CONF ${TOY_DATA}/conf
-ENV TOY_LOGS ${TOY_DATA}/logs
-ENV TOY_INST /inst
+ENV TOY_LOGS $TOY_DATA/logs
+ENV TOY_INST $TOY_DATA/inst
+ENV TOY_CONF $TOY_DATA/conf
 
 
 RUN echo "deb http://archive.ubuntu.com/ubuntu trusty main universe" >> /etc/apt/sources.list
 RUN apt-get -y update
 
 # Install Maven
-RUN apt-cache search maven
-RUN apt-get -y install maven
-
-#Install git
-RUN apt-get install -y git
+#RUN apt-cache search maven
+#RUN apt-get -y install maven
+#
+##Install git
+#RUN apt-get install -y git
 
 #Install java 10
 RUN apt-get -y install software-properties-common
@@ -32,7 +33,7 @@ RUN apt-get -y install oracle-java10-set-default
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 #Clone the repo (currently with my cradintials!)
-RUN git clone https://yontyon:y8o9ni89@github.com/yontyon/JToy.git
+#RUN git clone https://yontyon:y8o9ni89@github.com/yontyon/JToy.git
 
 ##Compile
 #RUN cd $TOY_HOME && mvn compile && mvn install
@@ -54,15 +55,25 @@ EXPOSE 16000
 EXPOSE 17000
 
 #Create directories
-RUN mkdir -p $TOY_LOGS
+#RUN mkdir -p $TOY_LOGS
 #RUN mkdir -p ${TOY_CONF}
-RUN mkdir -p $TOY_INST
+#RUN mkdir -p $TOY_INST
 
 #Copy configuration
-ADD $HOST_TOY_DATA/config.toml $TOY_HOME/src/main/resources
-ADD $HOST_TOY_DATA/input.inst $TOY_INST
+#ADD $HOST_TOY_DATA/config.toml $TOY_HOME/src/main/resources
+#ADD $HOST_TOY_DATA/input.inst $TOY_INST
 
-RUN cd $TOY_HOME && mvn install
+RUN mkdir -p $TOY_HOME/src/main/resources
+RUN mkdir -p $TOY_HOME/target
+ADD ./target $TOY_HOME/target
+ADD ./run.sh $TOY_HOME
+ADD ./src/main/resources $TOY_HOME/src/main/resources
+
+#ADD $HOST_TOY_DATA/ca.pem $TOY_HOME/src/main/resources/sslConfig
+#ADD $HOST_TOY_DATA/cert.pem $TOY_HOME/src/main/resources/sslConfig
+#ADD $HOST_TOY_DATA/server.pem $TOY_HOME/src/main/resources/sslConfig
+
+#RUN cd $TOY_HOME && mvn install
 #Copy configuration
 #COPY ${HOST_TOY_DATA}/config.toml ${TOY_HOME}/src/main/resources
 #COPY ${HOST_TOY_DATA}/input.inst ${TOY_INST}
@@ -74,5 +85,10 @@ RUN cd $TOY_HOME && mvn install
 #Run
 #CMD "bash"
 #CMD "cat ${TOY_INST}/input.inst"
+CMD ["cp", "${TOY_CONF}/config.toml", "$TOY_HOME/src/main/resources"]
+CMD ["rm", "$TOY_HOME/src/main/resources/sslConfig/*"]
+CMD ["cp", "${TOY_CONF}/ca.pem", "$TOY_HOME/src/main/resources/sslConfig"]
+CMD ["cp", "${TOY_CONF}/cert.pem", "$TOY_HOME/src/main/resources/sslConfig"]
+CMD ["cp", "${TOY_CONF}/key.pem", "$TOY_HOME/src/main/resources/sslConfig"]
 CMD ["/bin/sh", "-c", "${TOY_HOME}/run.sh < ${TOY_INST}/input.inst"]
 # < ${TOY_INST}/input.inst"
