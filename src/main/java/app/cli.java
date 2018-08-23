@@ -48,7 +48,7 @@ public class cli {
                 }
                 if (args[0].equals("stop")) {
                     stop();
-                    System.out.println("Stopping server... [OK]");
+                    System.out.println("stop server... [OK]");
                     return;
                 }
                 if (args[0].equals("quit")) {
