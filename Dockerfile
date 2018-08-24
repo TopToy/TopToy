@@ -4,13 +4,10 @@
 FROM ubuntu
 MAINTAINER Yehonatan Buchnik <yon_b@cs.technion.ac.il>
 
-#ARG HOST_TOY_DATA
-ENV TOY_HOME /JToy
-ENV TOY_DATA /toy
 #ENV TOY_CONF ${TOY_DATA}/conf
-ENV TOY_LOGS $TOY_DATA/logs
-ENV TOY_INST $TOY_DATA/inst
-ENV TOY_CONF $TOY_DATA/conf
+#ENV TOY_LOGS $TOY_DATA/logs
+#ENV TOY_INST $TOY_DATA/inst
+#ENV TOY_CONF $TOY_DATA/conf
 
 
 RUN echo "deb http://archive.ubuntu.com/ubuntu trusty main universe" >> /etc/apt/sources.list
@@ -43,7 +40,6 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 ##RUN mkdir -p ${TOY_CONF}
 #RUN mkdir -p ${TOY_INST}
 
-VOLUME ${TOY_DATA}
 
 #exspose rmf port
 EXPOSE 20000
@@ -63,11 +59,29 @@ EXPOSE 17000
 #ADD $HOST_TOY_DATA/config.toml $TOY_HOME/src/main/resources
 #ADD $HOST_TOY_DATA/input.inst $TOY_INST
 
-RUN mkdir -p $TOY_HOME/src/main/resources
-RUN mkdir -p $TOY_HOME/target
-ADD ./target $TOY_HOME/target
-ADD ./run.sh $TOY_HOME
-ADD ./src/main/resources $TOY_HOME/src/main/resources
+
+ARG TOY_BIN
+ARG TOY_CONF
+ENV TOY_HOME /JToy
+ENV TOY_DATA /toy
+
+RUN mkdir $TOY_HOME
+RUN mkdir $TOY_DATA
+
+COPY $TOY_BIN $TOY_HOME
+COPY $TOY_CONF/ca.pem $TOY_HOME/src/main/resources/sslConfig
+COPY $TOY_CONF/cert.pem $TOY_HOME/src/main/resources/sslConfig
+COPY $TOY_CONF/key.pem $TOY_HOME/src/main/resources/sslConfig
+COPY $TOY_CONF/config.toml $TOY_HOME/src/main/resources
+
+VOLUME ${TOY_DATA}
+
+#RUN mkdir -p $TOY_HOME/src/main/resources
+#RUN mkdir -p $TOY_HOME/target
+#COPY $HOST_TOY_BIN
+#COPY $HOST_TOY_DATA/target $TOY_HOME/target
+#COPY $HOST_TOY_DATA/run.sh $TOY_HOME
+#COPY $HOST_TOY_DATA/src/main/resources $TOY_HOME/src/main/resources
 
 #ADD $HOST_TOY_DATA/ca.pem $TOY_HOME/src/main/resources/sslConfig
 #ADD $HOST_TOY_DATA/cert.pem $TOY_HOME/src/main/resources/sslConfig
@@ -85,10 +99,14 @@ ADD ./src/main/resources $TOY_HOME/src/main/resources
 #Run
 #CMD "bash"
 #CMD "cat ${TOY_INST}/input.inst"
-CMD ["cp", "${TOY_CONF}/config.toml", "$TOY_HOME/src/main/resources"]
-CMD ["rm", "$TOY_HOME/src/main/resources/sslConfig/*"]
-CMD ["cp", "${TOY_CONF}/ca.pem", "$TOY_HOME/src/main/resources/sslConfig"]
-CMD ["cp", "${TOY_CONF}/cert.pem", "$TOY_HOME/src/main/resources/sslConfig"]
-CMD ["cp", "${TOY_CONF}/key.pem", "$TOY_HOME/src/main/resources/sslConfig"]
-CMD ["/bin/sh", "-c", "${TOY_HOME}/run.sh < ${TOY_INST}/input.inst"]
+#ENTRYPOINT echo "Hi" >  /JToy/src/main/resources/config.toml
+#CMD ["cp", "-f", "/toy/conf/config.toml", "/JToy/src/main/resources/config.toml"]
+#CMD ["cat", "/toy/conf/config.toml"]
+#CMD cat /JToy/src/main/resources/config.toml
+#CMD ["da", "/JToy/src/main/resources/sslConfig/*"]
+#CMD ["cp", "/toy/conf/ca.pem /JToy/src/main/resources/sslConfig"]
+#CMD ["cp", "/toy/conf/cert.pem /JToy/src/main/resources/sslConfig"]
+#CMD ["cp", "/toy/conf/key.pem /JToy/src/main/resources/sslConfig"]
+CMD chmod 777 /JToy/run.sh
+CMD /JToy/run.sh /toy
 # < ${TOY_INST}/input.inst"

@@ -38,6 +38,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                         .get(Grpc.TRANSPORT_ATTR_SSL_SESSION).getPeerPrincipal().getName().split("=")[1];
                 int peerId = Integer.parseInt(Objects.requireNonNull(metadata.get
                         (Metadata.Key.of("id", ASCII_STRING_MARSHALLER))));
+                logger.debug(format("[#%d] peerDomain=%s", id, peerDomain));
                 if (nodes.get(peerId).getAddr().equals(peerDomain)) {
                     res = serverCallHandler.startCall(serverCall, metadata);
                 }
