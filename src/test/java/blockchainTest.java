@@ -1,6 +1,7 @@
 import blockchain.asyncBcServer;
 import blockchain.cbcServer;
 import blockchain.byzantineBcServer;
+
 import config.Config;
 import config.Node;
 import org.apache.commons.lang.ArrayUtils;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static config.Config.setConfig;
 import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -21,7 +23,8 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 public class blockchainTest {
 
     private int timeToWaitBetweenTests = 1; //1000 * 60;
-    static Config conf = new Config();
+//    static Config conf = new Config();
+//    Config.setConfig(null, 0);
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(blockchainTest.class);
     private String localHost = "127.0.0.1";
     private int[] rmfPorts = {20000, 20010, 20020, 20030};
@@ -89,29 +92,36 @@ public class blockchainTest {
 //        ((cbcServer) rn1[0]).shutdown();
 //    }
 //
-//    @Test
-//    void TestSingleServerDisseminateMessage() throws InterruptedException {
-//        Thread.sleep(timeToWaitBetweenTests);
-//        logger.info("start TestSingleServer");
-//        String SingleServerconfigHome = Paths.get("config", "bbcConfig", "bbcSingleServer").toString();
-//        Node[] rn1 = initLocalRmfNodes(1, 0, SingleServerconfigHome, null);
-//        ((cbcServer) rn1[0]).start();
-//        ((cbcServer) rn1[0]).serve();
-//        ((cbcServer) rn1[0]).addTransaction(("hello").getBytes(), 100);
+    @Test
+    void TestSingleServerDisseminateMessage() throws InterruptedException {
+        String SingleServerconfigHome = Paths.get("config", "singleServer", "config.toml").toString();
+        setConfig(Paths.get("config", "singleServer", "config.toml"), 0);
+        Thread.sleep(timeToWaitBetweenTests);
+        logger.info("start TestSingleServer");
+
+
+        Node[] rn1 = initLocalRmfNodes(1, 0, SingleServerconfigHome, null);
+        ((cbcServer) rn1[0]).start();
+        ((cbcServer) rn1[0]).serve();
+        for (int i = 0 ; i < 1000 ; i++) {
+            ((cbcServer) rn1[0]).addTransaction(("hello").getBytes(), 100);
+        }
+        Thread.sleep(30 * 1000);
 //        Block b = ((cbcServer) rn1[0]).deliver(1);
 //        assertEquals(1, b.getHeader().getHeight());
 //        assertEquals(0, b.getHeader().getCreatorID());
-////        assertEquals(100, b.getData(0).getClientID());
-////        assertEquals("hello", new String(b.getData(0).getData().toByteArray()));
-//        ((cbcServer) rn1[0]).shutdown();
-//
-//    }
+//        assertEquals(100, b.getData(0).getClientID());
+//        assertEquals("hello", new String(b.getData(0).getData().toByteArray()));
+        ((cbcServer) rn1[0]).shutdown();
+
+    }
 
     @Test
     void TestFourServersNoFailuresSingleMessage() throws InterruptedException {
+        setConfig(null, 0);
         Thread.sleep(timeToWaitBetweenTests);
         int nnodes = 4;
-        String fourServersConfig = Paths.get("config", "bbcConfig", "bbcFourServers").toString();
+        String fourServersConfig = Paths.get("config", "Configurations/single server/bbcConfig", "bbcFourServers").toString();
         logger.info("start TestFourServersNoFailures");
         Thread[] servers = new Thread[4];
         Node[] allNodes = initLocalRmfNodes(nnodes,1,fourServersConfig, null);
@@ -163,10 +173,11 @@ public class blockchainTest {
     }
     @Test
     void TestStressFourServersNoFailures() throws InterruptedException {
+        setConfig(null, 0);
         Thread.sleep(timeToWaitBetweenTests);
         Thread[] servers = new Thread[4];
         int nnodes = 4;
-        String fourServersConfig = Paths.get("config", "bbcConfig", "bbcFourServers").toString();
+        String fourServersConfig = Paths.get("config", "Configurations/single server/bbcConfig", "bbcFourServers").toString();
         logger.info("start TestStressFourServersNoFailures");
 
         Node[] allNodes = initLocalRmfNodes(nnodes,1,fourServersConfig, null);
@@ -209,10 +220,11 @@ public class blockchainTest {
 //
 @Test
 void TestStressFourServersMuteFault() throws InterruptedException {
+    setConfig(null, 0);
     Thread.sleep(timeToWaitBetweenTests);
     Thread[] servers = new Thread[4];
     int nnodes = 4;
-    String fourServersConfig = Paths.get("config", "bbcConfig", "bbcFourServers").toString();
+    String fourServersConfig = Paths.get("config", "Configurations/single server/bbcConfig", "bbcFourServers").toString();
     logger.info("start TestStressFourServersNoFailures");
 
     Node[] allNodes = initLocalRmfNodes(nnodes,1,fourServersConfig, null);
@@ -272,10 +284,11 @@ void TestStressFourServersMuteFault() throws InterruptedException {
     }
     @Test
     void TestStressFourServersSelectiveBroadcastFault() throws InterruptedException {
+        setConfig(null, 0);
         Thread.sleep(timeToWaitBetweenTests);
         Thread[] servers = new Thread[4];
         int nnodes = 4;
-        String fourServersConfig = Paths.get("config", "bbcConfig", "bbcFourServers").toString();
+        String fourServersConfig = Paths.get("config", "Configurations/single server/bbcConfig", "bbcFourServers").toString();
         logger.info("start TestStressFourServersNoFailures");
 
         Node[] allNodes = initLocalRmfNodes(nnodes,1,fourServersConfig, new int[]{0});
@@ -351,10 +364,11 @@ void TestStressFourServersMuteFault() throws InterruptedException {
     }
     @Test
     void TestStressFourServersAsyncNetwork() throws InterruptedException {
+        setConfig(null, 0);
 //        Thread.sleep(timeToWaitBetweenTests);
         Thread[] servers = new Thread[4];
         int nnodes = 4;
-        String fourServersConfig = Paths.get("config", "bbcConfig", "bbcFourServers").toString();
+        String fourServersConfig = Paths.get("config", "Configurations/single server/bbcConfig", "bbcFourServers").toString();
         logger.info("start TestStressFourServersNoFailures");
 
         Node[] allNodes = initLocalAsyncRmfNodes(nnodes,1,fourServersConfig, null);
@@ -404,10 +418,11 @@ void TestStressFourServersMuteFault() throws InterruptedException {
 
     @Test
     void TestFourServersSplitBroadcastFault() throws InterruptedException {
+        setConfig(null, 0);
         Thread.sleep(timeToWaitBetweenTests);
         Thread[] servers = new Thread[4];
         int nnodes = 4;
-        String fourServersConfig = Paths.get("config", "bbcConfig", "bbcFourServers").toString();
+        String fourServersConfig = Paths.get("config", "Configurations/single server/bbcConfig", "bbcFourServers").toString();
         logger.info("start TestStressFourServersNoFailures");
 
         Node[] allNodes = initLocalRmfNodes(nnodes,1,fourServersConfig, new int[]{0});
@@ -446,10 +461,11 @@ void TestStressFourServersMuteFault() throws InterruptedException {
 
     @Test
     void TestStressFourServersSplitBrodacastFault() throws InterruptedException {
+        setConfig(null, 0);
         Thread.sleep(timeToWaitBetweenTests);
         Thread[] servers = new Thread[4];
         int nnodes = 4;
-        String fourServersConfig = Paths.get("config", "bbcConfig", "bbcFourServers").toString();
+        String fourServersConfig = Paths.get("config", "Configurations/single server/bbcConfig", "bbcFourServers").toString();
         logger.info("start TestStressFourServersNoFailures");
 
         Node[] allNodes = initLocalRmfNodes(nnodes,1,fourServersConfig, new int[]{0});
@@ -524,10 +540,11 @@ void TestStressFourServersMuteFault() throws InterruptedException {
 
     @Test
     void TestStressAsyncFourServersSplitBrodacastFault() throws InterruptedException {
+        setConfig(null, 0);
         Thread.sleep(timeToWaitBetweenTests);
         Thread[] servers = new Thread[4];
         int nnodes = 4;
-        String fourServersConfig = Paths.get("config", "bbcConfig", "bbcFourServers").toString();
+        String fourServersConfig = Paths.get("config", "Configurations/single server/bbcConfig", "bbcFourServers").toString();
         logger.info("start TestStressFourServersNoFailures");
 
         Node[] allNodes = initLocalAsyncRmfNodes(nnodes,1,fourServersConfig, new int[]{0});

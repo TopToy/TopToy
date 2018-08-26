@@ -6,6 +6,7 @@ import io.grpc.netty.NettyChannelBuilder;
 import io.netty.handler.ssl.ClientAuth;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslProvider;
+import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 
 import javax.net.ssl.SSLException;
 import java.io.File;
@@ -16,11 +17,19 @@ public class sslUtils {
                                              String clientCertFilePath,
                                              String clientPrivateKeyFilePath) throws SSLException {
 
+        if (caCertFilePath.equals("")) {
+            return GrpcSslContexts.
+                    forClient().
+                    trustManager(InsecureTrustManagerFactory.INSTANCE).
+                    keyManager(new File(clientCertFilePath), new File(clientPrivateKeyFilePath)).
+                    build();
+        }
         return GrpcSslContexts.
                 forClient().
                 trustManager(new File(caCertFilePath)).
                 keyManager(new File(clientCertFilePath), new File(clientPrivateKeyFilePath)).
                 build();
+
     }
 
     public static ManagedChannelBuilder buildSslChannel(String host, int port, SslContext ctx) {
@@ -32,11 +41,20 @@ public class sslUtils {
     public static SslContext buildSslContextForServer(String serverCertFilePath,
                                                       String caCertPath,
                                                       String serverPrivateKeyFilePath) throws SSLException {
-        return GrpcSslContexts.configure(GrpcSslContexts.
-                forServer(new File(serverCertFilePath), new File(serverPrivateKeyFilePath)).
-                trustManager(new File(caCertPath)).
-                clientAuth(ClientAuth.REQUIRE)
-        , SslProvider.OPENSSL).
+        if (caCertPath.equals("")) {
+            return GrpcSslContexts.configure(GrpcSslContexts.
+                            forServer(new File(serverCertFilePath), new File(serverPrivateKeyFilePath)).
+                            trustManager(InsecureTrustManagerFactory.INSTANCE). //new File(caCertPath)).
+                            clientAuth(ClientAuth.REQUIRE)
+                    , SslProvider.OPENSSL).
+                    build();
+        }
+        return  GrpcSslContexts.configure(GrpcSslContexts.
+                        forServer(new File(serverCertFilePath), new File(serverPrivateKeyFilePath)).
+                        trustManager(new File(caCertPath)).
+                        clientAuth(ClientAuth.REQUIRE)
+                , SslProvider.OPENSSL).
                 build();
+
     }
 }

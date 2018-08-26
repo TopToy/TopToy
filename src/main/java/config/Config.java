@@ -1,8 +1,6 @@
 package config;
 
 import com.moandjiezana.toml.Toml;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -43,16 +41,10 @@ public class Config {
 
     private static tomlKeys tKeys;
     private static Toml conf;
-    private static Path tomlPath = Paths.get("src", "main", "resources", "config.toml");
-    static {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy:hh:m");
-        System.setProperty("current.date.time", dateFormat.format(new Date()));
-        tKeys = new tomlKeys();
-        conf = readConf(tomlPath);
+    private static int s_id;
+    private static Path tomlPath;
 
-    }
-
-    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Config.class);
+    private static org.apache.log4j.Logger logger; //= org.apache.log4j.Logger.getLogger(Config.class);
     public Config() {
 //        Logger.getLogger("io.netty").setLevel(Level.OFF);
 //        Logger.getLogger("io.grpc").setLevel(Level.OFF);
@@ -60,6 +52,19 @@ public class Config {
         logger.debug("logger is configured");
     }
 
+    public static void setConfig(Path path, int id) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy:hh:m");
+        System.setProperty("current.date.time", dateFormat.format(new Date()));
+        tomlPath =  Paths.get("src", "main", "resources", "config.toml");
+        if (path != null) {
+            tomlPath = path;
+        }
+        s_id = id;
+        System.setProperty("s_id", Integer.toString(s_id));
+        logger = org.apache.log4j.Logger.getLogger(Config.class);
+        tKeys = new tomlKeys();
+        conf = readConf(tomlPath);
+    }
     static Toml readConf(Path tomlPath) {
         byte[] encoded = new byte[0];
         try {
@@ -88,11 +93,19 @@ public class Config {
         return Math.toIntExact(conf.getLong(tKeys.SETTING_TMO_INTERVAL_KEY));
     }
 
-    public static String getAddress() {return conf.getString(tKeys.SERVER_IP_KEY); }
+    public static String getAddress(int id) {
+        Toml t = conf.getTables(tKeys.RMFCLUSTER_KEY).get(0);
+        Toml node = t.getTable("s" + id);
+        return node.getString("ip");
+    }
 
-    public static int getPort() {return Math.toIntExact(conf.getLong(tKeys.SERVER_RMFPORT_KEY)); }
-
-    public static int getID() { return Math.toIntExact(conf.getLong(tKeys.SERVER_ID_KEY)); }
+    public static int getPort(int id) {
+        Toml t = conf.getTables(tKeys.RMFCLUSTER_KEY).get(0);
+        Toml node = t.getTable("s" + id);
+        return Math.toIntExact(node.getLong("rmfPort"));
+    }
+//
+//    public static int getID() { return Math.toIntExact(conf.getLong(tKeys.SERVER_ID_KEY)); }
 
     public static ArrayList<Node> getCluster() {
         Toml t = conf.getTables(tKeys.RMFCLUSTER_KEY).get(0);

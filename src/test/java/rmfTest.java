@@ -1,6 +1,5 @@
 import config.Config;
 import config.Node;
-import crypto.pkiUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.junit.jupiter.api.Test;
 import rmf.ByzantineRmfNode;
@@ -19,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 public class rmfTest {
     int cidSeires = 0;
     private int timeToWaitBetweenTests = 1000 * 15;
-    static Config conf = new Config();
+//    static Config conf = new Config();
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(rmfTest.class);
     private String localHost = "localhost";
     private int[] rmfPorts = {20000, 20010, 20020, 20030};
@@ -61,7 +60,7 @@ public class rmfTest {
     void TestSingleServer() throws InterruptedException {
         Thread.sleep(timeToWaitBetweenTests);
         logger.info("start TestSingleServer");
-        String SingleServerconfigHome = Paths.get("config", "bbcConfig", "bbcSingleServer").toString();
+        String SingleServerconfigHome = Paths.get("config", "Configurations/single server/bbcConfig", "bbcSingleServer").toString();
         Node[] rn1 = initLocalRmfNodes(1, 0, SingleServerconfigHome, null);
         ((RmfNode) rn1[0]).start();
         ((RmfNode) rn1[0]).stop();
@@ -72,7 +71,7 @@ public class rmfTest {
         int cid = 0;
         Thread.sleep(timeToWaitBetweenTests);
         logger.info("start TestSingleServerDisseminateMessage");
-        String SingleServerconfigHome = Paths.get("config", "bbcConfig", "bbcSingleServer").toString();
+        String SingleServerconfigHome = Paths.get("config", "Configurations/single server/bbcConfig", "bbcSingleServer").toString();
         Node[] rn = initLocalRmfNodes( 1, 0, SingleServerconfigHome, null);
         ((RmfNode) rn[0]).start();
         String msg = "hello world";
@@ -87,7 +86,7 @@ public class rmfTest {
         Thread.sleep(timeToWaitBetweenTests);
         Thread[] servers = new Thread[4];
         int nnodes = 4;
-        String fourServersConfig = Paths.get("config", "bbcConfig", "bbcFourServers").toString();
+        String fourServersConfig = Paths.get("config", "Configurations/single server/bbcConfig", "bbcFourServers").toString();
         logger.info("start TestFourServersNoFailures");
 
         Node[] allNodes = initLocalRmfNodes(nnodes,1,fourServersConfig, null);
@@ -133,7 +132,7 @@ public class rmfTest {
         Thread.sleep(timeToWaitBetweenTests);
         Thread[] servers = new Thread[4];
         int nnodes = 4;
-        String fourServersConfig = Paths.get("config", "bbcConfig", "bbcFourServers").toString();
+        String fourServersConfig = Paths.get("config", "Configurations/single server/bbcConfig", "bbcFourServers").toString();
         logger.info("start TestStressFourServersNoFailures");
 
         Node[] allNodes = initLocalRmfNodes(nnodes,1,fourServersConfig, null);
@@ -182,7 +181,7 @@ public class rmfTest {
         Thread.sleep(timeToWaitBetweenTests);
         Thread[] servers = new Thread[4];
         int nnodes = 4;
-        String fourServersConfig = Paths.get("config", "bbcConfig", "bbcFourServers").toString();
+        String fourServersConfig = Paths.get("config", "Configurations/single server/bbcConfig", "bbcFourServers").toString();
         logger.info("start TestFourServersSenderMuteFailure");
 
         Node[] allNodes = initLocalRmfNodes(nnodes,1,fourServersConfig, null);
@@ -228,7 +227,7 @@ public class rmfTest {
         Thread.sleep(timeToWaitBetweenTests);
         Thread[] servers = new Thread[4];
         int nnodes = 4;
-        String fourServersConfig = Paths.get("config", "bbcConfig", "bbcFourServers").toString();
+        String fourServersConfig = Paths.get("config", "Configurations/single server/bbcConfig", "bbcFourServers").toString();
         logger.info("start TestFourServersSelectiveBroadcast");
 
         Node[] allNodes = initLocalRmfNodes(nnodes,1,fourServersConfig, new int[] {0});
@@ -304,7 +303,7 @@ public class rmfTest {
         Thread.sleep(timeToWaitBetweenTests);
         Thread[] servers = new Thread[4];
         int nnodes = 4;
-        String fourServersConfig = Paths.get("config", "bbcConfig", "bbcFourServers").toString();
+        String fourServersConfig = Paths.get("config", "Configurations/single server/bbcConfig", "bbcFourServers").toString();
         logger.info("start TestFourServersSelectiveBroadcast");
 
         Node[] allNodes = initLocalRmfNodes(nnodes,1,fourServersConfig, new int[] {0});
@@ -406,7 +405,7 @@ public class rmfTest {
         Thread.sleep(timeToWaitBetweenTests);
         Thread[] servers = new Thread[4];
         int nnodes = 4;
-        String fourServersConfig = Paths.get("config", "bbcConfig", "bbcFourServers").toString();
+        String fourServersConfig = Paths.get("config", "Configurations/single server/bbcConfig", "bbcFourServers").toString();
         logger.info("start TestFourServersSenderMuteFailure");
 
         Node[] allNodes = initLocalRmfNodes(nnodes,1,fourServersConfig, null);

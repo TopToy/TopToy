@@ -25,7 +25,13 @@ public class cli {
                                     "-s: check the status of a transaction\n" +
                                     "Usage: tx -s [txID]")
                             .build()); // TODO: How?
+            options.addOption(Option.builder("wait")
+                    .hasArg()
+                    .desc("Usage: wait [sec]\n" +
+                            "waits for [sec] second")
+                    .build());
         }
+
 
         void parse(String[] args) {
 //            CommandLineParser parser = new DefaultParser();
@@ -53,6 +59,14 @@ public class cli {
                 }
                 if (args[0].equals("quit")) {
                     System.exit(0);
+                    return;
+                }
+
+                if (args[0].equals("wait")) {
+                    if (args.length == 2) {
+                        int sec = Integer.parseInt(args[1]);
+                        Thread.sleep(sec * 1000);
+                    }
                     return;
                 }
 

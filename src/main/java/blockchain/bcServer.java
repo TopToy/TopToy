@@ -230,9 +230,12 @@ public abstract class bcServer extends Node {
                     }
                     newBlockNotifyer.notify();
                 }
-                synchronized (approvedTx) {
-                    addApprovedTransactions(bc.getBlock(bc.getHeight() - f).getDataList());
+                if (bc.getHeight() - f >= 0) {
+                    synchronized (approvedTx) {
+                        addApprovedTransactions(bc.getBlock(bc.getHeight() - f).getDataList());
+                    }
                 }
+
                 if (currLeader == getID()) {
                     removeFromProposed(recBlock.getDataList());
                 }
@@ -389,7 +392,7 @@ public abstract class bcServer extends Node {
                     fpe.done = false;
                     fpe.fp = p;
                     fp.put(pHeight, fpe);
-                    logger.debug(format("[#%d] interrupts the main thread", getID()));
+                    logger.debug(format("[#%d] interrupts the main thread panic from [#%d]", getID(), p.getSender()));
                     mainThread.interrupt();
                 }
             }

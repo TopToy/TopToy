@@ -33,20 +33,25 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                                                                      Metadata metadata,
                                                                      ServerCallHandler<ReqT, RespT> serverCallHandler) {
             ServerCall.Listener res = new ServerCall.Listener() {};
-            try {
-                String peerDomain = serverCall.getAttributes()
-                        .get(Grpc.TRANSPORT_ATTR_SSL_SESSION).getPeerPrincipal().getName().split("=")[1];
+//            try {
+//                String peerDomain = serverCall.getAttributes()
+//                        .get(Grpc.TRANSPORT_ATTR_SSL_SESSION).getPeerPrincipal().getName().split("=")[1];
+////                int peerId = Integer.parseInt(Objects.requireNonNull(metadata.get
+//                        (Metadata.Key.of("id", ASCII_STRING_MARSHALLER))));
+                String peerIp = Objects.requireNonNull(serverCall.getAttributes().get(Grpc.TRANSPORT_ATTR_REMOTE_ADDR)).
+                        toString().split(":")[0].replace("/", "");
                 int peerId = Integer.parseInt(Objects.requireNonNull(metadata.get
                         (Metadata.Key.of("id", ASCII_STRING_MARSHALLER))));
-                logger.debug(format("[#%d] peerDomain=%s", id, peerDomain));
-                if (nodes.get(peerId).getAddr().equals(peerDomain)) {
-                    res = serverCallHandler.startCall(serverCall, metadata);
-                }
-            } catch (SSLPeerUnverifiedException e) {
-                logger.error(format("[#%d]", id), e);
-            } finally {
-                return res;
-            }
+//                logger.debug(format("[#%d] peerDomain=%s", id, peerIp));
+//                if (nodes.get(peerId).getAddr().equals(peerIp)) {
+                    return serverCallHandler.startCall(serverCall, metadata);
+//                }
+//            } catch (SSLPeerUnverifiedException e) {
+//                logger.error(format("[#%d]", id), e);
+//            } finally {
+//                return res;
+//            }
+//            return res;
 
         }
     }

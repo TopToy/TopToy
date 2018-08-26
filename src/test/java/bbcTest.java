@@ -6,8 +6,6 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -15,10 +13,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class bbcTest {
     int cidSeries = 0;
     private int timeToWaitBetweenTest = 1; //15 * 1000;
-    static Config conf = new Config();
+//    static Config conf = new Config();
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(bbcTest.class);
-    private static Path SingleServerconfigHome = Paths.get("config", "bbcConfig", "bbcSingleServer");
-    private static Path FourServerconfigHome = Paths.get("config", "bbcConfig", "bbcFourServers");
+    private static Path SingleServerconfigHome = Paths.get("config", "Configurations/single server/bbcConfig", "bbcSingleServer");
+    private static Path FourServerconfigHome = Paths.get("config", "bbcFourConfig");
     private static void deleteViewIfExist(String configHome){
         File file2 = new File(Paths.get(configHome, "currentView").toString());
         if (file2.exists()) {

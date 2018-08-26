@@ -59,7 +59,7 @@
                                 <resource>
                                     <directory>.</directory>
                                     <filtering>true</filtering>
-                                    <includes>run.sh</includes>
+                                    <includes>run_single.sh</includes>
                                 </resource>
                             </resources>
                         </configuration>
