@@ -15,7 +15,9 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 public class pkiUtils {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(pkiUtils.class);
     private static PrivateKey privKey;
-    private static HashMap<Integer, PublicKey> clusterPubKeys = new HashMap<>();
+    private static HashMap<Integer, Signature> clusterPubKeys = new HashMap<>();
+    private static final Object globalLock = new Object();
+    private static Signature privateSignature;
 
     static {
         try {
@@ -27,8 +29,11 @@ public class pkiUtils {
             HashMap<Integer, String> keys = Config.getClusterPubKeys();
             for (int i : keys.keySet()) {
                 X509EncodedKeySpec spec = new X509EncodedKeySpec(Base64.getDecoder().decode(keys.get(i).replaceAll("\\s+","")));
-              clusterPubKeys.put(i, ecKeyFac.generatePublic(spec));
+              clusterPubKeys.put(i, Signature.getInstance("SHA256withECDSA"));
+              clusterPubKeys.get(i).initVerify(ecKeyFac.generatePublic(spec));
             }
+            privateSignature = Signature.getInstance("SHA256withECDSA");
+            privateSignature.initSign(privKey);
         } catch (Exception e) {
             logger.fatal("Unable to generate rsa keys", e);
         }
@@ -44,31 +49,30 @@ public class pkiUtils {
         System.out.println(new String(Base64.getEncoder().encode(publicKey.getEncoded())));
     }
     static public String sign(String plainText) {
-        Signature privateSignature = null;
-        try {
-            privateSignature = Signature.getInstance("SHA256withECDSA");
-            privateSignature.initSign(privKey);
-            privateSignature.update(plainText.getBytes(UTF_8));
-            byte[] signature = privateSignature.sign();
-            return Base64.getEncoder().encodeToString(signature);
-        } catch (Exception e) {
-            logger.fatal("Unable to generate rsa keys", e);
+        synchronized (globalLock) {
+            try {
+                privateSignature.update(plainText.getBytes(UTF_8));
+                byte[] signature = privateSignature.sign();
+                return Base64.getEncoder().encodeToString(signature);
+            } catch (Exception e) {
+                logger.fatal("Unable to generate rsa keys", e);
+            }
         }
         return null;
     }
 
    static public boolean verify(int id, String plainText, String signature)  {
-        Signature publicSignature = null;
-        try {
-            publicSignature = Signature.getInstance("SHA256withECDSA");
-            publicSignature.initVerify(clusterPubKeys.get(id));
-            publicSignature.update(plainText.getBytes(UTF_8));
-
-            byte[] signatureBytes = Base64.getDecoder().decode(signature);
-
-            return publicSignature.verify(signatureBytes);
-        } catch (Exception e) {
-            logger.fatal("Unable to validate message", e);
+        synchronized (globalLock) {
+            Signature publicSignature = clusterPubKeys.get(id);
+            try {
+//            publicSignature = Signature.getInstance("SHA256withECDSA");
+//            publicSignature.initVerify(clusterPubKeys.get(id));
+                publicSignature.update(plainText.getBytes(UTF_8));
+                byte[] signatureBytes = Base64.getDecoder().decode(signature);
+                return publicSignature.verify(signatureBytes);
+            } catch (Exception e) {
+                logger.fatal("Unable to validate message", e);
+            }
         }
         return false;
     }
