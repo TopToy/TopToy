@@ -162,6 +162,7 @@ public class blockchainTest {
     }
 //
     void serverDoing(List<Block> res, cbcServer s) {
+        logger.info("--->" + s.getID() + " STARTS");
         for(int i = 0; i < 100 ; i++) {
             String msg = "Hello" + i;
             if (i % 4 == s.getID()) {
@@ -169,7 +170,7 @@ public class blockchainTest {
             }
             res.add(s.deliver(i));
         }
-        logger.info("******************" + s.getID() + "****************************");
+        logger.info("--->" + s.getID() + " ENDS");
     }
     @Test
     void TestStressFourServersNoFailures() throws InterruptedException {
@@ -178,7 +179,6 @@ public class blockchainTest {
         Thread[] servers = new Thread[4];
         int nnodes = 4;
         String fourServersConfig = Paths.get("config", "Configurations/single server/bbcConfig", "bbcFourServers").toString();
-        logger.info("start TestStressFourServersNoFailures");
 
         Node[] allNodes = initLocalRmfNodes(nnodes,1,fourServersConfig, null);
         for (int i = 0 ; i < nnodes ; i++) {
@@ -189,14 +189,15 @@ public class blockchainTest {
         for (int i = 0 ; i < nnodes ; i++) {
             servers[i].join();
         }
-
         for (int i = 0 ; i < nnodes ; i++) {
             ((cbcServer) allNodes[i]).serve();
         }
+        Thread.sleep(5*1000);
         HashMap<Integer, ArrayList<Block>> res = new HashMap<>();
         for (int i = 0 ; i < nnodes ; i++) {
             res.put(i, new ArrayList<Block>());
         }
+        logger.info("start TestStressFourServersNoFailures");
         Thread[] tasks = new Thread[4];
         for (int i = 0 ; i < 4 ;i++) {
             int finalI = i;

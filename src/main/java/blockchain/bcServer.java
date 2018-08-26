@@ -263,7 +263,7 @@ public abstract class bcServer extends Node {
                 .setData(ByteString.copyFrom(data))
                 .build();
         synchronized (transactionsPool) {
-            logger.info(format("[#%d] adds transaction from [client=%d ; txID=%s]", getID(), t.getClientID(), t.getTxID()));
+            logger.debug(format("[#%d] adds transaction from [client=%d ; txID=%s]", getID(), t.getClientID(), t.getTxID()));
             transactionsPool.add(t);
         }
         return txID;

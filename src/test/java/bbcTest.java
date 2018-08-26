@@ -150,7 +150,7 @@ public class bbcTest {
     @Test
     void stressTestFourServersAllCorrect() throws InterruptedException {
         Thread.sleep(timeToWaitBetweenTest);
-        logger.info("Testing testFourServersAllCorrect1...");
+
         deleteViewIfExist(FourServerconfigHome.toString());
         int consID = 0;
         CountDownLatch latch = new CountDownLatch(4);
@@ -165,6 +165,7 @@ public class bbcTest {
             serversThread[i].start();
         }
         latch.await();
+        logger.info("Testing testFourServersAllCorrect1 -> STARTS");
         for (int i = 0 ; i < 100 ; i++) {
             for (int k = 0 ; k < 4 ; k++) {
                 servers[k].propose(consID % 2, cidSeries, consID);
@@ -175,6 +176,7 @@ public class bbcTest {
             consID++;
 
         }
+        logger.info("Testing testFourServersAllCorrect1 -> RNDS");
         for (int i = 0 ; i < 4 ; i++) {
             servers[i].shutdown();
         }
