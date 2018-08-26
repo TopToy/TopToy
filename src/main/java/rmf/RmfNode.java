@@ -36,7 +36,7 @@ public class RmfNode extends Node{
         rmfService.start();
     }
 
-    Data buildData(byte[] msg, int cidSeries, int cid, int height) {
+    Data buildData(byte[] msg, int cidSeries, int cid, int height, boolean fm) {
         Meta metaMsg = Meta.
                 newBuilder().
                 setSender(getID()).
@@ -48,18 +48,21 @@ public class RmfNode extends Node{
                 newBuilder().
                 setData(ByteString.copyFrom(msg)).
                 setMeta(metaMsg);
-        return dataMsg.setSig(rmfDigSig.sign(dataMsg)).build();
+        if (!fm) {
+            dataMsg = dataMsg.setSig(rmfDigSig.sign(dataMsg));
+        }
+        return dataMsg.build();
     }
     public void broadcast(int cidSeries, int cid, byte[] msg, int height) {
         logger.debug(format("[#%d] broadcasts data message with [height=%d]", getID(), height));
 
-        rmfService.rmfBroadcast(buildData(msg, cidSeries, cid, height));
+        rmfService.rmfBroadcast(buildData(msg, cidSeries, cid, height, false));
     }
 
     public byte[][] deliver(int cidSeries, int cid, int height, int sender, int tmo, byte[] msg) throws InterruptedException {
         Data dMsg = null;
         if (msg != null) {
-            dMsg = buildData(msg, cidSeries, cid + 1, height + 1);
+            dMsg = buildData(msg, cidSeries, cid + 1, height + 1, true);
         }
         Data m = rmfService.deliver(cidSeries, cid, tmo, sender, height, dMsg);
         return (m == null ? new byte[][] {null, null} :
