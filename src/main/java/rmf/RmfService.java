@@ -428,6 +428,8 @@ public class RmfService extends RmfGrpc.RmfImplBase {
     public Data deliver(int cidSeries, int cid, int tmo, int sender, int height, Data next) throws InterruptedException {
         int cVotes = 0;
         int v = 0;
+        boolean verfied = false;
+        boolean valid = false;
         synchronized (globalLock) {
             long startTime = System.currentTimeMillis();
             if (!pendingMsg.contains(cidSeries, cid)) {
@@ -436,19 +438,24 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             long estimatedTime = System.currentTimeMillis() - startTime;
             if (pendingMsg.contains(cidSeries, cid) &&
                     pendingMsg.get(cidSeries, cid).getMeta().getSender() == sender) { // &&
-//                    pendingMsg.get(cidSeries, cid).getMeta().getHeight() == height) {
-                BbcMsg.Builder bv = BbcMsg
-                        .newBuilder().setCid(cid).setCidSeries(cidSeries).setPropserID(id).setVote(1);
-                if (next != null) {
-                    logger.debug(format("[#%d] broadcasts [cidSeries=%d ; cid=%d] via fast mode",
-                            id,  next.getMeta().getCidSeries(), next.getMeta().getCid()));
-                    try {
-                        bv.setNext(setFastModeData(pendingMsg.get(cidSeries, cid), next));
-                    } catch (InvalidProtocolBufferException e) {
-                        logger.error(format("[#%d]", id), e);
+                Data msg = pendingMsg.get(cidSeries, cid);
+                verfied = true;
+                valid = rmfDigSig.verify(msg.getMeta().getSender(), msg);
+                if (valid) {
+                    BbcMsg.Builder bv = BbcMsg
+                            .newBuilder().setCid(cid).setCidSeries(cidSeries).setPropserID(id).setVote(1);
+                    if (next != null) {
+                        logger.debug(format("[#%d] broadcasts [cidSeries=%d ; cid=%d] via fast mode",
+                                id,  next.getMeta().getCidSeries(), next.getMeta().getCid()));
+                        try {
+                            bv.setNext(setFastModeData(pendingMsg.get(cidSeries, cid), next));
+                        } catch (InvalidProtocolBufferException e) {
+                            logger.error(format("[#%d]", id), e);
+                        }
                     }
+                    broadcastFastVoteMessage(bv.build());
                 }
-                broadcastFastVoteMessage(bv.build());
+//                    pendingMsg.get(cidSeries, cid).getMeta().getHeight() == height) {
             }
             if (fVotes.contains(cidSeries, cid)) {
                 cVotes = fVotes.get(cidSeries, cid).voters.size();
@@ -457,16 +464,26 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                 globalLock.wait(Math.max(tmo - estimatedTime, 1));
             }
 
-            if (pendingMsg.contains(cidSeries, cid) &&
-                    pendingMsg.get(cidSeries, cid).getMeta().getSender() == sender) { // &&
-                 //   pendingMsg.get(cidSeries, cid).getMeta().getHeight() == height) {
-                v = 1;
-            }
             if (fVotes.contains(cidSeries, cid)) {
                 cVotes = fVotes.get(cidSeries, cid).voters.size();
             }
 
             if (cVotes < n) {
+                if (pendingMsg.contains(cidSeries, cid) &&
+                        pendingMsg.get(cidSeries, cid).getMeta().getSender() == sender) { // &&
+                    //   pendingMsg.get(cidSeries, cid).getMeta().getHeight() == height) {
+                    if (verfied && valid) {
+                        v = 1;
+                    }
+                    if (!verfied) {
+                        Data msg = pendingMsg.get(cidSeries, cid);
+                        verfied = true;
+                        valid = rmfDigSig.verify(msg.getMeta().getSender(), msg);
+                        if (valid) {
+                            v = 1;
+                        }
+                    }
+                }
 //                td.t = Ctype.FULL;
                 logger.debug(format("[#%d] cvotes is [%d] for [cidSeries=%d ; cid=%d]", id, cVotes,cidSeries, cid));
                 int dec = fullBbcConsensus(v, cidSeries, cid);

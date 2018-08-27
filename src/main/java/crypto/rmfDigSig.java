@@ -8,7 +8,7 @@ public class rmfDigSig implements digitalSignature {
     public String signMessage(Object toSign) {
         Data.Builder m = (Data.Builder) toSign;
         return pkiUtils.sign(String.valueOf(m.getMeta().getCidSeries()) + String.valueOf(m.getMeta().getCid())
-                + new String (m.getData().toByteArray()));
+                + new String (DigestMethod.hash(m.getData().toByteArray())));
     }
 
     @Override
@@ -16,7 +16,7 @@ public class rmfDigSig implements digitalSignature {
         Data m = (Data) toVer;
         return  pkiUtils.verify(id,
                 String.valueOf(m.getMeta().getCidSeries()) + String.valueOf(m.getMeta().getCid())
-                        + new String(m.getData().toByteArray()),
+                        + new String(DigestMethod.hash(m.getData().toByteArray())),
                 m.getSig());
     }
 

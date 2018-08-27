@@ -53,7 +53,6 @@ public abstract class block {
                 .setHeader(blockBuilder
                         .getHeader()
                         .toBuilder()
-                        .setProof(blockDigSig.sign(blockBuilder))
                         .build())
                 .build();
     }

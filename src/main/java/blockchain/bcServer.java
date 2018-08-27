@@ -18,6 +18,7 @@ import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.lang.Math.max;
 import static java.lang.String.format;
 
 public abstract class bcServer extends Node {
@@ -181,9 +182,11 @@ public abstract class bcServer extends Node {
                                     .setCidSeries(cidSeries)
                                     .setCid(cid)
                                     .setPrev(ByteString.copyFrom(new byte[0]))
-                                    .setProof(msgSign)
                                     .build())
-                            .setOrig(ByteString.copyFrom(msg))
+                            .setFooter(BlockFooter
+                                    .newBuilder()
+                                    .setOrig(ByteString.copyFrom(msg))
+                                    .build())
                             .build();
                 /*
                     We should create an empty block to the case in which a byzantine leader sends valid block to
@@ -200,7 +203,22 @@ public abstract class bcServer extends Node {
 ////                            .setProof(msgSign)
 //                            .build())
 //                    .build();
-
+                Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+                recBlock = recBlock
+                        .toBuilder()
+                        .setFooter(recBlock.hasFooter() ?
+                                recBlock
+                                        .getFooter()
+                                        .toBuilder()
+                                        .setRmfProof(msgSign)
+                                        .setTs(timestamp.getTime())
+                                        .build()
+                                        : BlockFooter
+                                        .newBuilder()
+                                        .setRmfProof(msgSign)
+                                        .setTs(timestamp.getTime())
+                                        .build())
+                        .build();
                 if (currLeader == getID()) {
                     logger.debug(format("[#%d] nullifies currBlock [height=%d] [cidSeries=%d, cid=%d]", getID(), currHeight,
                             cidSeries, cid));
@@ -328,6 +346,7 @@ public abstract class bcServer extends Node {
     }
 
     private int validateForkProof(ForkProof p)  {
+        logger.debug(format("[#%d] starts validating fp", getID()));
         Block curr = p.getCurr();
         Block prev = p.getPrev();
         int prevBlockH = prev.getHeader().getHeight();
@@ -345,7 +364,7 @@ public abstract class bcServer extends Node {
             logger.debug(format("[#%d] invalid fork proof #2", getID()));
             return -1;
         }
-        if (!curr.getOrig().isEmpty()) {
+        if (!curr.getFooter().getOrig().isEmpty()) {
             Data asInRmf = Data
                     .newBuilder()
                     .setMeta(Meta
@@ -355,19 +374,54 @@ public abstract class bcServer extends Node {
                             .setCidSeries(curr.getHeader().getCidSeries())
                             .setCid(curr.getHeader().getCid())
                             .build())
-                    .setData(curr.getOrig())
-                    .setSig(curr.getHeader().getProof())
+                    .setData(curr.getFooter().getOrig())
+                    .setSig(curr.getFooter().getRmfProof())
                     .build();
             if (!rmfDigSig.verify(curr.getHeader().getCreatorID(), asInRmf)) {
                 logger.debug(format("[#%d] invalid fork proof #6", getID()));
                 return -1;
             }
-        } else if (!blockDigSig.verify(curr.getHeader().getCreatorID(), curr)) {
-            logger.debug(format("[#%d] invalid fork proof #3", getID()));
-            return -1;
+        } else {
+            Block.Builder dataAsInRmf = Block.newBuilder()
+                    .setHeader(curr.getHeader());
+            for (int i = 0 ; i < curr.getDataList().size() ; i++ ) {
+                dataAsInRmf.addData(i, curr.getData(i));
+            }
+            Data asInRmf = Data
+                    .newBuilder()
+                    .setMeta(Meta
+                            .newBuilder()
+                            //  .setHeight(curr.getHeader().getHeight())
+                            .setSender(curr.getHeader().getCreatorID())
+                            .setCidSeries(curr.getHeader().getCidSeries())
+                            .setCid(curr.getHeader().getCid())
+                            .build())
+                    .setData(dataAsInRmf.build().toByteString())
+                    .setSig(curr.getFooter().getRmfProof())
+                    .build();
+            if (!rmfDigSig.verify(curr.getHeader().getCreatorID(), asInRmf)) {
+                logger.debug(format("[#%d] invalid fork proof #3", getID()));
+                return -1;
+            }
         }
-
-        if (!blockDigSig.verify(prev.getHeader().getCreatorID(), prev)) {
+        Block.Builder dataAsInRmf = Block.newBuilder()
+                .setHeader(prev.getHeader());
+        for (int i = 0 ; i < prev.getDataList().size() ; i++ ) {
+            dataAsInRmf.addData(i, prev.getData(i));
+        }
+        Data asInRmf = Data
+                .newBuilder()
+                .setMeta(Meta
+                        .newBuilder()
+                        //  .setHeight(curr.getHeader().getHeight())
+                        .setSender(prev.getHeader().getCreatorID())
+                        .setCidSeries(prev.getHeader().getCidSeries())
+                        .setCid(prev.getHeader().getCid())
+                        .build())
+                .setData(dataAsInRmf.build().toByteString())
+                .setSig(prev.getFooter().getRmfProof())
+                .build();
+        if (!rmfDigSig.verify(prev.getHeader().getCreatorID(), asInRmf)) {
             logger.debug(format("[#%d] invalid fork proof #4", getID()));
             return -1;
         }
@@ -439,6 +493,19 @@ public abstract class bcServer extends Node {
         return bc.getBlock(index);
     }
 
+    public Block nonBlockingdeliver(int index) {
+        synchronized (newBlockNotifyer) {
+            if (index > bc.getHeight() - f) {
+                return null;
+            }
+        }
+        return bc.getBlock(index);
+    }
+
+    public int bcSize() {
+        return max(bc.getHeight() - f, 0);
+    }
+
     private void handleFork(ForkProof p) {
         if (validateForkProof(p) == -1) return;
         int fpoint = p.getCurr().getHeader().getHeight();
@@ -456,7 +523,7 @@ public abstract class bcServer extends Node {
 
     private int disseminateChainVersion(int forkPoint) {
         subChainVersion.Builder sv = subChainVersion.newBuilder();
-            int low = Math.max(forkPoint - f, 1);
+            int low = max(forkPoint - f, 1);
             int high = bc.getHeight() + 1;
             for (Block b : bc.getBlocks(low, high)) {
 //                int cid = b.getHeader().getCid();
@@ -494,7 +561,24 @@ public abstract class bcServer extends Node {
 //            if (b.hasOrig()) {
 //                b = b.getOrig(); // To handle self created empty block
 //            }
-            if (!blockDigSig.verify(pb.getHeader().getCreatorID(), pb)) {
+            Block.Builder dataAsInRmf = Block.newBuilder()
+                    .setHeader(pb.getHeader());
+            for (int i = 0 ; i < pb.getDataList().size() ; i++ ) {
+                dataAsInRmf.addData(i, pb.getData(i));
+            }
+            Data asInRmf = Data
+                    .newBuilder()
+                    .setMeta(Meta
+                            .newBuilder()
+                            //  .setHeight(curr.getHeader().getHeight())
+                            .setSender(pb.getHeader().getCreatorID())
+                            .setCidSeries(pb.getHeader().getCidSeries())
+                            .setCid(pb.getHeader().getCid())
+                            .build())
+                    .setData(dataAsInRmf.build().toByteString())
+                    .setSig(pb.getFooter().getRmfProof())
+                    .build();
+            if (!rmfDigSig.verify(pb.getHeader().getCreatorID(), asInRmf)) {
                 logger.debug(format("[#%d] invalid sub chain version, block [height=%d] digital signature is invalid " +
                         "[fp=%d ; sender=%d]", getID(), pb.getHeader().getHeight(), forkPoint, v.getSender()));
                 return false;

@@ -11,13 +11,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import static config.Config.setConfig;
 import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class rmfTest {
     int cidSeires = 0;
-    private int timeToWaitBetweenTests = 1000 * 15;
+    private int timeToWaitBetweenTests = 1; //1000 * 15;
 //    static Config conf = new Config();
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(rmfTest.class);
     private String localHost = "localhost";
@@ -129,10 +130,11 @@ public class rmfTest {
 
     @Test
     void TestStressFourServersNoFailures() throws InterruptedException {
+        setConfig(null, 0);
         Thread.sleep(timeToWaitBetweenTests);
         Thread[] servers = new Thread[4];
         int nnodes = 4;
-        String fourServersConfig = Paths.get("config", "Configurations/single server/bbcConfig", "bbcFourServers").toString();
+        String fourServersConfig = Paths.get("config", "bbcFourConfig").toString();
         logger.info("start TestStressFourServersNoFailures");
 
         Node[] allNodes = initLocalRmfNodes(nnodes,1,fourServersConfig, null);

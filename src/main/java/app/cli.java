@@ -1,9 +1,15 @@
 package app;
-import blockchain.cbcServer;
-import config.Config;
 import org.apache.commons.cli.*;
+import proto.Types;
+import utils.CSVUtils;
 
+import java.io.FileWriter;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.List;
 
 import static java.lang.String.format;
 
@@ -29,6 +35,11 @@ public class cli {
                     .hasArg()
                     .desc("Usage: wait [sec]\n" +
                             "waits for [sec] second")
+                    .build());
+            options.addOption(Option.builder("res")
+                    .hasArg()
+                    .desc("Write the results into csv file\n" +
+                            "Usage: res -p [path_to_csv]")
                     .build());
         }
 
@@ -66,6 +77,16 @@ public class cli {
                     if (args.length == 2) {
                         int sec = Integer.parseInt(args[1]);
                         Thread.sleep(sec * 1000);
+                    }
+                    return;
+                }
+
+                if (args[0].equals("res")) {
+                    if (args.length == 3) {
+                        if (!args[1].equals("-p")) return;
+                        String path = args[2];
+                        writeToScv(path);
+
                     }
                     return;
                 }
@@ -118,6 +139,7 @@ public class cli {
             JToy.server.shutdown();
         }
 
+
         private String addtx(String data, int clientID) {
             return JToy.server.addTransaction(data.getBytes(), clientID);
         }
@@ -133,6 +155,31 @@ public class cli {
                 case 3: return "Pending";
             }
             return null;
+        }
+
+        private void writeToScv(String pathString) {
+            Path path = Paths.get(pathString, String.valueOf(JToy.server.getID()), "res.csv");
+            try {
+                File f = new File(path.toString());
+
+                f.getParentFile().mkdirs();
+                f.createNewFile();
+                FileWriter writer = new FileWriter(path.toString());
+                int nob = JToy.server.bcSize();
+                for (int i = 0 ; i < nob ; i++) {
+                    Types.Block b = JToy.server.nonBlockingdeliver(i);
+                    for (Types.Transaction t : b.getDataList()) {
+                        List<String> row = Arrays.asList(t.getTxID(),
+                                String.valueOf(t.getClientID()), String.valueOf(b.getFooter().getTs()),
+                                String.valueOf(t.getData().size()), String.valueOf(i));
+                        CSVUtils.writeLine(writer, row);
+                    }
+                }
+                writer.flush();
+                writer.close();
+            } catch (IOException e) {
+                logger.error("", e);
+            }
         }
 
 }
