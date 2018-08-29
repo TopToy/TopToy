@@ -2,7 +2,6 @@ import blockchain.asyncBcServer;
 import blockchain.cbcServer;
 import blockchain.byzantineBcServer;
 
-import config.Config;
 import config.Node;
 import org.apache.commons.lang.ArrayUtils;
 import org.junit.jupiter.api.Test;
@@ -94,8 +93,8 @@ public class blockchainTest {
 //
     @Test
     void TestSingleServerDisseminateMessage() throws InterruptedException {
-        String SingleServerconfigHome = Paths.get("config", "singleServer", "config.toml").toString();
-        setConfig(Paths.get("config", "singleServer", "config.toml"), 0);
+        String SingleServerconfigHome = Paths.get("config", "singleServer", "Configurations/single server/config.toml").toString();
+        setConfig(Paths.get("config", "singleServer", "Configurations/single server/config.toml"), 0);
         Thread.sleep(timeToWaitBetweenTests);
         logger.info("start TestSingleServer");
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-servers=(yon_b@10.10.43.55) # yon_b@10.10.43.57 yon_b@10.10.43.56 yon_b@10.10.43.58)
+servers=(yon_b@10.10.43.55 yon_b@10.10.43.57 yon_b@10.10.43.56 yon_b@10.10.43.58)
 types=(r r r r)
-ids=(0 0 0 0)
+ids=(0 1 2 3)
 pass=yon_b@2017@
 for i in `seq 0 $((${#servers[@]} - 1))`; do
     echo "compiling server ${servers[$i]}"
@@ -9,7 +9,7 @@ for i in `seq 0 $((${#servers[@]} - 1))`; do
 done
 
 for i in `seq 0 $((${#servers[@]} - 1))`; do
-    echo "running server ${servers[$i]}"
+    echo "running server ${servers[$i]} [${ids[i]}]"
     cat run_remote.sh | sed 's/${1}/'${pass}'/g' | sed 's/${2}/'${ids[i]}'/g' | sed 's/${3}/'${types[i]}'/g' | sshpass -p ${pass} ssh ${servers[$i]} bash &
 done
 wait

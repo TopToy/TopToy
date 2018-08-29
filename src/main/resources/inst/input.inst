@@ -1,5 +1,4 @@
 init
-serve
 tx -a "hello" 0
 tx -a "hello" 0
 tx -a "hello" 0
