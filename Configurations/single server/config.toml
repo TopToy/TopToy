@@ -16,9 +16,9 @@ title = "configuration"
     fastMode = true
 
 [server]
-    id = 0
-    ip = "127.0.0.1"
-    rmfPort = 20000
+#    id = 0
+#    ip = "127.0.0.1"
+#    rmfPort = 20000
     privateKey = """MIGNAgEAMBAGByqGSM49AgEGBSuBBAAKBHYwdAIBAQQg/ngTdAL+eZOyh4lilm6djqsl
                     RDHT5C60eLxRcEoNjAGgBwYFK4EEAAqhRANCAASeFQqtyOwJcJtYceofW2TeNg7rJBlW
                     L28GZn+tk32fz95JqVS3+iF6JdoM1clkRFLliyXSxEnS1iO4wzRKGQwm"""
