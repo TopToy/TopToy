@@ -4,9 +4,13 @@ import com.google.protobuf.ByteString;
 import config.Config;
 import crypto.DigestMethod;
 
+import org.apache.commons.lang.ArrayUtils;
 import proto.Types.*;
 import rmf.ByzantineRmfNode;
 
+import java.math.BigInteger;
+import java.security.SecureRandom;
+import java.sql.Timestamp;
 import java.util.*;
 
 import static java.lang.String.format;
@@ -15,13 +19,46 @@ public class byzantineBcServer extends bcServer {
 
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(byzantineBcServer.class);
     private boolean fullByz = false;
+    List<List<Integer>> groups = new ArrayList<>();
     public byzantineBcServer(String addr, int rmfPort, int id) {
         super(addr, rmfPort, id);
         rmfServer.stop();
         rmfServer = new ByzantineRmfNode(id, addr, rmfPort, Config.getF(),
                 Config.getCluster(), Config.getRMFbbcConfigHome());
+        groups.add(new ArrayList<>());
+        for (int i = 0 ; i < Config.getN() ; i++) {
+            groups.get(0).add(i); // At the beginning there is no byzantine behaviour
+        }
+    }
+    public void setByzSetting(boolean fullByz, List<List<Integer>> groups) {
+        if (!fullByz && groups.size() > 2) {
+            logger.debug("On non full byzantine behavior there is at most two send groups");
+            return;
+        }
+        this.fullByz = fullByz;
+        this.groups = groups;
+
     }
 
+    private void addByzData() {
+        SecureRandom random = new SecureRandom();
+        byte[] byzTx = new byte[40];
+        random.nextBytes(byzTx);
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        long magic = timestamp.getTime();
+        String txID = new BigInteger(DigestMethod.hash(ArrayUtils.addAll(byzTx, (String.valueOf(magic)).getBytes())))
+                .toString()
+                .replaceAll("-","N");
+        Transaction t = Transaction.newBuilder()
+                .setClientID(getID())
+                .setData(ByteString.copyFrom(byzTx))
+                .setTxID(txID)
+                .build();
+        currBlock.addTransaction(t);
+        if (currBlock.getTransactionCount() > 1) {
+            currBlock.removeTransaction(0);
+        }
+    }
      byte[] leaderImpl() {
         if (currLeader != getID()) {
             return null;
@@ -32,32 +69,22 @@ public class byzantineBcServer extends bcServer {
             addTransactionsToCurrBlock();
             Block sealedBlock1 = currBlock.construct(getID(), currHeight, cidSeries, cid,
                     DigestMethod.hash(bc.getBlock(currHeight - 1).getHeader().toByteArray()));
-            String msg = "Hello Byz";
-            Transaction t = Transaction.newBuilder().setClientID(getID()).
-                    setData(ByteString.copyFrom(msg.getBytes())).build();
-            currBlock.addTransaction(t);
-            Block sealedBlock2 = currBlock.construct(getID(), currHeight, cidSeries, cid,
-                    DigestMethod.hash(bc.getBlock(currHeight - 1).getHeader().toByteArray()));
-//            currBlock = bc.createNewBLock();
-            List<Integer> all = new ArrayList<>();
-            for (int i = 0 ; i < n ;i++) {
-                all.add(i);
-            }
-            List<Integer> heights = new ArrayList<>();
+
             List<byte[]> msgs = new ArrayList<>();
-            msgs.add(sealedBlock1.toByteArray());
-            msgs.add(sealedBlock2.toByteArray());
-            List<List<Integer>> sids = new ArrayList<>();
-            sids.add(all.subList(0, 2));
-            sids.add(all.subList(2, 4));
-            for (int i = 0 ; i < 2 ; i++) {
+            List<Integer> heights = new ArrayList<>();
+            for (int i = 0 ; i < groups.size() ; i++) {
+                addByzData();
+                Block byzBlock = currBlock.construct(getID(), currHeight, cidSeries, cid,
+                        DigestMethod.hash(bc.getBlock(currHeight - 1).getHeader().toByteArray()));
+                msgs.add(byzBlock.toByteArray());
                 heights.add(currHeight);
             }
+
             if (fullByz) {
-                ((ByzantineRmfNode)rmfServer).devidedBroadcast(cidSeries, cid, msgs, heights, sids);
+                ((ByzantineRmfNode)rmfServer).devidedBroadcast(cidSeries, cid, msgs, heights, groups);
 
             } else {
-                ((ByzantineRmfNode)rmfServer).selectiveBroadcast(cidSeries, cid, sealedBlock1.toByteArray(), currHeight, all.subList(0, n/2));
+                ((ByzantineRmfNode)rmfServer).selectiveBroadcast(cidSeries, cid, sealedBlock1.toByteArray(), currHeight, groups.get(0));
             }
 //        }
          return null;

@@ -1,4 +1,6 @@
 package app;
+import blockchain.asyncBcServer;
+import blockchain.byzantineBcServer;
 import org.apache.commons.cli.*;
 import proto.Types;
 import utils.CSVUtils;
@@ -8,8 +10,10 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
+import java.security.SecureRandom;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 import static java.lang.String.format;
 
@@ -40,6 +44,12 @@ public class cli {
                     .hasArg()
                     .desc("Write the results into csv file\n" +
                             "Usage: res -p [path_to_csv]")
+                    .build());
+            options.addOption(Option.builder("bm")
+                    .hasArg()
+                    .desc("run a benchmark on the system\n" +
+                            "Note that this method should run write after init!\n" +
+                            "Usage: bm -t [transaction size] -s [amount of loaded transactions] -p [path to csv]")
                     .build());
         }
 
@@ -81,6 +91,26 @@ public class cli {
                     return;
                 }
 
+                if (args[0].equals("async")) {
+                    if (!JToy.type.equals("a")) {
+                        logger.debug("Unable to set async behaviour to non async server");
+                        return;
+                    }
+                    if (args.length == 2) {
+                        int sec = Integer.parseInt(args[1]);
+                        ((asyncBcServer) JToy.server).setAsyncParam(sec);
+                    }
+                    return;
+                }
+
+                if (args[0].equals("byz")) {
+                    if (!JToy.type.equals("bs") && !JToy.type.equals("bf")) {
+                        logger.debug("Unable to set byzantine behaviour to non async server");
+                        return;
+                    }
+                    setByzSetting(args);
+                }
+
                 if (args[0].equals("res")) {
                     if (args.length == 3) {
                         if (!args[1].equals("-p")) return;
@@ -88,6 +118,15 @@ public class cli {
                         writeToScv(path);
 
                     }
+                    return;
+                }
+
+                if (args[0].equals("bm")) {
+                    if (args.length != 7) return;
+                    if (!args[1].equals("-t")) return;
+                    if (!args[3].equals("-s")) return;
+                    if (!args[5].equals("-p")) return;
+                    runBenchMark(Integer.parseInt(args[2]), Integer.parseInt(args[4]), args[6]);
                     return;
                 }
 
@@ -127,12 +166,12 @@ public class cli {
         }
 
         private void init() {
-
             JToy.server.start();
         }
 
         private void serve() {
-
+            if (JToy.type.equals("m")) return;
+            logger.debug("start serving");
             JToy.server.serve();
         }
         private void stop() {
@@ -158,7 +197,9 @@ public class cli {
         }
 
         private void writeToScv(String pathString) {
-            Path path = Paths.get(pathString, String.valueOf(JToy.server.getID()), "res.csv");
+            if (JToy.type.equals("m")) return;
+            DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyyHH:mm:ss");
+            Path path = Paths.get(pathString, String.valueOf(JToy.server.getID()), dateFormat.format(new Date()) + ".csv");
             try {
                 File f = new File(path.toString());
 
@@ -166,20 +207,84 @@ public class cli {
                 f.createNewFile();
                 FileWriter writer = new FileWriter(path.toString());
                 int nob = JToy.server.bcSize();
+                long fts = -1;
+                long lts = -1;
+                int tCount = 0;
                 for (int i = 0 ; i < nob ; i++) {
                     Types.Block b = JToy.server.nonBlockingdeliver(i);
                     for (Types.Transaction t : b.getDataList()) {
+                        tCount++;
+                        if (fts == -1) {
+                            fts = b.getFooter().getTs();
+                        }
+                        lts = b.getFooter().getTs();
                         List<String> row = Arrays.asList(t.getTxID(),
                                 String.valueOf(t.getClientID()), String.valueOf(b.getFooter().getTs()),
-                                String.valueOf(t.getData().size()), String.valueOf(i));
+                                String.valueOf(t.getData().size()), String.valueOf(i),
+                                String.valueOf(b.getHeader().getCreatorID()));
                         CSVUtils.writeLine(writer, row);
                     }
                 }
                 writer.flush();
                 writer.close();
+                writeSummery(pathString, tCount, fts, lts);
             } catch (IOException e) {
                 logger.error("", e);
             }
+        }
+
+        void writeSummery(String pathString, int tCount, long fts, long lts) throws IOException {
+            Path path = Paths.get(pathString,   "summery.csv");
+            File f = new File(path.toString());
+            if (!f.exists()) {
+                f.getParentFile().mkdirs();
+                f.createNewFile();
+            }
+            FileWriter writer = new FileWriter(path.toString(), true);
+            double time = ((double) lts - (double) fts) / 1000;
+            int thrp = (int) (tCount / time);
+            List<String> row = Arrays.asList(String.valueOf(JToy.server.getID()), String.valueOf(tCount),
+                    String.valueOf(time), String.valueOf(thrp));
+            CSVUtils.writeLine(writer, row);
+            writer.flush();
+            writer.close();
+        }
+        private void runBenchMark(int tSize, int tNumber, String csvPath) throws InterruptedException {
+            Random rand = new Random();
+            String last = "";
+            for (int i = 0 ; i < tNumber ; i++) {
+                int cID = rand.nextInt( 100 );
+                SecureRandom random = new SecureRandom();
+                byte[] tx = new byte[tSize];
+                random.nextBytes(tx);
+                last = JToy.server.addTransaction(tx, cID);
+            }
+            serve();
+            while ((!JToy.type.equals("m")) && (!last.equals("")) && JToy.server.isTxPresent(last) != 2) {
+                Thread.sleep(5 * 1000);
+            }
+//            if (JToy.type.equals("m")) {
+//                Thread.sleep(60 * 1000);
+//            }
+//            Thread.sleep(20 * 1000);
+            stop();
+            writeToScv(csvPath);
+        }
+
+        private void setByzSetting(String[] args) {
+            boolean fullByz = Integer.parseInt(args[1]) == 1;
+            List<List<Integer>> groups = new ArrayList<>();
+            int i = 2;
+            while (i < args.length) {
+                i++;
+                List<Integer> group = new ArrayList<>();
+                while (i < args.length && !args[i].equals("-g")) {
+                    group.add(Integer.parseInt(args[i]));
+                    i++;
+                }
+                groups.add(group);
+            }
+            ((byzantineBcServer) JToy.server).setByzSetting(fullByz, groups);
         }
 
 }

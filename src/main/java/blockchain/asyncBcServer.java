@@ -9,13 +9,14 @@ import static java.lang.String.format;
 public class asyncBcServer extends bcServer {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(asyncBcServer.class);
 
+    int maxTime = 0;
     public asyncBcServer(String addr, int rmfPort,  int id) {
         super(addr, rmfPort,  id);
     }
 
     byte[] leaderImpl() throws InterruptedException {
         Random rand = new Random();
-        int x = rand.nextInt(1500) + 1;
+        int x = rand.nextInt(maxTime) + 1;
         logger.debug(format("[#%d] sleeps for %d ms", getID(), x));
         Thread.sleep(x);
         if (!configuredFastMode) {
@@ -48,7 +49,10 @@ public class asyncBcServer extends bcServer {
             addTransactionsToCurrBlock();
             return currBlock.construct(getID(), currHeight + 1, cidSeries, cid + 1, new byte[0]).toByteArray();
         }
+    public void setAsyncParam(int maxTime) {
+        this.maxTime = maxTime;
 
+    }
     @Override
     blockchain initBC(int id) {
         return new basicBlockchain(id);
