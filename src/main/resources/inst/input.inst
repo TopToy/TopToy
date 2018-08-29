@@ -1,0 +1,12 @@
+init
+serve
+tx -a "hello" 0
+tx -a "hello" 0
+tx -a "hello" 0
+tx -a "hello" 0
+tx -a "hello" 0
+tx -a "hello" 0
+wait 5
+stop
+res -p /tmp/JToy/res/
+quit

@@ -6,7 +6,6 @@
 # Intellij
 .idea/
 *.iml
-input*
 output*
 *.iws
 

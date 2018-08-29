@@ -234,7 +234,7 @@ public class cli {
         }
 
         void writeSummery(String pathString, int tCount, long fts, long lts) throws IOException {
-            Path path = Paths.get(pathString,   "summery.csv");
+            Path path = Paths.get(pathString,   String.valueOf(JToy.server.getID()), "summery.csv");
             File f = new File(path.toString());
             if (!f.exists()) {
                 f.getParentFile().mkdirs();
@@ -243,7 +243,8 @@ public class cli {
             FileWriter writer = new FileWriter(path.toString(), true);
             double time = ((double) lts - (double) fts) / 1000;
             int thrp = (int) (tCount / time);
-            List<String> row = Arrays.asList(String.valueOf(JToy.server.getID()), String.valueOf(tCount),
+            DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyyHH:mm:ss");
+            List<String> row = Arrays.asList(dateFormat.format(new Date()), String.valueOf(JToy.server.getID()), String.valueOf(tCount),
                     String.valueOf(time), String.valueOf(thrp));
             CSVUtils.writeLine(writer, row);
             writer.flush();
