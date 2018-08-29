@@ -2,12 +2,12 @@
 
 toyHome=JToy
 
-mkdir ${toyHome}/logs
-mkdir ${toyHome}/res
+mkdir -p /tmp/JToy/logs
+mkdir -p /tmp/JToy/res
 
 cd ${toyHome}
 
-
+rm -r -f ./bin
 mvn install -DskipTests
 
 #Basically we should reconfigure the project
