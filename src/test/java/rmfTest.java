@@ -84,10 +84,11 @@ public class rmfTest {
 
     @Test
     void TestFourServersNoFailuresSingleMessage() throws InterruptedException {
+        setConfig(Paths.get("Configurations", "4Servers", "local", "config.toml"), 0);
         Thread.sleep(timeToWaitBetweenTests);
         Thread[] servers = new Thread[4];
         int nnodes = 4;
-        String fourServersConfig = Paths.get("config", "Configurations/single server/bbcConfig", "bbcFourServers").toString();
+        String fourServersConfig = Paths.get("Configurations", "4Servers", "local", "bbcConfig").toString();
         logger.info("start TestFourServersNoFailures");
 
         Node[] allNodes = initLocalRmfNodes(nnodes,1,fourServersConfig, null);
@@ -130,11 +131,11 @@ public class rmfTest {
 
     @Test
     void TestStressFourServersNoFailures() throws InterruptedException {
-        setConfig(null, 0);
+        setConfig(Paths.get("Configurations", "4Servers", "local", "config.toml"), 0);
         Thread.sleep(timeToWaitBetweenTests);
         Thread[] servers = new Thread[4];
         int nnodes = 4;
-        String fourServersConfig = Paths.get("config", "bbcFourConfig").toString();
+        String fourServersConfig = Paths.get("Configurations", "4Servers", "local", "bbcConfig").toString();
         logger.info("start TestStressFourServersNoFailures");
 
         Node[] allNodes = initLocalRmfNodes(nnodes,1,fourServersConfig, null);
@@ -180,10 +181,11 @@ public class rmfTest {
 
     @Test
     void TestFourServersSenderMuteFailure() throws InterruptedException {
+        setConfig(Paths.get("Configurations", "4Servers", "local", "config.toml"), 0);
         Thread.sleep(timeToWaitBetweenTests);
         Thread[] servers = new Thread[4];
         int nnodes = 4;
-        String fourServersConfig = Paths.get("config", "Configurations/single server/bbcConfig", "bbcFourServers").toString();
+        String fourServersConfig = Paths.get("Configurations", "4Servers", "local", "bbcConfig").toString();
         logger.info("start TestFourServersSenderMuteFailure");
 
         Node[] allNodes = initLocalRmfNodes(nnodes,1,fourServersConfig, null);
@@ -208,7 +210,7 @@ public class rmfTest {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                ret[finalI] = (res.length == 0 ? null : new String(res));
+                ret[finalI] = (res == null ? null : new String(res));
             });
             tasks[i].start();
         }
@@ -226,10 +228,11 @@ public class rmfTest {
     }
     @Test
     void TestFourServersSelectiveBroadcast() throws InterruptedException {
+        setConfig(Paths.get("Configurations", "4Servers", "local", "config.toml"), 0);
         Thread.sleep(timeToWaitBetweenTests);
         Thread[] servers = new Thread[4];
         int nnodes = 4;
-        String fourServersConfig = Paths.get("config", "Configurations/single server/bbcConfig", "bbcFourServers").toString();
+        String fourServersConfig = Paths.get("Configurations", "4Servers", "local", "bbcConfig").toString();
         logger.info("start TestFourServersSelectiveBroadcast");
 
         Node[] allNodes = initLocalRmfNodes(nnodes,1,fourServersConfig, new int[] {0});
@@ -302,10 +305,11 @@ public class rmfTest {
 
     @Test
     void TestStressFourServersSelectiveBroadcast() throws InterruptedException {
+        setConfig(Paths.get("Configurations", "4Servers", "local", "config.toml"), 0);
         Thread.sleep(timeToWaitBetweenTests);
         Thread[] servers = new Thread[4];
         int nnodes = 4;
-        String fourServersConfig = Paths.get("config", "Configurations/single server/bbcConfig", "bbcFourServers").toString();
+        String fourServersConfig = Paths.get("Configurations", "4Servers", "local", "bbcConfig").toString();
         logger.info("start TestFourServersSelectiveBroadcast");
 
         Node[] allNodes = initLocalRmfNodes(nnodes,1,fourServersConfig, new int[] {0});
@@ -404,10 +408,11 @@ public class rmfTest {
 
     @Test
     void TestAsyncNetwork1() throws InterruptedException {
+        setConfig(Paths.get("Configurations", "4Servers", "local", "config.toml"), 0);
         Thread.sleep(timeToWaitBetweenTests);
         Thread[] servers = new Thread[4];
         int nnodes = 4;
-        String fourServersConfig = Paths.get("config", "Configurations/single server/bbcConfig", "bbcFourServers").toString();
+        String fourServersConfig = Paths.get("Configurations", "4Servers", "local", "bbcConfig").toString();
         logger.info("start TestFourServersSenderMuteFailure");
 
         Node[] allNodes = initLocalRmfNodes(nnodes,1,fourServersConfig, null);
