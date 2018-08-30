@@ -237,7 +237,7 @@ public class cli {
                 f.createNewFile();
             }
             FileWriter writer = new FileWriter(path.toString(), true);
-            DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyyHH:mm:ss");
+            DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy-HH:mm:ss");
             List<String> row = Arrays.asList(dateFormat.format(new Date()), String.valueOf(JToy.server.getID()), String.valueOf(count));
             CSVUtils.writeLine(writer, row);
             writer.flush();
@@ -245,7 +245,7 @@ public class cli {
         }
         private void writeToScv(String pathString) {
             if (JToy.type.equals("m")) return;
-            DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyyHH:mm:ss");
+            DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy-HH:mm:ss");
             Path path = Paths.get(pathString, String.valueOf(JToy.server.getID()), dateFormat.format(new Date()) + ".csv");
             try {
                 File f = new File(path.toString());
@@ -290,7 +290,7 @@ public class cli {
             FileWriter writer = new FileWriter(path.toString(), true);
             double time = ((double) lts - (double) fts) / 1000;
             int thrp = (int) (tCount / time);
-            DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyyHH:mm:ss");
+            DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy-HH:mm:ss");
             List<String> row = Arrays.asList(dateFormat.format(new Date()), String.valueOf(JToy.server.getID()), String.valueOf(tCount),
                     String.valueOf(time), String.valueOf(thrp));
             CSVUtils.writeLine(writer, row);

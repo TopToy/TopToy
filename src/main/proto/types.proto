@@ -8,6 +8,7 @@ message BbcMsg {
     int32 cidSeries = 3;
     int32 vote = 4;
     Data next = 5;
+    bytes auth = 6;
 }
 
 
@@ -72,6 +73,11 @@ message Meta {
     int32 cid = 2;
     int32 cidSeries = 3;
 }
+
+//message Auth {
+//    Meta m = 1;
+//    bytes hash = 2;
+//}
 
 message Data {
     Meta _meta = 1;

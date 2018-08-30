@@ -148,7 +148,9 @@ public abstract class bcServer extends Node {
                 }
                 byte[][] pmsg;
                 try {
+                    long startTime = System.currentTimeMillis();
                     pmsg = rmfServer.deliver(cidSeries, cid, currHeight, currLeader, tmo, next);
+                    logger.debug(format("deliver took about [%d] ms", System.currentTimeMillis() - startTime));
                 } catch (InterruptedException e) {
                     logger.debug(format("[#%d] main thread has been interrupted on rmf deliver", getID()));
                     continue;

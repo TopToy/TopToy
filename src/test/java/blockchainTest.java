@@ -10,9 +10,7 @@ import proto.Types.*;
 
 import java.io.File;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import static config.Config.setConfig;
 import static java.lang.String.format;
@@ -564,10 +562,14 @@ void TestStressFourServersMuteFault() throws InterruptedException {
 
         for (int i = 0 ; i < nnodes ; i++) {
             if (i == 0) {
-                ((byzantineBcServer) allNodes[i]).setFullByz();
+                List<List<Integer>> gr = new ArrayList<>();
+                gr.add(Arrays.asList(1, 2));
+                gr.add(Arrays.asList(0 , 3));
+                ((byzantineBcServer) allNodes[i]).setByzSetting(true, gr);
                 ((byzantineBcServer) allNodes[i]).serve();
                 continue;
             }
+            ((asyncBcServer) allNodes[i]).setAsyncParam(1500);
             ((asyncBcServer) allNodes[i]).serve();
         }
 

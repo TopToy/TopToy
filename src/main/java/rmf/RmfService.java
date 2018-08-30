@@ -429,7 +429,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         }
     }
 
-    public Data deliver(int cidSeries, int cid, int tmo, int sender, int height, Data next) throws InterruptedException {
+    public Data deliver(int cidSeries, int cid, int tmo, int sender, int height, Data next, byte[] auth) throws InterruptedException {
         int cVotes = 0;
         int v = 0;
         boolean verfied = false;
@@ -448,7 +448,12 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                 valid = rmfDigSig.verify(msg.getMeta().getSender(), msg);
                 if (valid) {
                     BbcMsg.Builder bv = BbcMsg
-                            .newBuilder().setCid(cid).setCidSeries(cidSeries).setPropserID(id).setVote(1);
+                            .newBuilder()
+                            .setCid(cid)
+                            .setCidSeries(cidSeries)
+                            .setPropserID(id)
+                            .setAuth(ByteString.copyFrom(auth))
+                            .setVote(1);
                     if (next != null) {
                         logger.debug(format("[#%d] broadcasts [cidSeries=%d ; cid=%d] via fast mode",
                                 id,  next.getMeta().getCidSeries(), next.getMeta().getCid()));

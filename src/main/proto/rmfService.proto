@@ -4,48 +4,6 @@ option java_package = "proto";
 
 package proto;
 import "types.proto";
-//import "bbcProtos.proto";
-//
-////option java_outer_classname="RmfGrpc";
-//
-//message Empty {
-//
-//}
-//
-//message Meta {
-//    int32 sender = 1;
-//    int32 height = 2;
-//    int32 cid = 3;
-//    int32 cidSeries = 4;
-//}
-//
-//message Data {
-//    Meta _meta = 1;
-//    bytes data = 2;
-//    string sig = 3;
-//}
-//
-//message Req {
-//    Meta _meta = 1;
-//}
-//
-//message Res {
-//    Meta _meta = 1;
-//    Data _data = 2;
-//}
-//
-////message FastBbcVote {
-////    int32 sender = 1;
-////    int32 vote = 2;
-////    int32 cid = 3;
-////    string sig = 4;
-////}
-//
-//message RmfResult {
-//    int32 cid = 1;
-//    int32 cidSeries = 2;
-//    bytes data = 3;
-//}
 
 service Rmf {
     rpc DisseminateMessage(Data) returns (Empty) {};

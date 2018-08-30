@@ -11,7 +11,7 @@ title = "configuration"
     rmfBbcConfigPath = "src/main/resources/bbcConfig"
     panicRBroadcastConfigPath = "src/main/resources/panicRBConfig"
     syncRBroadcastConfigPath = "src/main/resources/syncRBConfig"
-    maxTransactionInBlock = 100
+    maxTransactionInBlock = 1000
     caRootPath = ""
     fastMode = true
 

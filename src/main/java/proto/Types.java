@@ -50,6 +50,11 @@ public final class Types {
      * <code>.proto.Data next = 5;</code>
      */
     proto.Types.DataOrBuilder getNextOrBuilder();
+
+    /**
+     * <code>bytes auth = 6;</code>
+     */
+    com.google.protobuf.ByteString getAuth();
   }
   /**
    * Protobuf type {@code proto.BbcMsg}
@@ -68,6 +73,7 @@ public final class Types {
       cid_ = 0;
       cidSeries_ = 0;
       vote_ = 0;
+      auth_ = com.google.protobuf.ByteString.EMPTY;
     }
 
     @java.lang.Override
@@ -132,6 +138,11 @@ public final class Types {
                 next_ = subBuilder.buildPartial();
               }
 
+              break;
+            }
+            case 50: {
+
+              auth_ = input.readBytes();
               break;
             }
           }
@@ -215,6 +226,15 @@ public final class Types {
       return getNext();
     }
 
+    public static final int AUTH_FIELD_NUMBER = 6;
+    private com.google.protobuf.ByteString auth_;
+    /**
+     * <code>bytes auth = 6;</code>
+     */
+    public com.google.protobuf.ByteString getAuth() {
+      return auth_;
+    }
+
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -241,6 +261,9 @@ public final class Types {
       }
       if (next_ != null) {
         output.writeMessage(5, getNext());
+      }
+      if (!auth_.isEmpty()) {
+        output.writeBytes(6, auth_);
       }
       unknownFields.writeTo(output);
     }
@@ -269,6 +292,10 @@ public final class Types {
       if (next_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(5, getNext());
+      }
+      if (!auth_.isEmpty()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(6, auth_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -299,6 +326,8 @@ public final class Types {
         result = result && getNext()
             .equals(other.getNext());
       }
+      result = result && getAuth()
+          .equals(other.getAuth());
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -322,6 +351,8 @@ public final class Types {
         hash = (37 * hash) + NEXT_FIELD_NUMBER;
         hash = (53 * hash) + getNext().hashCode();
       }
+      hash = (37 * hash) + AUTH_FIELD_NUMBER;
+      hash = (53 * hash) + getAuth().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -465,6 +496,8 @@ public final class Types {
           next_ = null;
           nextBuilder_ = null;
         }
+        auth_ = com.google.protobuf.ByteString.EMPTY;
+
         return this;
       }
 
@@ -496,6 +529,7 @@ public final class Types {
         } else {
           result.next_ = nextBuilder_.build();
         }
+        result.auth_ = auth_;
         onBuilt();
         return result;
       }
@@ -551,6 +585,9 @@ public final class Types {
         }
         if (other.hasNext()) {
           mergeNext(other.getNext());
+        }
+        if (other.getAuth() != com.google.protobuf.ByteString.EMPTY) {
+          setAuth(other.getAuth());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -798,6 +835,35 @@ public final class Types {
           next_ = null;
         }
         return nextBuilder_;
+      }
+
+      private com.google.protobuf.ByteString auth_ = com.google.protobuf.ByteString.EMPTY;
+      /**
+       * <code>bytes auth = 6;</code>
+       */
+      public com.google.protobuf.ByteString getAuth() {
+        return auth_;
+      }
+      /**
+       * <code>bytes auth = 6;</code>
+       */
+      public Builder setAuth(com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        auth_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>bytes auth = 6;</code>
+       */
+      public Builder clearAuth() {
+        
+        auth_ = getDefaultInstance().getAuth();
+        onChanged();
+        return this;
       }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -10905,33 +10971,33 @@ public final class Types {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\013types.proto\022\005proto\"d\n\006BbcMsg\022\021\n\tpropse" +
+      "\n\013types.proto\022\005proto\"r\n\006BbcMsg\022\021\n\tpropse" +
       "rID\030\001 \001(\005\022\013\n\003cid\030\002 \001(\005\022\021\n\tcidSeries\030\003 \001(" +
       "\005\022\014\n\004vote\030\004 \001(\005\022\031\n\004next\030\005 \001(\0132\013.proto.Da" +
-      "ta\"?\n\013BbcDecision\022\013\n\003cid\030\001 \001(\005\022\021\n\tcidSer" +
-      "ies\030\002 \001(\005\022\020\n\010decosion\030\003 \001(\005\"w\n\013BlockHead" +
-      "er\022\014\n\004prev\030\001 \001(\014\022\021\n\tcreatorID\030\002 \001(\005\022\016\n\006h" +
-      "eight\030\003 \001(\005\022\027\n\017transactionHash\030\004 \001(\014\022\013\n\003" +
-      "cid\030\005 \001(\005\022\021\n\tcidSeries\030\006 \001(\005\"9\n\013BlockFoo" +
-      "ter\022\020\n\010rmfProof\030\001 \001(\t\022\n\n\002ts\030\002 \001(\003\022\014\n\004ori" +
-      "g\030\003 \001(\014\"q\n\005Block\022\"\n\006header\030\001 \001(\0132\022.proto" +
-      ".BlockHeader\022 \n\004data\030\002 \003(\0132\022.proto.Trans" +
-      "action\022\"\n\006footer\030\003 \001(\0132\022.proto.BlockFoot" +
-      "er\";\n\013Transaction\022\020\n\010clientID\030\001 \001(\005\022\014\n\004t" +
-      "xID\030\002 \001(\t\022\014\n\004data\030\003 \001(\014\"\034\n\010accepted\022\020\n\010a" +
-      "ccepted\030\001 \001(\010\"S\n\tForkProof\022\016\n\006sender\030\001 \001" +
-      "(\005\022\032\n\004curr\030\002 \001(\0132\014.proto.Block\022\032\n\004prev\030\004" +
-      " \001(\0132\014.proto.Block\".\n\005RBMsg\022\n\n\002id\030\001 \001(\005\022" +
-      "\013\n\003cid\030\002 \001(\005\022\014\n\004data\030\003 \001(\014\"\007\n\005Empty\"6\n\004M" +
-      "eta\022\016\n\006sender\030\001 \001(\005\022\013\n\003cid\030\002 \001(\005\022\021\n\tcidS" +
-      "eries\030\003 \001(\005\"=\n\004Data\022\032\n\005_meta\030\001 \001(\0132\013.pro" +
-      "to.Meta\022\014\n\004data\030\002 \001(\014\022\013\n\003sig\030\003 \001(\t\"!\n\003Re" +
-      "q\022\032\n\005_meta\030\001 \001(\0132\013.proto.Meta\"=\n\003Res\022\032\n\005" +
-      "_meta\030\001 \001(\0132\013.proto.Meta\022\032\n\005_data\030\002 \001(\0132" +
-      "\013.proto.Data\"`\n\017subChainVersion\022\021\n\tforkP" +
-      "oint\030\001 \001(\005\022\021\n\tsuggested\030\002 \001(\005\022\027\n\001v\030\003 \003(\013" +
-      "2\014.proto.Block\022\016\n\006sender\030\004 \001(\005B\007\n\005protob" +
-      "\006proto3"
+      "ta\022\014\n\004auth\030\006 \001(\014\"?\n\013BbcDecision\022\013\n\003cid\030\001" +
+      " \001(\005\022\021\n\tcidSeries\030\002 \001(\005\022\020\n\010decosion\030\003 \001(" +
+      "\005\"w\n\013BlockHeader\022\014\n\004prev\030\001 \001(\014\022\021\n\tcreato" +
+      "rID\030\002 \001(\005\022\016\n\006height\030\003 \001(\005\022\027\n\017transaction" +
+      "Hash\030\004 \001(\014\022\013\n\003cid\030\005 \001(\005\022\021\n\tcidSeries\030\006 \001" +
+      "(\005\"9\n\013BlockFooter\022\020\n\010rmfProof\030\001 \001(\t\022\n\n\002t" +
+      "s\030\002 \001(\003\022\014\n\004orig\030\003 \001(\014\"q\n\005Block\022\"\n\006header" +
+      "\030\001 \001(\0132\022.proto.BlockHeader\022 \n\004data\030\002 \003(\013" +
+      "2\022.proto.Transaction\022\"\n\006footer\030\003 \001(\0132\022.p" +
+      "roto.BlockFooter\";\n\013Transaction\022\020\n\010clien" +
+      "tID\030\001 \001(\005\022\014\n\004txID\030\002 \001(\t\022\014\n\004data\030\003 \001(\014\"\034\n" +
+      "\010accepted\022\020\n\010accepted\030\001 \001(\010\"S\n\tForkProof" +
+      "\022\016\n\006sender\030\001 \001(\005\022\032\n\004curr\030\002 \001(\0132\014.proto.B" +
+      "lock\022\032\n\004prev\030\004 \001(\0132\014.proto.Block\".\n\005RBMs" +
+      "g\022\n\n\002id\030\001 \001(\005\022\013\n\003cid\030\002 \001(\005\022\014\n\004data\030\003 \001(\014" +
+      "\"\007\n\005Empty\"6\n\004Meta\022\016\n\006sender\030\001 \001(\005\022\013\n\003cid" +
+      "\030\002 \001(\005\022\021\n\tcidSeries\030\003 \001(\005\"=\n\004Data\022\032\n\005_me" +
+      "ta\030\001 \001(\0132\013.proto.Meta\022\014\n\004data\030\002 \001(\014\022\013\n\003s" +
+      "ig\030\003 \001(\t\"!\n\003Req\022\032\n\005_meta\030\001 \001(\0132\013.proto.M" +
+      "eta\"=\n\003Res\022\032\n\005_meta\030\001 \001(\0132\013.proto.Meta\022\032" +
+      "\n\005_data\030\002 \001(\0132\013.proto.Data\"`\n\017subChainVe" +
+      "rsion\022\021\n\tforkPoint\030\001 \001(\005\022\021\n\tsuggested\030\002 " +
+      "\001(\005\022\027\n\001v\030\003 \003(\0132\014.proto.Block\022\016\n\006sender\030\004" +
+      " \001(\005B\007\n\005protob\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -10950,7 +11016,7 @@ public final class Types {
     internal_static_proto_BbcMsg_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_BbcMsg_descriptor,
-        new java.lang.String[] { "PropserID", "Cid", "CidSeries", "Vote", "Next", });
+        new java.lang.String[] { "PropserID", "Cid", "CidSeries", "Vote", "Next", "Auth", });
     internal_static_proto_BbcDecision_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_proto_BbcDecision_fieldAccessorTable = new
