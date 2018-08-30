@@ -13,6 +13,7 @@ import com.google.protobuf.ByteString;
 import proto.Types.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import static java.lang.String.format;
@@ -20,7 +21,7 @@ import static java.lang.String.format;
 public class RBrodcastService extends DefaultSingleRecoverable {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(RBrodcastService.class);
     private int id;
-    private List<RBMsg> recMsg;
+    private HashMap<Integer, List<RBMsg>> recMsg;
     private AsynchServiceProxy RBProxy;
     private ServiceReplica sr;
     private String configHome;
@@ -32,7 +33,7 @@ public class RBrodcastService extends DefaultSingleRecoverable {
         this.id = id;
         this.configHome = configHome;
         sr = null;
-        recMsg = new ArrayList<>();
+        recMsg = new HashMap<>();
     }
 
 
@@ -87,7 +88,11 @@ public class RBrodcastService extends DefaultSingleRecoverable {
         try {
             RBMsg msg = RBMsg.parseFrom(command);
             synchronized (globalLock) {
-                recMsg.add(msg);
+                int channel = msg.getM().getChannel();
+                if (!recMsg.containsKey(channel)) {
+                    recMsg.put(channel, new ArrayList<>());
+                }
+                recMsg.get(msg.getM().getChannel()).add(msg);
                 globalLock.notify();
             }
         } catch (Exception e) {
@@ -102,42 +107,45 @@ public class RBrodcastService extends DefaultSingleRecoverable {
         return new byte[1];
     }
 
-    public byte[] deliver() throws InterruptedException {
+    public byte[] deliver(int channel) throws InterruptedException {
         synchronized (globalLock) {
             while (recMsg.isEmpty()) {
                 globalLock.wait();
             }
-            RBMsg msg = recMsg.get(0);
-            recMsg.remove(0);
+            RBMsg msg = recMsg.get(channel).get(0);
+            recMsg.get(channel).remove(0);
             return msg.getData().toByteArray();
         }
     }
 
-    public void notifyOnNewBlock() throws InterruptedException {
-        synchronized (globalLock) {
-            while (recMsg.isEmpty()) {
-                globalLock.wait();
-            }
-        }
-    }
+//    public void notifyOnNewBlock() throws InterruptedException {
+//        synchronized (globalLock) {
+//            while (recMsg.isEmpty()) {
+//                globalLock.wait();
+//            }
+//        }
+//    }
 
-    public byte[] nonBlockingDeliver() {
-        synchronized (globalLock) {
-            if(recMsg.isEmpty()) {
-                return null;
-            }
-            RBMsg msg = recMsg.get(0);
-            recMsg.remove(0);
-            return msg.getData().toByteArray();
-        }
-    }
+//    public byte[] nonBlockingDeliver() {
+//        synchronized (globalLock) {
+//            if(recMsg.isEmpty()) {
+//                return null;
+//            }
+//            RBMsg msg = recMsg.get(0);
+//            recMsg.remove(0);
+//            return msg.getData().toByteArray();
+//        }
+//    }
 
 
-    public int broadcast(byte[] m, int id) {
+    public int broadcast(byte[] m, int channel, int id) {
         RBMsg msg = RBMsg.
                 newBuilder().
-                setCid(cid).
-                setId(id).
+                setM(Meta.newBuilder()
+                        .setChannel(channel)
+                        .setSender(id)
+                        .setCid(cid)
+                        .build()).
                 setData(ByteString.copyFrom(m)).
                 build();
         int ret = cid;

@@ -63,8 +63,7 @@ message ForkProof {
 }
 
 message RBMsg {
-    int32 id = 1;
-    int32 cid = 2;
+    Meta m = 1;
     bytes data = 3;
 }
 

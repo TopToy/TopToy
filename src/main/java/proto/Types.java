@@ -6771,14 +6771,17 @@ public final class Types {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>int32 id = 1;</code>
+     * <code>.proto.Meta m = 1;</code>
      */
-    int getId();
-
+    boolean hasM();
     /**
-     * <code>int32 cid = 2;</code>
+     * <code>.proto.Meta m = 1;</code>
      */
-    int getCid();
+    proto.Types.Meta getM();
+    /**
+     * <code>.proto.Meta m = 1;</code>
+     */
+    proto.Types.MetaOrBuilder getMOrBuilder();
 
     /**
      * <code>bytes data = 3;</code>
@@ -6798,8 +6801,6 @@ public final class Types {
       super(builder);
     }
     private RBMsg() {
-      id_ = 0;
-      cid_ = 0;
       data_ = com.google.protobuf.ByteString.EMPTY;
     }
 
@@ -6834,14 +6835,17 @@ public final class Types {
               }
               break;
             }
-            case 8: {
+            case 10: {
+              proto.Types.Meta.Builder subBuilder = null;
+              if (m_ != null) {
+                subBuilder = m_.toBuilder();
+              }
+              m_ = input.readMessage(proto.Types.Meta.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(m_);
+                m_ = subBuilder.buildPartial();
+              }
 
-              id_ = input.readInt32();
-              break;
-            }
-            case 16: {
-
-              cid_ = input.readInt32();
               break;
             }
             case 26: {
@@ -6873,22 +6877,25 @@ public final class Types {
               proto.Types.RBMsg.class, proto.Types.RBMsg.Builder.class);
     }
 
-    public static final int ID_FIELD_NUMBER = 1;
-    private int id_;
+    public static final int M_FIELD_NUMBER = 1;
+    private proto.Types.Meta m_;
     /**
-     * <code>int32 id = 1;</code>
+     * <code>.proto.Meta m = 1;</code>
      */
-    public int getId() {
-      return id_;
+    public boolean hasM() {
+      return m_ != null;
     }
-
-    public static final int CID_FIELD_NUMBER = 2;
-    private int cid_;
     /**
-     * <code>int32 cid = 2;</code>
+     * <code>.proto.Meta m = 1;</code>
      */
-    public int getCid() {
-      return cid_;
+    public proto.Types.Meta getM() {
+      return m_ == null ? proto.Types.Meta.getDefaultInstance() : m_;
+    }
+    /**
+     * <code>.proto.Meta m = 1;</code>
+     */
+    public proto.Types.MetaOrBuilder getMOrBuilder() {
+      return getM();
     }
 
     public static final int DATA_FIELD_NUMBER = 3;
@@ -6912,11 +6919,8 @@ public final class Types {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (id_ != 0) {
-        output.writeInt32(1, id_);
-      }
-      if (cid_ != 0) {
-        output.writeInt32(2, cid_);
+      if (m_ != null) {
+        output.writeMessage(1, getM());
       }
       if (!data_.isEmpty()) {
         output.writeBytes(3, data_);
@@ -6929,13 +6933,9 @@ public final class Types {
       if (size != -1) return size;
 
       size = 0;
-      if (id_ != 0) {
+      if (m_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(1, id_);
-      }
-      if (cid_ != 0) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(2, cid_);
+          .computeMessageSize(1, getM());
       }
       if (!data_.isEmpty()) {
         size += com.google.protobuf.CodedOutputStream
@@ -6957,10 +6957,11 @@ public final class Types {
       proto.Types.RBMsg other = (proto.Types.RBMsg) obj;
 
       boolean result = true;
-      result = result && (getId()
-          == other.getId());
-      result = result && (getCid()
-          == other.getCid());
+      result = result && (hasM() == other.hasM());
+      if (hasM()) {
+        result = result && getM()
+            .equals(other.getM());
+      }
       result = result && getData()
           .equals(other.getData());
       result = result && unknownFields.equals(other.unknownFields);
@@ -6974,10 +6975,10 @@ public final class Types {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
-      hash = (37 * hash) + ID_FIELD_NUMBER;
-      hash = (53 * hash) + getId();
-      hash = (37 * hash) + CID_FIELD_NUMBER;
-      hash = (53 * hash) + getCid();
+      if (hasM()) {
+        hash = (37 * hash) + M_FIELD_NUMBER;
+        hash = (53 * hash) + getM().hashCode();
+      }
       hash = (37 * hash) + DATA_FIELD_NUMBER;
       hash = (53 * hash) + getData().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
@@ -7109,10 +7110,12 @@ public final class Types {
       }
       public Builder clear() {
         super.clear();
-        id_ = 0;
-
-        cid_ = 0;
-
+        if (mBuilder_ == null) {
+          m_ = null;
+        } else {
+          m_ = null;
+          mBuilder_ = null;
+        }
         data_ = com.google.protobuf.ByteString.EMPTY;
 
         return this;
@@ -7137,8 +7140,11 @@ public final class Types {
 
       public proto.Types.RBMsg buildPartial() {
         proto.Types.RBMsg result = new proto.Types.RBMsg(this);
-        result.id_ = id_;
-        result.cid_ = cid_;
+        if (mBuilder_ == null) {
+          result.m_ = m_;
+        } else {
+          result.m_ = mBuilder_.build();
+        }
         result.data_ = data_;
         onBuilt();
         return result;
@@ -7181,11 +7187,8 @@ public final class Types {
 
       public Builder mergeFrom(proto.Types.RBMsg other) {
         if (other == proto.Types.RBMsg.getDefaultInstance()) return this;
-        if (other.getId() != 0) {
-          setId(other.getId());
-        }
-        if (other.getCid() != 0) {
-          setCid(other.getCid());
+        if (other.hasM()) {
+          mergeM(other.getM());
         }
         if (other.getData() != com.google.protobuf.ByteString.EMPTY) {
           setData(other.getData());
@@ -7217,56 +7220,121 @@ public final class Types {
         return this;
       }
 
-      private int id_ ;
+      private proto.Types.Meta m_ = null;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          proto.Types.Meta, proto.Types.Meta.Builder, proto.Types.MetaOrBuilder> mBuilder_;
       /**
-       * <code>int32 id = 1;</code>
+       * <code>.proto.Meta m = 1;</code>
        */
-      public int getId() {
-        return id_;
+      public boolean hasM() {
+        return mBuilder_ != null || m_ != null;
       }
       /**
-       * <code>int32 id = 1;</code>
+       * <code>.proto.Meta m = 1;</code>
        */
-      public Builder setId(int value) {
-        
-        id_ = value;
-        onChanged();
-        return this;
+      public proto.Types.Meta getM() {
+        if (mBuilder_ == null) {
+          return m_ == null ? proto.Types.Meta.getDefaultInstance() : m_;
+        } else {
+          return mBuilder_.getMessage();
+        }
       }
       /**
-       * <code>int32 id = 1;</code>
+       * <code>.proto.Meta m = 1;</code>
        */
-      public Builder clearId() {
-        
-        id_ = 0;
-        onChanged();
-        return this;
-      }
+      public Builder setM(proto.Types.Meta value) {
+        if (mBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          m_ = value;
+          onChanged();
+        } else {
+          mBuilder_.setMessage(value);
+        }
 
-      private int cid_ ;
-      /**
-       * <code>int32 cid = 2;</code>
-       */
-      public int getCid() {
-        return cid_;
-      }
-      /**
-       * <code>int32 cid = 2;</code>
-       */
-      public Builder setCid(int value) {
-        
-        cid_ = value;
-        onChanged();
         return this;
       }
       /**
-       * <code>int32 cid = 2;</code>
+       * <code>.proto.Meta m = 1;</code>
        */
-      public Builder clearCid() {
-        
-        cid_ = 0;
-        onChanged();
+      public Builder setM(
+          proto.Types.Meta.Builder builderForValue) {
+        if (mBuilder_ == null) {
+          m_ = builderForValue.build();
+          onChanged();
+        } else {
+          mBuilder_.setMessage(builderForValue.build());
+        }
+
         return this;
+      }
+      /**
+       * <code>.proto.Meta m = 1;</code>
+       */
+      public Builder mergeM(proto.Types.Meta value) {
+        if (mBuilder_ == null) {
+          if (m_ != null) {
+            m_ =
+              proto.Types.Meta.newBuilder(m_).mergeFrom(value).buildPartial();
+          } else {
+            m_ = value;
+          }
+          onChanged();
+        } else {
+          mBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <code>.proto.Meta m = 1;</code>
+       */
+      public Builder clearM() {
+        if (mBuilder_ == null) {
+          m_ = null;
+          onChanged();
+        } else {
+          m_ = null;
+          mBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <code>.proto.Meta m = 1;</code>
+       */
+      public proto.Types.Meta.Builder getMBuilder() {
+        
+        onChanged();
+        return getMFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.proto.Meta m = 1;</code>
+       */
+      public proto.Types.MetaOrBuilder getMOrBuilder() {
+        if (mBuilder_ != null) {
+          return mBuilder_.getMessageOrBuilder();
+        } else {
+          return m_ == null ?
+              proto.Types.Meta.getDefaultInstance() : m_;
+        }
+      }
+      /**
+       * <code>.proto.Meta m = 1;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          proto.Types.Meta, proto.Types.Meta.Builder, proto.Types.MetaOrBuilder> 
+          getMFieldBuilder() {
+        if (mBuilder_ == null) {
+          mBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              proto.Types.Meta, proto.Types.Meta.Builder, proto.Types.MetaOrBuilder>(
+                  getM(),
+                  getParentForChildren(),
+                  isClean());
+          m_ = null;
+        }
+        return mBuilder_;
       }
 
       private com.google.protobuf.ByteString data_ = com.google.protobuf.ByteString.EMPTY;
@@ -11038,15 +11106,15 @@ public final class Types {
       "D\030\002 \001(\t\022\014\n\004data\030\003 \001(\014\"\034\n\010accepted\022\020\n\010acc" +
       "epted\030\001 \001(\010\"S\n\tForkProof\022\016\n\006sender\030\001 \001(\005" +
       "\022\032\n\004curr\030\002 \001(\0132\014.proto.Block\022\032\n\004prev\030\004 \001" +
-      "(\0132\014.proto.Block\".\n\005RBMsg\022\n\n\002id\030\001 \001(\005\022\013\n" +
-      "\003cid\030\002 \001(\005\022\014\n\004data\030\003 \001(\014\"\007\n\005Empty\"=\n\004Dat" +
-      "a\022\032\n\005_meta\030\001 \001(\0132\013.proto.Meta\022\014\n\004data\030\002 " +
-      "\001(\014\022\013\n\003sig\030\003 \001(\t\"!\n\003Req\022\032\n\005_meta\030\001 \001(\0132\013" +
-      ".proto.Meta\"=\n\003Res\022\032\n\005_meta\030\001 \001(\0132\013.prot" +
-      "o.Meta\022\032\n\005_data\030\002 \001(\0132\013.proto.Data\"`\n\017su" +
-      "bChainVersion\022\021\n\tforkPoint\030\001 \001(\005\022\021\n\tsugg" +
-      "ested\030\002 \001(\005\022\027\n\001v\030\003 \003(\0132\014.proto.Block\022\016\n\006" +
-      "sender\030\004 \001(\005B\007\n\005protob\006proto3"
+      "(\0132\014.proto.Block\"-\n\005RBMsg\022\026\n\001m\030\001 \001(\0132\013.p" +
+      "roto.Meta\022\014\n\004data\030\003 \001(\014\"\007\n\005Empty\"=\n\004Data" +
+      "\022\032\n\005_meta\030\001 \001(\0132\013.proto.Meta\022\014\n\004data\030\002 \001" +
+      "(\014\022\013\n\003sig\030\003 \001(\t\"!\n\003Req\022\032\n\005_meta\030\001 \001(\0132\013." +
+      "proto.Meta\"=\n\003Res\022\032\n\005_meta\030\001 \001(\0132\013.proto" +
+      ".Meta\022\032\n\005_data\030\002 \001(\0132\013.proto.Data\"`\n\017sub" +
+      "ChainVersion\022\021\n\tforkPoint\030\001 \001(\005\022\021\n\tsugge" +
+      "sted\030\002 \001(\005\022\027\n\001v\030\003 \003(\0132\014.proto.Block\022\016\n\006s" +
+      "ender\030\004 \001(\005B\007\n\005protob\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -11119,7 +11187,7 @@ public final class Types {
     internal_static_proto_RBMsg_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_RBMsg_descriptor,
-        new java.lang.String[] { "Id", "Cid", "Data", });
+        new java.lang.String[] { "M", "Data", });
     internal_static_proto_Empty_descriptor =
       getDescriptor().getMessageTypes().get(10);
     internal_static_proto_Empty_fieldAccessorTable = new
