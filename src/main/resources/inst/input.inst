@@ -1,11 +1,3 @@
 init
-tx -a "hello" 0
-tx -a "hello" 0
-tx -a "hello" 0
-tx -a "hello" 0
-tx -a "hello" 0
-tx -a "hello" 0
-wait 5
-stop
-res -p /tmp/JToy/res/
+bm -t 40 -s 100000 -p /tmp/JToy/res/
 quit

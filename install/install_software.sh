@@ -24,4 +24,4 @@ echo ${1} | sudo -S apt-get clean && rm -rf /tmp/JToy
 
 #clone toy repo
 rm -r -f ~/JToy
-git clone https://yontyon:y8o9ni89@github.com/yontyon/JToy.git
+#git clone https://yontyon:y8o9ni89@github.com/yontyon/JToy.git

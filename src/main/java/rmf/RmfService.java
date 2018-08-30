@@ -147,6 +147,10 @@ public class RmfService extends RmfGrpc.RmfImplBase {
 
     private void startGrpcServer() {
         try {
+//            rmfServer = ServerBuilder.forPort(nodes.get(id).getRmfPort())
+//                    .addService(this)
+//                    .build()
+//                    .start();
             rmfServer = NettyServerBuilder.
                     forPort(nodes.get(id).getRmfPort()).
                     sslContext(sslUtils.buildSslContextForServer(Config.getServerCrtPath(),
@@ -436,6 +440,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                 globalLock.wait(tmo);
             }
             long estimatedTime = System.currentTimeMillis() - startTime;
+            logger.debug(format("#(1)# have waited [%d] ms for data msg", estimatedTime));
             if (pendingMsg.contains(cidSeries, cid) &&
                     pendingMsg.get(cidSeries, cid).getMeta().getSender() == sender) { // &&
                 Data msg = pendingMsg.get(cidSeries, cid);
@@ -460,9 +465,27 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             if (fVotes.contains(cidSeries, cid)) {
                 cVotes = fVotes.get(cidSeries, cid).voters.size();
             }
+            
             if (cVotes < n) {
+                startTime = System.currentTimeMillis();
                 globalLock.wait(Math.max(tmo - estimatedTime, 1));
+                logger.debug(format("#(2)# have waited for more [%d] ms for fast bbc", System.currentTimeMillis() - startTime));
             }
+
+//            if (cVotes < n) {
+//                while (cVotes < n && estimatedTime < tmo) {
+//                    if (fVotes.contains(cidSeries, cid)) {
+//                        cVotes = fVotes.get(cidSeries, cid).voters.size();
+//                    }
+//                    estimatedTime = System.currentTimeMillis() - startTime;
+//                }
+//                logger.debug(format("#(2)# have waited for more [%d] ms for fast bbc", System.currentTimeMillis() - startTime));
+//            }
+
+//                startTime = System.currentTimeMillis();
+//                globalLock.wait(Math.max(tmo - estimatedTime, 1));
+//                logger.debug(format("#(2)# have waited for more [%d] ms for fast bbc", System.currentTimeMillis() - startTime));
+//            }
 
             if (fVotes.contains(cidSeries, cid)) {
                 cVotes = fVotes.get(cidSeries, cid).voters.size();
@@ -493,7 +516,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                     return null;
                 }
             } else {
-                logger.debug(format("[#%d] delivered by fast vote [cidSeries=%d ; cid=%d]", id, cidSeries, cid));
+                logger.debug(format("[#%d] deliver by fast vote [cidSeries=%d ; cid=%d]", id, cidSeries, cid));
             }
             requestData(cidSeries, cid, sender, height);
             Data msg;

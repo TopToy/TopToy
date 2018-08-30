@@ -6,12 +6,12 @@ title = "configuration"
 
 
 [setting]
-    tmo = 200
+    tmo = 1000
     tmoInterval = 100
     rmfBbcConfigPath = "src/main/resources/bbcConfig"
     panicRBroadcastConfigPath = "src/main/resources/panicRBConfig"
     syncRBroadcastConfigPath = "src/main/resources/syncRBConfig"
-    maxTransactionInBlock = 1000
+    maxTransactionInBlock = 100
     caRootPath = ""
     fastMode = true
 

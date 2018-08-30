@@ -1,6 +1,8 @@
 package app;
 import blockchain.asyncBcServer;
 import blockchain.byzantineBcServer;
+import com.google.protobuf.ByteString;
+import crypto.rmfDigSig;
 import org.apache.commons.cli.*;
 import proto.Types;
 import utils.CSVUtils;
@@ -11,6 +13,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.SecureRandom;
+import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -121,6 +124,16 @@ public class cli {
                     return;
                 }
 
+                if (args[0].equals("sigTest")) {
+                    if (args.length == 3) {
+                        if (!args[1].equals("-p")) return;
+                        String path = args[2];
+                        sigTets(path);
+
+                    }
+                    return;
+
+                }
                 if (args[0].equals("bm")) {
                     if (args.length != 7) return;
                     if (!args[1].equals("-t")) return;
@@ -196,6 +209,40 @@ public class cli {
             return null;
         }
 
+        private void sigTets(String pathString) throws IOException {
+            SecureRandom random = new SecureRandom();
+            byte[] tx = new byte[100];
+            random.nextBytes(tx);
+
+            Types.Data.Builder d = Types.Data.newBuilder()
+                    .setMeta(Types.Meta.newBuilder()
+                            .setCid(0)
+                            .setCidSeries(0)
+                            .setSender(0))
+                    .setData(ByteString.copyFrom(tx));
+            d.setSig(rmfDigSig.sign(d));
+            Types.Data ds = d.build();
+            int count = 0;
+            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+            long t = timestamp.getTime();
+            while (new Timestamp(System.currentTimeMillis()).getTime() - t < 1000) {
+                rmfDigSig.verify(JToy.server.getID(), ds);
+                count++;
+            }
+
+            Path path = Paths.get(pathString,   String.valueOf(JToy.server.getID()), "summery.csv");
+            File f = new File(path.toString());
+            if (!f.exists()) {
+                f.getParentFile().mkdirs();
+                f.createNewFile();
+            }
+            FileWriter writer = new FileWriter(path.toString(), true);
+            DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyyHH:mm:ss");
+            List<String> row = Arrays.asList(dateFormat.format(new Date()), String.valueOf(JToy.server.getID()), String.valueOf(count));
+            CSVUtils.writeLine(writer, row);
+            writer.flush();
+            writer.close();
+        }
         private void writeToScv(String pathString) {
             if (JToy.type.equals("m")) return;
             DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyyHH:mm:ss");
@@ -261,13 +308,13 @@ public class cli {
                 last = JToy.server.addTransaction(tx, cID);
             }
             serve();
-            while ((!JToy.type.equals("m")) && (!last.equals("")) && JToy.server.isTxPresent(last) != 2) {
-                Thread.sleep(5 * 1000);
-            }
+//            while ((!JToy.type.equals("m")) && (!last.equals("")) && JToy.server.isTxPresent(last) != 2) {
+//                Thread.sleep(5 * 1000);
+//            }
 //            if (JToy.type.equals("m")) {
 //                Thread.sleep(60 * 1000);
 //            }
-//            Thread.sleep(20 * 1000);
+            Thread.sleep(60 * 1000);
             stop();
             writeToScv(csvPath);
         }

@@ -220,8 +220,8 @@ public abstract class bcServer extends Node {
                                         .build())
                         .build();
                 if (currLeader == getID()) {
-                    logger.debug(format("[#%d] nullifies currBlock [height=%d] [cidSeries=%d, cid=%d]", getID(), currHeight,
-                            cidSeries, cid));
+                    logger.debug(format("[#%d] nullifies currBlock [sender=%d] [height=%d] [cidSeries=%d, cid=%d]",
+                            getID(), recBlock.getHeader().getCreatorID(), currHeight, cidSeries, cid));
                     currBlock = null;
                 }
                 if (!bc.validateBlockHash(recBlock)) {
@@ -240,8 +240,8 @@ public abstract class bcServer extends Node {
                 tmo = initTmo;
                 synchronized (newBlockNotifyer) {
                     bc.addBlock(recBlock);
-                    logger.debug(String.format("[#%d] adds new block with [height=%d] [cidSeries=%d ; cid=%d]",
-                            getID(), recBlock.getHeader().getHeight(), cidSeries, cid));
+                    logger.debug(String.format("[#%d] adds new block with [height=%d] [cidSeries=%d ; cid=%d] [size=%d]",
+                            getID(), recBlock.getHeader().getHeight(), cidSeries, cid, recBlock.getDataCount()));
                     if (currHeight % 500 == 0) {
                         logger.info(String.format("[#%d] adds new block with [height=%d] [cidSeries=%d ; cid=%d]",
                                 getID(), recBlock.getHeader().getHeight(), cidSeries, cid));
@@ -281,7 +281,7 @@ public abstract class bcServer extends Node {
                 .setData(ByteString.copyFrom(data))
                 .build();
         synchronized (transactionsPool) {
-            logger.debug(format("[#%d] adds transaction from [client=%d ; txID=%s]", getID(), t.getClientID(), t.getTxID()));
+//            logger.debug(format("[#%d] adds transaction from [client=%d ; txID=%s]", getID(), t.getClientID(), t.getTxID()));
             transactionsPool.add(t);
         }
         return txID;

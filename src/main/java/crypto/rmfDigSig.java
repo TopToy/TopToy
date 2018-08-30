@@ -21,10 +21,14 @@ public class rmfDigSig implements digitalSignature {
     }
 
     static public String sign(Data.Builder toSign) {
+
         return new rmfDigSig().signMessage(toSign);
+//        return "";
     }
 
     static public boolean verify(int id, Data toVer) {
+
         return new rmfDigSig().verifyMessage(id, toVer);
+//        return true;
     }
 }
