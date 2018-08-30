@@ -14,47 +14,680 @@ public final class Types {
     registerAllExtensions(
         (com.google.protobuf.ExtensionRegistryLite) registry);
   }
+  public interface MetaOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:proto.Meta)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>int32 channel = 1;</code>
+     */
+    int getChannel();
+
+    /**
+     * <code>int32 sender = 2;</code>
+     */
+    int getSender();
+
+    /**
+     * <code>int32 cid = 3;</code>
+     */
+    int getCid();
+
+    /**
+     * <code>int32 cidSeries = 4;</code>
+     */
+    int getCidSeries();
+  }
+  /**
+   * Protobuf type {@code proto.Meta}
+   */
+  public  static final class Meta extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:proto.Meta)
+      MetaOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use Meta.newBuilder() to construct.
+    private Meta(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private Meta() {
+      channel_ = 0;
+      sender_ = 0;
+      cid_ = 0;
+      cidSeries_ = 0;
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private Meta(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownFieldProto3(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 8: {
+
+              channel_ = input.readInt32();
+              break;
+            }
+            case 16: {
+
+              sender_ = input.readInt32();
+              break;
+            }
+            case 24: {
+
+              cid_ = input.readInt32();
+              break;
+            }
+            case 32: {
+
+              cidSeries_ = input.readInt32();
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return proto.Types.internal_static_proto_Meta_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return proto.Types.internal_static_proto_Meta_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              proto.Types.Meta.class, proto.Types.Meta.Builder.class);
+    }
+
+    public static final int CHANNEL_FIELD_NUMBER = 1;
+    private int channel_;
+    /**
+     * <code>int32 channel = 1;</code>
+     */
+    public int getChannel() {
+      return channel_;
+    }
+
+    public static final int SENDER_FIELD_NUMBER = 2;
+    private int sender_;
+    /**
+     * <code>int32 sender = 2;</code>
+     */
+    public int getSender() {
+      return sender_;
+    }
+
+    public static final int CID_FIELD_NUMBER = 3;
+    private int cid_;
+    /**
+     * <code>int32 cid = 3;</code>
+     */
+    public int getCid() {
+      return cid_;
+    }
+
+    public static final int CIDSERIES_FIELD_NUMBER = 4;
+    private int cidSeries_;
+    /**
+     * <code>int32 cidSeries = 4;</code>
+     */
+    public int getCidSeries() {
+      return cidSeries_;
+    }
+
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (channel_ != 0) {
+        output.writeInt32(1, channel_);
+      }
+      if (sender_ != 0) {
+        output.writeInt32(2, sender_);
+      }
+      if (cid_ != 0) {
+        output.writeInt32(3, cid_);
+      }
+      if (cidSeries_ != 0) {
+        output.writeInt32(4, cidSeries_);
+      }
+      unknownFields.writeTo(output);
+    }
+
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (channel_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(1, channel_);
+      }
+      if (sender_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(2, sender_);
+      }
+      if (cid_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(3, cid_);
+      }
+      if (cidSeries_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(4, cidSeries_);
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof proto.Types.Meta)) {
+        return super.equals(obj);
+      }
+      proto.Types.Meta other = (proto.Types.Meta) obj;
+
+      boolean result = true;
+      result = result && (getChannel()
+          == other.getChannel());
+      result = result && (getSender()
+          == other.getSender());
+      result = result && (getCid()
+          == other.getCid());
+      result = result && (getCidSeries()
+          == other.getCidSeries());
+      result = result && unknownFields.equals(other.unknownFields);
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + CHANNEL_FIELD_NUMBER;
+      hash = (53 * hash) + getChannel();
+      hash = (37 * hash) + SENDER_FIELD_NUMBER;
+      hash = (53 * hash) + getSender();
+      hash = (37 * hash) + CID_FIELD_NUMBER;
+      hash = (53 * hash) + getCid();
+      hash = (37 * hash) + CIDSERIES_FIELD_NUMBER;
+      hash = (53 * hash) + getCidSeries();
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static proto.Types.Meta parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static proto.Types.Meta parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static proto.Types.Meta parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static proto.Types.Meta parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static proto.Types.Meta parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static proto.Types.Meta parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static proto.Types.Meta parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static proto.Types.Meta parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static proto.Types.Meta parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static proto.Types.Meta parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static proto.Types.Meta parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static proto.Types.Meta parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(proto.Types.Meta prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code proto.Meta}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:proto.Meta)
+        proto.Types.MetaOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return proto.Types.internal_static_proto_Meta_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return proto.Types.internal_static_proto_Meta_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                proto.Types.Meta.class, proto.Types.Meta.Builder.class);
+      }
+
+      // Construct using proto.Types.Meta.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      public Builder clear() {
+        super.clear();
+        channel_ = 0;
+
+        sender_ = 0;
+
+        cid_ = 0;
+
+        cidSeries_ = 0;
+
+        return this;
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return proto.Types.internal_static_proto_Meta_descriptor;
+      }
+
+      public proto.Types.Meta getDefaultInstanceForType() {
+        return proto.Types.Meta.getDefaultInstance();
+      }
+
+      public proto.Types.Meta build() {
+        proto.Types.Meta result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public proto.Types.Meta buildPartial() {
+        proto.Types.Meta result = new proto.Types.Meta(this);
+        result.channel_ = channel_;
+        result.sender_ = sender_;
+        result.cid_ = cid_;
+        result.cidSeries_ = cidSeries_;
+        onBuilt();
+        return result;
+      }
+
+      public Builder clone() {
+        return (Builder) super.clone();
+      }
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return (Builder) super.setField(field, value);
+      }
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return (Builder) super.clearField(field);
+      }
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return (Builder) super.clearOneof(oneof);
+      }
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return (Builder) super.setRepeatedField(field, index, value);
+      }
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return (Builder) super.addRepeatedField(field, value);
+      }
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof proto.Types.Meta) {
+          return mergeFrom((proto.Types.Meta)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(proto.Types.Meta other) {
+        if (other == proto.Types.Meta.getDefaultInstance()) return this;
+        if (other.getChannel() != 0) {
+          setChannel(other.getChannel());
+        }
+        if (other.getSender() != 0) {
+          setSender(other.getSender());
+        }
+        if (other.getCid() != 0) {
+          setCid(other.getCid());
+        }
+        if (other.getCidSeries() != 0) {
+          setCidSeries(other.getCidSeries());
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        proto.Types.Meta parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (proto.Types.Meta) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      private int channel_ ;
+      /**
+       * <code>int32 channel = 1;</code>
+       */
+      public int getChannel() {
+        return channel_;
+      }
+      /**
+       * <code>int32 channel = 1;</code>
+       */
+      public Builder setChannel(int value) {
+        
+        channel_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int32 channel = 1;</code>
+       */
+      public Builder clearChannel() {
+        
+        channel_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private int sender_ ;
+      /**
+       * <code>int32 sender = 2;</code>
+       */
+      public int getSender() {
+        return sender_;
+      }
+      /**
+       * <code>int32 sender = 2;</code>
+       */
+      public Builder setSender(int value) {
+        
+        sender_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int32 sender = 2;</code>
+       */
+      public Builder clearSender() {
+        
+        sender_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private int cid_ ;
+      /**
+       * <code>int32 cid = 3;</code>
+       */
+      public int getCid() {
+        return cid_;
+      }
+      /**
+       * <code>int32 cid = 3;</code>
+       */
+      public Builder setCid(int value) {
+        
+        cid_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int32 cid = 3;</code>
+       */
+      public Builder clearCid() {
+        
+        cid_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private int cidSeries_ ;
+      /**
+       * <code>int32 cidSeries = 4;</code>
+       */
+      public int getCidSeries() {
+        return cidSeries_;
+      }
+      /**
+       * <code>int32 cidSeries = 4;</code>
+       */
+      public Builder setCidSeries(int value) {
+        
+        cidSeries_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int32 cidSeries = 4;</code>
+       */
+      public Builder clearCidSeries() {
+        
+        cidSeries_ = 0;
+        onChanged();
+        return this;
+      }
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFieldsProto3(unknownFields);
+      }
+
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:proto.Meta)
+    }
+
+    // @@protoc_insertion_point(class_scope:proto.Meta)
+    private static final proto.Types.Meta DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new proto.Types.Meta();
+    }
+
+    public static proto.Types.Meta getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<Meta>
+        PARSER = new com.google.protobuf.AbstractParser<Meta>() {
+      public Meta parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new Meta(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<Meta> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<Meta> getParserForType() {
+      return PARSER;
+    }
+
+    public proto.Types.Meta getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   public interface BbcMsgOrBuilder extends
       // @@protoc_insertion_point(interface_extends:proto.BbcMsg)
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>int32 propserID = 1;</code>
+     * <code>.proto.Meta m = 1;</code>
      */
-    int getPropserID();
+    boolean hasM();
+    /**
+     * <code>.proto.Meta m = 1;</code>
+     */
+    proto.Types.Meta getM();
+    /**
+     * <code>.proto.Meta m = 1;</code>
+     */
+    proto.Types.MetaOrBuilder getMOrBuilder();
 
     /**
-     * <code>int32 cid = 2;</code>
-     */
-    int getCid();
-
-    /**
-     * <code>int32 cidSeries = 3;</code>
-     */
-    int getCidSeries();
-
-    /**
-     * <code>int32 vote = 4;</code>
+     * <code>int32 vote = 2;</code>
      */
     int getVote();
 
     /**
-     * <code>.proto.Data next = 5;</code>
+     * <code>.proto.Data next = 3;</code>
      */
     boolean hasNext();
     /**
-     * <code>.proto.Data next = 5;</code>
+     * <code>.proto.Data next = 3;</code>
      */
     proto.Types.Data getNext();
     /**
-     * <code>.proto.Data next = 5;</code>
+     * <code>.proto.Data next = 3;</code>
      */
     proto.Types.DataOrBuilder getNextOrBuilder();
-
-    /**
-     * <code>bytes auth = 6;</code>
-     */
-    com.google.protobuf.ByteString getAuth();
   }
   /**
    * Protobuf type {@code proto.BbcMsg}
@@ -69,11 +702,7 @@ public final class Types {
       super(builder);
     }
     private BbcMsg() {
-      propserID_ = 0;
-      cid_ = 0;
-      cidSeries_ = 0;
       vote_ = 0;
-      auth_ = com.google.protobuf.ByteString.EMPTY;
     }
 
     @java.lang.Override
@@ -107,27 +736,25 @@ public final class Types {
               }
               break;
             }
-            case 8: {
+            case 10: {
+              proto.Types.Meta.Builder subBuilder = null;
+              if (m_ != null) {
+                subBuilder = m_.toBuilder();
+              }
+              m_ = input.readMessage(proto.Types.Meta.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(m_);
+                m_ = subBuilder.buildPartial();
+              }
 
-              propserID_ = input.readInt32();
               break;
             }
             case 16: {
 
-              cid_ = input.readInt32();
-              break;
-            }
-            case 24: {
-
-              cidSeries_ = input.readInt32();
-              break;
-            }
-            case 32: {
-
               vote_ = input.readInt32();
               break;
             }
-            case 42: {
+            case 26: {
               proto.Types.Data.Builder subBuilder = null;
               if (next_ != null) {
                 subBuilder = next_.toBuilder();
@@ -138,11 +765,6 @@ public final class Types {
                 next_ = subBuilder.buildPartial();
               }
 
-              break;
-            }
-            case 50: {
-
-              auth_ = input.readBytes();
               break;
             }
           }
@@ -169,70 +791,55 @@ public final class Types {
               proto.Types.BbcMsg.class, proto.Types.BbcMsg.Builder.class);
     }
 
-    public static final int PROPSERID_FIELD_NUMBER = 1;
-    private int propserID_;
+    public static final int M_FIELD_NUMBER = 1;
+    private proto.Types.Meta m_;
     /**
-     * <code>int32 propserID = 1;</code>
+     * <code>.proto.Meta m = 1;</code>
      */
-    public int getPropserID() {
-      return propserID_;
+    public boolean hasM() {
+      return m_ != null;
+    }
+    /**
+     * <code>.proto.Meta m = 1;</code>
+     */
+    public proto.Types.Meta getM() {
+      return m_ == null ? proto.Types.Meta.getDefaultInstance() : m_;
+    }
+    /**
+     * <code>.proto.Meta m = 1;</code>
+     */
+    public proto.Types.MetaOrBuilder getMOrBuilder() {
+      return getM();
     }
 
-    public static final int CID_FIELD_NUMBER = 2;
-    private int cid_;
-    /**
-     * <code>int32 cid = 2;</code>
-     */
-    public int getCid() {
-      return cid_;
-    }
-
-    public static final int CIDSERIES_FIELD_NUMBER = 3;
-    private int cidSeries_;
-    /**
-     * <code>int32 cidSeries = 3;</code>
-     */
-    public int getCidSeries() {
-      return cidSeries_;
-    }
-
-    public static final int VOTE_FIELD_NUMBER = 4;
+    public static final int VOTE_FIELD_NUMBER = 2;
     private int vote_;
     /**
-     * <code>int32 vote = 4;</code>
+     * <code>int32 vote = 2;</code>
      */
     public int getVote() {
       return vote_;
     }
 
-    public static final int NEXT_FIELD_NUMBER = 5;
+    public static final int NEXT_FIELD_NUMBER = 3;
     private proto.Types.Data next_;
     /**
-     * <code>.proto.Data next = 5;</code>
+     * <code>.proto.Data next = 3;</code>
      */
     public boolean hasNext() {
       return next_ != null;
     }
     /**
-     * <code>.proto.Data next = 5;</code>
+     * <code>.proto.Data next = 3;</code>
      */
     public proto.Types.Data getNext() {
       return next_ == null ? proto.Types.Data.getDefaultInstance() : next_;
     }
     /**
-     * <code>.proto.Data next = 5;</code>
+     * <code>.proto.Data next = 3;</code>
      */
     public proto.Types.DataOrBuilder getNextOrBuilder() {
       return getNext();
-    }
-
-    public static final int AUTH_FIELD_NUMBER = 6;
-    private com.google.protobuf.ByteString auth_;
-    /**
-     * <code>bytes auth = 6;</code>
-     */
-    public com.google.protobuf.ByteString getAuth() {
-      return auth_;
     }
 
     private byte memoizedIsInitialized = -1;
@@ -247,23 +854,14 @@ public final class Types {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (propserID_ != 0) {
-        output.writeInt32(1, propserID_);
-      }
-      if (cid_ != 0) {
-        output.writeInt32(2, cid_);
-      }
-      if (cidSeries_ != 0) {
-        output.writeInt32(3, cidSeries_);
+      if (m_ != null) {
+        output.writeMessage(1, getM());
       }
       if (vote_ != 0) {
-        output.writeInt32(4, vote_);
+        output.writeInt32(2, vote_);
       }
       if (next_ != null) {
-        output.writeMessage(5, getNext());
-      }
-      if (!auth_.isEmpty()) {
-        output.writeBytes(6, auth_);
+        output.writeMessage(3, getNext());
       }
       unknownFields.writeTo(output);
     }
@@ -273,29 +871,17 @@ public final class Types {
       if (size != -1) return size;
 
       size = 0;
-      if (propserID_ != 0) {
+      if (m_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(1, propserID_);
-      }
-      if (cid_ != 0) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(2, cid_);
-      }
-      if (cidSeries_ != 0) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(3, cidSeries_);
+          .computeMessageSize(1, getM());
       }
       if (vote_ != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(4, vote_);
+          .computeInt32Size(2, vote_);
       }
       if (next_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(5, getNext());
-      }
-      if (!auth_.isEmpty()) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(6, auth_);
+          .computeMessageSize(3, getNext());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -313,12 +899,11 @@ public final class Types {
       proto.Types.BbcMsg other = (proto.Types.BbcMsg) obj;
 
       boolean result = true;
-      result = result && (getPropserID()
-          == other.getPropserID());
-      result = result && (getCid()
-          == other.getCid());
-      result = result && (getCidSeries()
-          == other.getCidSeries());
+      result = result && (hasM() == other.hasM());
+      if (hasM()) {
+        result = result && getM()
+            .equals(other.getM());
+      }
       result = result && (getVote()
           == other.getVote());
       result = result && (hasNext() == other.hasNext());
@@ -326,8 +911,6 @@ public final class Types {
         result = result && getNext()
             .equals(other.getNext());
       }
-      result = result && getAuth()
-          .equals(other.getAuth());
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -339,20 +922,16 @@ public final class Types {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
-      hash = (37 * hash) + PROPSERID_FIELD_NUMBER;
-      hash = (53 * hash) + getPropserID();
-      hash = (37 * hash) + CID_FIELD_NUMBER;
-      hash = (53 * hash) + getCid();
-      hash = (37 * hash) + CIDSERIES_FIELD_NUMBER;
-      hash = (53 * hash) + getCidSeries();
+      if (hasM()) {
+        hash = (37 * hash) + M_FIELD_NUMBER;
+        hash = (53 * hash) + getM().hashCode();
+      }
       hash = (37 * hash) + VOTE_FIELD_NUMBER;
       hash = (53 * hash) + getVote();
       if (hasNext()) {
         hash = (37 * hash) + NEXT_FIELD_NUMBER;
         hash = (53 * hash) + getNext().hashCode();
       }
-      hash = (37 * hash) + AUTH_FIELD_NUMBER;
-      hash = (53 * hash) + getAuth().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -482,12 +1061,12 @@ public final class Types {
       }
       public Builder clear() {
         super.clear();
-        propserID_ = 0;
-
-        cid_ = 0;
-
-        cidSeries_ = 0;
-
+        if (mBuilder_ == null) {
+          m_ = null;
+        } else {
+          m_ = null;
+          mBuilder_ = null;
+        }
         vote_ = 0;
 
         if (nextBuilder_ == null) {
@@ -496,8 +1075,6 @@ public final class Types {
           next_ = null;
           nextBuilder_ = null;
         }
-        auth_ = com.google.protobuf.ByteString.EMPTY;
-
         return this;
       }
 
@@ -520,16 +1097,17 @@ public final class Types {
 
       public proto.Types.BbcMsg buildPartial() {
         proto.Types.BbcMsg result = new proto.Types.BbcMsg(this);
-        result.propserID_ = propserID_;
-        result.cid_ = cid_;
-        result.cidSeries_ = cidSeries_;
+        if (mBuilder_ == null) {
+          result.m_ = m_;
+        } else {
+          result.m_ = mBuilder_.build();
+        }
         result.vote_ = vote_;
         if (nextBuilder_ == null) {
           result.next_ = next_;
         } else {
           result.next_ = nextBuilder_.build();
         }
-        result.auth_ = auth_;
         onBuilt();
         return result;
       }
@@ -571,23 +1149,14 @@ public final class Types {
 
       public Builder mergeFrom(proto.Types.BbcMsg other) {
         if (other == proto.Types.BbcMsg.getDefaultInstance()) return this;
-        if (other.getPropserID() != 0) {
-          setPropserID(other.getPropserID());
-        }
-        if (other.getCid() != 0) {
-          setCid(other.getCid());
-        }
-        if (other.getCidSeries() != 0) {
-          setCidSeries(other.getCidSeries());
+        if (other.hasM()) {
+          mergeM(other.getM());
         }
         if (other.getVote() != 0) {
           setVote(other.getVote());
         }
         if (other.hasNext()) {
           mergeNext(other.getNext());
-        }
-        if (other.getAuth() != com.google.protobuf.ByteString.EMPTY) {
-          setAuth(other.getAuth());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -616,93 +1185,132 @@ public final class Types {
         return this;
       }
 
-      private int propserID_ ;
+      private proto.Types.Meta m_ = null;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          proto.Types.Meta, proto.Types.Meta.Builder, proto.Types.MetaOrBuilder> mBuilder_;
       /**
-       * <code>int32 propserID = 1;</code>
+       * <code>.proto.Meta m = 1;</code>
        */
-      public int getPropserID() {
-        return propserID_;
+      public boolean hasM() {
+        return mBuilder_ != null || m_ != null;
       }
       /**
-       * <code>int32 propserID = 1;</code>
+       * <code>.proto.Meta m = 1;</code>
        */
-      public Builder setPropserID(int value) {
-        
-        propserID_ = value;
-        onChanged();
-        return this;
+      public proto.Types.Meta getM() {
+        if (mBuilder_ == null) {
+          return m_ == null ? proto.Types.Meta.getDefaultInstance() : m_;
+        } else {
+          return mBuilder_.getMessage();
+        }
       }
       /**
-       * <code>int32 propserID = 1;</code>
+       * <code>.proto.Meta m = 1;</code>
        */
-      public Builder clearPropserID() {
-        
-        propserID_ = 0;
-        onChanged();
-        return this;
-      }
+      public Builder setM(proto.Types.Meta value) {
+        if (mBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          m_ = value;
+          onChanged();
+        } else {
+          mBuilder_.setMessage(value);
+        }
 
-      private int cid_ ;
-      /**
-       * <code>int32 cid = 2;</code>
-       */
-      public int getCid() {
-        return cid_;
-      }
-      /**
-       * <code>int32 cid = 2;</code>
-       */
-      public Builder setCid(int value) {
-        
-        cid_ = value;
-        onChanged();
         return this;
       }
       /**
-       * <code>int32 cid = 2;</code>
+       * <code>.proto.Meta m = 1;</code>
        */
-      public Builder clearCid() {
-        
-        cid_ = 0;
-        onChanged();
-        return this;
-      }
+      public Builder setM(
+          proto.Types.Meta.Builder builderForValue) {
+        if (mBuilder_ == null) {
+          m_ = builderForValue.build();
+          onChanged();
+        } else {
+          mBuilder_.setMessage(builderForValue.build());
+        }
 
-      private int cidSeries_ ;
-      /**
-       * <code>int32 cidSeries = 3;</code>
-       */
-      public int getCidSeries() {
-        return cidSeries_;
-      }
-      /**
-       * <code>int32 cidSeries = 3;</code>
-       */
-      public Builder setCidSeries(int value) {
-        
-        cidSeries_ = value;
-        onChanged();
         return this;
       }
       /**
-       * <code>int32 cidSeries = 3;</code>
+       * <code>.proto.Meta m = 1;</code>
        */
-      public Builder clearCidSeries() {
-        
-        cidSeries_ = 0;
-        onChanged();
+      public Builder mergeM(proto.Types.Meta value) {
+        if (mBuilder_ == null) {
+          if (m_ != null) {
+            m_ =
+              proto.Types.Meta.newBuilder(m_).mergeFrom(value).buildPartial();
+          } else {
+            m_ = value;
+          }
+          onChanged();
+        } else {
+          mBuilder_.mergeFrom(value);
+        }
+
         return this;
+      }
+      /**
+       * <code>.proto.Meta m = 1;</code>
+       */
+      public Builder clearM() {
+        if (mBuilder_ == null) {
+          m_ = null;
+          onChanged();
+        } else {
+          m_ = null;
+          mBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <code>.proto.Meta m = 1;</code>
+       */
+      public proto.Types.Meta.Builder getMBuilder() {
+        
+        onChanged();
+        return getMFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.proto.Meta m = 1;</code>
+       */
+      public proto.Types.MetaOrBuilder getMOrBuilder() {
+        if (mBuilder_ != null) {
+          return mBuilder_.getMessageOrBuilder();
+        } else {
+          return m_ == null ?
+              proto.Types.Meta.getDefaultInstance() : m_;
+        }
+      }
+      /**
+       * <code>.proto.Meta m = 1;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          proto.Types.Meta, proto.Types.Meta.Builder, proto.Types.MetaOrBuilder> 
+          getMFieldBuilder() {
+        if (mBuilder_ == null) {
+          mBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              proto.Types.Meta, proto.Types.Meta.Builder, proto.Types.MetaOrBuilder>(
+                  getM(),
+                  getParentForChildren(),
+                  isClean());
+          m_ = null;
+        }
+        return mBuilder_;
       }
 
       private int vote_ ;
       /**
-       * <code>int32 vote = 4;</code>
+       * <code>int32 vote = 2;</code>
        */
       public int getVote() {
         return vote_;
       }
       /**
-       * <code>int32 vote = 4;</code>
+       * <code>int32 vote = 2;</code>
        */
       public Builder setVote(int value) {
         
@@ -711,7 +1319,7 @@ public final class Types {
         return this;
       }
       /**
-       * <code>int32 vote = 4;</code>
+       * <code>int32 vote = 2;</code>
        */
       public Builder clearVote() {
         
@@ -724,13 +1332,13 @@ public final class Types {
       private com.google.protobuf.SingleFieldBuilderV3<
           proto.Types.Data, proto.Types.Data.Builder, proto.Types.DataOrBuilder> nextBuilder_;
       /**
-       * <code>.proto.Data next = 5;</code>
+       * <code>.proto.Data next = 3;</code>
        */
       public boolean hasNext() {
         return nextBuilder_ != null || next_ != null;
       }
       /**
-       * <code>.proto.Data next = 5;</code>
+       * <code>.proto.Data next = 3;</code>
        */
       public proto.Types.Data getNext() {
         if (nextBuilder_ == null) {
@@ -740,7 +1348,7 @@ public final class Types {
         }
       }
       /**
-       * <code>.proto.Data next = 5;</code>
+       * <code>.proto.Data next = 3;</code>
        */
       public Builder setNext(proto.Types.Data value) {
         if (nextBuilder_ == null) {
@@ -756,7 +1364,7 @@ public final class Types {
         return this;
       }
       /**
-       * <code>.proto.Data next = 5;</code>
+       * <code>.proto.Data next = 3;</code>
        */
       public Builder setNext(
           proto.Types.Data.Builder builderForValue) {
@@ -770,7 +1378,7 @@ public final class Types {
         return this;
       }
       /**
-       * <code>.proto.Data next = 5;</code>
+       * <code>.proto.Data next = 3;</code>
        */
       public Builder mergeNext(proto.Types.Data value) {
         if (nextBuilder_ == null) {
@@ -788,7 +1396,7 @@ public final class Types {
         return this;
       }
       /**
-       * <code>.proto.Data next = 5;</code>
+       * <code>.proto.Data next = 3;</code>
        */
       public Builder clearNext() {
         if (nextBuilder_ == null) {
@@ -802,7 +1410,7 @@ public final class Types {
         return this;
       }
       /**
-       * <code>.proto.Data next = 5;</code>
+       * <code>.proto.Data next = 3;</code>
        */
       public proto.Types.Data.Builder getNextBuilder() {
         
@@ -810,7 +1418,7 @@ public final class Types {
         return getNextFieldBuilder().getBuilder();
       }
       /**
-       * <code>.proto.Data next = 5;</code>
+       * <code>.proto.Data next = 3;</code>
        */
       public proto.Types.DataOrBuilder getNextOrBuilder() {
         if (nextBuilder_ != null) {
@@ -821,7 +1429,7 @@ public final class Types {
         }
       }
       /**
-       * <code>.proto.Data next = 5;</code>
+       * <code>.proto.Data next = 3;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           proto.Types.Data, proto.Types.Data.Builder, proto.Types.DataOrBuilder> 
@@ -835,35 +1443,6 @@ public final class Types {
           next_ = null;
         }
         return nextBuilder_;
-      }
-
-      private com.google.protobuf.ByteString auth_ = com.google.protobuf.ByteString.EMPTY;
-      /**
-       * <code>bytes auth = 6;</code>
-       */
-      public com.google.protobuf.ByteString getAuth() {
-        return auth_;
-      }
-      /**
-       * <code>bytes auth = 6;</code>
-       */
-      public Builder setAuth(com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  
-        auth_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>bytes auth = 6;</code>
-       */
-      public Builder clearAuth() {
-        
-        auth_ = getDefaultInstance().getAuth();
-        onChanged();
-        return this;
       }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -919,17 +1498,20 @@ public final class Types {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>int32 cid = 1;</code>
+     * <code>.proto.Meta m = 1;</code>
      */
-    int getCid();
+    boolean hasM();
+    /**
+     * <code>.proto.Meta m = 1;</code>
+     */
+    proto.Types.Meta getM();
+    /**
+     * <code>.proto.Meta m = 1;</code>
+     */
+    proto.Types.MetaOrBuilder getMOrBuilder();
 
     /**
-     * <code>int32 cidSeries = 2;</code>
-     */
-    int getCidSeries();
-
-    /**
-     * <code>int32 decosion = 3;</code>
+     * <code>int32 decosion = 2;</code>
      */
     int getDecosion();
   }
@@ -946,8 +1528,6 @@ public final class Types {
       super(builder);
     }
     private BbcDecision() {
-      cid_ = 0;
-      cidSeries_ = 0;
       decosion_ = 0;
     }
 
@@ -982,17 +1562,20 @@ public final class Types {
               }
               break;
             }
-            case 8: {
+            case 10: {
+              proto.Types.Meta.Builder subBuilder = null;
+              if (m_ != null) {
+                subBuilder = m_.toBuilder();
+              }
+              m_ = input.readMessage(proto.Types.Meta.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(m_);
+                m_ = subBuilder.buildPartial();
+              }
 
-              cid_ = input.readInt32();
               break;
             }
             case 16: {
-
-              cidSeries_ = input.readInt32();
-              break;
-            }
-            case 24: {
 
               decosion_ = input.readInt32();
               break;
@@ -1021,28 +1604,31 @@ public final class Types {
               proto.Types.BbcDecision.class, proto.Types.BbcDecision.Builder.class);
     }
 
-    public static final int CID_FIELD_NUMBER = 1;
-    private int cid_;
+    public static final int M_FIELD_NUMBER = 1;
+    private proto.Types.Meta m_;
     /**
-     * <code>int32 cid = 1;</code>
+     * <code>.proto.Meta m = 1;</code>
      */
-    public int getCid() {
-      return cid_;
+    public boolean hasM() {
+      return m_ != null;
+    }
+    /**
+     * <code>.proto.Meta m = 1;</code>
+     */
+    public proto.Types.Meta getM() {
+      return m_ == null ? proto.Types.Meta.getDefaultInstance() : m_;
+    }
+    /**
+     * <code>.proto.Meta m = 1;</code>
+     */
+    public proto.Types.MetaOrBuilder getMOrBuilder() {
+      return getM();
     }
 
-    public static final int CIDSERIES_FIELD_NUMBER = 2;
-    private int cidSeries_;
-    /**
-     * <code>int32 cidSeries = 2;</code>
-     */
-    public int getCidSeries() {
-      return cidSeries_;
-    }
-
-    public static final int DECOSION_FIELD_NUMBER = 3;
+    public static final int DECOSION_FIELD_NUMBER = 2;
     private int decosion_;
     /**
-     * <code>int32 decosion = 3;</code>
+     * <code>int32 decosion = 2;</code>
      */
     public int getDecosion() {
       return decosion_;
@@ -1060,14 +1646,11 @@ public final class Types {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (cid_ != 0) {
-        output.writeInt32(1, cid_);
-      }
-      if (cidSeries_ != 0) {
-        output.writeInt32(2, cidSeries_);
+      if (m_ != null) {
+        output.writeMessage(1, getM());
       }
       if (decosion_ != 0) {
-        output.writeInt32(3, decosion_);
+        output.writeInt32(2, decosion_);
       }
       unknownFields.writeTo(output);
     }
@@ -1077,17 +1660,13 @@ public final class Types {
       if (size != -1) return size;
 
       size = 0;
-      if (cid_ != 0) {
+      if (m_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(1, cid_);
-      }
-      if (cidSeries_ != 0) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(2, cidSeries_);
+          .computeMessageSize(1, getM());
       }
       if (decosion_ != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(3, decosion_);
+          .computeInt32Size(2, decosion_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -1105,10 +1684,11 @@ public final class Types {
       proto.Types.BbcDecision other = (proto.Types.BbcDecision) obj;
 
       boolean result = true;
-      result = result && (getCid()
-          == other.getCid());
-      result = result && (getCidSeries()
-          == other.getCidSeries());
+      result = result && (hasM() == other.hasM());
+      if (hasM()) {
+        result = result && getM()
+            .equals(other.getM());
+      }
       result = result && (getDecosion()
           == other.getDecosion());
       result = result && unknownFields.equals(other.unknownFields);
@@ -1122,10 +1702,10 @@ public final class Types {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
-      hash = (37 * hash) + CID_FIELD_NUMBER;
-      hash = (53 * hash) + getCid();
-      hash = (37 * hash) + CIDSERIES_FIELD_NUMBER;
-      hash = (53 * hash) + getCidSeries();
+      if (hasM()) {
+        hash = (37 * hash) + M_FIELD_NUMBER;
+        hash = (53 * hash) + getM().hashCode();
+      }
       hash = (37 * hash) + DECOSION_FIELD_NUMBER;
       hash = (53 * hash) + getDecosion();
       hash = (29 * hash) + unknownFields.hashCode();
@@ -1257,10 +1837,12 @@ public final class Types {
       }
       public Builder clear() {
         super.clear();
-        cid_ = 0;
-
-        cidSeries_ = 0;
-
+        if (mBuilder_ == null) {
+          m_ = null;
+        } else {
+          m_ = null;
+          mBuilder_ = null;
+        }
         decosion_ = 0;
 
         return this;
@@ -1285,8 +1867,11 @@ public final class Types {
 
       public proto.Types.BbcDecision buildPartial() {
         proto.Types.BbcDecision result = new proto.Types.BbcDecision(this);
-        result.cid_ = cid_;
-        result.cidSeries_ = cidSeries_;
+        if (mBuilder_ == null) {
+          result.m_ = m_;
+        } else {
+          result.m_ = mBuilder_.build();
+        }
         result.decosion_ = decosion_;
         onBuilt();
         return result;
@@ -1329,11 +1914,8 @@ public final class Types {
 
       public Builder mergeFrom(proto.Types.BbcDecision other) {
         if (other == proto.Types.BbcDecision.getDefaultInstance()) return this;
-        if (other.getCid() != 0) {
-          setCid(other.getCid());
-        }
-        if (other.getCidSeries() != 0) {
-          setCidSeries(other.getCidSeries());
+        if (other.hasM()) {
+          mergeM(other.getM());
         }
         if (other.getDecosion() != 0) {
           setDecosion(other.getDecosion());
@@ -1365,67 +1947,132 @@ public final class Types {
         return this;
       }
 
-      private int cid_ ;
+      private proto.Types.Meta m_ = null;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          proto.Types.Meta, proto.Types.Meta.Builder, proto.Types.MetaOrBuilder> mBuilder_;
       /**
-       * <code>int32 cid = 1;</code>
+       * <code>.proto.Meta m = 1;</code>
        */
-      public int getCid() {
-        return cid_;
+      public boolean hasM() {
+        return mBuilder_ != null || m_ != null;
       }
       /**
-       * <code>int32 cid = 1;</code>
+       * <code>.proto.Meta m = 1;</code>
        */
-      public Builder setCid(int value) {
-        
-        cid_ = value;
-        onChanged();
-        return this;
+      public proto.Types.Meta getM() {
+        if (mBuilder_ == null) {
+          return m_ == null ? proto.Types.Meta.getDefaultInstance() : m_;
+        } else {
+          return mBuilder_.getMessage();
+        }
       }
       /**
-       * <code>int32 cid = 1;</code>
+       * <code>.proto.Meta m = 1;</code>
        */
-      public Builder clearCid() {
-        
-        cid_ = 0;
-        onChanged();
-        return this;
-      }
+      public Builder setM(proto.Types.Meta value) {
+        if (mBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          m_ = value;
+          onChanged();
+        } else {
+          mBuilder_.setMessage(value);
+        }
 
-      private int cidSeries_ ;
-      /**
-       * <code>int32 cidSeries = 2;</code>
-       */
-      public int getCidSeries() {
-        return cidSeries_;
-      }
-      /**
-       * <code>int32 cidSeries = 2;</code>
-       */
-      public Builder setCidSeries(int value) {
-        
-        cidSeries_ = value;
-        onChanged();
         return this;
       }
       /**
-       * <code>int32 cidSeries = 2;</code>
+       * <code>.proto.Meta m = 1;</code>
        */
-      public Builder clearCidSeries() {
-        
-        cidSeries_ = 0;
-        onChanged();
+      public Builder setM(
+          proto.Types.Meta.Builder builderForValue) {
+        if (mBuilder_ == null) {
+          m_ = builderForValue.build();
+          onChanged();
+        } else {
+          mBuilder_.setMessage(builderForValue.build());
+        }
+
         return this;
+      }
+      /**
+       * <code>.proto.Meta m = 1;</code>
+       */
+      public Builder mergeM(proto.Types.Meta value) {
+        if (mBuilder_ == null) {
+          if (m_ != null) {
+            m_ =
+              proto.Types.Meta.newBuilder(m_).mergeFrom(value).buildPartial();
+          } else {
+            m_ = value;
+          }
+          onChanged();
+        } else {
+          mBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <code>.proto.Meta m = 1;</code>
+       */
+      public Builder clearM() {
+        if (mBuilder_ == null) {
+          m_ = null;
+          onChanged();
+        } else {
+          m_ = null;
+          mBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <code>.proto.Meta m = 1;</code>
+       */
+      public proto.Types.Meta.Builder getMBuilder() {
+        
+        onChanged();
+        return getMFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.proto.Meta m = 1;</code>
+       */
+      public proto.Types.MetaOrBuilder getMOrBuilder() {
+        if (mBuilder_ != null) {
+          return mBuilder_.getMessageOrBuilder();
+        } else {
+          return m_ == null ?
+              proto.Types.Meta.getDefaultInstance() : m_;
+        }
+      }
+      /**
+       * <code>.proto.Meta m = 1;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          proto.Types.Meta, proto.Types.Meta.Builder, proto.Types.MetaOrBuilder> 
+          getMFieldBuilder() {
+        if (mBuilder_ == null) {
+          mBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              proto.Types.Meta, proto.Types.Meta.Builder, proto.Types.MetaOrBuilder>(
+                  getM(),
+                  getParentForChildren(),
+                  isClean());
+          m_ = null;
+        }
+        return mBuilder_;
       }
 
       private int decosion_ ;
       /**
-       * <code>int32 decosion = 3;</code>
+       * <code>int32 decosion = 2;</code>
        */
       public int getDecosion() {
         return decosion_;
       }
       /**
-       * <code>int32 decosion = 3;</code>
+       * <code>int32 decosion = 2;</code>
        */
       public Builder setDecosion(int value) {
         
@@ -1434,7 +2081,7 @@ public final class Types {
         return this;
       }
       /**
-       * <code>int32 decosion = 3;</code>
+       * <code>int32 decosion = 2;</code>
        */
       public Builder clearDecosion() {
         
@@ -7086,603 +7733,6 @@ public final class Types {
 
   }
 
-  public interface MetaOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:proto.Meta)
-      com.google.protobuf.MessageOrBuilder {
-
-    /**
-     * <code>int32 sender = 1;</code>
-     */
-    int getSender();
-
-    /**
-     * <pre>
-     *    int32 height = 2;
-     * </pre>
-     *
-     * <code>int32 cid = 2;</code>
-     */
-    int getCid();
-
-    /**
-     * <code>int32 cidSeries = 3;</code>
-     */
-    int getCidSeries();
-  }
-  /**
-   * Protobuf type {@code proto.Meta}
-   */
-  public  static final class Meta extends
-      com.google.protobuf.GeneratedMessageV3 implements
-      // @@protoc_insertion_point(message_implements:proto.Meta)
-      MetaOrBuilder {
-  private static final long serialVersionUID = 0L;
-    // Use Meta.newBuilder() to construct.
-    private Meta(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
-      super(builder);
-    }
-    private Meta() {
-      sender_ = 0;
-      cid_ = 0;
-      cidSeries_ = 0;
-    }
-
-    @java.lang.Override
-    public final com.google.protobuf.UnknownFieldSet
-    getUnknownFields() {
-      return this.unknownFields;
-    }
-    private Meta(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      this();
-      if (extensionRegistry == null) {
-        throw new java.lang.NullPointerException();
-      }
-      int mutable_bitField0_ = 0;
-      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder();
-      try {
-        boolean done = false;
-        while (!done) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              done = true;
-              break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
-            case 8: {
-
-              sender_ = input.readInt32();
-              break;
-            }
-            case 16: {
-
-              cid_ = input.readInt32();
-              break;
-            }
-            case 24: {
-
-              cidSeries_ = input.readInt32();
-              break;
-            }
-          }
-        }
-      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
-      } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e).setUnfinishedMessage(this);
-      } finally {
-        this.unknownFields = unknownFields.build();
-        makeExtensionsImmutable();
-      }
-    }
-    public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
-      return proto.Types.internal_static_proto_Meta_descriptor;
-    }
-
-    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-        internalGetFieldAccessorTable() {
-      return proto.Types.internal_static_proto_Meta_fieldAccessorTable
-          .ensureFieldAccessorsInitialized(
-              proto.Types.Meta.class, proto.Types.Meta.Builder.class);
-    }
-
-    public static final int SENDER_FIELD_NUMBER = 1;
-    private int sender_;
-    /**
-     * <code>int32 sender = 1;</code>
-     */
-    public int getSender() {
-      return sender_;
-    }
-
-    public static final int CID_FIELD_NUMBER = 2;
-    private int cid_;
-    /**
-     * <pre>
-     *    int32 height = 2;
-     * </pre>
-     *
-     * <code>int32 cid = 2;</code>
-     */
-    public int getCid() {
-      return cid_;
-    }
-
-    public static final int CIDSERIES_FIELD_NUMBER = 3;
-    private int cidSeries_;
-    /**
-     * <code>int32 cidSeries = 3;</code>
-     */
-    public int getCidSeries() {
-      return cidSeries_;
-    }
-
-    private byte memoizedIsInitialized = -1;
-    public final boolean isInitialized() {
-      byte isInitialized = memoizedIsInitialized;
-      if (isInitialized == 1) return true;
-      if (isInitialized == 0) return false;
-
-      memoizedIsInitialized = 1;
-      return true;
-    }
-
-    public void writeTo(com.google.protobuf.CodedOutputStream output)
-                        throws java.io.IOException {
-      if (sender_ != 0) {
-        output.writeInt32(1, sender_);
-      }
-      if (cid_ != 0) {
-        output.writeInt32(2, cid_);
-      }
-      if (cidSeries_ != 0) {
-        output.writeInt32(3, cidSeries_);
-      }
-      unknownFields.writeTo(output);
-    }
-
-    public int getSerializedSize() {
-      int size = memoizedSize;
-      if (size != -1) return size;
-
-      size = 0;
-      if (sender_ != 0) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(1, sender_);
-      }
-      if (cid_ != 0) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(2, cid_);
-      }
-      if (cidSeries_ != 0) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(3, cidSeries_);
-      }
-      size += unknownFields.getSerializedSize();
-      memoizedSize = size;
-      return size;
-    }
-
-    @java.lang.Override
-    public boolean equals(final java.lang.Object obj) {
-      if (obj == this) {
-       return true;
-      }
-      if (!(obj instanceof proto.Types.Meta)) {
-        return super.equals(obj);
-      }
-      proto.Types.Meta other = (proto.Types.Meta) obj;
-
-      boolean result = true;
-      result = result && (getSender()
-          == other.getSender());
-      result = result && (getCid()
-          == other.getCid());
-      result = result && (getCidSeries()
-          == other.getCidSeries());
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
-    }
-
-    @java.lang.Override
-    public int hashCode() {
-      if (memoizedHashCode != 0) {
-        return memoizedHashCode;
-      }
-      int hash = 41;
-      hash = (19 * hash) + getDescriptor().hashCode();
-      hash = (37 * hash) + SENDER_FIELD_NUMBER;
-      hash = (53 * hash) + getSender();
-      hash = (37 * hash) + CID_FIELD_NUMBER;
-      hash = (53 * hash) + getCid();
-      hash = (37 * hash) + CIDSERIES_FIELD_NUMBER;
-      hash = (53 * hash) + getCidSeries();
-      hash = (29 * hash) + unknownFields.hashCode();
-      memoizedHashCode = hash;
-      return hash;
-    }
-
-    public static proto.Types.Meta parseFrom(
-        java.nio.ByteBuffer data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static proto.Types.Meta parseFrom(
-        java.nio.ByteBuffer data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static proto.Types.Meta parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static proto.Types.Meta parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static proto.Types.Meta parseFrom(byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static proto.Types.Meta parseFrom(
-        byte[] data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static proto.Types.Meta parseFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input);
-    }
-    public static proto.Types.Meta parseFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input, extensionRegistry);
-    }
-    public static proto.Types.Meta parseDelimitedFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseDelimitedWithIOException(PARSER, input);
-    }
-    public static proto.Types.Meta parseDelimitedFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
-    }
-    public static proto.Types.Meta parseFrom(
-        com.google.protobuf.CodedInputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input);
-    }
-    public static proto.Types.Meta parseFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input, extensionRegistry);
-    }
-
-    public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder() {
-      return DEFAULT_INSTANCE.toBuilder();
-    }
-    public static Builder newBuilder(proto.Types.Meta prototype) {
-      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
-    }
-    public Builder toBuilder() {
-      return this == DEFAULT_INSTANCE
-          ? new Builder() : new Builder().mergeFrom(this);
-    }
-
-    @java.lang.Override
-    protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-      Builder builder = new Builder(parent);
-      return builder;
-    }
-    /**
-     * Protobuf type {@code proto.Meta}
-     */
-    public static final class Builder extends
-        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:proto.Meta)
-        proto.Types.MetaOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
-          getDescriptor() {
-        return proto.Types.internal_static_proto_Meta_descriptor;
-      }
-
-      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-          internalGetFieldAccessorTable() {
-        return proto.Types.internal_static_proto_Meta_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                proto.Types.Meta.class, proto.Types.Meta.Builder.class);
-      }
-
-      // Construct using proto.Types.Meta.newBuilder()
-      private Builder() {
-        maybeForceBuilderInitialization();
-      }
-
-      private Builder(
-          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-        super(parent);
-        maybeForceBuilderInitialization();
-      }
-      private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessageV3
-                .alwaysUseFieldBuilders) {
-        }
-      }
-      public Builder clear() {
-        super.clear();
-        sender_ = 0;
-
-        cid_ = 0;
-
-        cidSeries_ = 0;
-
-        return this;
-      }
-
-      public com.google.protobuf.Descriptors.Descriptor
-          getDescriptorForType() {
-        return proto.Types.internal_static_proto_Meta_descriptor;
-      }
-
-      public proto.Types.Meta getDefaultInstanceForType() {
-        return proto.Types.Meta.getDefaultInstance();
-      }
-
-      public proto.Types.Meta build() {
-        proto.Types.Meta result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(result);
-        }
-        return result;
-      }
-
-      public proto.Types.Meta buildPartial() {
-        proto.Types.Meta result = new proto.Types.Meta(this);
-        result.sender_ = sender_;
-        result.cid_ = cid_;
-        result.cidSeries_ = cidSeries_;
-        onBuilt();
-        return result;
-      }
-
-      public Builder clone() {
-        return (Builder) super.clone();
-      }
-      public Builder setField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
-        return (Builder) super.setField(field, value);
-      }
-      public Builder clearField(
-          com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
-      }
-      public Builder clearOneof(
-          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
-      }
-      public Builder setRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
-      }
-      public Builder addRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
-      }
-      public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof proto.Types.Meta) {
-          return mergeFrom((proto.Types.Meta)other);
-        } else {
-          super.mergeFrom(other);
-          return this;
-        }
-      }
-
-      public Builder mergeFrom(proto.Types.Meta other) {
-        if (other == proto.Types.Meta.getDefaultInstance()) return this;
-        if (other.getSender() != 0) {
-          setSender(other.getSender());
-        }
-        if (other.getCid() != 0) {
-          setCid(other.getCid());
-        }
-        if (other.getCidSeries() != 0) {
-          setCidSeries(other.getCidSeries());
-        }
-        this.mergeUnknownFields(other.unknownFields);
-        onChanged();
-        return this;
-      }
-
-      public final boolean isInitialized() {
-        return true;
-      }
-
-      public Builder mergeFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
-        proto.Types.Meta parsedMessage = null;
-        try {
-          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
-        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (proto.Types.Meta) e.getUnfinishedMessage();
-          throw e.unwrapIOException();
-        } finally {
-          if (parsedMessage != null) {
-            mergeFrom(parsedMessage);
-          }
-        }
-        return this;
-      }
-
-      private int sender_ ;
-      /**
-       * <code>int32 sender = 1;</code>
-       */
-      public int getSender() {
-        return sender_;
-      }
-      /**
-       * <code>int32 sender = 1;</code>
-       */
-      public Builder setSender(int value) {
-        
-        sender_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>int32 sender = 1;</code>
-       */
-      public Builder clearSender() {
-        
-        sender_ = 0;
-        onChanged();
-        return this;
-      }
-
-      private int cid_ ;
-      /**
-       * <pre>
-       *    int32 height = 2;
-       * </pre>
-       *
-       * <code>int32 cid = 2;</code>
-       */
-      public int getCid() {
-        return cid_;
-      }
-      /**
-       * <pre>
-       *    int32 height = 2;
-       * </pre>
-       *
-       * <code>int32 cid = 2;</code>
-       */
-      public Builder setCid(int value) {
-        
-        cid_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <pre>
-       *    int32 height = 2;
-       * </pre>
-       *
-       * <code>int32 cid = 2;</code>
-       */
-      public Builder clearCid() {
-        
-        cid_ = 0;
-        onChanged();
-        return this;
-      }
-
-      private int cidSeries_ ;
-      /**
-       * <code>int32 cidSeries = 3;</code>
-       */
-      public int getCidSeries() {
-        return cidSeries_;
-      }
-      /**
-       * <code>int32 cidSeries = 3;</code>
-       */
-      public Builder setCidSeries(int value) {
-        
-        cidSeries_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>int32 cidSeries = 3;</code>
-       */
-      public Builder clearCidSeries() {
-        
-        cidSeries_ = 0;
-        onChanged();
-        return this;
-      }
-      public final Builder setUnknownFields(
-          final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
-      }
-
-      public final Builder mergeUnknownFields(
-          final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.mergeUnknownFields(unknownFields);
-      }
-
-
-      // @@protoc_insertion_point(builder_scope:proto.Meta)
-    }
-
-    // @@protoc_insertion_point(class_scope:proto.Meta)
-    private static final proto.Types.Meta DEFAULT_INSTANCE;
-    static {
-      DEFAULT_INSTANCE = new proto.Types.Meta();
-    }
-
-    public static proto.Types.Meta getDefaultInstance() {
-      return DEFAULT_INSTANCE;
-    }
-
-    private static final com.google.protobuf.Parser<Meta>
-        PARSER = new com.google.protobuf.AbstractParser<Meta>() {
-      public Meta parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new Meta(input, extensionRegistry);
-      }
-    };
-
-    public static com.google.protobuf.Parser<Meta> parser() {
-      return PARSER;
-    }
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<Meta> getParserForType() {
-      return PARSER;
-    }
-
-    public proto.Types.Meta getDefaultInstanceForType() {
-      return DEFAULT_INSTANCE;
-    }
-
-  }
-
   public interface DataOrBuilder extends
       // @@protoc_insertion_point(interface_extends:proto.Data)
       com.google.protobuf.MessageOrBuilder {
@@ -10888,6 +10938,11 @@ public final class Types {
   }
 
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_proto_Meta_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_proto_Meta_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_proto_BbcMsg_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -10938,11 +10993,6 @@ public final class Types {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_proto_Empty_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_proto_Meta_descriptor;
-  private static final 
-    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_proto_Meta_fieldAccessorTable;
-  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_proto_Data_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -10971,33 +11021,32 @@ public final class Types {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\013types.proto\022\005proto\"r\n\006BbcMsg\022\021\n\tpropse" +
-      "rID\030\001 \001(\005\022\013\n\003cid\030\002 \001(\005\022\021\n\tcidSeries\030\003 \001(" +
-      "\005\022\014\n\004vote\030\004 \001(\005\022\031\n\004next\030\005 \001(\0132\013.proto.Da" +
-      "ta\022\014\n\004auth\030\006 \001(\014\"?\n\013BbcDecision\022\013\n\003cid\030\001" +
-      " \001(\005\022\021\n\tcidSeries\030\002 \001(\005\022\020\n\010decosion\030\003 \001(" +
-      "\005\"w\n\013BlockHeader\022\014\n\004prev\030\001 \001(\014\022\021\n\tcreato" +
-      "rID\030\002 \001(\005\022\016\n\006height\030\003 \001(\005\022\027\n\017transaction" +
-      "Hash\030\004 \001(\014\022\013\n\003cid\030\005 \001(\005\022\021\n\tcidSeries\030\006 \001" +
-      "(\005\"9\n\013BlockFooter\022\020\n\010rmfProof\030\001 \001(\t\022\n\n\002t" +
-      "s\030\002 \001(\003\022\014\n\004orig\030\003 \001(\014\"q\n\005Block\022\"\n\006header" +
-      "\030\001 \001(\0132\022.proto.BlockHeader\022 \n\004data\030\002 \003(\013" +
-      "2\022.proto.Transaction\022\"\n\006footer\030\003 \001(\0132\022.p" +
-      "roto.BlockFooter\";\n\013Transaction\022\020\n\010clien" +
-      "tID\030\001 \001(\005\022\014\n\004txID\030\002 \001(\t\022\014\n\004data\030\003 \001(\014\"\034\n" +
-      "\010accepted\022\020\n\010accepted\030\001 \001(\010\"S\n\tForkProof" +
-      "\022\016\n\006sender\030\001 \001(\005\022\032\n\004curr\030\002 \001(\0132\014.proto.B" +
-      "lock\022\032\n\004prev\030\004 \001(\0132\014.proto.Block\".\n\005RBMs" +
-      "g\022\n\n\002id\030\001 \001(\005\022\013\n\003cid\030\002 \001(\005\022\014\n\004data\030\003 \001(\014" +
-      "\"\007\n\005Empty\"6\n\004Meta\022\016\n\006sender\030\001 \001(\005\022\013\n\003cid" +
-      "\030\002 \001(\005\022\021\n\tcidSeries\030\003 \001(\005\"=\n\004Data\022\032\n\005_me" +
-      "ta\030\001 \001(\0132\013.proto.Meta\022\014\n\004data\030\002 \001(\014\022\013\n\003s" +
-      "ig\030\003 \001(\t\"!\n\003Req\022\032\n\005_meta\030\001 \001(\0132\013.proto.M" +
-      "eta\"=\n\003Res\022\032\n\005_meta\030\001 \001(\0132\013.proto.Meta\022\032" +
-      "\n\005_data\030\002 \001(\0132\013.proto.Data\"`\n\017subChainVe" +
-      "rsion\022\021\n\tforkPoint\030\001 \001(\005\022\021\n\tsuggested\030\002 " +
-      "\001(\005\022\027\n\001v\030\003 \003(\0132\014.proto.Block\022\016\n\006sender\030\004" +
-      " \001(\005B\007\n\005protob\006proto3"
+      "\n\013types.proto\022\005proto\"G\n\004Meta\022\017\n\007channel\030" +
+      "\001 \001(\005\022\016\n\006sender\030\002 \001(\005\022\013\n\003cid\030\003 \001(\005\022\021\n\tci" +
+      "dSeries\030\004 \001(\005\"I\n\006BbcMsg\022\026\n\001m\030\001 \001(\0132\013.pro" +
+      "to.Meta\022\014\n\004vote\030\002 \001(\005\022\031\n\004next\030\003 \001(\0132\013.pr" +
+      "oto.Data\"7\n\013BbcDecision\022\026\n\001m\030\001 \001(\0132\013.pro" +
+      "to.Meta\022\020\n\010decosion\030\002 \001(\005\"w\n\013BlockHeader" +
+      "\022\014\n\004prev\030\001 \001(\014\022\021\n\tcreatorID\030\002 \001(\005\022\016\n\006hei" +
+      "ght\030\003 \001(\005\022\027\n\017transactionHash\030\004 \001(\014\022\013\n\003ci" +
+      "d\030\005 \001(\005\022\021\n\tcidSeries\030\006 \001(\005\"9\n\013BlockFoote" +
+      "r\022\020\n\010rmfProof\030\001 \001(\t\022\n\n\002ts\030\002 \001(\003\022\014\n\004orig\030" +
+      "\003 \001(\014\"q\n\005Block\022\"\n\006header\030\001 \001(\0132\022.proto.B" +
+      "lockHeader\022 \n\004data\030\002 \003(\0132\022.proto.Transac" +
+      "tion\022\"\n\006footer\030\003 \001(\0132\022.proto.BlockFooter" +
+      "\";\n\013Transaction\022\020\n\010clientID\030\001 \001(\005\022\014\n\004txI" +
+      "D\030\002 \001(\t\022\014\n\004data\030\003 \001(\014\"\034\n\010accepted\022\020\n\010acc" +
+      "epted\030\001 \001(\010\"S\n\tForkProof\022\016\n\006sender\030\001 \001(\005" +
+      "\022\032\n\004curr\030\002 \001(\0132\014.proto.Block\022\032\n\004prev\030\004 \001" +
+      "(\0132\014.proto.Block\".\n\005RBMsg\022\n\n\002id\030\001 \001(\005\022\013\n" +
+      "\003cid\030\002 \001(\005\022\014\n\004data\030\003 \001(\014\"\007\n\005Empty\"=\n\004Dat" +
+      "a\022\032\n\005_meta\030\001 \001(\0132\013.proto.Meta\022\014\n\004data\030\002 " +
+      "\001(\014\022\013\n\003sig\030\003 \001(\t\"!\n\003Req\022\032\n\005_meta\030\001 \001(\0132\013" +
+      ".proto.Meta\"=\n\003Res\022\032\n\005_meta\030\001 \001(\0132\013.prot" +
+      "o.Meta\022\032\n\005_data\030\002 \001(\0132\013.proto.Data\"`\n\017su" +
+      "bChainVersion\022\021\n\tforkPoint\030\001 \001(\005\022\021\n\tsugg" +
+      "ested\030\002 \001(\005\022\027\n\001v\030\003 \003(\0132\014.proto.Block\022\016\n\006" +
+      "sender\030\004 \001(\005B\007\n\005protob\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -11011,72 +11060,72 @@ public final class Types {
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
         }, assigner);
-    internal_static_proto_BbcMsg_descriptor =
+    internal_static_proto_Meta_descriptor =
       getDescriptor().getMessageTypes().get(0);
+    internal_static_proto_Meta_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_proto_Meta_descriptor,
+        new java.lang.String[] { "Channel", "Sender", "Cid", "CidSeries", });
+    internal_static_proto_BbcMsg_descriptor =
+      getDescriptor().getMessageTypes().get(1);
     internal_static_proto_BbcMsg_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_BbcMsg_descriptor,
-        new java.lang.String[] { "PropserID", "Cid", "CidSeries", "Vote", "Next", "Auth", });
+        new java.lang.String[] { "M", "Vote", "Next", });
     internal_static_proto_BbcDecision_descriptor =
-      getDescriptor().getMessageTypes().get(1);
+      getDescriptor().getMessageTypes().get(2);
     internal_static_proto_BbcDecision_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_BbcDecision_descriptor,
-        new java.lang.String[] { "Cid", "CidSeries", "Decosion", });
+        new java.lang.String[] { "M", "Decosion", });
     internal_static_proto_BlockHeader_descriptor =
-      getDescriptor().getMessageTypes().get(2);
+      getDescriptor().getMessageTypes().get(3);
     internal_static_proto_BlockHeader_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_BlockHeader_descriptor,
         new java.lang.String[] { "Prev", "CreatorID", "Height", "TransactionHash", "Cid", "CidSeries", });
     internal_static_proto_BlockFooter_descriptor =
-      getDescriptor().getMessageTypes().get(3);
+      getDescriptor().getMessageTypes().get(4);
     internal_static_proto_BlockFooter_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_BlockFooter_descriptor,
         new java.lang.String[] { "RmfProof", "Ts", "Orig", });
     internal_static_proto_Block_descriptor =
-      getDescriptor().getMessageTypes().get(4);
+      getDescriptor().getMessageTypes().get(5);
     internal_static_proto_Block_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_Block_descriptor,
         new java.lang.String[] { "Header", "Data", "Footer", });
     internal_static_proto_Transaction_descriptor =
-      getDescriptor().getMessageTypes().get(5);
+      getDescriptor().getMessageTypes().get(6);
     internal_static_proto_Transaction_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_Transaction_descriptor,
         new java.lang.String[] { "ClientID", "TxID", "Data", });
     internal_static_proto_accepted_descriptor =
-      getDescriptor().getMessageTypes().get(6);
+      getDescriptor().getMessageTypes().get(7);
     internal_static_proto_accepted_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_accepted_descriptor,
         new java.lang.String[] { "Accepted", });
     internal_static_proto_ForkProof_descriptor =
-      getDescriptor().getMessageTypes().get(7);
+      getDescriptor().getMessageTypes().get(8);
     internal_static_proto_ForkProof_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_ForkProof_descriptor,
         new java.lang.String[] { "Sender", "Curr", "Prev", });
     internal_static_proto_RBMsg_descriptor =
-      getDescriptor().getMessageTypes().get(8);
+      getDescriptor().getMessageTypes().get(9);
     internal_static_proto_RBMsg_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_RBMsg_descriptor,
         new java.lang.String[] { "Id", "Cid", "Data", });
     internal_static_proto_Empty_descriptor =
-      getDescriptor().getMessageTypes().get(9);
+      getDescriptor().getMessageTypes().get(10);
     internal_static_proto_Empty_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_Empty_descriptor,
         new java.lang.String[] { });
-    internal_static_proto_Meta_descriptor =
-      getDescriptor().getMessageTypes().get(10);
-    internal_static_proto_Meta_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_proto_Meta_descriptor,
-        new java.lang.String[] { "Sender", "Cid", "CidSeries", });
     internal_static_proto_Data_descriptor =
       getDescriptor().getMessageTypes().get(11);
     internal_static_proto_Data_fieldAccessorTable = new

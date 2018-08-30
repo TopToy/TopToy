@@ -11,8 +11,8 @@ public class ByzantineRmfNode extends RmfNode {
 //    private boolean stopped = false;
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ByzantineRmfNode.class);
 
-    public ByzantineRmfNode(int id, String addr, int rmfPort, int f, ArrayList<Node> nodes, String bbcConfig) {
-        super(id, addr, rmfPort, f, nodes, bbcConfig);
+    public ByzantineRmfNode(int channel, int id, String addr, int rmfPort, int f, ArrayList<Node> nodes, String bbcConfig) {
+        super(channel, id, addr, rmfPort, f, nodes, bbcConfig);
     }
 
     public void selectiveBroadcast(int cidSeries, int cid, byte[] msg, int height, List<Integer> ids) {

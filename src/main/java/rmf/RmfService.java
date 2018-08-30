@@ -106,6 +106,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             }
         }
     }
+    int channel;
     protected int id;
     private int n;
     protected int f;
@@ -128,7 +129,8 @@ public class RmfService extends RmfGrpc.RmfImplBase {
     private boolean stopped = false;
     private Server rmfServer;
 
-    public RmfService(int id, int f, ArrayList<Node> nodes, String bbcConfig) {
+    public RmfService(int channel, int id, int f, ArrayList<Node> nodes, String bbcConfig) {
+        this.channel = channel;
         this.bbcConfig = bbcConfig;
         this.fVotes = HashBasedTable.create();
         this.pendingMsg =  HashBasedTable.create();
@@ -363,28 +365,30 @@ public class RmfService extends RmfGrpc.RmfImplBase {
     @Override
     public void fastVote(BbcMsg request, StreamObserver<Empty> responeObserver) {
         synchronized (globalLock) {
-            int cid = request.getCid();
-            int cidSeries = request.getCidSeries();
+            int cid = request.getM().getCid();
+            int cidSeries = request.getM().getCidSeries();
             if (regBbcCons.contains(cidSeries, cid)) return;
             synchronized (fastBbcCons) {
                 if (fastBbcCons.contains(cidSeries, cid)) return; // Against byzantine activity
             }
             if (!fVotes.contains(cidSeries, cid)) {
                 fvote v = new fvote();
-                v.dec.setCid(cid);
-                v.dec.setCidSeries(cidSeries);
+                v.dec.setM(Meta.newBuilder()
+                        .setChannel(channel)
+                        .setCidSeries(cidSeries)
+                        .setCid(cid));
                 v.cid = cid;
                 v.cidSeries = cidSeries;
                 v.voters = new ArrayList<>();
                 fVotes.put(cidSeries, cid, v);
             }
 
-            if (fVotes.get(cidSeries, cid).voters.contains(request.getPropserID())) {
-                logger.debug(format("[#%d] has received duplicate vote from [%d] for [cidSeries=%d ; cid=%d]",
-                        id, request.getPropserID(), cidSeries, cid));
+            if (fVotes.get(cidSeries, cid).voters.contains(request.getM().getSender())) {
+                logger.debug(format("[#%d] has received duplicate vote from [%d] for [channel=%d ; cidSeries=%d ; cid=%d]",
+                        id, request.getM().getSender(), channel, cidSeries, cid));
                 return;
             }
-            fVotes.get(cidSeries, cid).voters.add(request.getPropserID());
+            fVotes.get(cidSeries, cid).voters.add(request.getM().getSender());
             if (request.hasNext()) {
                 addToPendings(request.getNext());
             }
@@ -429,7 +433,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         }
     }
 
-    public Data deliver(int cidSeries, int cid, int tmo, int sender, int height, Data next, byte[] auth) throws InterruptedException {
+    public Data deliver(int cidSeries, int cid, int tmo, int sender, int height, Data next) throws InterruptedException {
         int cVotes = 0;
         int v = 0;
         boolean verfied = false;
@@ -449,10 +453,12 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                 if (valid) {
                     BbcMsg.Builder bv = BbcMsg
                             .newBuilder()
-                            .setCid(cid)
-                            .setCidSeries(cidSeries)
-                            .setPropserID(id)
-                            .setAuth(ByteString.copyFrom(auth))
+                            .setM(Meta.newBuilder()
+                                    .setChannel(channel)
+                                    .setCidSeries(cidSeries)
+                                    .setCidSeries(cid)
+                                    .setSender(id)
+                                    .build())
                             .setVote(1);
                     if (next != null) {
                         logger.debug(format("[#%d] broadcasts [cidSeries=%d ; cid=%d] via fast mode",
@@ -535,8 +541,8 @@ public class RmfService extends RmfGrpc.RmfImplBase {
     }
     private int fullBbcConsensus(int vote, int cidSeries, int cid) throws InterruptedException {
         logger.debug(format("[#%d] Initiates full bbc instance [cidSeries=%d ; cid=%d], [vote:%d]", id, cidSeries, cid, vote));
-        bbcService.propose(vote, cidSeries, cid);
-        BbcDecision dec = bbcService.decide(cidSeries, cid);
+        bbcService.propose(vote, channel, cidSeries, cid);
+        BbcDecision dec = bbcService.decide(channel, cidSeries, cid);
         regBbcCons.put(cidSeries, cid, dec);
         return dec.getDecosion();
     }

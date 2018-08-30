@@ -16,9 +16,9 @@ public class RmfNode extends Node{
     protected boolean stopped = false;
     RmfService rmfService;
 
-    public RmfNode(int id, String addr, int rmfPort, int f , ArrayList<Node> nodes, String bbcConfig) {
+    public RmfNode(int channel, int id, String addr, int rmfPort, int f , ArrayList<Node> nodes, String bbcConfig) {
         super(addr, rmfPort,  id);
-        rmfService = new RmfService(id, f, nodes, bbcConfig);
+        rmfService = new RmfService(channel, id, f, nodes, bbcConfig);
     }
 
     public void stop() {

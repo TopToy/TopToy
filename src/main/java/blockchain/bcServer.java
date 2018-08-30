@@ -60,7 +60,7 @@ public abstract class bcServer extends Node {
         super(addr, rmfPort, id);
         this.f = Config.getF();
         n = Config.getN();
-        rmfServer = new RmfNode(id, addr, rmfPort, Config.getF(),
+        rmfServer = new RmfNode(0, id, addr, rmfPort, Config.getF(), // TODO: Change that!!! channel != 0!!
                 Config.getCluster(), Config.getRMFbbcConfigHome());
         panicRB = new RBrodcastService(id, Config.getPanicRBConfigHome());
         syncRB = new RBrodcastService(id, Config.getSyncRBConfigHome());

@@ -23,7 +23,7 @@ public class byzantineBcServer extends bcServer {
     public byzantineBcServer(String addr, int rmfPort, int id) {
         super(addr, rmfPort, id);
         rmfServer.stop();
-        rmfServer = new ByzantineRmfNode(id, addr, rmfPort, Config.getF(),
+        rmfServer = new ByzantineRmfNode(0, id, addr, rmfPort, Config.getF(), // TODO: Change channel!!!
                 Config.getCluster(), Config.getRMFbbcConfigHome());
         groups.add(new ArrayList<>());
         for (int i = 0 ; i < Config.getN() ; i++) {

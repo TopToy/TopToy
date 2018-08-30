@@ -2,20 +2,25 @@ syntax = "proto3";
 option java_package = "proto";
 package proto;
 
+
+message Meta {
+    int32 channel = 1;
+    int32 sender = 2;
+    int32 cid = 3;
+    int32 cidSeries = 4;
+}
+
+
 message BbcMsg {
-    int32 propserID = 1;
-    int32 cid = 2;
-    int32 cidSeries = 3;
-    int32 vote = 4;
-    Data next = 5;
-    bytes auth = 6;
+    Meta m = 1;
+    int32 vote = 2;
+    Data next = 3;
 }
 
 
 message BbcDecision {
-    int32 cid = 1;
-    int32 cidSeries = 2;
-    int32 decosion = 3;
+    Meta m = 1;
+    int32 decosion = 2;
 }
 
 message BlockHeader {
@@ -67,12 +72,7 @@ message Empty {
 
 }
 
-message Meta {
-    int32 sender = 1;
-//    int32 height = 2;
-    int32 cid = 2;
-    int32 cidSeries = 3;
-}
+
 
 //message Auth {
 //    Meta m = 1;

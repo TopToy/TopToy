@@ -49,10 +49,10 @@ public class rmfTest {
         for (int id = 0 ; id < nnodes ; id++) {
             logger.info("init server #" + id);
             if (ArrayUtils.contains(byzIds, id)) {
-                ret[id] = new ByzantineRmfNode(id, localHost, rmfPorts[id], f,  currentNodes, configHome);
+                ret[id] = new ByzantineRmfNode(0, id, localHost, rmfPorts[id], f,  currentNodes, configHome);
                 continue;
             }
-            ret[id] =  new RmfNode(id, localHost, rmfPorts[id], f, currentNodes, configHome);
+            ret[id] =  new RmfNode(0, id, localHost, rmfPorts[id], f, currentNodes, configHome);
         }
         return ret;
 
