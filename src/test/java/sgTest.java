@@ -4,14 +4,20 @@ import blockchain.cbcServer;
 import config.Node;
 import org.apache.commons.lang.ArrayUtils;
 import org.junit.jupiter.api.Test;
+import proto.Types;
 import serverGroup.sg;
 
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 
 import static config.Config.setConfig;
+import static java.lang.String.format;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class sgTest {
     private int timeToWaitBetweenTests = 1; //1000 * 60;
@@ -115,4 +121,584 @@ public class sgTest {
         rn1[0].start();
         rn1[0].shutdown();
     }
+
+    @Test
+    void TestSingleServerDisseminateMessage() throws InterruptedException {
+        setConfig(singleConfig, 0);
+        Thread.sleep(timeToWaitBetweenTests);
+        logger.info("start TestSingleServer");
+        sg[] rn1 = initLocalSgNodes(1, 0, 2, singleBbc.toString(),
+                singlepanic.toString(), singlesync.toString(), null);
+        rn1[0].start();
+        rn1[0].serve();
+//        for (int i = 0 ; i < 1000 ; i++) {
+//            rn1[0].addTransaction(("hello").getBytes(), 100);
+//        }
+//        Thread.sleep(30 * 1000);
+        rn1[0].shutdown();
+
+    }
+
+    @Test
+    void TestFourServersNoFailuresSingleMessage() throws InterruptedException {
+        setConfig(fourConfig, 0);
+        Thread.sleep(timeToWaitBetweenTests);
+        int nnodes = 4;
+        logger.info("start TestFourServersNoFailures");
+        Thread[] servers = new Thread[4];
+        sg[] allNodes = initLocalSgNodes(nnodes,1, 2, fourBbc.toString(),
+                fourpanic.toString(), foursync.toString(), null);
+        for (int i = 0 ; i < nnodes ; i++) {
+            int finalI = i;
+            servers[i]  = new Thread(() -> {
+                try {
+                    (allNodes[finalI]).start();
+                } catch (InterruptedException e) {
+                    logger.error("", e);
+                }
+            });
+            servers[i].start();
+        }
+        for (int i = 0 ; i < nnodes ; i++) {
+            servers[i].join();
+        }
+        String msg = "Hello";
+        allNodes[0].addTransaction(msg.getBytes(), 0);
+        for (int i = 0 ; i < nnodes ; i++) {
+            allNodes[i].serve();
+        }
+        String[] ret = new String[4];
+        Thread[] tasks = new Thread[4];
+        for (int i = 0 ; i < nnodes ; i++) {
+            int finalI = i;
+            tasks[i] = new Thread(()-> {
+                try {
+                    ret[finalI] = new String(allNodes[finalI].deliver(1).getData(0).getData().toByteArray());
+                } catch (InterruptedException e) {
+                    logger.error("", e);
+                }
+            });
+            tasks[i].start();
+        }
+
+        for (int i = 0 ; i < nnodes ; i++) {
+            tasks[i].join();
+        }
+        for (int i = 0 ; i < 4 ; i++) {
+            allNodes[i].shutdown();
+        }
+//        for (int i = 0 ; i < 4 ; i++) {
+//            assertEquals(msg, ret[i]);
+//            ((RmfNode) allNodes[i]).stop();
+//        }
+
+    }
+
+    void serverDoing(List<Types.Block> res, sg s) throws InterruptedException {
+        logger.info("--->" + s.getID() + " STARTS");
+        for(int i = 0; i < 100 ; i++) {
+            String msg = "Hello" + i;
+            if (i % 4 == s.getID()) {
+                s.addTransaction(msg.getBytes(), 0);
+            }
+            res.add(s.deliver(i));
+        }
+        logger.info("--->" + s.getID() + " ENDS");
+    }
+    @Test
+    void TestStressFourServersNoFailures() throws InterruptedException {
+        setConfig(fourConfig, 0);
+        Thread.sleep(timeToWaitBetweenTests);
+        int nnodes = 4;
+        logger.info("start TestFourServersNoFailures");
+        Thread[] servers = new Thread[4];
+        sg[] allNodes = initLocalSgNodes(nnodes,1, 2, fourBbc.toString(),
+                fourpanic.toString(), foursync.toString(), null);
+        for (int i = 0 ; i < nnodes ; i++) {
+            int finalI = i;
+            servers[i]  = new Thread(() -> {
+                try {
+                    allNodes[finalI].start();
+                } catch (InterruptedException e) {
+                    logger.error("", e);
+                }
+            });
+            servers[i].start();
+        }
+        for (int i = 0 ; i < nnodes ; i++) {
+            servers[i].join();
+        }
+        for (int i = 0 ; i < nnodes ; i++) {
+            allNodes[i].serve();
+        }
+        Thread.sleep(5*1000);
+        HashMap<Integer, ArrayList<Types.Block>> res = new HashMap<>();
+        for (int i = 0 ; i < nnodes ; i++) {
+            res.put(i, new ArrayList<Types.Block>());
+        }
+        logger.info("start TestStressFourServersNoFailures");
+        Thread[] tasks = new Thread[4];
+        for (int i = 0 ; i < 4 ;i++) {
+            int finalI = i;
+            tasks[i] = new Thread(() -> {
+                try {
+                    serverDoing(res.get(finalI), allNodes[finalI]);
+                } catch (InterruptedException e) {
+                    logger.error("", e);
+                }
+            });
+            tasks[i].start();
+        }
+        for (int i = 0 ; i < nnodes ; i++) {
+            tasks[i].join();
+        }
+        for (int i = 0 ; i < 4 ; i++) {
+            allNodes[i].shutdown();
+        }
+        for (int i = 0 ; i < 100 ; i++) {
+            logger.info(format("***** Assert creator = %d", res.get(0).get(i).getHeader().getCreatorID()));
+            for (int k = 0 ; k < nnodes ;k++) {
+                assertEquals(res.get(0).get(i).getHeader().getCreatorID(), res.get(k).get(i).getHeader().getCreatorID());
+            }
+        }
+
+    }
+
+    @Test
+    void TestStressFourServersMuteFault() throws InterruptedException {
+        setConfig(fourConfig, 0);
+        Thread.sleep(timeToWaitBetweenTests);
+        int nnodes = 4;
+        logger.info("start TestFourServersNoFailures");
+        Thread[] servers = new Thread[4];
+        sg[] allNodes = initLocalSgNodes(nnodes,1, 2, fourBbc.toString(),
+                fourpanic.toString(), foursync.toString(), null);
+        for (int i = 0 ; i < nnodes ; i++) {
+            int finalI = i;
+            servers[i]  = new Thread(() -> {
+                try {
+                    allNodes[finalI].start();
+                } catch (InterruptedException e) {
+                    logger.error("", e);
+                }
+            });
+            servers[i].start();
+        }
+        for (int i = 0 ; i < nnodes ; i++) {
+            servers[i].join();
+        }
+
+        for (int i = 1 ; i < nnodes ; i++) {
+            allNodes[i].serve();
+        }
+
+        HashMap<Integer, ArrayList<Types.Block>> res = new HashMap<>();
+        for (int i = 1 ; i < nnodes ; i++) {
+            res.put(i, new ArrayList<Types.Block>());
+        }
+        Thread[] tasks = new Thread[4];
+        for (int i = 1 ; i < 4 ;i++) {
+            int finalI = i;
+            tasks[i] = new Thread(() -> {
+                try {
+                    serverDoing(res.get(finalI), allNodes[finalI]);
+                } catch (InterruptedException e) {
+                    logger.error("", e);
+                }
+            });
+            tasks[i].start();
+        }
+        for (int i = 1 ; i < nnodes ; i++) {
+            tasks[i].join();
+        }
+
+        for (int i = 0 ; i < 4 ; i++) {
+            allNodes[i].shutdown();
+        }
+
+        for (int i = 0 ; i < 100 ; i++) {
+            logger.info(format("***** Assert creator = %d", res.get(1).get(i).getHeader().getCreatorID()));
+            for (int k = 1 ; k < nnodes ;k++) {
+                assertEquals(res.get(1).get(i).getHeader().getCreatorID(), res.get(k).get(i).getHeader().getCreatorID());
+            }
+        }
+
+    }
+
+    void bServerDoing(List<Types.Block> res, sg s) throws InterruptedException {
+        for(int i = 0; i < 100 ; i++) {
+            String msg = "Hello" + i;
+            if (i % 4 == s.getID()) {
+                s.addTransaction(msg.getBytes(), 0);
+            }
+            logger.info(format("**** %d ***** %d", s.getID(), i));
+            res.add(s.deliver(i));
+        }
+    }
+    @Test
+    void TestStressFourServersSelectiveBroadcastFault() throws InterruptedException {
+        setConfig(fourConfig, 0);
+        Thread.sleep(timeToWaitBetweenTests);
+        int nnodes = 4;
+        logger.info("start TestFourServersNoFailures");
+        Thread[] servers = new Thread[4];
+        sg[] allNodes = initLocalSgNodes(nnodes,1, 2, fourBbc.toString(),
+                fourpanic.toString(), foursync.toString(), new int[]{0});
+        for (int i = 0 ; i < nnodes ; i++) {
+            int finalI = i;
+            if (i == 0) {
+                servers[i]  = new Thread(() -> {
+                    try {
+                        allNodes[finalI].start();
+                    } catch (InterruptedException e) {
+                        logger.error(e);
+                    }
+                });
+                servers[i].start();
+                continue;
+            }
+            servers[i]  = new Thread(() -> {
+                try {
+                    allNodes[finalI].start();
+                } catch (InterruptedException e) {
+                    logger.error(e);
+                }
+            });
+            servers[i].start();
+        }
+        for (int i = 0 ; i < nnodes ; i++) {
+            servers[i].join();
+        }
+
+        for (int i = 0 ; i < nnodes ; i++) {
+            if (i == 0) {
+                List<List<Integer>> gr = new ArrayList<>();
+                gr.add(Arrays.asList(1, 2));
+                gr.add(Arrays.asList(0 , 3));
+                allNodes[i].setByzSetting(false, gr);
+                allNodes[i].serve();
+                continue;
+            }
+            allNodes[i].serve();
+        }
+
+        HashMap<Integer, ArrayList<Types.Block>> res = new HashMap<>();
+        for (int i = 0 ; i < nnodes ; i++) {
+            res.put(i, new ArrayList<Types.Block>());
+        }
+        Thread[] tasks = new Thread[4];
+        for (int i = 0 ; i < 4 ;i++) {
+            if (i == 0) {
+                int finalI1 = i;
+                tasks[i] = new Thread(() -> {
+                    try {
+                        bServerDoing(res.get(finalI1), allNodes[finalI1]);
+                    } catch (InterruptedException e) {
+                        logger.error("", e);
+                    }
+                });
+                tasks[i].start();
+                continue;
+            }
+            int finalI = i;
+            tasks[i] = new Thread(() -> {
+                try {
+                    serverDoing(res.get(finalI), allNodes[finalI]);
+                } catch (InterruptedException e) {
+                    logger.error("", e);
+                }
+            });
+            tasks[i].start();
+        }
+        for (int i = 0 ; i < nnodes ; i++) {
+            tasks[i].join();
+        }
+
+        for (int i = 0 ; i < 4 ; i++) {
+            if (i == 0) {
+                allNodes[i].shutdown();
+                continue;
+            }
+            allNodes[i].shutdown();
+        }
+
+        for (int i = 0 ; i < 100 ; i++) {
+            logger.info(format("***** Assert creator = %d", res.get(0).get(i).getHeader().getCreatorID()));
+            for (int k = 0 ; k < nnodes ;k++) {
+                assertEquals(res.get(0).get(i).getHeader().getCreatorID(), res.get(k).get(i).getHeader().getCreatorID());
+            }
+        }
+
+    }
+
+    void asyncServerDoing(List<Types.Block> res, sg s) throws InterruptedException {
+        for(int i = 0; i < 100 ; i++) {
+            String msg = "Hello" + i;
+            if (i % 4 == s.getID()) {
+                s.addTransaction(msg.getBytes(), 0);
+            }
+            res.add(s.deliver(i));
+            logger.info(format("**** %d ***** %d", s.getID(), i));
+        }
+//        logger.info("******************" + s.getID() + "****************************");
+    }
+
+    @Test
+    void TestStressFourServersAsyncNetwork() throws InterruptedException {
+        setConfig(fourConfig, 0);
+        Thread.sleep(timeToWaitBetweenTests);
+        int nnodes = 4;
+        logger.info("start TestFourServersNoFailures");
+        Thread[] servers = new Thread[4];
+        sg[] allNodes = initLocalAsyncBCNodes(nnodes,1, 2, fourBbc.toString(),
+                fourpanic.toString(), foursync.toString(), null);
+
+        for (int i = 0 ; i < nnodes ; i++) {
+            int finalI = i;
+            servers[i]  = new Thread(() -> {
+                try {
+                    allNodes[finalI].start();
+                } catch (InterruptedException e) {
+                    logger.error(e);
+                }
+            });
+            servers[i].start();
+        }
+        for (int i = 0 ; i < nnodes ; i++) {
+            servers[i].join();
+        }
+
+        for (int i = 0 ; i < nnodes ; i++) {
+            allNodes[i].setAsyncParam(1000);
+            allNodes[i].serve();
+        }
+        HashMap<Integer, ArrayList<Types.Block>> res = new HashMap<>();
+        for (int i = 0 ; i < nnodes ; i++) {
+            res.put(i, new ArrayList<Types.Block>());
+        }
+        Thread[] tasks = new Thread[4];
+        for (int i = 0 ; i < 4 ;i++) {
+            int finalI = i;
+            tasks[i] = new Thread(() -> {
+                try {
+                    asyncServerDoing(res.get(finalI), allNodes[finalI]);
+                } catch (InterruptedException e) {
+                    logger.error("", e);
+                }
+            });
+            tasks[i].start();
+        }
+
+
+        for (int i = 0 ; i < nnodes ; i++) {
+            tasks[i].join();
+        }
+
+        for (int i = 0 ; i < 100 ; i++) {
+            logger.info(format("***** Assert creator = %d", res.get(0).get(i).getHeader().getCreatorID()));
+            for (int k = 0 ; k < nnodes ;k++) {
+                assertEquals(res.get(0).get(i).getHeader().getCreatorID(), res.get(k).get(i).getHeader().getCreatorID());
+            }
+        }
+
+        for (int i = 0 ; i < 4 ; i++) {
+            allNodes[i].shutdown();
+        }
+    }
+
+    @Test
+    void TestStressFourServersSplitBrodacastFault() throws InterruptedException {
+        setConfig(fourConfig, 0);
+        Thread.sleep(timeToWaitBetweenTests);
+        int nnodes = 4;
+        logger.info("start TestFourServersNoFailures");
+        Thread[] servers = new Thread[4];
+        sg[] allNodes = initLocalSgNodes(nnodes,1, 2, fourBbc.toString(),
+                fourpanic.toString(), foursync.toString(), new int[]{0});
+        for (int i = 0 ; i < nnodes ; i++) {
+            int finalI = i;
+            if (i == 0) {
+                servers[i]  = new Thread(() -> {
+                    try {
+                        allNodes[finalI].start();
+                    } catch (InterruptedException e) {
+                        logger.error(e);
+                    }
+                });
+                servers[i].start();
+                continue;
+            }
+            servers[i]  = new Thread(() -> {
+                try {
+                    allNodes[finalI].start();
+                } catch (InterruptedException e) {
+                    logger.error(e);
+                }
+            });
+            servers[i].start();
+        }
+        for (int i = 0 ; i < nnodes ; i++) {
+            servers[i].join();
+        }
+
+        for (int i = 0 ; i < nnodes ; i++) {
+            if (i == 0) {
+                List<List<Integer>> gr = new ArrayList<>();
+                gr.add(Arrays.asList(1, 2));
+                gr.add(Arrays.asList(0 , 3));
+                allNodes[i].setByzSetting(true, gr);
+                allNodes[i].serve();
+                continue;
+            }
+            allNodes[i].serve();
+        }
+
+        HashMap<Integer, ArrayList<Types.Block>> res = new HashMap<>();
+        for (int i = 0 ; i < nnodes ; i++) {
+            res.put(i, new ArrayList<Types.Block>());
+        }
+        Thread[] tasks = new Thread[4];
+        for (int i = 0 ; i < 4 ;i++) {
+            if (i == 0) {
+                int finalI1 = i;
+                tasks[i] = new Thread(() -> {
+                    try {
+                        bServerDoing(res.get(finalI1), allNodes[finalI1]);
+                    } catch (InterruptedException e) {
+                        logger.error("", e);
+                    }
+                });
+                tasks[i].start();
+                continue;
+            }
+            int finalI = i;
+            tasks[i] = new Thread(() -> {
+                try {
+                    serverDoing(res.get(finalI), allNodes[finalI]);
+                } catch (InterruptedException e) {
+                    logger.error("",e);
+                }
+            });
+            tasks[i].start();
+        }
+        for (int i = 0 ; i < nnodes ; i++) {
+            tasks[i].join();
+        }
+
+        for (int i = 0 ; i < 4 ; i++) {
+            if (i == 0) {
+                allNodes[i].shutdown();
+                continue;
+            }
+            allNodes[i].shutdown();
+        }
+
+        for (int i = 0 ; i < 100 ; i++) {
+            logger.info(format("***** Assert creator = %d", res.get(0).get(i).getHeader().getCreatorID()));
+            for (int k = 0 ; k < nnodes ;k++) {
+                assertEquals(res.get(0).get(i).getHeader().getCreatorID(), res.get(k).get(i).getHeader().getCreatorID());
+                for (int j = 0 ; j < res.get(0).get(i).getDataList().size() ; j++) {
+                    logger.info(format("***** Assert data = %s",
+                            new String(res.get(0).get(i).getData(j).getData().toByteArray())));
+                    assertEquals(new String(res.get(0).get(i).getData(j).getData().toByteArray()),
+                            new String(res.get(k).get(i).getData(j).getData().toByteArray()));
+                }
+
+            }
+        }
+    }
+
+    @Test
+    void TestStressAsyncFourServersSplitBrodacastFault() throws InterruptedException {
+        setConfig(fourConfig, 0);
+        Thread.sleep(timeToWaitBetweenTests);
+        int nnodes = 4;
+        logger.info("start TestFourServersNoFailures");
+        Thread[] servers = new Thread[4];
+        sg[] allNodes = initLocalAsyncBCNodes(nnodes,1, 2, fourBbc.toString(),
+                fourpanic.toString(), foursync.toString(), new int[]{0});
+        for (int i = 0 ; i < nnodes ; i++) {
+            int finalI = i;
+            servers[i]  = new Thread(() -> {
+                try {
+                    allNodes[finalI].start();
+                } catch (InterruptedException e) {
+                    logger.error(e);
+                }
+            });
+            servers[i].start();
+        }
+        for (int i = 0 ; i < nnodes ; i++) {
+            servers[i].join();
+        }
+
+        for (int i = 0 ; i < nnodes ; i++) {
+            if (i == 0) {
+                List<List<Integer>> gr = new ArrayList<>();
+                gr.add(Arrays.asList(1, 2));
+                gr.add(Arrays.asList(0 , 3));
+                allNodes[i].setByzSetting(true, gr);
+                allNodes[i].serve();
+                continue;
+            }
+            allNodes[i].setAsyncParam(1500);
+            allNodes[i].serve();
+        }
+
+        HashMap<Integer, ArrayList<Types.Block>> res = new HashMap<>();
+        for (int i = 0 ; i < nnodes ; i++) {
+            res.put(i, new ArrayList<Types.Block>());
+        }
+        Thread[] tasks = new Thread[4];
+        for (int i = 0 ; i < 4 ;i++) {
+            if (i == 0) {
+                int finalI1 = i;
+                tasks[i] = new Thread(() -> {
+                    try {
+                        bServerDoing(res.get(finalI1), allNodes[finalI1]);
+                    } catch (InterruptedException e) {
+                        logger.error("", e);
+                    }
+                });
+                tasks[i].start();
+                continue;
+            }
+            int finalI = i;
+            tasks[i] = new Thread(() -> {
+                try {
+                    asyncServerDoing(res.get(finalI),  allNodes[finalI]);
+                } catch (InterruptedException e) {
+                    logger.error("", e);
+                }
+            });
+            tasks[i].start();
+        }
+        for (int i = 0 ; i < nnodes ; i++) {
+            tasks[i].join();
+        }
+
+        for (int i = 0 ; i < 4 ; i++) {
+            if (i == 0) {
+                allNodes[i].shutdown();
+                continue;
+            }
+            allNodes[i].shutdown();
+        }
+
+        for (int i = 0 ; i < 100 ; i++) {
+            logger.info(format("***** Assert creator = %d", res.get(0).get(i).getHeader().getCreatorID()));
+            for (int k = 0 ; k < nnodes ;k++) {
+                assertEquals(res.get(0).get(i).getHeader().getCreatorID(), res.get(k).get(i).getHeader().getCreatorID());
+                for (int j = 0 ; j < res.get(0).get(i).getDataList().size() ; j++) {
+                    logger.info(format("***** Assert data = %s",
+                            new String(res.get(0).get(i).getData(j).getData().toByteArray())));
+                    assertEquals(new String(res.get(0).get(i).getData(j).getData().toByteArray()),
+                            new String(res.get(k).get(i).getData(j).getData().toByteArray()));
+                }
+
+            }
+        }
+
+    }
+
 }

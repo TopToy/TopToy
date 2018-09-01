@@ -1,8 +1,10 @@
 package blockchain;
 
 import config.Node;
+import consensus.RBroadcast.RBrodcastService;
 import crypto.DigestMethod;
 import proto.Types;
+import rmf.RmfNode;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -13,6 +15,12 @@ public class asyncBcServer extends bcServer {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(asyncBcServer.class);
 
     int maxTime = 0;
+
+    public asyncBcServer(String addr, int rmfPort, int id, int channel, int f, int tmo, int tmoInterval,
+                             int maxTx, boolean fastMode, ArrayList<Node> cluster, RmfNode rmf,
+                         RBrodcastService panic, RBrodcastService sync) {
+        super(addr, rmfPort, id, channel, f, tmo, tmoInterval, maxTx, fastMode, cluster, rmf, panic, sync);
+    }
     public asyncBcServer(String addr, int rmfPort, int id, int channel, int f, int tmo, int tmoInterval,
                          int maxTx, boolean fastMode, ArrayList<Node> cluster,
                          String bbcConfig, String panicConfig, String syncConfig) {

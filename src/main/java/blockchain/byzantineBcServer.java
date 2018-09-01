@@ -3,11 +3,13 @@ package blockchain;
 import com.google.protobuf.ByteString;
 import config.Config;
 import config.Node;
+import consensus.RBroadcast.RBrodcastService;
 import crypto.DigestMethod;
 
 import org.apache.commons.lang.ArrayUtils;
 import proto.Types.*;
 import rmf.ByzantineRmfNode;
+import rmf.RmfNode;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
@@ -21,6 +23,12 @@ public class byzantineBcServer extends bcServer {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(byzantineBcServer.class);
     private boolean fullByz = false;
     List<List<Integer>> groups = new ArrayList<>();
+
+    public byzantineBcServer(String addr, int rmfPort, int id, int channel, int f, int tmo, int tmoInterval,
+                     int maxTx, boolean fastMode, ArrayList<Node> cluster, RmfNode rmf, RBrodcastService panic, RBrodcastService sync) {
+        super(addr, rmfPort, id, channel, f, tmo, tmoInterval, maxTx, fastMode, cluster, rmf, panic, sync);
+    }
+
     public byzantineBcServer(String addr, int rmfPort, int id, int channel, int f, int tmo, int tmoInterval,
                              int maxTx, boolean fastMode, ArrayList<Node> cluster,
                              String bbcConfig, String panicConfig, String syncConfig) {
@@ -104,7 +112,7 @@ public class byzantineBcServer extends bcServer {
         return new basicBlockchain(this.bc, start, end);
     }
 
-    public void setFullByz() {
-        fullByz = true;
-    }
+//    public void setFullByz() {
+//        fullByz = true;
+//    }
 }

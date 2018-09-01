@@ -1,7 +1,8 @@
 package serverGroup;
 
 import blockchain.bcServer;
-import blockchain.block;
+import blockchain.byzantineBcServer;
+import blockchain.asyncBcServer;
 import blockchain.blockchain;
 import blockchain.cbcServer;
 import com.google.protobuf.ByteString;
@@ -11,6 +12,7 @@ import consensus.RBroadcast.RBrodcastService;
 import consensus.bbc.bbcService;
 import crypto.DigestMethod;
 import proto.Types;
+import rmf.ByzantineRmfNode;
 import rmf.RmfNode;
 
 import java.util.ArrayList;
@@ -48,7 +50,12 @@ public class sg {
         this.group = new bcServer[g];
         this.id = id;
         this.g = g;
-        rmf = new RmfNode(g, id, addr, port, f, cluster, bbcConfig);
+        if (type.equals("r") || type.equals("a")) {
+            rmf = new RmfNode(g, id, addr, port, f, cluster, bbcConfig);
+        }
+        if (type.equals("b")) {
+            rmf = new ByzantineRmfNode(g, id, addr, port, f, cluster, bbcConfig);
+        }
         deliverFork = new RBrodcastService(id, panicConfig);
         sync = new RBrodcastService(id, syncConfig);
         this.type = type;
@@ -56,6 +63,18 @@ public class sg {
         if (type.equals("r")) {
             for (int i = 0 ; i < g ; i++) {
                 group[i] = new cbcServer(addr, port, id, i, f, tmo, tmoInterval, maxTx,
+                        fastMode, cluster, rmf, deliverFork, sync);
+            }
+        }
+        if (type.equals("b")) {
+            for (int i = 0 ; i < g ; i++) {
+                group[i] = new byzantineBcServer(addr, port, id, i, f, tmo, tmoInterval, maxTx,
+                        fastMode, cluster, rmf, deliverFork, sync);
+            }
+        }
+        if (type.equals("a")) {
+            for (int i = 0 ; i < g ; i++) {
+                group[i] = new asyncBcServer(addr, port, id, i, f, tmo, tmoInterval, maxTx,
                         fastMode, cluster, rmf, deliverFork, sync);
             }
         }
@@ -70,11 +89,10 @@ public class sg {
                 Types.Block cBlock = group[currChannel].deliver(currBlock);
                 cBlock = cBlock.toBuilder()
                         .setHeader(cBlock.getHeader().toBuilder()
-                        .setHeight(bc.getHeight() + 1)
-                        .setPrev(ByteString.copyFrom(
+                            .setHeight(bc.getHeight() + 1)
+                            .setPrev(ByteString.copyFrom(
                                 DigestMethod.hash(bc.getBlock(bc.getHeight()).getHeader().toByteArray())))
-                                .setCreatorID(id)
-                                .build())
+                            .build())
                         .build();
                 synchronized (bc) {
                     bc.addBlock(cBlock);
@@ -113,19 +131,25 @@ public class sg {
         } catch (InterruptedException e) {
             logger.error(format("G-%d", id), e);
         }
-        rmf.stop();
-        deliverFork.shutdown();
-        sync.shutdown();
         for (int i = 0 ; i < g ; i++) {
             group[i].shutdown(true);
+            logger.debug(format("G-%d shutdown channel %d", id, i));
         }
+        logger.debug(format("G-%d shutdown deliverThread", id));
+        rmf.stop();
+        logger.debug(format("G-%d shutdown rmf Service", id));
+        deliverFork.shutdown();
+        logger.debug(format("G-%d shutdown panic service", id));
+        sync.shutdown();
+        logger.debug(format("G-%d shutdown sync service", id));
+
     }
 
     public void serve() {
         for (int i = 0 ; i < g ; i++) {
             group[i].serve();
         }
-        deliverThread.run();
+        deliverThread.start();
     }
 
     public String addTransaction(byte[] data, int clientID) {
@@ -155,4 +179,29 @@ public class sg {
         if (bc.getHeight() < index) return null;
         return bc.getBlock(index);
     }
+
+    public int getID() {
+        return id;
+    }
+
+    public void setByzSetting(boolean fullByz, List<List<Integer>> groups) {
+        if (!type.equals("b")) {
+            logger.debug(format("G-%d Unable to set byzantine behaviour to non byzantine node", id));
+            return;
+        }
+        for (int i = 0 ; i < g ; i++) {
+            ((byzantineBcServer) group[i]).setByzSetting(fullByz, groups);
+        }
+    }
+
+    public void setAsyncParam(int maxTime) {
+        if (!type.equals("a")) {
+            logger.debug(format("G-%d Unable to set async behaviour to non async node", id));
+            return;
+        }
+        for (int i = 0 ; i < g ; i++) {
+            ((asyncBcServer) group[i]).setAsyncParam(maxTime);
+        }
+    }
+
 }
