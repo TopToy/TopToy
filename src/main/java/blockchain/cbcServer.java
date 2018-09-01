@@ -1,15 +1,30 @@
 package blockchain;
 
+import config.Node;
+import consensus.RBroadcast.RBrodcastService;
+import consensus.bbc.bbcService;
 import crypto.DigestMethod;
 
 import proto.Types.*;
+import rmf.RmfNode;
+
+import java.util.ArrayList;
+
 import static java.lang.String.format;
 
 public class cbcServer extends bcServer {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(cbcServer.class);
 
-    public cbcServer(String addr, int rmfPort, int id) {
-        super(addr, rmfPort, id);
+    public cbcServer(String addr, int rmfPort, int id, int channel, int f, int tmo, int tmoInterval,
+                     int maxTx, boolean fastMode, ArrayList<Node> cluster, RmfNode rmf, RBrodcastService panic, RBrodcastService sync) {
+        super(addr, rmfPort, id, channel, f, tmo, tmoInterval, maxTx, fastMode, cluster, rmf, panic, sync);
+    }
+
+    public cbcServer(String addr, int rmfPort, int id, int channel, int f, int tmo, int tmoInterval,
+                     int maxTx, boolean fastMode, ArrayList<Node> cluster,
+                     String bbcConfig, String panicConfig, String syncConfig) {
+        super(addr, rmfPort, id, channel, f, tmo, tmoInterval, maxTx, fastMode, cluster,
+                bbcConfig, panicConfig, syncConfig);
     }
 
     byte[] leaderImpl() {
@@ -30,7 +45,7 @@ public class cbcServer extends bcServer {
                 getID(), currHeight, cidSeries, cid));
         addTransactionsToCurrBlock();
         Block sealedBlock = currBlock.construct(getID(), currHeight, cidSeries, cid, DigestMethod.hash(bc.getBlock(currHeight - 1).getHeader().toByteArray()));
-        rmfServer.broadcast(cidSeries, cid, sealedBlock.toByteArray(), currHeight);
+        rmfServer.broadcast(channel, cidSeries, cid, sealedBlock.toByteArray(), currHeight);
         return null;
     }
 
@@ -45,12 +60,12 @@ public class cbcServer extends bcServer {
     }
 
     @Override
-    blockchain initBC(int id) {
+    public blockchain initBC(int id) {
         return new basicBlockchain(id);
     }
 
     @Override
-    blockchain getBC(int start, int end) {
+    public blockchain getBC(int start, int end) {
         return new basicBlockchain(this.bc, start, end);
     }
 }

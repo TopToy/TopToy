@@ -12,7 +12,7 @@ public class basicBlockchain extends blockchain {
     }
 
     @Override
-    block createNewBLock() {
+    public block createNewBLock() {
         return new basicBlock();
     }
 

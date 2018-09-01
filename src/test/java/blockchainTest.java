@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import proto.Types.*;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
@@ -32,6 +33,16 @@ public class blockchainTest {
     private Node s3= new Node(localHost, rmfPorts[3],  3);
     private ArrayList<Node> nodes = new ArrayList<Node>() {{add(s0); add(s1); add(s2); add(s3);}};
 
+    private Path singleBbc = Paths.get("Configurations", "single", "bbcConfig");
+    private Path singlepanic = Paths.get("Configurations", "single", "panicRBConfig");
+    private Path singlesync = Paths.get("Configurations", "single", "syncRBConfig");
+    private Path singleConfig = Paths.get("Configurations", "single", "config.toml");
+
+    private Path fourBbc = Paths.get("Configurations", "4Servers", "local", "bbcConfig");
+    private Path fourpanic = Paths.get("Configurations", "4Servers", "local", "panicRBConfig");
+    private Path foursync = Paths.get("Configurations", "4Servers", "local", "syncRBConfig");
+    private Path fourConfig = Paths.get("Configurations", "4Servers", "local", "config.toml");
+
     private static void deleteViewIfExist(String configHome){
         File file2 = new File(Paths.get(configHome, "currentView").toString());
         if (file2.exists()) {
@@ -45,86 +56,88 @@ public class blockchainTest {
     }
 
 
-    private Node[] initLocalRmfNodes(int nnodes, int f, String configHome, int[] byzIds) {
-        deleteViewIfExist(configHome);
+    private Node[] initLocalBCNodes(int nnodes, int f, String bbcConfig, String panicConfig, String syncConfig, int[] byzIds) {
+        deleteViewIfExist(bbcConfig);
+        deleteViewIfExist(panicConfig);
+        deleteViewIfExist(syncConfig);
         ArrayList<Node> currentNodes = new ArrayList<>(nodes.subList(0, nnodes));
         Node[] ret = new Node[nnodes];
         for (int id = 0 ; id < nnodes ; id++) {
             logger.info("init server #" + id);
             if (ArrayUtils.contains(byzIds, id)) {
-                ret[id] = new byzantineBcServer(localHost, rmfPorts[id],  id);
+                ret[id] = new byzantineBcServer(localHost, rmfPorts[id], id, 0, f, 1000, 100,
+                        1, true, currentNodes, bbcConfig, panicConfig, syncConfig);
                 continue;
             }
-            ret[id] =  new cbcServer(localHost, rmfPorts[id],  id);
+            ret[id] =  new cbcServer(localHost, rmfPorts[id], id, 0, f, 1000, 100,
+                    1, true, currentNodes, bbcConfig, panicConfig, syncConfig);
         }
         return ret;
         //        n.start();
 
     }
 
-    private Node[] initLocalAsyncRmfNodes(int nnodes, int f, String configHome, int[] byzIds) {
-        deleteViewIfExist(configHome);
+    private Node[] initLocalAsyncBCNodes(int nnodes, int f, String bbcConfig, String panicConfig, String syncConfig, int[] byzIds) {
+        deleteViewIfExist(bbcConfig);
+        deleteViewIfExist(panicConfig);
+        deleteViewIfExist(syncConfig);
         ArrayList<Node> currentNodes = new ArrayList<>(nodes.subList(0, nnodes));
         Node[] ret = new Node[nnodes];
         for (int id = 0 ; id < nnodes ; id++) {
             if (ArrayUtils.contains(byzIds, id)) {
-                ret[id] = new byzantineBcServer(localHost, rmfPorts[id],  id);
+                ret[id] = new byzantineBcServer(localHost, rmfPorts[id], id, 0, f, 1000, 100,
+                        1, true, currentNodes, bbcConfig, panicConfig, syncConfig);
                 continue;
             }
             logger.info("init server #" + id);
-            ret[id] =  new asyncBcServer(localHost, rmfPorts[id],  id);
+            ret[id] =  new asyncBcServer(localHost, rmfPorts[id], id, 0, f, 1000, 100,
+                    1, true, currentNodes, bbcConfig, panicConfig, syncConfig);
         }
         return ret;
         //        n.start();
 
     }
 
-//    @Test
-//    void TestSingleServer() throws InterruptedException {
-//        Thread.sleep(timeToWaitBetweenTests);
-//        logger.info("start TestSingleServer");
-//        String SingleServerconfigHome = Paths.get("config", "bbcConfig", "bbcSingleServer").toString();
-//        Node[] rn1 = initLocalRmfNodes(1, 0, SingleServerconfigHome, null);
-//        ((cbcServer) rn1[0]).start();
-//        ((cbcServer) rn1[0]).shutdown();
-//    }
+    @Test
+    void TestSingleServer() throws InterruptedException {
+        setConfig(singleConfig, 0);
+        Thread.sleep(timeToWaitBetweenTests);
+        logger.info("start TestSingleServer");
+        Node[] rn1 = initLocalBCNodes(1, 0, singleBbc.toString(),
+                singlepanic.toString(), singlesync.toString(), null);
+        ((cbcServer) rn1[0]).start(false);
+        ((cbcServer) rn1[0]).shutdown(false);
+    }
 //
     @Test
     void TestSingleServerDisseminateMessage() throws InterruptedException {
-        String SingleServerconfigHome = Paths.get("config", "singleServer", "Configurations/single server/config.toml").toString();
-        setConfig(Paths.get("config", "singleServer", "Configurations/single server/config.toml"), 0);
+        setConfig(singleConfig, 0);
         Thread.sleep(timeToWaitBetweenTests);
         logger.info("start TestSingleServer");
-
-
-        Node[] rn1 = initLocalRmfNodes(1, 0, SingleServerconfigHome, null);
-        ((cbcServer) rn1[0]).start();
+        Node[] rn1 = initLocalBCNodes(1, 0, singleBbc.toString(),
+                singlepanic.toString(), singlesync.toString(), null);
+        ((cbcServer) rn1[0]).start(false);
         ((cbcServer) rn1[0]).serve();
         for (int i = 0 ; i < 1000 ; i++) {
             ((cbcServer) rn1[0]).addTransaction(("hello").getBytes(), 100);
         }
         Thread.sleep(30 * 1000);
-//        Block b = ((cbcServer) rn1[0]).deliver(1);
-//        assertEquals(1, b.getHeader().getHeight());
-//        assertEquals(0, b.getHeader().getCreatorID());
-//        assertEquals(100, b.getData(0).getClientID());
-//        assertEquals("hello", new String(b.getData(0).getData().toByteArray()));
-        ((cbcServer) rn1[0]).shutdown();
+        ((cbcServer) rn1[0]).shutdown(false);
 
     }
 
     @Test
     void TestFourServersNoFailuresSingleMessage() throws InterruptedException {
-        setConfig(null, 0);
+        setConfig(fourConfig, 0);
         Thread.sleep(timeToWaitBetweenTests);
         int nnodes = 4;
-        String fourServersConfig = Paths.get("config", "Configurations/single server/bbcConfig", "bbcFourServers").toString();
         logger.info("start TestFourServersNoFailures");
         Thread[] servers = new Thread[4];
-        Node[] allNodes = initLocalRmfNodes(nnodes,1,fourServersConfig, null);
+        Node[] allNodes = initLocalBCNodes(nnodes,1, fourBbc.toString(),
+                fourpanic.toString(), foursync.toString(), null);
         for (int i = 0 ; i < nnodes ; i++) {
             int finalI = i;
-            servers[i]  = new Thread(() ->((cbcServer) allNodes[finalI]).start());
+            servers[i]  = new Thread(() ->((cbcServer) allNodes[finalI]).start(false));
             servers[i].start();
         }
         for (int i = 0 ; i < nnodes ; i++) {
@@ -140,7 +153,11 @@ public class blockchainTest {
         for (int i = 0 ; i < nnodes ; i++) {
             int finalI = i;
             tasks[i] = new Thread(()-> {
-                ret[finalI] = new String(((cbcServer) allNodes[finalI]).deliver(1).getData(0).getData().toByteArray());
+                try {
+                    ret[finalI] = new String(((cbcServer) allNodes[finalI]).deliver(1).getData(0).getData().toByteArray());
+                } catch (InterruptedException e) {
+                    logger.error("", e);
+                }
             });
             tasks[i].start();
         }
@@ -149,7 +166,7 @@ public class blockchainTest {
             tasks[i].join();
         }
         for (int i = 0 ; i < 4 ; i++) {
-            ((cbcServer) allNodes[i]).shutdown();
+            ((cbcServer) allNodes[i]).shutdown(true);
         }
         for (int i = 0 ; i < 4 ; i++) {
             assertEquals(msg, ret[i]);
@@ -158,7 +175,7 @@ public class blockchainTest {
 
     }
 //
-    void serverDoing(List<Block> res, cbcServer s) {
+    void serverDoing(List<Block> res, cbcServer s) throws InterruptedException {
         logger.info("--->" + s.getID() + " STARTS");
         for(int i = 0; i < 100 ; i++) {
             String msg = "Hello" + i;
@@ -171,16 +188,16 @@ public class blockchainTest {
     }
     @Test
     void TestStressFourServersNoFailures() throws InterruptedException {
-        setConfig(null, 0);
+        setConfig(fourConfig, 0);
         Thread.sleep(timeToWaitBetweenTests);
-        Thread[] servers = new Thread[4];
         int nnodes = 4;
-        String fourServersConfig = Paths.get("config", "Configurations/single server/bbcConfig", "bbcFourServers").toString();
-
-        Node[] allNodes = initLocalRmfNodes(nnodes,1,fourServersConfig, null);
+        logger.info("start TestFourServersNoFailures");
+        Thread[] servers = new Thread[4];
+        Node[] allNodes = initLocalBCNodes(nnodes,1, fourBbc.toString(),
+                fourpanic.toString(), foursync.toString(), null);
         for (int i = 0 ; i < nnodes ; i++) {
             int finalI = i;
-            servers[i]  = new Thread(() ->((cbcServer) allNodes[finalI]).start());
+            servers[i]  = new Thread(() ->((cbcServer) allNodes[finalI]).start(false));
             servers[i].start();
         }
         for (int i = 0 ; i < nnodes ; i++) {
@@ -198,14 +215,20 @@ public class blockchainTest {
         Thread[] tasks = new Thread[4];
         for (int i = 0 ; i < 4 ;i++) {
             int finalI = i;
-            tasks[i] = new Thread(() -> serverDoing(res.get(finalI), (cbcServer) allNodes[finalI]));
+            tasks[i] = new Thread(() -> {
+                try {
+                    serverDoing(res.get(finalI), (cbcServer) allNodes[finalI]);
+                } catch (InterruptedException e) {
+                    logger.error("", e);
+                }
+            });
             tasks[i].start();
         }
         for (int i = 0 ; i < nnodes ; i++) {
             tasks[i].join();
         }
         for (int i = 0 ; i < 4 ; i++) {
-            ((cbcServer) allNodes[i]).shutdown();
+            ((cbcServer) allNodes[i]).shutdown(false);
         }
         for (int i = 0 ; i < 100 ; i++) {
             logger.info(format("***** Assert creator = %d", res.get(0).get(i).getHeader().getCreatorID()));
@@ -218,22 +241,16 @@ public class blockchainTest {
 //
 @Test
 void TestStressFourServersMuteFault() throws InterruptedException {
-    setConfig(null, 0);
+    setConfig(fourConfig, 0);
     Thread.sleep(timeToWaitBetweenTests);
-    Thread[] servers = new Thread[4];
     int nnodes = 4;
-    String fourServersConfig = Paths.get("config", "Configurations/single server/bbcConfig", "bbcFourServers").toString();
-    logger.info("start TestStressFourServersNoFailures");
-
-    Node[] allNodes = initLocalRmfNodes(nnodes,1,fourServersConfig, null);
+    logger.info("start TestFourServersNoFailures");
+    Thread[] servers = new Thread[4];
+    Node[] allNodes = initLocalBCNodes(nnodes,1, fourBbc.toString(),
+            fourpanic.toString(), foursync.toString(), null);
     for (int i = 0 ; i < nnodes ; i++) {
         int finalI = i;
-//        if (i == 0) {
-//            servers[i]  = new Thread(() ->((byzantineBcServer) allNodes[finalI]).start());
-//            servers[i].start();
-//            continue;
-//        }
-        servers[i]  = new Thread(() ->((cbcServer) allNodes[finalI]).start());
+        servers[i]  = new Thread(() ->((cbcServer) allNodes[finalI]).start(false));
         servers[i].start();
     }
     for (int i = 0 ; i < nnodes ; i++) {
@@ -251,7 +268,13 @@ void TestStressFourServersMuteFault() throws InterruptedException {
     Thread[] tasks = new Thread[4];
     for (int i = 1 ; i < 4 ;i++) {
         int finalI = i;
-        tasks[i] = new Thread(() -> serverDoing(res.get(finalI), (cbcServer) allNodes[finalI]));
+        tasks[i] = new Thread(() -> {
+            try {
+                serverDoing(res.get(finalI), (cbcServer) allNodes[finalI]);
+            } catch (InterruptedException e) {
+                logger.error("", e);
+            }
+        });
         tasks[i].start();
     }
     for (int i = 1 ; i < nnodes ; i++) {
@@ -259,7 +282,7 @@ void TestStressFourServersMuteFault() throws InterruptedException {
     }
 
     for (int i = 0 ; i < 4 ; i++) {
-        ((cbcServer) allNodes[i]).shutdown();
+        ((cbcServer) allNodes[i]).shutdown(false);
     }
 
     for (int i = 0 ; i < 100 ; i++) {
@@ -270,34 +293,33 @@ void TestStressFourServersMuteFault() throws InterruptedException {
     }
 
 }
-    void bServerDoing(List<Block> res, byzantineBcServer s) {
+    void bServerDoing(List<Block> res, byzantineBcServer s) throws InterruptedException {
         for(int i = 0; i < 100 ; i++) {
-//            String msg = "Hello" + i;
-//            if (i % 4 == s.getID()) {
-//                s.addTransaction(msg.getBytes(), 0);
-//            }
+            String msg = "Hello" + i;
+            if (i % 4 == s.getID()) {
+                s.addTransaction(msg.getBytes(), 0);
+            }
             logger.info(format("**** %d ***** %d", s.getID(), i));
             res.add(s.deliver(i));
         }
     }
     @Test
     void TestStressFourServersSelectiveBroadcastFault() throws InterruptedException {
-        setConfig(null, 0);
+        setConfig(fourConfig, 0);
         Thread.sleep(timeToWaitBetweenTests);
-        Thread[] servers = new Thread[4];
         int nnodes = 4;
-        String fourServersConfig = Paths.get("config", "Configurations/single server/bbcConfig", "bbcFourServers").toString();
-        logger.info("start TestStressFourServersNoFailures");
-
-        Node[] allNodes = initLocalRmfNodes(nnodes,1,fourServersConfig, new int[]{0});
+        logger.info("start TestFourServersNoFailures");
+        Thread[] servers = new Thread[4];
+        Node[] allNodes = initLocalBCNodes(nnodes,1, fourBbc.toString(),
+                fourpanic.toString(), foursync.toString(), new int[]{0});
         for (int i = 0 ; i < nnodes ; i++) {
             int finalI = i;
             if (i == 0) {
-                servers[i]  = new Thread(() ->((byzantineBcServer) allNodes[finalI]).start());
+                servers[i]  = new Thread(() ->((byzantineBcServer) allNodes[finalI]).start(false));
                 servers[i].start();
                 continue;
             }
-            servers[i]  = new Thread(() ->((cbcServer) allNodes[finalI]).start());
+            servers[i]  = new Thread(() ->((cbcServer) allNodes[finalI]).start(false));
             servers[i].start();
         }
         for (int i = 0 ; i < nnodes ; i++) {
@@ -320,12 +342,24 @@ void TestStressFourServersMuteFault() throws InterruptedException {
         for (int i = 0 ; i < 4 ;i++) {
             if (i == 0) {
                 int finalI1 = i;
-                tasks[i] = new Thread(() -> bServerDoing(res.get(finalI1), (byzantineBcServer) allNodes[finalI1]));
+                tasks[i] = new Thread(() -> {
+                    try {
+                        bServerDoing(res.get(finalI1), (byzantineBcServer) allNodes[finalI1]);
+                    } catch (InterruptedException e) {
+                        logger.error("", e);
+                    }
+                });
                 tasks[i].start();
                 continue;
             }
             int finalI = i;
-            tasks[i] = new Thread(() -> serverDoing(res.get(finalI), (cbcServer) allNodes[finalI]));
+            tasks[i] = new Thread(() -> {
+                try {
+                    serverDoing(res.get(finalI), (cbcServer) allNodes[finalI]);
+                } catch (InterruptedException e) {
+                    logger.error("", e);
+                }
+            });
             tasks[i].start();
         }
         for (int i = 0 ; i < nnodes ; i++) {
@@ -334,10 +368,10 @@ void TestStressFourServersMuteFault() throws InterruptedException {
 
         for (int i = 0 ; i < 4 ; i++) {
             if (i == 0) {
-                ((byzantineBcServer) allNodes[i]).shutdown();
+                ((byzantineBcServer) allNodes[i]).shutdown(false);
                 continue;
             }
-            ((cbcServer) allNodes[i]).shutdown();
+            ((cbcServer) allNodes[i]).shutdown(false);
         }
 
         for (int i = 0 ; i < 100 ; i++) {
@@ -349,7 +383,7 @@ void TestStressFourServersMuteFault() throws InterruptedException {
 
     }
 
-    void asyncServerDoing(List<Block> res, asyncBcServer s) {
+    void asyncServerDoing(List<Block> res, asyncBcServer s) throws InterruptedException {
         for(int i = 0; i < 100 ; i++) {
             String msg = "Hello" + i;
             if (i % 4 == s.getID()) {
@@ -362,18 +396,17 @@ void TestStressFourServersMuteFault() throws InterruptedException {
     }
     @Test
     void TestStressFourServersAsyncNetwork() throws InterruptedException {
-        setConfig(null, 0);
-//        Thread.sleep(timeToWaitBetweenTests);
-        Thread[] servers = new Thread[4];
+        setConfig(fourConfig, 0);
+        Thread.sleep(timeToWaitBetweenTests);
         int nnodes = 4;
-        String fourServersConfig = Paths.get("config", "Configurations/single server/bbcConfig", "bbcFourServers").toString();
-        logger.info("start TestStressFourServersNoFailures");
-
-        Node[] allNodes = initLocalAsyncRmfNodes(nnodes,1,fourServersConfig, null);
+        logger.info("start TestFourServersNoFailures");
+        Thread[] servers = new Thread[4];
+        Node[] allNodes = initLocalAsyncBCNodes(nnodes,1, fourBbc.toString(),
+                fourpanic.toString(), foursync.toString(), null);
 
         for (int i = 0 ; i < nnodes ; i++) {
             int finalI = i;
-            servers[i]  = new Thread(() ->((asyncBcServer) allNodes[finalI]).start());
+            servers[i]  = new Thread(() ->((asyncBcServer) allNodes[finalI]).start(false));
             servers[i].start();
         }
         for (int i = 0 ; i < nnodes ; i++) {
@@ -381,6 +414,7 @@ void TestStressFourServersMuteFault() throws InterruptedException {
         }
 
         for (int i = 0 ; i < nnodes ; i++) {
+            ((asyncBcServer) allNodes[i]).setAsyncParam(1000);
             ((asyncBcServer) allNodes[i]).serve();
         }
         HashMap<Integer, ArrayList<Block>> res = new HashMap<>();
@@ -390,7 +424,13 @@ void TestStressFourServersMuteFault() throws InterruptedException {
         Thread[] tasks = new Thread[4];
         for (int i = 0 ; i < 4 ;i++) {
             int finalI = i;
-            tasks[i] = new Thread(() -> asyncServerDoing(res.get(finalI), (asyncBcServer) allNodes[finalI]));
+            tasks[i] = new Thread(() -> {
+                try {
+                    asyncServerDoing(res.get(finalI), (asyncBcServer) allNodes[finalI]);
+                } catch (InterruptedException e) {
+                    logger.error("", e);
+                }
+            });
             tasks[i].start();
         }
 
@@ -407,7 +447,7 @@ void TestStressFourServersMuteFault() throws InterruptedException {
         }
 
         for (int i = 0 ; i < 4 ; i++) {
-            ((asyncBcServer) allNodes[i]).shutdown();
+            ((asyncBcServer) allNodes[i]).shutdown(false);
         }
 
 
@@ -416,22 +456,21 @@ void TestStressFourServersMuteFault() throws InterruptedException {
 
     @Test
     void TestFourServersSplitBroadcastFault() throws InterruptedException {
-        setConfig(null, 0);
+        setConfig(fourConfig, 0);
         Thread.sleep(timeToWaitBetweenTests);
-        Thread[] servers = new Thread[4];
         int nnodes = 4;
-        String fourServersConfig = Paths.get("config", "Configurations/single server/bbcConfig", "bbcFourServers").toString();
-        logger.info("start TestStressFourServersNoFailures");
-
-        Node[] allNodes = initLocalRmfNodes(nnodes,1,fourServersConfig, new int[]{0});
+        logger.info("start TestFourServersNoFailures");
+        Thread[] servers = new Thread[4];
+        Node[] allNodes = initLocalBCNodes(nnodes,1, fourBbc.toString(),
+                fourpanic.toString(), foursync.toString(), new int[]{0});
         for (int i = 0 ; i < nnodes ; i++) {
             int finalI = i;
             if (i == 0) {
-                servers[i]  = new Thread(() ->((byzantineBcServer) allNodes[finalI]).start());
+                servers[i]  = new Thread(() ->((byzantineBcServer) allNodes[finalI]).start(false));
                 servers[i].start();
                 continue;
             }
-            servers[i]  = new Thread(() ->((cbcServer) allNodes[finalI]).start());
+            servers[i]  = new Thread(() ->((cbcServer) allNodes[finalI]).start(false));
             servers[i].start();
         }
         for (int i = 0 ; i < nnodes ; i++) {
@@ -440,7 +479,10 @@ void TestStressFourServersMuteFault() throws InterruptedException {
 
         for (int i = 0 ; i < nnodes ; i++) {
             if (i == 0) {
-                ((byzantineBcServer) allNodes[i]).setFullByz();
+                List<List<Integer>> gr = new ArrayList<>();
+                gr.add(Arrays.asList(1, 2));
+                gr.add(Arrays.asList(0 , 3));
+                ((byzantineBcServer) allNodes[i]).setByzSetting(true, gr);
                 ((byzantineBcServer) allNodes[i]).serve();
                 continue;
             }
@@ -450,31 +492,30 @@ void TestStressFourServersMuteFault() throws InterruptedException {
         Thread.sleep(10 * 60 * 1000);
         for (int i = 0 ; i < 4 ; i++) {
             if (i == 0) {
-                ((byzantineBcServer) allNodes[i]).shutdown();
+                ((byzantineBcServer) allNodes[i]).shutdown(false);
                 continue;
             }
-            ((cbcServer) allNodes[i]).shutdown();
+            ((cbcServer) allNodes[i]).shutdown(false);
         }
     }
 
     @Test
     void TestStressFourServersSplitBrodacastFault() throws InterruptedException {
-        setConfig(null, 0);
+        setConfig(fourConfig, 0);
         Thread.sleep(timeToWaitBetweenTests);
-        Thread[] servers = new Thread[4];
         int nnodes = 4;
-        String fourServersConfig = Paths.get("config", "Configurations/single server/bbcConfig", "bbcFourServers").toString();
-        logger.info("start TestStressFourServersNoFailures");
-
-        Node[] allNodes = initLocalRmfNodes(nnodes,1,fourServersConfig, new int[]{0});
+        logger.info("start TestFourServersNoFailures");
+        Thread[] servers = new Thread[4];
+        Node[] allNodes = initLocalBCNodes(nnodes,1, fourBbc.toString(),
+                fourpanic.toString(), foursync.toString(), new int[]{0});
         for (int i = 0 ; i < nnodes ; i++) {
             int finalI = i;
             if (i == 0) {
-                servers[i]  = new Thread(() ->((byzantineBcServer) allNodes[finalI]).start());
+                servers[i]  = new Thread(() ->((byzantineBcServer) allNodes[finalI]).start(false));
                 servers[i].start();
                 continue;
             }
-            servers[i]  = new Thread(() ->((cbcServer) allNodes[finalI]).start());
+            servers[i]  = new Thread(() ->((cbcServer) allNodes[finalI]).start(false));
             servers[i].start();
         }
         for (int i = 0 ; i < nnodes ; i++) {
@@ -483,7 +524,10 @@ void TestStressFourServersMuteFault() throws InterruptedException {
 
         for (int i = 0 ; i < nnodes ; i++) {
             if (i == 0) {
-                ((byzantineBcServer) allNodes[i]).setFullByz();
+                List<List<Integer>> gr = new ArrayList<>();
+                gr.add(Arrays.asList(1, 2));
+                gr.add(Arrays.asList(0 , 3));
+                ((byzantineBcServer) allNodes[i]).setByzSetting(true, gr);
                 ((byzantineBcServer) allNodes[i]).serve();
                 continue;
             }
@@ -498,12 +542,24 @@ void TestStressFourServersMuteFault() throws InterruptedException {
         for (int i = 0 ; i < 4 ;i++) {
             if (i == 0) {
                 int finalI1 = i;
-                tasks[i] = new Thread(() -> bServerDoing(res.get(finalI1), (byzantineBcServer) allNodes[finalI1]));
+                tasks[i] = new Thread(() -> {
+                    try {
+                        bServerDoing(res.get(finalI1), (byzantineBcServer) allNodes[finalI1]);
+                    } catch (InterruptedException e) {
+                        logger.error("", e);
+                    }
+                });
                 tasks[i].start();
                 continue;
             }
             int finalI = i;
-            tasks[i] = new Thread(() -> serverDoing(res.get(finalI), (cbcServer) allNodes[finalI]));
+            tasks[i] = new Thread(() -> {
+                try {
+                    serverDoing(res.get(finalI), (cbcServer) allNodes[finalI]);
+                } catch (InterruptedException e) {
+                    logger.error("",e);
+                }
+            });
             tasks[i].start();
         }
         for (int i = 0 ; i < nnodes ; i++) {
@@ -512,10 +568,10 @@ void TestStressFourServersMuteFault() throws InterruptedException {
 
         for (int i = 0 ; i < 4 ; i++) {
             if (i == 0) {
-                ((byzantineBcServer) allNodes[i]).shutdown();
+                ((byzantineBcServer) allNodes[i]).shutdown(false);
                 continue;
             }
-            ((cbcServer) allNodes[i]).shutdown();
+            ((cbcServer) allNodes[i]).shutdown(false);
         }
 
         for (int i = 0 ; i < 100 ; i++) {
@@ -538,22 +594,21 @@ void TestStressFourServersMuteFault() throws InterruptedException {
 
     @Test
     void TestStressAsyncFourServersSplitBrodacastFault() throws InterruptedException {
-        setConfig(null, 0);
+        setConfig(fourConfig, 0);
         Thread.sleep(timeToWaitBetweenTests);
-        Thread[] servers = new Thread[4];
         int nnodes = 4;
-        String fourServersConfig = Paths.get("config", "Configurations/single server/bbcConfig", "bbcFourServers").toString();
-        logger.info("start TestStressFourServersNoFailures");
-
-        Node[] allNodes = initLocalAsyncRmfNodes(nnodes,1,fourServersConfig, new int[]{0});
+        logger.info("start TestFourServersNoFailures");
+        Thread[] servers = new Thread[4];
+        Node[] allNodes = initLocalAsyncBCNodes(nnodes,1, fourBbc.toString(),
+                fourpanic.toString(), foursync.toString(), new int[]{0});
         for (int i = 0 ; i < nnodes ; i++) {
             int finalI = i;
             if (i == 0) {
-                servers[i]  = new Thread(() ->((byzantineBcServer) allNodes[finalI]).start());
+                servers[i]  = new Thread(() ->((byzantineBcServer) allNodes[finalI]).start(false));
                 servers[i].start();
                 continue;
             }
-            servers[i]  = new Thread(() ->((asyncBcServer) allNodes[finalI]).start());
+            servers[i]  = new Thread(() ->((asyncBcServer) allNodes[finalI]).start(false));
             servers[i].start();
         }
         for (int i = 0 ; i < nnodes ; i++) {
@@ -581,12 +636,24 @@ void TestStressFourServersMuteFault() throws InterruptedException {
         for (int i = 0 ; i < 4 ;i++) {
             if (i == 0) {
                 int finalI1 = i;
-                tasks[i] = new Thread(() -> bServerDoing(res.get(finalI1), (byzantineBcServer) allNodes[finalI1]));
+                tasks[i] = new Thread(() -> {
+                    try {
+                        bServerDoing(res.get(finalI1), (byzantineBcServer) allNodes[finalI1]);
+                    } catch (InterruptedException e) {
+                        logger.error("", e);
+                    }
+                });
                 tasks[i].start();
                 continue;
             }
             int finalI = i;
-            tasks[i] = new Thread(() -> asyncServerDoing(res.get(finalI), (asyncBcServer) allNodes[finalI]));
+            tasks[i] = new Thread(() -> {
+                try {
+                    asyncServerDoing(res.get(finalI), (asyncBcServer) allNodes[finalI]);
+                } catch (InterruptedException e) {
+                    logger.error("", e);
+                }
+            });
             tasks[i].start();
         }
         for (int i = 0 ; i < nnodes ; i++) {
@@ -595,10 +662,10 @@ void TestStressFourServersMuteFault() throws InterruptedException {
 
         for (int i = 0 ; i < 4 ; i++) {
             if (i == 0) {
-                ((byzantineBcServer) allNodes[i]).shutdown();
+                ((byzantineBcServer) allNodes[i]).shutdown(false);
                 continue;
             }
-            ((asyncBcServer) allNodes[i]).shutdown();
+            ((asyncBcServer) allNodes[i]).shutdown(false);
         }
 
         for (int i = 0 ; i < 100 ; i++) {

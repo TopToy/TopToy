@@ -2,6 +2,7 @@ package rmf;
 
 import com.google.protobuf.ByteString;
 import config.Node;
+import consensus.bbc.bbcService;
 import crypto.rmfDigSig;
 
 import proto.Types.*;
@@ -16,10 +17,15 @@ public class RmfNode extends Node{
     protected boolean stopped = false;
     RmfService rmfService;
 
-    public RmfNode(int channel, int id, String addr, int rmfPort, int f , ArrayList<Node> nodes, String bbcConfig) {
+    public RmfNode(int channels, int id, String addr, int rmfPort, int f , ArrayList<Node> nodes, String bbcConfig) {
         super(addr, rmfPort,  id);
-        rmfService = new RmfService(channel, id, f, nodes, bbcConfig);
+        rmfService = new RmfService(channels, id, f, nodes, bbcConfig);
     }
+
+//    public RmfNode(int channel, int id, String addr, int rmfPort, int f , ArrayList<Node> nodes, bbcService bbc) {
+//        super(addr, rmfPort,  id);
+//        rmfService = new RmfService(channel, id, f, nodes, bbc);
+//    }
 
     public void stop() {
         stopped = true;
@@ -27,22 +33,23 @@ public class RmfNode extends Node{
             rmfService.shutdown();
     }
 
-    public void blockUntilShutdown() throws InterruptedException {
-        rmfService.shutdown();
-    }
+//    public void blockUntilShutdown() throws InterruptedException {
+//        rmfService.shutdown();
+//    }
 
     // This should be called only after all servers are running (as this object contains also the client logic)
     public void start() {
         rmfService.start();
     }
 
-    Data buildData(byte[] msg, int cidSeries, int cid, int height, boolean fm) {
+    Data buildData(byte[] msg, int channel, int cidSeries, int cid, int height, boolean fm) {
         Meta metaMsg = Meta.
                 newBuilder().
                 setSender(getID()).
                // setHeight(height).
                 setCid(cid).
                 setCidSeries(cidSeries).
+                setChannel(channel).
                 build();
         Data.Builder dataMsg = Data.
                 newBuilder().
@@ -53,18 +60,18 @@ public class RmfNode extends Node{
         }
         return dataMsg.build();
     }
-    public void broadcast(int cidSeries, int cid, byte[] msg, int height) {
+    public void broadcast(int channel, int cidSeries, int cid, byte[] msg, int height) {
         logger.debug(format("[#%d] broadcasts data message with [height=%d]", getID(), height));
 
-        rmfService.rmfBroadcast(buildData(msg, cidSeries, cid, height, false));
+        rmfService.rmfBroadcast(buildData(msg, channel, cidSeries, cid, height, false));
     }
 
-    public byte[][] deliver(int cidSeries, int cid, int height, int sender, int tmo, byte[] msg) throws InterruptedException {
+    public byte[][] deliver(int channel, int cidSeries, int cid, int height, int sender, int tmo, byte[] msg) throws InterruptedException {
         Data dMsg = null;
         if (msg != null) {
-            dMsg = buildData(msg, cidSeries, cid + 1, height + 1, true);
+            dMsg = buildData(msg, channel, cidSeries, cid + 1, height + 1, true);
         }
-        Data m = rmfService.deliver(cidSeries, cid, tmo, sender, height, dMsg);
+        Data m = rmfService.deliver(channel, cidSeries, cid, tmo, sender, height, dMsg);
         return (m == null ? new byte[][] {null, null} :
                 new byte[][] {m.getData().toByteArray(), Base64.getDecoder().decode(m.getSig())});
 //        Data data = (td == null ? null : td.d);
@@ -78,7 +85,7 @@ public class RmfNode extends Node{
 //                build();
     }
 
-    public String getRmfDataSig(int cidSeries, int cid) {
-        return rmfService.getMessageSig(cidSeries, cid);
+    public String getRmfDataSig(int channel, int cidSeries, int cid) {
+        return rmfService.getMessageSig(channel, cidSeries, cid);
     }
 }

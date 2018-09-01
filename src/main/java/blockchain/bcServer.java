@@ -5,6 +5,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import config.Config;
 import config.Node;
 import consensus.RBroadcast.RBrodcastService;
+import consensus.bbc.bbcService;
 import crypto.DigestMethod;
 import crypto.blockDigSig;
 import crypto.rmfDigSig;
@@ -52,42 +53,77 @@ public abstract class bcServer extends Node {
     private final ArrayList<Types.Transaction> transactionsPool = new ArrayList<>();
     private final ArrayList<String> proposedTx = new ArrayList<>();
     private final HashMap<String, Transaction> approvedTx = new HashMap<>();
-    boolean configuredFastMode = Config.getFastMode();
-    boolean fastMode = configuredFastMode;
+    boolean configuredFastMode;
+    boolean fastMode;
+    int channel;
 
-    bcServer(String addr, int rmfPort, int id) {
+    public bcServer(String addr, int rmfPort, int id, int channel, int f, int tmo, int tmoInterval,
+                    int maxTx, boolean fastMode, ArrayList<Node> cluster,
+                    RmfNode rmf, RBrodcastService panic, RBrodcastService sync) {
+        super(addr, rmfPort, id);
+        this.f = f;
+        this.n = 3*f + 1;
+        this.panicRB = panic;
+        this.syncRB = sync;
+        bc = initBC(id);
+        currBlock = null;
+        stopped = false;
+        currHeight = 1; // starts from 1 due to the genesis block
+        currLeader = 0;
+        this.tmo = tmo;
+        this.tmoInterval = tmoInterval;
+        initTmo = tmo;
+        this.maxTransactionInBlock = maxTx;
+        fp = new HashMap<>();
+        scVersions = new HashMap<>();
+        mainThread = new Thread(this::mainLoop);
+        panicThread = new Thread(this::deliverForkAnnounce);
+        this.configuredFastMode = fastMode;
+        this.fastMode = fastMode;
+        this.channel = channel;
+        rmfServer = rmf;
+    }
+
+    public bcServer(String addr, int rmfPort, int id, int channel, int f, int tmo, int tmoInterval,
+                    int maxTx, boolean fastMode, ArrayList<Node> cluster,
+                    String bbcConfig, String panicConfig, String syncConfig) {
 
         super(addr, rmfPort, id);
-        this.f = Config.getF();
-        n = Config.getN();
-        rmfServer = new RmfNode(0, id, addr, rmfPort, Config.getF(), // TODO: Change that!!! channel != 0!!
-                Config.getCluster(), Config.getRMFbbcConfigHome());
-        panicRB = new RBrodcastService(id, Config.getPanicRBConfigHome());
-        syncRB = new RBrodcastService(id, Config.getSyncRBConfigHome());
+        this.f = f;
+        this.n = 3*f + 1;
+        rmfServer = new RmfNode(1, id, addr, rmfPort, f,
+               cluster, bbcConfig);
+        panicRB = new RBrodcastService(id, panicConfig);
+        syncRB = new RBrodcastService(id, syncConfig);
         bc = initBC(id);
         currBlock = null;
 
         stopped = false;
         currHeight = 1; // starts from 1 due to the genesis block
         currLeader = 0;
-        tmo =  Config.getTMO();
-        tmoInterval = Config.getTMOInterval();
+        this.tmo =  tmo;
+        this.tmoInterval = tmoInterval;
         initTmo = tmo;
-        this.maxTransactionInBlock = Config.getMaxTransactionsInBlock();
+        this.maxTransactionInBlock = maxTx;
         fp = new HashMap<>();
         scVersions = new HashMap<>();
         mainThread = new Thread(this::mainLoop);
         panicThread = new Thread(this::deliverForkAnnounce);
+        this.configuredFastMode = fastMode;
+        this.fastMode = fastMode;
+        this.channel = channel;
 
     }
 
-    public void start() {
-        rmfServer.start();
-        logger.debug(format("[#%d] rmf server is up", getID()));
-        syncRB.start();
-        logger.debug(format("[#%d] sync server is up", getID()));
-        panicRB.start();
-        logger.debug(format("[#%d] panic server is up", getID()));
+    public void start(boolean group) {
+        if (!group) {
+            rmfServer.start();
+            logger.debug(format("[#%d] rmf server is up", getID()));
+            syncRB.start();
+            logger.debug(format("[#%d] sync server is up", getID()));
+            panicRB.start();
+            logger.debug(format("[#%d] panic server is up", getID()));
+        }
         logger.info(format("[#%d] is up", getID()));
     }
 
@@ -99,7 +135,7 @@ public abstract class bcServer extends Node {
         logger.info(format("[#%d] starts serving", getID()));
     }
 
-    public void shutdown() {
+    public void shutdown(boolean group) {
         stopped =  true;
         mainThread.interrupt();
         try {
@@ -107,9 +143,12 @@ public abstract class bcServer extends Node {
         } catch (InterruptedException e) {
             logger.error(format("[#%d]", getID()), e);
         }
-        rmfServer.stop();
-        panicRB.shutdown();
-        syncRB.shutdown();
+
+        if (!group) {
+            if (rmfServer != null) rmfServer.stop();
+            if (panicRB != null) panicRB.shutdown();
+            if (syncRB != null) syncRB.shutdown();
+        }
         panicThread.interrupt();
         try {
             panicThread.join();
@@ -149,7 +188,7 @@ public abstract class bcServer extends Node {
                 byte[][] pmsg;
                 try {
                     long startTime = System.currentTimeMillis();
-                    pmsg = rmfServer.deliver(cidSeries, cid, currHeight, currLeader, tmo, next);
+                    pmsg = rmfServer.deliver(channel, cidSeries, cid, currHeight, currLeader, tmo, next);
                     logger.debug(format("deliver took about [%d] ms", System.currentTimeMillis() - startTime));
                 } catch (InterruptedException e) {
                     logger.debug(format("[#%d] main thread has been interrupted on rmf deliver", getID()));
@@ -266,9 +305,9 @@ public abstract class bcServer extends Node {
 
     abstract byte[] leaderImpl() throws InterruptedException;
 
-    abstract blockchain initBC(int id);
+    abstract public blockchain initBC(int id);
 
-    abstract blockchain getBC(int start, int end);
+    abstract public blockchain getBC(int start, int end);
 
 
     public String addTransaction(byte[] data, int clientID) {
@@ -436,7 +475,7 @@ public abstract class bcServer extends Node {
         while (!stopped) {
             ForkProof p;
             try {
-                p = ForkProof.parseFrom(panicRB.deliver());
+                p = ForkProof.parseFrom(panicRB.deliver(channel));
             } catch (Exception e) {
                 logger.error(format("[#%d]", getID()), e);
                 continue;
@@ -476,20 +515,14 @@ public abstract class bcServer extends Node {
                 fp.put(pHeight, fpe);
             }
         }
-        panicRB.broadcast(p.toByteArray(), getID());
+        panicRB.broadcast(p.toByteArray(), channel, getID());
         handleFork(p);
     }
 
-    public Block deliver(int index) {
+    public Block deliver(int index) throws InterruptedException {
         synchronized (newBlockNotifyer) {
             while (index > bc.getHeight() - f) {
-                try {
-                    newBlockNotifyer.wait();
-                } catch (InterruptedException e) {
-                    logger.error(format("[#%d] Servers has been interrupted while trying to deliver [index=%d]",
-                            getID(), index), e);
-                    return null;
-                }
+                newBlockNotifyer.wait();
             }
         }
         return bc.getBlock(index);
@@ -540,7 +573,7 @@ public abstract class bcServer extends Node {
             sv.setSuggested(1);
             sv.setSender(getID());
             sv.setForkPoint(forkPoint);
-        return syncRB.broadcast(sv.build().toByteArray(), getID());
+        return syncRB.broadcast(sv.build().toByteArray(), channel, getID());
     }
 
     private boolean validateSubChainVersion(subChainVersion v, int forkPoint) {
@@ -611,7 +644,7 @@ public abstract class bcServer extends Node {
         while (!scVersions.containsKey(forkPoint) || scVersions.get(forkPoint).size() < 2*f + 1) {
             subChainVersion v;
             try {
-                v = subChainVersion.parseFrom(syncRB.deliver());
+                v = subChainVersion.parseFrom(syncRB.deliver(channel));
             } catch (InterruptedException e) {
                 if (!stopped) {
                     // might interrupted if more then one panic message received.

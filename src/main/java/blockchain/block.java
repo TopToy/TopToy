@@ -25,7 +25,7 @@ public abstract class block {
     }
 
 
-    void addTransaction(Transaction t) {
+    public void addTransaction(Transaction t) {
             blockBuilder.addData(t);
     }
 

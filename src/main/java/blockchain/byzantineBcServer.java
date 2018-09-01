@@ -2,6 +2,7 @@ package blockchain;
 
 import com.google.protobuf.ByteString;
 import config.Config;
+import config.Node;
 import crypto.DigestMethod;
 
 import org.apache.commons.lang.ArrayUtils;
@@ -20,13 +21,16 @@ public class byzantineBcServer extends bcServer {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(byzantineBcServer.class);
     private boolean fullByz = false;
     List<List<Integer>> groups = new ArrayList<>();
-    public byzantineBcServer(String addr, int rmfPort, int id) {
-        super(addr, rmfPort, id);
-        rmfServer.stop();
-        rmfServer = new ByzantineRmfNode(0, id, addr, rmfPort, Config.getF(), // TODO: Change channel!!!
-                Config.getCluster(), Config.getRMFbbcConfigHome());
+    public byzantineBcServer(String addr, int rmfPort, int id, int channel, int f, int tmo, int tmoInterval,
+                             int maxTx, boolean fastMode, ArrayList<Node> cluster,
+                             String bbcConfig, String panicConfig, String syncConfig) {
+        super(addr, rmfPort, id, channel, f, tmo, tmoInterval, maxTx, fastMode, cluster,
+                bbcConfig, panicConfig, syncConfig);
+        rmfServer.stop(); //TODO: May cause a problem
+        rmfServer = new ByzantineRmfNode(1, id, addr, rmfPort, Config.getF(),
+                cluster, bbcConfig);
         groups.add(new ArrayList<>());
-        for (int i = 0 ; i < Config.getN() ; i++) {
+        for (int i = 0 ; i < n ; i++) {
             groups.get(0).add(i); // At the beginning there is no byzantine behaviour
         }
     }
@@ -81,22 +85,22 @@ public class byzantineBcServer extends bcServer {
             }
 
             if (fullByz) {
-                ((ByzantineRmfNode)rmfServer).devidedBroadcast(cidSeries, cid, msgs, heights, groups);
+                ((ByzantineRmfNode)rmfServer).devidedBroadcast(channel, cidSeries, cid, msgs, heights, groups);
 
             } else {
-                ((ByzantineRmfNode)rmfServer).selectiveBroadcast(cidSeries, cid, sealedBlock1.toByteArray(), currHeight, groups.get(0));
+                ((ByzantineRmfNode)rmfServer).selectiveBroadcast(channel, cidSeries, cid, sealedBlock1.toByteArray(), currHeight, groups.get(0));
             }
 //        }
          return null;
     }
 
     @Override
-    blockchain initBC(int id) {
+    public blockchain initBC(int id) {
         return new basicBlockchain(id);
     }
 
     @Override
-    blockchain getBC(int start, int end) {
+    public blockchain getBC(int start, int end) {
         return new basicBlockchain(this.bc, start, end);
     }
 

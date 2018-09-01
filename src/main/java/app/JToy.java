@@ -21,38 +21,38 @@ public class JToy {
     static String type;
     public static void main(String argv[]) {
 //        new Config();
-        Path config = null;
-        if (argv.length == 3) {
-            config = Paths.get(argv[2]);
-        }
-
-        int serverID = Integer.parseInt(argv[0]);
-        Config.setConfig(config, serverID);
-        logger = org.apache.log4j.Logger.getLogger(cli.class);
-        type = argv[1];
-        logger.debug("type is " + type);
-        // possible types: r - regular, m - mute, a - async, bs - selective byz, bf - full byz
-        switch (type) {
-            case "a":
-                server = new asyncBcServer(Config.getAddress(serverID), Config.getPort(serverID), serverID);
-                break;
-            case "bs":
-                server = new byzantineBcServer(Config.getAddress(serverID), Config.getPort(serverID), serverID);
-                break;
-            case "bf":
-                server = new byzantineBcServer(Config.getAddress(serverID), Config.getPort(serverID), serverID);
-                break;
-            default:
-                server = new cbcServer(Config.getAddress(serverID), Config.getPort(serverID), serverID);
-                break;
-        }
-
-        cli parser = new cli();
-        Scanner scan = new Scanner(System.in).useDelimiter("\\n");
-        while (true) {
-            System.out.print("Toy>> ");
-            parser.parse(getArgs(scan.next()));
-        }
+//        Path config = null;
+//        if (argv.length == 3) {
+//            config = Paths.get(argv[2]);
+//        }
+//
+//        int serverID = Integer.parseInt(argv[0]);
+//        Config.setConfig(config, serverID);
+//        logger = org.apache.log4j.Logger.getLogger(cli.class);
+//        type = argv[1];
+//        logger.debug("type is " + type);
+//        // possible types: r - regular, m - mute, a - async, bs - selective byz, bf - full byz
+//        switch (type) {
+//            case "a":
+//                server = new asyncBcServer(Config.getAddress(serverID), Config.getPort(serverID), serverID);
+//                break;
+//            case "bs":
+//                server = new byzantineBcServer(Config.getAddress(serverID), Config.getPort(serverID), serverID);
+//                break;
+//            case "bf":
+//                server = new byzantineBcServer(Config.getAddress(serverID), Config.getPort(serverID), serverID);
+//                break;
+//            default:
+//                server = new cbcServer(Config.getAddress(serverID), Config.getPort(serverID), serverID);
+//                break;
+//        }
+//
+//        cli parser = new cli();
+//        Scanner scan = new Scanner(System.in).useDelimiter("\\n");
+//        while (true) {
+//            System.out.print("Toy>> ");
+//            parser.parse(getArgs(scan.next()));
+//        }
     }
 
     static String[] getArgs(String cmd) {

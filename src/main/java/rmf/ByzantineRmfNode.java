@@ -11,17 +11,18 @@ public class ByzantineRmfNode extends RmfNode {
 //    private boolean stopped = false;
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ByzantineRmfNode.class);
 
-    public ByzantineRmfNode(int channel, int id, String addr, int rmfPort, int f, ArrayList<Node> nodes, String bbcConfig) {
-        super(channel, id, addr, rmfPort, f, nodes, bbcConfig);
+    public ByzantineRmfNode(int channels, int id, String addr, int rmfPort, int f, ArrayList<Node> nodes, String bbcConfig) {
+        super(channels, id, addr, rmfPort, f, nodes, bbcConfig);
     }
 
-    public void selectiveBroadcast(int cidSeries, int cid, byte[] msg, int height, List<Integer> ids) {
+    public void selectiveBroadcast(int channel, int cidSeries, int cid, byte[] msg, int height, List<Integer> ids) {
         Meta metaMsg = Meta.
                 newBuilder().
                 setSender(getID()).
               //  setHeight(height).
                 setCid(cid).
                 setCidSeries(cidSeries).
+                setChannel(channel).
                 build();
         Data.Builder dataMsg = Data.
                 newBuilder().
@@ -39,9 +40,9 @@ public class ByzantineRmfNode extends RmfNode {
     /*
         This should used outside the rmf protocol (Note that the rmf protocol does not handle such failures)
      */
-    public void devidedBroadcast(int cidSeries, int cid, List<byte[]> msgs, List<Integer> heights, List<List<Integer>> ids) {
+    public void devidedBroadcast(int channel, int cidSeries, int cid, List<byte[]> msgs, List<Integer> heights, List<List<Integer>> ids) {
         for (int i = 0 ; i < msgs.size() ; i++) {
-            selectiveBroadcast(cidSeries, cid, msgs.get(i), heights.get(i), ids.get(i));
+            selectiveBroadcast(channel, cidSeries, cid, msgs.get(i), heights.get(i), ids.get(i));
         }
     }
 

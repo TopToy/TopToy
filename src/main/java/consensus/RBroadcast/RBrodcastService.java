@@ -93,10 +93,10 @@ public class RBrodcastService extends DefaultSingleRecoverable {
                     recMsg.put(channel, new ArrayList<>());
                 }
                 recMsg.get(msg.getM().getChannel()).add(msg);
-                globalLock.notify();
+                globalLock.notifyAll();
             }
         } catch (Exception e) {
-            logger.error(format("[#%d]"), e);
+            logger.error(format("[#%d]", id), e);
         }
 
         return new byte[0];
@@ -109,7 +109,7 @@ public class RBrodcastService extends DefaultSingleRecoverable {
 
     public byte[] deliver(int channel) throws InterruptedException {
         synchronized (globalLock) {
-            while (recMsg.isEmpty()) {
+            while (!recMsg.containsKey(channel) || recMsg.get(channel).isEmpty()) {
                 globalLock.wait();
             }
             RBMsg msg = recMsg.get(channel).get(0);

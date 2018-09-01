@@ -18,10 +18,11 @@ public class Config {
         String SYSTEM_KEY = "system";
         String SYSTEM_N_KEY = "system.n";
         String SYSTEM_F_KEY = "system.f";
+        String SYSTEM_G_KEY = "system.g";
         String SERVER_KEY = "server";
         String SERVER_ID_KEY = "server.id";
         String SERVER_IP_KEY = "server.ip";
-        String SERVER_RMFPORT_KEY = "server.rmfPort";
+//        String SERVER_RMFPORT_KEY = "server.rmfPort";
         String SERVER_CRT_PATH = "server.TlsCertPath";
         String SERVER_TLS_PRIV_KEY_PATH = "server.TlsPrivKeyPath";
         String RMFCLUSTER_KEY = "cluster";
@@ -99,21 +100,30 @@ public class Config {
         return node.getString("ip");
     }
 
-    public static int getPort(int id) {
+    public static int getPort(int channel, int id) {
         Toml t = conf.getTables(tKeys.RMFCLUSTER_KEY).get(0);
-        Toml node = t.getTable("s" + id);
-        return Math.toIntExact(node.getLong("rmfPort"));
+        Toml c = t.getTable("s" + id)
+                .getTables("SG")
+                .get(0)
+                .getTable("c" + id);
+        return Math.toIntExact(c.getLong("port"));
     }
-//
-//    public static int getID() { return Math.toIntExact(conf.getLong(tKeys.SERVER_ID_KEY)); }
 
-    public static ArrayList<Node> getCluster() {
+    public static int getG() {
+        return Math.toIntExact(conf.getLong(tKeys.SYSTEM_G_KEY));
+    }
+
+    public static ArrayList<Node> getCluster(int channel) {
         Toml t = conf.getTables(tKeys.RMFCLUSTER_KEY).get(0);
         ArrayList<Node> ret = new ArrayList<>();
         for (int i = 0 ; i < getN() ; i++) {
             Toml node = t.getTable("s" + i);
             ret.add(new Node(node.getString("ip"),
-                    Math.toIntExact(node.getLong("rmfPort")),
+                    Math.toIntExact(node
+                            .getTables("SG")
+                            .get(0)
+                            .getTable("c" + channel)
+                            .getLong("port")),
                     Math.toIntExact(node.getLong("id"))));
         }
         return ret;

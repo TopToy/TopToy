@@ -134,7 +134,7 @@ public class bbcService extends DefaultSingleRecoverable {
                     }
                     if (curr.neg + curr.pos == quorumSize) {
                         logger.debug(format("[#%d] notifies on  [channel=%d ; cidSeries=%d ; cid=%d]", id, channel, cidSeries, cid));
-                        globalLock.notify();
+                        globalLock.notifyAll();
                     }
                 }
 

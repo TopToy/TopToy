@@ -1,7 +1,10 @@
 package blockchain;
 
+import config.Node;
 import crypto.DigestMethod;
 import proto.Types;
+
+import java.util.ArrayList;
 import java.util.Random;
 
 import static java.lang.String.format;
@@ -10,8 +13,11 @@ public class asyncBcServer extends bcServer {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(asyncBcServer.class);
 
     int maxTime = 0;
-    public asyncBcServer(String addr, int rmfPort,  int id) {
-        super(addr, rmfPort,  id);
+    public asyncBcServer(String addr, int rmfPort, int id, int channel, int f, int tmo, int tmoInterval,
+                         int maxTx, boolean fastMode, ArrayList<Node> cluster,
+                         String bbcConfig, String panicConfig, String syncConfig) {
+        super(addr, rmfPort,  id, channel, f, tmo, tmoInterval, maxTx, fastMode, cluster,
+                bbcConfig, panicConfig, syncConfig);
     }
 
     byte[] leaderImpl() throws InterruptedException {
@@ -36,7 +42,7 @@ public class asyncBcServer extends bcServer {
                     getID(), currHeight, cidSeries, cid));
             addTransactionsToCurrBlock();
             Types.Block sealedBlock = currBlock.construct(getID(), currHeight, cidSeries, cid, DigestMethod.hash(bc.getBlock(currHeight - 1).getHeader().toByteArray()));
-            rmfServer.broadcast(cidSeries, cid, sealedBlock.toByteArray(), currHeight);
+            rmfServer.broadcast(channel, cidSeries, cid, sealedBlock.toByteArray(), currHeight);
             return null;
         }
 
@@ -54,12 +60,12 @@ public class asyncBcServer extends bcServer {
 
     }
     @Override
-    blockchain initBC(int id) {
+    public blockchain initBC(int id) {
         return new basicBlockchain(id);
     }
 
     @Override
-    blockchain getBC(int start, int end) {
+    public blockchain getBC(int start, int end) {
         return new basicBlockchain(this.bc, start, end);
     }
 }

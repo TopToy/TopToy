@@ -27,7 +27,7 @@ public abstract class blockchain {
         this.blocks.addAll(orig.getBlocks(start, end));
     }
 
-    abstract block createNewBLock();
+    public abstract block createNewBLock();
 
     abstract void createGenesis();
 
@@ -61,13 +61,13 @@ public abstract class blockchain {
                 Objects.requireNonNull(d));
     }
 
-    void addBlock(Block b) {
+    public void addBlock(Block b) {
         synchronized (blocks) {
             blocks.add(b);
         }
     }
 
-    Block getBlock(int index) {
+    public Block getBlock(int index) {
         synchronized (blocks) {
             return blocks.get(index);
         }

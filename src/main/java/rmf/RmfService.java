@@ -106,43 +106,79 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             }
         }
     }
-    int channel;
+//    int channel;
     protected int id;
     private int n;
     protected int f;
     private bbcService bbcService;
-    private final Object globalLock = new Object();
+    private final Object[] globalLock;
 
-    private final Table<Integer, Integer, Data> recMsg;
+    private final Table<Integer, Integer, Data>[] recMsg;
 
-    private final Table<Integer, Integer, fvote> fVotes;
-    private final Table<Integer, Integer, Data> pendingMsg;
-    private final Table<Integer, Integer, BbcDecision> fastBbcCons;
+    private final Table<Integer, Integer, fvote>[] fVotes;
+    private final Table<Integer, Integer, Data>[] pendingMsg;
+    private final Table<Integer, Integer, BbcDecision>[] fastBbcCons;
 
     Map<Integer, peer> peers;
     private List<Node> nodes;
     private Thread bbcServiceThread;
-    private Thread bbcMissedConsensusThread;
-    protected Server server;
+    private Thread[] bbcMissedConsensusThreads;
+//    protected Server server;
     private String bbcConfig;
-    private final Table<Integer, Integer, BbcDecision> regBbcCons;
+    private final Table<Integer, Integer, BbcDecision>[] regBbcCons;
     private boolean stopped = false;
     private Server rmfServer;
+    int channels;
 
-    public RmfService(int channel, int id, int f, ArrayList<Node> nodes, String bbcConfig) {
-        this.channel = channel;
+//    public RmfService(int channels, int id, int f, ArrayList<Node> nodes, bbcService bbc) {
+//        this.channels = channels;
+//        this.globalLock = new Object[channels];
+//        this.fVotes = new HashBasedTable[channels];
+//        this.pendingMsg =  new HashBasedTable[channels];
+//        this.recMsg =  new HashBasedTable[channels];
+//        this.bbcService = bbc;
+//        this.peers = new HashMap<>();
+//        this.f = f;
+//        this.n = 3*f +1;
+//        this.id = id;
+//        this.nodes = nodes;
+//        this.fastBbcCons = new HashBasedTable[channels];
+//        this.regBbcCons = new HashBasedTable[channels];
+//        for (int i = 0 ; i < channels ; i++) {
+//            globalLock[i] = new Object();
+//            recMsg[i] = HashBasedTable.create();
+//            pendingMsg[i] = HashBasedTable.create();
+//            this.fVotes[i] = HashBasedTable.create();
+//            fastBbcCons[i] = HashBasedTable.create();
+//            regBbcCons[i] = HashBasedTable.create();
+//        }
+//        startGrpcServer();
+//    }
+
+    public RmfService(int channels, int id, int f, ArrayList<Node> nodes, String bbcConfig) {
+        this.channels = channels;
+        this.globalLock = new Object[channels];
         this.bbcConfig = bbcConfig;
-        this.fVotes = HashBasedTable.create();
-        this.pendingMsg =  HashBasedTable.create();
-        this.recMsg =  HashBasedTable.create();
+        this.fVotes = new HashBasedTable[channels];
+        this.pendingMsg =  new HashBasedTable[channels];
+        this.recMsg =  new HashBasedTable[channels];
 
         this.peers = new HashMap<>();
         this.f = f;
         this.n = 3*f +1;
         this.id = id;
         this.nodes = nodes;
-        this.fastBbcCons =  HashBasedTable.create();
-        this.regBbcCons = HashBasedTable.create();
+        this.fastBbcCons = new HashBasedTable[channels];
+        this.regBbcCons = new HashBasedTable[channels];
+        this.bbcMissedConsensusThreads = new Thread[channels];
+        for (int i = 0 ; i < channels ; i++) {
+            globalLock[i] = new Object();
+            recMsg[i] = HashBasedTable.create();
+            pendingMsg[i] = HashBasedTable.create();
+            fVotes[i] = HashBasedTable.create();
+            fastBbcCons[i] = HashBasedTable.create();
+            regBbcCons[i] = HashBasedTable.create();
+        }
         startGrpcServer();
     }
 
@@ -168,27 +204,35 @@ public class RmfService extends RmfGrpc.RmfImplBase {
     }
 
     public void start() {
-        this.bbcService = new bbcService(id, 2*f + 1, bbcConfig);
         CountDownLatch latch = new CountDownLatch(1);
-        bbcServiceThread = new Thread(() -> {
+//        if (!group)  {
+            this.bbcService = new bbcService(id, 2*f + 1, bbcConfig);
+            bbcServiceThread = new Thread(() -> {
                 /*
                     Note that in case that there is more than one bbc server this call blocks until all servers are up.
                  */
-            this.bbcService.start();
-            latch.countDown();
-        }
-        );
-        bbcServiceThread.start();
-        bbcMissedConsensusThread = new Thread(() ->
-        {
-            try {
-                bbcMissedConsensus();
-            } catch (InterruptedException e) {
-                logger.error(format("[#%d]", id), e);
+                this.bbcService.start();
+                latch.countDown();
             }
-        });
-        bbcMissedConsensusThread.start();
+            );
+            bbcServiceThread.start();
+//        }
+
+        for (int i = 0 ; i < channels ; i++) {
+            int finalI = i;
+            bbcMissedConsensusThreads[i] = new Thread(() ->
+            {
+                try {
+                    bbcMissedConsensus(finalI);
+                } catch (InterruptedException e) {
+                    logger.error(format("[#%d-C[%d]]", id, finalI), e);
+                }
+            });
+            bbcMissedConsensusThreads[i].start();
+        }
+
         try {
+//            if (!group)
             latch.await();
         } catch (InterruptedException e) {
             logger.error("", e);
@@ -207,18 +251,18 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         }));
     }
 
-    private void bbcMissedConsensus() throws InterruptedException {
+    private void bbcMissedConsensus(int channel) throws InterruptedException {
         while (!stopped) {
             Thread.sleep(200);
             synchronized (fastBbcCons) {
-                if (fastBbcCons.rowKeySet().isEmpty()) {
+                if (fastBbcCons[channel].rowKeySet().isEmpty()) {
 //                    logger.debug(format("[#%d] There are no fast bbc", id));
                     continue;
                 }
-                int fcidSeries = Collections.max(fastBbcCons.rowKeySet());
-                int fcid = Collections.max(fastBbcCons.row(fcidSeries).keySet());
+                int fcidSeries = Collections.max(fastBbcCons[channel].rowKeySet());
+                int fcid = Collections.max(fastBbcCons[channel].row(fcidSeries).keySet());
 //                logger.debug(format("[#%d] Trying re-participate [cidSeries=%d ; cid=%d]", id, fcidSeries, fcid));
-                bbcService.periodicallyVoteMissingConsensus(fastBbcCons.get(fcidSeries, fcid));
+                bbcService.periodicallyVoteMissingConsensus(fastBbcCons[channel].get(fcidSeries, fcid));
             }
 
         }
@@ -229,19 +273,25 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         for (peer p : peers.values()) {
             p.shutdown();
         }
-        logger.debug(format("[#%d] shutting sown rmf clients", id));
-        if (bbcService != null) {
-            bbcService.shutdown();
-        }
+        logger.debug(format("[#%d] shutting down rmf clients", id));
+//        if (!group) {
+            if (bbcService != null) bbcService.shutdown();
+//        }
+
         try {
             if (bbcServiceThread != null) {
                 bbcServiceThread.interrupt();
                 bbcServiceThread.join();
             }
-            if (bbcMissedConsensusThread != null) {
-                bbcMissedConsensusThread.interrupt();
-                bbcMissedConsensusThread.join();
+            if (bbcMissedConsensusThreads != null) {
+                for (int i = 0 ; i < channels ; i++) {
+                    if (bbcMissedConsensusThreads[i] != null) {
+                        bbcMissedConsensusThreads[i].interrupt();
+                        bbcMissedConsensusThreads[i].join();
+                    }
+                }
             }
+
         } catch (InterruptedException e) {
             logger.error("", e);
         }
@@ -288,22 +338,24 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             }
         });
     }
-    private void sendReqMessage(RmfGrpc.RmfStub stub, Req req, int cidSeries, int cid, int sender, int height) {
+    private void sendReqMessage(RmfGrpc.RmfStub stub, Req req, int channel, int cidSeries, int cid, int sender, int height) {
         stub.reqMessage(req, new StreamObserver<Res>() {
             @Override
             public void onNext(Res res) {
-                if (res.getData().getMeta().getCid() == cid && res.getData().getMeta().getCidSeries() == cidSeries) {
-                    synchronized (globalLock) {
-                        if (!pendingMsg.contains(cidSeries, cid) && !recMsg.contains(cidSeries, cid)) {
+                if (res.getData().getMeta().getCid() == cid &&
+                        res.getData().getMeta().getCidSeries() == cidSeries
+                        && res.getMeta().getChannel() == channel && res.getData().getMeta().getChannel() == channel) {
+                    synchronized (globalLock[channel]) {
+                        if (!pendingMsg[channel].contains(cidSeries, cid) && !recMsg[channel].contains(cidSeries, cid)) {
                             if (!rmfDigSig.verify(sender, res.getData())) {
-                                logger.debug(format("[#%d] has received invalid response message from [#%d] for [cidSeries=%d ; cid=%d]",
-                                        id, res.getMeta().getSender(), cidSeries, cid));
+                                logger.debug(format("[#%d-C[%d]] has received invalid response message from [#%d] for [cidSeries=%d ; cid=%d]",
+                                        id, channel, res.getMeta().getSender(), cidSeries, cid));
                                 return;
                             }
-                            logger.debug(format("[#%d] has received response message from [#%d] for [cidSeries=%d ; cid=%d]",
-                                    id, res.getMeta().getSender(), cidSeries,  cid));
-                            pendingMsg.put(cidSeries, cid, res.getData());
-                            globalLock.notify();
+                            logger.debug(format("[#%d-C[%d]] has received response message from [#%d] for [cidSeries=%d ; cid=%d]",
+                                    id, channel, res.getMeta().getSender(), cidSeries,  cid));
+                            pendingMsg[channel].put(cidSeries, cid, res.getData());
+                            globalLock[channel].notify();
                         }
                     }
                 }
@@ -320,11 +372,12 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             }
         });
     }
-    private void broadcastReqMsg(Req req, int cidSeries, int cid, int sender, int height) {
-        logger.debug(format("[#%d] broadcasts request message [cidSeries=%d ; cid=%d]", id, cidSeries, cid));
+    private void broadcastReqMsg(Req req, int channel, int cidSeries, int cid, int sender, int height) {
+        logger.debug(format("[#%d-C[%d]] broadcasts request message [cidSeries=%d ; cid=%d]", id,
+                req.getMeta().getChannel(), cidSeries, cid));
         for (int p : peers.keySet()) {
             if (p == id) continue;
-            sendReqMessage(peers.get(p).stub, req, cidSeries, cid, sender, height);
+            sendReqMessage(peers.get(p).stub, req, channel, cidSeries, cid, sender, height);
         }
     }
     private void broadcastFastVoteMessage(BbcMsg v) {
@@ -341,10 +394,11 @@ public class RmfService extends RmfGrpc.RmfImplBase {
     private void addToPendings(Data request) {
         int sender = request.getMeta().getSender();
         int cid = request.getMeta().getCid();
+        int channel = request.getMeta().getChannel();
         int cidSeries = request.getMeta().getCidSeries();
-        if (pendingMsg.contains(cidSeries, cid) || recMsg.contains(cidSeries, cid)) return;
-        pendingMsg.put(cidSeries, cid, request);
-        logger.debug(format("[#%d] has received data message from [%d], [cidSeries=%d ; cid=%d]", id,
+        if (pendingMsg[channel].contains(cidSeries, cid) || recMsg[channel].contains(cidSeries, cid)) return;
+        pendingMsg[channel].put(cidSeries, cid, request);
+        logger.debug(format("[#%d-C[%d]] has received data message from [%d], [cidSeries=%d ; cid=%d]", id, channel,
                 sender, cidSeries, cid));
     }
 
@@ -353,25 +407,27 @@ public class RmfService extends RmfGrpc.RmfImplBase {
 
         int cid = request.getMeta().getCid();
         int cidSeries = request.getMeta().getCidSeries();
-        synchronized (globalLock) {
+        int channel = request.getMeta().getChannel();
+        synchronized (globalLock[channel]) {
             synchronized (fastBbcCons) {
-                if (fastBbcCons.contains(cidSeries, cid) || regBbcCons.contains(cidSeries, cid)) return;
+                if (fastBbcCons[channel].contains(cidSeries, cid) || regBbcCons[channel].contains(cidSeries, cid)) return;
             }
             addToPendings(request);
-            globalLock.notify();
+            globalLock[channel].notify();
         }
     }
 
     @Override
     public void fastVote(BbcMsg request, StreamObserver<Empty> responeObserver) {
-        synchronized (globalLock) {
-            int cid = request.getM().getCid();
-            int cidSeries = request.getM().getCidSeries();
-            if (regBbcCons.contains(cidSeries, cid)) return;
+        int cid = request.getM().getCid();
+        int cidSeries = request.getM().getCidSeries();
+        int channel = request.getM().getChannel();
+        synchronized (globalLock[channel]) {
+            if (regBbcCons[channel].contains(cidSeries, cid)) return;
             synchronized (fastBbcCons) {
-                if (fastBbcCons.contains(cidSeries, cid)) return; // Against byzantine activity
+                if (fastBbcCons[channel].contains(cidSeries, cid)) return; // Against byzantine activity
             }
-            if (!fVotes.contains(cidSeries, cid)) {
+            if (!fVotes[channel].contains(cidSeries, cid)) {
                 fvote v = new fvote();
                 v.dec.setM(Meta.newBuilder()
                         .setChannel(channel)
@@ -380,25 +436,25 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                 v.cid = cid;
                 v.cidSeries = cidSeries;
                 v.voters = new ArrayList<>();
-                fVotes.put(cidSeries, cid, v);
+                fVotes[channel].put(cidSeries, cid, v);
             }
 
-            if (fVotes.get(cidSeries, cid).voters.contains(request.getM().getSender())) {
-                logger.debug(format("[#%d] has received duplicate vote from [%d] for [channel=%d ; cidSeries=%d ; cid=%d]",
-                        id, request.getM().getSender(), channel, cidSeries, cid));
+            if (fVotes[channel].get(cidSeries, cid).voters.contains(request.getM().getSender())) {
+                logger.debug(format("[#%d-C[%d]] has received duplicate vote from [%d] for [channel=%d ; cidSeries=%d ; cid=%d]",
+                        id, channel, request.getM().getSender(), channel, cidSeries, cid));
                 return;
             }
-            fVotes.get(cidSeries, cid).voters.add(request.getM().getSender());
+            fVotes[channel].get(cidSeries, cid).voters.add(request.getM().getSender());
             if (request.hasNext()) {
                 addToPendings(request.getNext());
             }
-            if (fVotes.get(cidSeries, cid).voters.size() == n) {
-                logger.debug(format("[#%d] fastVote has been detected [cidSeries=%d ; cid=%d]", id, cidSeries, cid));
+            if (fVotes[channel].get(cidSeries, cid).voters.size() == n) {
+                logger.debug(format("[#%d-C[%d]] fastVote has been detected [cidSeries=%d ; cid=%d]", id, channel, cidSeries, cid));
                 synchronized (fastBbcCons) {
-                    fastBbcCons.put(cidSeries, cid, fVotes.get(cidSeries, cid).dec.setDecosion(1).build());
+                    fastBbcCons[channel].put(cidSeries, cid, fVotes[channel].get(cidSeries, cid).dec.setDecosion(1).build());
                 }
-                bbcService.updateFastVote(fVotes.get(cidSeries, cid).dec.build());
-                globalLock.notify();
+                bbcService.updateFastVote(fVotes[channel].get(cidSeries, cid).dec.build());
+                globalLock[channel].notify();
             }
         }
     }
@@ -407,19 +463,21 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         Data msg;
         int cid = request.getMeta().getCid();
         int cidSeries = request.getMeta().getCidSeries();
-        synchronized (globalLock) {
-                msg = recMsg.get(cidSeries, cid);
+        int channel = request.getMeta().getChannel();
+        synchronized (globalLock[channel]) {
+                msg = recMsg[channel].get(cidSeries, cid);
             if (msg == null) {
-                msg = pendingMsg.get(cidSeries, cid);
+                msg = pendingMsg[channel].get(cidSeries, cid);
             }
 
         }
         if (msg != null) {
-            logger.debug(format("[#%d] has received request message from [#%d] of [cidSeries=%d ; cid=%d]",
-                    id, request.getMeta().getSender(), cidSeries, cid));
+            logger.debug(format("[#%d-C[%d]] has received request message from [#%d] of [cidSeries=%d ; cid=%d]",
+                    id, channel, request.getMeta().getSender(), cidSeries, cid));
             Meta meta = Meta.newBuilder().
                     setSender(id).
 //                    setHeight(msg.getMeta().getHeight()).
+                    setChannel(channel).
                     setCid(cid).
                     setCidSeries(cid).
                     build();
@@ -428,26 +486,26 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                     setMeta(meta).
                     build());
         } else {
-            logger.debug(format("[#%d] has received request message from [#%d] of [cidSeries=%d ; cid=%d] but buffers are empty",
-                    id, request.getMeta().getSender(), cidSeries, cid));
+            logger.debug(format("[#%d-C[%d]] has received request message from [#%d] of [cidSeries=%d ; cid=%d] but buffers are empty",
+                    id, channel, request.getMeta().getSender(), cidSeries, cid));
         }
     }
 
-    public Data deliver(int cidSeries, int cid, int tmo, int sender, int height, Data next) throws InterruptedException {
+    public Data deliver(int channel, int cidSeries, int cid, int tmo, int sender, int height, Data next) throws InterruptedException {
         int cVotes = 0;
         int v = 0;
         boolean verfied = false;
         boolean valid = false;
-        synchronized (globalLock) {
+        synchronized (globalLock[channel]) {
             long startTime = System.currentTimeMillis();
-            if (!pendingMsg.contains(cidSeries, cid)) {
-                globalLock.wait(tmo);
+            if (!pendingMsg[channel].contains(cidSeries, cid)) {
+                globalLock[channel].wait(tmo);
             }
             long estimatedTime = System.currentTimeMillis() - startTime;
-            logger.debug(format("#(1)# have waited [%d] ms for data msg", estimatedTime));
-            if (pendingMsg.contains(cidSeries, cid) &&
-                    pendingMsg.get(cidSeries, cid).getMeta().getSender() == sender) { // &&
-                Data msg = pendingMsg.get(cidSeries, cid);
+            logger.debug(format("[#%d-C[%d]] have waited [%d] ms for data msg", id, channel, estimatedTime));
+            if (pendingMsg[channel].contains(cidSeries, cid) &&
+                    pendingMsg[channel].get(cidSeries, cid).getMeta().getSender() == sender) { // &&
+                Data msg = pendingMsg[channel].get(cidSeries, cid);
                 verfied = true;
                 valid = rmfDigSig.verify(msg.getMeta().getSender(), msg);
                 if (valid) {
@@ -456,31 +514,31 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                             .setM(Meta.newBuilder()
                                     .setChannel(channel)
                                     .setCidSeries(cidSeries)
-                                    .setCidSeries(cid)
+                                    .setCid(cid)
                                     .setSender(id)
                                     .build())
                             .setVote(1);
                     if (next != null) {
-                        logger.debug(format("[#%d] broadcasts [cidSeries=%d ; cid=%d] via fast mode",
-                                id,  next.getMeta().getCidSeries(), next.getMeta().getCid()));
+                        logger.debug(format("[#%d-C[%d]] broadcasts [cidSeries=%d ; cid=%d] via fast mode",
+                                id, channel, next.getMeta().getCidSeries(), next.getMeta().getCid()));
                         try {
-                            bv.setNext(setFastModeData(pendingMsg.get(cidSeries, cid), next));
+                            bv.setNext(setFastModeData(pendingMsg[channel].get(cidSeries, cid), next));
                         } catch (InvalidProtocolBufferException e) {
-                            logger.error(format("[#%d]", id), e);
+                            logger.error(format("[#%d-C[%d]]", id, channel), e);
                         }
                     }
                     broadcastFastVoteMessage(bv.build());
                 }
 //                    pendingMsg.get(cidSeries, cid).getMeta().getHeight() == height) {
             }
-            if (fVotes.contains(cidSeries, cid)) {
-                cVotes = fVotes.get(cidSeries, cid).voters.size();
+            if (fVotes[channel].contains(cidSeries, cid)) {
+                cVotes = fVotes[channel].get(cidSeries, cid).voters.size();
             }
             
             if (cVotes < n) {
                 startTime = System.currentTimeMillis();
-                globalLock.wait(Math.max(tmo - estimatedTime, 1));
-                logger.debug(format("#(2)# have waited for more [%d] ms for fast bbc", System.currentTimeMillis() - startTime));
+                globalLock[channel].wait(Math.max(tmo - estimatedTime, 1));
+                logger.debug(format("[#%d-C[%d]] have waited for more [%d] ms for fast bbc", id, channel, System.currentTimeMillis() - startTime));
             }
 
 //            if (cVotes < n) {
@@ -498,19 +556,19 @@ public class RmfService extends RmfGrpc.RmfImplBase {
 //                logger.debug(format("#(2)# have waited for more [%d] ms for fast bbc", System.currentTimeMillis() - startTime));
 //            }
 
-            if (fVotes.contains(cidSeries, cid)) {
-                cVotes = fVotes.get(cidSeries, cid).voters.size();
+            if (fVotes[channel].contains(cidSeries, cid)) {
+                cVotes = fVotes[channel].get(cidSeries, cid).voters.size();
             }
 
             if (cVotes < n) {
-                if (pendingMsg.contains(cidSeries, cid) &&
-                        pendingMsg.get(cidSeries, cid).getMeta().getSender() == sender) { // &&
+                if (pendingMsg[channel].contains(cidSeries, cid) &&
+                        pendingMsg[channel].get(cidSeries, cid).getMeta().getSender() == sender) { // &&
                     //   pendingMsg.get(cidSeries, cid).getMeta().getHeight() == height) {
                     if (verfied && valid) {
                         v = 1;
                     }
                     if (!verfied) {
-                        Data msg = pendingMsg.get(cidSeries, cid);
+                        Data msg = pendingMsg[channel].get(cidSeries, cid);
                         verfied = true;
                         valid = rmfDigSig.verify(msg.getMeta().getSender(), msg);
                         if (valid) {
@@ -519,68 +577,69 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                     }
                 }
 //                td.t = Ctype.FULL;
-                logger.debug(format("[#%d] cvotes is [%d] for [cidSeries=%d ; cid=%d]", id, cVotes,cidSeries, cid));
-                int dec = fullBbcConsensus(v, cidSeries, cid);
-                logger.debug(format("[#%d] bbc returned [%d] for [cidSeries=%d ; cid=%d]", id, dec, cidSeries, cid));
+                logger.debug(format("[#%d-C[%d]] cvotes is [%d] for [cidSeries=%d ; cid=%d]", id, channel, cVotes,cidSeries, cid));
+                int dec = fullBbcConsensus(channel, v, cidSeries, cid);
+                logger.debug(format("[#%d-C[%d]] bbc returned [%d] for [cidSeries=%d ; cid=%d]", id, channel, dec, cidSeries, cid));
                 if (dec == 0) {
-                    pendingMsg.remove(cidSeries, cid);
+                    pendingMsg[channel].remove(cidSeries, cid);
                     return null;
                 }
             } else {
-                logger.debug(format("[#%d] deliver by fast vote [cidSeries=%d ; cid=%d]", id, cidSeries, cid));
+                logger.debug(format("[#%d-C[%d]] deliver by fast vote [cidSeries=%d ; cid=%d]", id, channel, cidSeries, cid));
             }
-            requestData(cidSeries, cid, sender, height);
+            requestData(channel, cidSeries, cid, sender, height);
             Data msg;
-                msg = pendingMsg.get(cidSeries, cid);
-                recMsg.put(cidSeries, cid, msg);
-                pendingMsg.remove(cidSeries, cid);
+                msg = pendingMsg[channel].get(cidSeries, cid);
+                recMsg[channel].put(cidSeries, cid, msg);
+                pendingMsg[channel].remove(cidSeries, cid);
             return msg;
         }
 
 
     }
-    private int fullBbcConsensus(int vote, int cidSeries, int cid) throws InterruptedException {
-        logger.debug(format("[#%d] Initiates full bbc instance [cidSeries=%d ; cid=%d], [vote:%d]", id, cidSeries, cid, vote));
+    private int fullBbcConsensus(int channel, int vote, int cidSeries, int cid) throws InterruptedException {
+        logger.debug(format("[#%d-C[%d]] Initiates full bbc instance [cidSeries=%d ; cid=%d], [vote:%d]", id, channel, cidSeries, cid, vote));
         bbcService.propose(vote, channel, cidSeries, cid);
         BbcDecision dec = bbcService.decide(channel, cidSeries, cid);
-        regBbcCons.put(cidSeries, cid, dec);
+        regBbcCons[channel].put(cidSeries, cid, dec);
         return dec.getDecosion();
     }
 
-    private void requestData(int cidSeries, int cid, int sender, int height) throws InterruptedException {
-        if (pendingMsg.contains(cidSeries, cid) &&
-                pendingMsg.get(cidSeries, cid).getMeta().getSender() == sender) return; //&&
+    private void requestData(int channel, int cidSeries, int cid, int sender, int height) throws InterruptedException {
+        if (pendingMsg[channel].contains(cidSeries, cid) &&
+                pendingMsg[channel].get(cidSeries, cid).getMeta().getSender() == sender) return; //&&
 //                pendingMsg.get(cidSeries, cid).getMeta().getHeight() == height) return;
-        pendingMsg.remove(cidSeries, cid);
+        pendingMsg[channel].remove(cidSeries, cid);
         Meta meta = Meta.
                 newBuilder().
                 setCid(cid).
                 setCidSeries(cidSeries).
-                setSender(id).
+                setChannel(channel)
+                .setSender(id).
                 build();
         Req req = Req.newBuilder().setMeta(meta).build();
-        broadcastReqMsg(req, cidSeries, cid, sender, height);
-        while ((!pendingMsg.contains(cidSeries, cid)) ||
-                pendingMsg.get(cidSeries, cid).getMeta().getSender() != sender) { // ||
+        broadcastReqMsg(req,channel,  cidSeries, cid, sender, height);
+        while ((!pendingMsg[channel].contains(cidSeries, cid)) ||
+                pendingMsg[channel].get(cidSeries, cid).getMeta().getSender() != sender) { // ||
 //                pendingMsg.get(cidSeries, cid).getMeta().getHeight() != height) {
-            pendingMsg.remove(cidSeries, cid);
-            globalLock.wait();
+            pendingMsg[channel].remove(cidSeries, cid);
+            globalLock[channel].wait();
         }
     }
 
-    String getMessageSig(int cidSeries, int cid) {
-        if (recMsg.contains(cidSeries, cid)) {
-            return recMsg.get(cidSeries, cid).getSig();
+    String getMessageSig(int channel, int cidSeries, int cid) {
+        if (recMsg[channel].contains(cidSeries, cid)) {
+            return recMsg[channel].get(cidSeries, cid).getSig();
         }
         return null;
     }
 
-    public Data nonBlockingDeliver(int cidSeries, int cid) {
-        if (recMsg.contains(cidSeries, cid)) {
-            return recMsg.get(cidSeries, cid);
-        }
-        return null;
-    }
+//    public Data nonBlockingDeliver(int cidSeries, int cid) {
+//        if (recMsg.contains(cidSeries, cid)) {
+//            return recMsg.get(cidSeries, cid);
+//        }
+//        return null;
+//    }
 
     private Data setFastModeData(Data curr, Data next) throws InvalidProtocolBufferException {
         Block currBlock = Block.parseFrom(curr.getData());

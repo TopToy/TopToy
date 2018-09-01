@@ -1,8 +1,9 @@
 title = "configuration"
 
 [system]
-    n = 4
-    f = 1
+    n = 1
+    f = 0
+    g = 1
 
 
 [setting]
@@ -11,7 +12,7 @@ title = "configuration"
     rmfBbcConfigPath = "src/main/resources/bbcConfig"
     panicRBroadcastConfigPath = "src/main/resources/panicRBConfig"
     syncRBroadcastConfigPath = "src/main/resources/syncRBConfig"
-    maxTransactionInBlock = 1000
+    maxTransactionInBlock = 2
     caRootPath = ""
     fastMode = true
 
@@ -26,31 +27,15 @@ title = "configuration"
     publicKey = """MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
                     N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
 
-    TlsPrivKeyPath = "src/main/resources/sslConfig/server.pem"
-    TlsCertPath = "src/main/resources/sslConfig/server.crt"
+    TlsPrivKeyPath = "src/main/resources/sslConfig/key.pem"
+    TlsCertPath = "src/main/resources/sslConfig/cert.pem"
 [[cluster]]
 
     [cluster.s0]
         id = 0
-        ip = "10.10.43.55"
-        rmfPort = 30000
+        ip = "127.0.0.1"
         publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
                        N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
-    [cluster.s1]
-        id = 1
-        ip = "10.10.43.57"
-        rmfPort = 30010
-        publicKey = """MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
-                        N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
-    [cluster.s2]
-        id = 2
-        ip = "10.10.43.56"
-        rmfPort = 30020
-        publicKey = """MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
-                        N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
-    [cluster.s3]
-        id = 3
-        ip = "10.10.43.58"
-        rmfPort = 30030
-        publicKey="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
-                      N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+        [[SG]]
+            [SG.c0]
+                port = 20000

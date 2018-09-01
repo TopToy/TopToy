@@ -49,10 +49,10 @@ public class rmfTest {
         for (int id = 0 ; id < nnodes ; id++) {
             logger.info("init server #" + id);
             if (ArrayUtils.contains(byzIds, id)) {
-                ret[id] = new ByzantineRmfNode(0, id, localHost, rmfPorts[id], f,  currentNodes, configHome);
+                ret[id] = new ByzantineRmfNode(1, id, localHost, rmfPorts[id], f,  currentNodes, configHome);
                 continue;
             }
-            ret[id] =  new RmfNode(0, id, localHost, rmfPorts[id], f, currentNodes, configHome);
+            ret[id] =  new RmfNode(1, id, localHost, rmfPorts[id], f, currentNodes, configHome);
         }
         return ret;
 
@@ -76,8 +76,8 @@ public class rmfTest {
         Node[] rn = initLocalRmfNodes( 1, 0, SingleServerconfigHome, null);
         ((RmfNode) rn[0]).start();
         String msg = "hello world";
-        ((RmfNode) rn[0]).broadcast(cidSeires, cid, msg.getBytes(), 0);
-        assertEquals(msg, new String(((RmfNode) rn[0]).deliver(cidSeires, cid, 0, 0, 10 * 60 * 1000, null)[0]));
+        ((RmfNode) rn[0]).broadcast(0, cidSeires, cid, msg.getBytes(), 0);
+        assertEquals(msg, new String(((RmfNode) rn[0]).deliver(0, cidSeires, cid, 0, 0, 10 * 60 * 1000, null)[0]));
         ((RmfNode) rn[0]).stop();
 
     }
@@ -101,14 +101,14 @@ public class rmfTest {
         }
         int height = 0;
         String msg = "Hello";
-        ((RmfNode) allNodes[0]).broadcast(0, 0, msg.getBytes(), 0);
+        ((RmfNode) allNodes[0]).broadcast(0, 0, 0, msg.getBytes(), 0);
         String[] ret = new String[4];
         Thread[] tasks = new Thread[4];
         for (int i = 0 ; i < nnodes ; i++) {
             int finalI = i;
             tasks[i] = new Thread(()-> {
                 try {
-                    ret[finalI] = new String(((RmfNode) allNodes[finalI]).deliver(0, 0, height, 0, 1000, null)[0]);
+                    ret[finalI] = new String(((RmfNode) allNodes[finalI]).deliver(0, 0, 0, height, 0, 1000, null)[0]);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -148,7 +148,7 @@ public class rmfTest {
         }
         for (int k = 0 ; k < 100 ; k++) {
             String msg = "Hello" + k;
-            ((RmfNode) allNodes[k % 4]).broadcast(cidSeires, k, msg.getBytes(), k);
+            ((RmfNode) allNodes[k % 4]).broadcast(0, cidSeires, k, msg.getBytes(), k);
             String[] ret = new String[4];
             Thread[] tasks = new Thread[4];
             for (int i = 0 ; i < nnodes ; i++) {
@@ -156,7 +156,7 @@ public class rmfTest {
                 int finalK = k;
                 tasks[i] = new Thread(()-> {
                     try {
-                        ret[finalI] = new String(((RmfNode) allNodes[finalI]).deliver(cidSeires, finalK, finalK,
+                        ret[finalI] = new String(((RmfNode) allNodes[finalI]).deliver(0, cidSeires, finalK, finalK,
                                 finalK % 4, 1* 1000, null)[0]);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
@@ -203,7 +203,7 @@ public class rmfTest {
             tasks[i] = new Thread(()-> {
                 byte[] res = new byte[0];
                 try {
-                    res = ((RmfNode) allNodes[finalI]).deliver(0, 0, height, 0, 1000,
+                    res = ((RmfNode) allNodes[finalI]).deliver(0, 0, 0, height, 0, 1000,
                             null)[0];
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -250,7 +250,7 @@ public class rmfTest {
         List<Integer> ids = new ArrayList<Integer>();
         ids.add(1);
         ids.add(2);
-        ((ByzantineRmfNode) allNodes[0]).selectiveBroadcast(0, 0, msg.getBytes(), 0, ids);
+        ((ByzantineRmfNode) allNodes[0]).selectiveBroadcast(0, 0, 0, msg.getBytes(), 0, ids);
         String[] ret = new String[4];
         Thread[] tasks = new Thread[4];
         for (int i = 0 ; i < nnodes ; i++) {
@@ -259,7 +259,7 @@ public class rmfTest {
                 tasks[i] = new Thread(()-> {
                     byte[] res = new byte[0];
                     try {
-                        res = ((ByzantineRmfNode) allNodes[finalI]).deliver(0, 0, height, 0, 1000,
+                        res = ((ByzantineRmfNode) allNodes[finalI]).deliver(0, 0, 0, height, 0, 1000,
                                 null)[0];
                     } catch (InterruptedException e) {
                         e.printStackTrace();
@@ -271,7 +271,7 @@ public class rmfTest {
                 tasks[i] = new Thread(()-> {
                     byte[] res = new byte[0];
                     try {
-                        res = ((RmfNode) allNodes[finalI]).deliver(0, 0, height, 0, 1000,
+                        res = ((RmfNode) allNodes[finalI]).deliver(0, 0, 0, height, 0, 1000,
                                 null)[0];
                     } catch (InterruptedException e) {
                         e.printStackTrace();
@@ -326,7 +326,7 @@ public class rmfTest {
         ids.add(2);
         for (int k = 0 ; k < 100 ; k++) {
             String msg = "Hello" + k;
-            ((ByzantineRmfNode) allNodes[0]).selectiveBroadcast(0, k, msg.getBytes(), k, ids);
+            ((ByzantineRmfNode) allNodes[0]).selectiveBroadcast(0, 0, k, msg.getBytes(), k, ids);
 //        sender.act((RmfNode) allNodes[0]);
             String[] ret = new String[4];
             Thread[] tasks = new Thread[4];
@@ -337,7 +337,7 @@ public class rmfTest {
                     tasks[i] = new Thread(()-> {
                         byte[] res = new byte[0];
                         try {
-                            res = ((ByzantineRmfNode) allNodes[finalI]).deliver(0, finalK, finalK, 0, 1000,
+                            res = ((ByzantineRmfNode) allNodes[finalI]).deliver(0, 0, finalK, finalK, 0, 1000,
                                     null)[0];
                         } catch (InterruptedException e) {
                             e.printStackTrace();
@@ -350,7 +350,7 @@ public class rmfTest {
                     tasks[i] = new Thread(()-> {
                         byte[] res = new byte[0];
                         try {
-                            res = ((RmfNode) allNodes[finalI]).deliver(0, finalK1, finalK1, 0, 1000,
+                            res = ((RmfNode) allNodes[finalI]).deliver(0, 0, finalK1, finalK1, 0, 1000,
                                     null)[0];
                         } catch (InterruptedException e) {
                             e.printStackTrace();
@@ -391,9 +391,9 @@ public class rmfTest {
             }
             if (i % 4 == node.getID()) {
                 String msg = "hello" + i;
-                node.broadcast(0, i, msg.getBytes(), i);
+                node.broadcast(0, 0, i, msg.getBytes(), i);
             }
-            byte[] ret = node.deliver(0, i, i, i % 4, 1000,
+            byte[] ret = node.deliver(0, 0, i, i, i % 4, 1000,
                     null)[0];
             res[i] = (ret == null ? null : new String(ret));
             if (i == 99) {
