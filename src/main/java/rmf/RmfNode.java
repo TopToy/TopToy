@@ -17,9 +17,10 @@ public class RmfNode extends Node{
     protected boolean stopped = false;
     RmfService rmfService;
 
-    public RmfNode(int channels, int id, String addr, int rmfPort, int f , ArrayList<Node> nodes, String bbcConfig) {
+    public RmfNode(int channels, int id, String addr, int rmfPort, int f , ArrayList<Node> nodes, String bbcConfig,
+                   String serverCrt, String serverPrivKey, String caRoot) {
         super(addr, rmfPort,  id);
-        rmfService = new RmfService(channels, id, f, nodes, bbcConfig);
+        rmfService = new RmfService(channels, id, f, nodes, bbcConfig, serverCrt, serverPrivKey, caRoot);
     }
 
 //    public RmfNode(int channel, int id, String addr, int rmfPort, int f , ArrayList<Node> nodes, bbcService bbc) {

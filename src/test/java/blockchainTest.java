@@ -2,6 +2,7 @@ import blockchain.asyncBcServer;
 import blockchain.cbcServer;
 import blockchain.byzantineBcServer;
 
+import config.Config;
 import config.Node;
 import org.apache.commons.lang.ArrayUtils;
 import org.junit.jupiter.api.Test;
@@ -66,11 +67,13 @@ public class blockchainTest {
             logger.info("init server #" + id);
             if (ArrayUtils.contains(byzIds, id)) {
                 ret[id] = new byzantineBcServer(localHost, rmfPorts[id], id, 0, f, 1000, 100,
-                        1, true, currentNodes, bbcConfig, panicConfig, syncConfig);
+                        1, true, currentNodes, bbcConfig, panicConfig, syncConfig,
+                        Config.getServerCrtPath(), Config.getServerTlsPrivKeyPath(), Config.getCaRootPath());
                 continue;
             }
             ret[id] =  new cbcServer(localHost, rmfPorts[id], id, 0, f, 1000, 100,
-                    1, true, currentNodes, bbcConfig, panicConfig, syncConfig);
+                    1, true, currentNodes, bbcConfig, panicConfig, syncConfig,
+                    Config.getServerCrtPath(), Config.getServerTlsPrivKeyPath(), Config.getCaRootPath());
         }
         return ret;
         //        n.start();
@@ -86,12 +89,14 @@ public class blockchainTest {
         for (int id = 0 ; id < nnodes ; id++) {
             if (ArrayUtils.contains(byzIds, id)) {
                 ret[id] = new byzantineBcServer(localHost, rmfPorts[id], id, 0, f, 1000, 100,
-                        1, true, currentNodes, bbcConfig, panicConfig, syncConfig);
+                        1, true, currentNodes, bbcConfig, panicConfig, syncConfig,
+                        Config.getServerCrtPath(), Config.getServerTlsPrivKeyPath(), Config.getCaRootPath());
                 continue;
             }
             logger.info("init server #" + id);
             ret[id] =  new asyncBcServer(localHost, rmfPorts[id], id, 0, f, 1000, 100,
-                    1, true, currentNodes, bbcConfig, panicConfig, syncConfig);
+                    1, true, currentNodes, bbcConfig, panicConfig, syncConfig,
+                    Config.getServerCrtPath(), Config.getServerTlsPrivKeyPath(), Config.getCaRootPath());
         }
         return ret;
         //        n.start();

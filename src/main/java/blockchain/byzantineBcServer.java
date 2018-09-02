@@ -31,12 +31,13 @@ public class byzantineBcServer extends bcServer {
 
     public byzantineBcServer(String addr, int rmfPort, int id, int channel, int f, int tmo, int tmoInterval,
                              int maxTx, boolean fastMode, ArrayList<Node> cluster,
-                             String bbcConfig, String panicConfig, String syncConfig) {
+                             String bbcConfig, String panicConfig, String syncConfig,
+                             String serverCrt, String serverPrivKey, String caRoot) {
         super(addr, rmfPort, id, channel, f, tmo, tmoInterval, maxTx, fastMode, cluster,
-                bbcConfig, panicConfig, syncConfig);
-        rmfServer.stop(); //TODO: May cause a problem
+                bbcConfig, panicConfig, syncConfig, serverCrt, serverPrivKey, caRoot);
+        rmfServer.stop();
         rmfServer = new ByzantineRmfNode(1, id, addr, rmfPort, Config.getF(),
-                cluster, bbcConfig);
+                cluster, bbcConfig, serverCrt, serverPrivKey, caRoot);
         groups.add(new ArrayList<>());
         for (int i = 0 ; i < n ; i++) {
             groups.get(0).add(i); // At the beginning there is no byzantine behaviour

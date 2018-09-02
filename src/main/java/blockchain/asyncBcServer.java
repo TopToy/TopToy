@@ -23,9 +23,10 @@ public class asyncBcServer extends bcServer {
     }
     public asyncBcServer(String addr, int rmfPort, int id, int channel, int f, int tmo, int tmoInterval,
                          int maxTx, boolean fastMode, ArrayList<Node> cluster,
-                         String bbcConfig, String panicConfig, String syncConfig) {
+                         String bbcConfig, String panicConfig, String syncConfig,
+                         String serverCrt, String serverPrivKey, String caRoot) {
         super(addr, rmfPort,  id, channel, f, tmo, tmoInterval, maxTx, fastMode, cluster,
-                bbcConfig, panicConfig, syncConfig);
+                bbcConfig, panicConfig, syncConfig, serverCrt, serverPrivKey, caRoot);
     }
 
     byte[] leaderImpl() throws InterruptedException {

@@ -18,7 +18,7 @@ public class Config {
         String SYSTEM_KEY = "system";
         String SYSTEM_N_KEY = "system.n";
         String SYSTEM_F_KEY = "system.f";
-        String SYSTEM_G_KEY = "system.g";
+        String SYSTEM_C_KEY = "system.g";
         String SERVER_KEY = "server";
         String SERVER_ID_KEY = "server.id";
         String SERVER_IP_KEY = "server.ip";
@@ -100,30 +100,23 @@ public class Config {
         return node.getString("ip");
     }
 
-    public static int getPort(int channel, int id) {
+    public static int getPort( int id) {
         Toml t = conf.getTables(tKeys.RMFCLUSTER_KEY).get(0);
-        Toml c = t.getTable("s" + id)
-                .getTables("SG")
-                .get(0)
-                .getTable("c" + id);
-        return Math.toIntExact(c.getLong("port"));
+        Toml node = t.getTable("s" + id);
+        return Math.toIntExact(node.getLong("port"));
     }
 
-    public static int getG() {
-        return Math.toIntExact(conf.getLong(tKeys.SYSTEM_G_KEY));
+    public static int getC() {
+        return Math.toIntExact(conf.getLong(tKeys.SYSTEM_C_KEY));
     }
 
-    public static ArrayList<Node> getCluster(int channel) {
+    public static ArrayList<Node> getCluster() {
         Toml t = conf.getTables(tKeys.RMFCLUSTER_KEY).get(0);
         ArrayList<Node> ret = new ArrayList<>();
         for (int i = 0 ; i < getN() ; i++) {
             Toml node = t.getTable("s" + i);
             ret.add(new Node(node.getString("ip"),
-                    Math.toIntExact(node
-                            .getTables("SG")
-                            .get(0)
-                            .getTable("c" + channel)
-                            .getLong("port")),
+                    Math.toIntExact(node.getLong("port")),
                     Math.toIntExact(node.getLong("id"))));
         }
         return ret;

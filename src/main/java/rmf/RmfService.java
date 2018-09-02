@@ -155,7 +155,8 @@ public class RmfService extends RmfGrpc.RmfImplBase {
 //        startGrpcServer();
 //    }
 
-    public RmfService(int channels, int id, int f, ArrayList<Node> nodes, String bbcConfig) {
+    public RmfService(int channels, int id, int f, ArrayList<Node> nodes, String bbcConfig,
+                      String serverCrt, String serverPrivKey, String caRoot) {
         this.channels = channels;
         this.globalLock = new Object[channels];
         this.bbcConfig = bbcConfig;
@@ -179,11 +180,11 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             fastBbcCons[i] = HashBasedTable.create();
             regBbcCons[i] = HashBasedTable.create();
         }
-        startGrpcServer();
+        startGrpcServer(serverCrt, serverPrivKey, caRoot);
     }
 
 
-    private void startGrpcServer() {
+    private void startGrpcServer(String serverCrt, String serverPrivKey, String caRoot) {
         try {
 //            rmfServer = ServerBuilder.forPort(nodes.get(id).getRmfPort())
 //                    .addService(this)
@@ -191,8 +192,8 @@ public class RmfService extends RmfGrpc.RmfImplBase {
 //                    .start();
             rmfServer = NettyServerBuilder.
                     forPort(nodes.get(id).getRmfPort()).
-                    sslContext(sslUtils.buildSslContextForServer(Config.getServerCrtPath(),
-                            Config.getCaRootPath(), Config.getServerTlsPrivKeyPath())).
+                    sslContext(sslUtils.buildSslContextForServer(serverCrt,
+                            caRoot, serverPrivKey)).
                     addService(this).
                     intercept(new authInterceptor()).
                     build().

@@ -1,6 +1,7 @@
 import blockchain.asyncBcServer;
 import blockchain.byzantineBcServer;
 import blockchain.cbcServer;
+import config.Config;
 import config.Node;
 import org.apache.commons.lang.ArrayUtils;
 import org.junit.jupiter.api.Test;
@@ -79,11 +80,13 @@ public class sgTest {
             logger.info("init server #" + id);
             if (ArrayUtils.contains(byzIds, id)) {
                 ret[id] = new sg(localHost, ports[id], id, f, g, 1000,
-                        100, 1, true, cluster, bbcConfig, panicConfig, syncConfig, "b");
+                        100, 1, true, cluster, bbcConfig, panicConfig, syncConfig, "b",
+                        Config.getServerCrtPath(), Config.getServerTlsPrivKeyPath(), Config.getCaRootPath());
                 continue;
             }
             ret[id] = new sg(localHost, ports[id], id,f, g, 1000,
-                    100, 1, true, cluster, bbcConfig, panicConfig, syncConfig, "r");
+                    100, 1, true, cluster, bbcConfig, panicConfig, syncConfig, "r",
+                    Config.getServerCrtPath(), Config.getServerTlsPrivKeyPath(), Config.getCaRootPath());
         }
         return ret;
         //        n.start();
@@ -102,11 +105,13 @@ public class sgTest {
             logger.info("init server #" + id);
             if (ArrayUtils.contains(byzIds, id)) {
                 ret[id] = new sg(localHost, ports[id], id,f, g, 1000,
-                        100, 1, true, cluster, bbcConfig, panicConfig, syncConfig, "b");
+                        100, 1, true, cluster, bbcConfig, panicConfig, syncConfig, "b",
+                        Config.getServerCrtPath(), Config.getServerTlsPrivKeyPath(), Config.getCaRootPath());
                 continue;
             }
             ret[id] = new sg(localHost, ports[id], id,f, g, 1000,
-                    100, 1, true, cluster, bbcConfig, panicConfig, syncConfig, "a");
+                    100, 1, true, cluster, bbcConfig, panicConfig, syncConfig, "a",
+                    Config.getServerCrtPath(), Config.getServerTlsPrivKeyPath(), Config.getCaRootPath());
         }
         return ret;
     }

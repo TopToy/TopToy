@@ -31,7 +31,7 @@ public class sg {
 
     final blockchain bc;
     int id;
-    int g;
+    int c;
     String type;
     int lastChannel = 0;
     boolean stopped = false;
@@ -44,36 +44,36 @@ public class sg {
     });
 
 
-    public sg(String addr, int port, int id, int f, int g, int tmo, int tmoInterval,
+    public sg(String addr, int port, int id, int f, int c, int tmo, int tmoInterval,
               int maxTx, boolean fastMode, ArrayList<Node> cluster, String bbcConfig, String panicConfig,
-              String syncConfig, String type) {
-        this.group = new bcServer[g];
+              String syncConfig, String type,  String serverCrt, String serverPrivKey, String caRoot) {
+        this.c = c;
+        this.group = new bcServer[c];
         this.id = id;
-        this.g = g;
         if (type.equals("r") || type.equals("a")) {
-            rmf = new RmfNode(g, id, addr, port, f, cluster, bbcConfig);
+            rmf = new RmfNode(c, id, addr, port, f, cluster, bbcConfig, serverCrt, serverPrivKey, caRoot);
         }
         if (type.equals("b")) {
-            rmf = new ByzantineRmfNode(g, id, addr, port, f, cluster, bbcConfig);
+            rmf = new ByzantineRmfNode(c, id, addr, port, f, cluster, bbcConfig, serverCrt, serverPrivKey, caRoot);
         }
         deliverFork = new RBrodcastService(id, panicConfig);
         sync = new RBrodcastService(id, syncConfig);
         this.type = type;
         // TODO: Apply to more types
         if (type.equals("r")) {
-            for (int i = 0 ; i < g ; i++) {
+            for (int i = 0 ; i < c ; i++) {
                 group[i] = new cbcServer(addr, port, id, i, f, tmo, tmoInterval, maxTx,
                         fastMode, cluster, rmf, deliverFork, sync);
             }
         }
         if (type.equals("b")) {
-            for (int i = 0 ; i < g ; i++) {
+            for (int i = 0 ; i < c ; i++) {
                 group[i] = new byzantineBcServer(addr, port, id, i, f, tmo, tmoInterval, maxTx,
                         fastMode, cluster, rmf, deliverFork, sync);
             }
         }
         if (type.equals("a")) {
-            for (int i = 0 ; i < g ; i++) {
+            for (int i = 0 ; i < c ; i++) {
                 group[i] = new asyncBcServer(addr, port, id, i, f, tmo, tmoInterval, maxTx,
                         fastMode, cluster, rmf, deliverFork, sync);
             }
@@ -85,7 +85,7 @@ public class sg {
         int currChannel = 0;
         int currBlock = 0;
         while (!stopped) {
-            for (currChannel = 0 ; currChannel < g ; currChannel++) {
+            for (currChannel = 0 ; currChannel < c ; currChannel++) {
                 Types.Block cBlock = group[currChannel].deliver(currBlock);
                 cBlock = cBlock.toBuilder()
                         .setHeader(cBlock.getHeader().toBuilder()
@@ -118,7 +118,7 @@ public class sg {
             latch.countDown();
         }).run();
         latch.await();
-        for (int i = 0 ; i < g ; i++) {
+        for (int i = 0 ; i < c ; i++) {
             group[i].start(true);
         }
     }
@@ -131,7 +131,7 @@ public class sg {
         } catch (InterruptedException e) {
             logger.error(format("G-%d", id), e);
         }
-        for (int i = 0 ; i < g ; i++) {
+        for (int i = 0 ; i < c ; i++) {
             group[i].shutdown(true);
             logger.debug(format("G-%d shutdown channel %d", id, i));
         }
@@ -146,7 +146,7 @@ public class sg {
     }
 
     public void serve() {
-        for (int i = 0 ; i < g ; i++) {
+        for (int i = 0 ; i < c ; i++) {
             group[i].serve();
         }
         deliverThread.start();
@@ -154,12 +154,12 @@ public class sg {
 
     public String addTransaction(byte[] data, int clientID) {
         String ret = group[lastChannel].addTransaction(data, clientID);
-        lastChannel = (lastChannel + 1) % g;
+        lastChannel = (lastChannel + 1) % c;
         return ret;
     }
 
     public int isTxPresent(String txID) {
-        for (int i = 0 ; i < g ; i++) {
+        for (int i = 0 ; i < c ; i++) {
             int ret = group[i].isTxPresent(txID);
             if (ret != -1) return ret;
         }
@@ -189,7 +189,7 @@ public class sg {
             logger.debug(format("G-%d Unable to set byzantine behaviour to non byzantine node", id));
             return;
         }
-        for (int i = 0 ; i < g ; i++) {
+        for (int i = 0 ; i < c ; i++) {
             ((byzantineBcServer) group[i]).setByzSetting(fullByz, groups);
         }
     }
@@ -199,9 +199,13 @@ public class sg {
             logger.debug(format("G-%d Unable to set async behaviour to non async node", id));
             return;
         }
-        for (int i = 0 ; i < g ; i++) {
+        for (int i = 0 ; i < c ; i++) {
             ((asyncBcServer) group[i]).setAsyncParam(maxTime);
         }
+    }
+
+    public int getBCSize() {
+        return bc.getHeight() + 1;
     }
 
 }

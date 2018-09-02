@@ -86,13 +86,14 @@ public abstract class bcServer extends Node {
 
     public bcServer(String addr, int rmfPort, int id, int channel, int f, int tmo, int tmoInterval,
                     int maxTx, boolean fastMode, ArrayList<Node> cluster,
-                    String bbcConfig, String panicConfig, String syncConfig) {
+                    String bbcConfig, String panicConfig, String syncConfig,
+                    String serverCrt, String serverPrivKey, String caRoot) {
 
         super(addr, rmfPort, id);
         this.f = f;
         this.n = 3*f + 1;
         rmfServer = new RmfNode(1, id, addr, rmfPort, f,
-               cluster, bbcConfig);
+               cluster, bbcConfig, serverCrt, serverPrivKey, caRoot);
         panicRB = new RBrodcastService(id, panicConfig);
         syncRB = new RBrodcastService(id, syncConfig);
         bc = initBC(id);
