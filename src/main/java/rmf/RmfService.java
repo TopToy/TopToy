@@ -255,7 +255,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
     private void bbcMissedConsensus(int channel) throws InterruptedException {
         while (!stopped) {
             Thread.sleep(200);
-            synchronized (fastBbcCons) {
+            synchronized (fastBbcCons[channel]) {
                 if (fastBbcCons[channel].rowKeySet().isEmpty()) {
 //                    logger.debug(format("[#%d] There are no fast bbc", id));
                     continue;
@@ -410,7 +410,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         int cidSeries = request.getMeta().getCidSeries();
         int channel = request.getMeta().getChannel();
         synchronized (globalLock[channel]) {
-            synchronized (fastBbcCons) {
+            synchronized (fastBbcCons[channel]) {
                 if (fastBbcCons[channel].contains(cidSeries, cid) || regBbcCons[channel].contains(cidSeries, cid)) return;
             }
             addToPendings(request);
@@ -425,7 +425,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         int channel = request.getM().getChannel();
         synchronized (globalLock[channel]) {
             if (regBbcCons[channel].contains(cidSeries, cid)) return;
-            synchronized (fastBbcCons) {
+            synchronized (fastBbcCons[channel]) {
                 if (fastBbcCons[channel].contains(cidSeries, cid)) return; // Against byzantine activity
             }
             if (!fVotes[channel].contains(cidSeries, cid)) {
@@ -451,7 +451,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             }
             if (fVotes[channel].get(cidSeries, cid).voters.size() == n) {
                 logger.debug(format("[#%d-C[%d]] fastVote has been detected [cidSeries=%d ; cid=%d]", id, channel, cidSeries, cid));
-                synchronized (fastBbcCons) {
+                synchronized (fastBbcCons[channel]) {
                     fastBbcCons[channel].put(cidSeries, cid, fVotes[channel].get(cidSeries, cid).dec.setDecosion(1).build());
                 }
                 bbcService.updateFastVote(fVotes[channel].get(cidSeries, cid).dec.build());
