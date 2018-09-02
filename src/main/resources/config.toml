@@ -1,18 +1,18 @@
 title = "configuration"
 
 [system]
-    n = 1
-    f = 0
-    c = 20
+    n = 4
+    f = 1
+    c = 2
 
 
 [setting]
-    tmo = 1000
+    tmo = 200
     tmoInterval = 100
     rmfBbcConfigPath = "src/main/resources/bbcConfig"
     panicRBroadcastConfigPath = "src/main/resources/panicRBConfig"
     syncRBroadcastConfigPath = "src/main/resources/syncRBConfig"
-    maxTransactionInBlock = 100
+    maxTransactionInBlock = 1000
     caRootPath = ""
     fastMode = true
 
@@ -34,6 +34,24 @@ title = "configuration"
     [cluster.s0]
         id = 0
         ip = "127.0.0.1"
-        port = 20000
+        port = 30000
         publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
                        N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    [cluster.s1]
+        id = 1
+        ip = "127.0.0.1"
+        port = 30010
+        publicKey = """MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                        N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    [cluster.s2]
+        id = 2
+        ip = "127.0.0.1"
+        port = 30020
+        publicKey = """MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                        N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    [cluster.s3]
+        id = 3
+        ip = "127.0.0.1"
+        port = 30030
+        publicKey="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                      N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""

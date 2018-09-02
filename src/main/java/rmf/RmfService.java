@@ -158,7 +158,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
     public RmfService(int channels, int id, int f, ArrayList<Node> nodes, String bbcConfig,
                       String serverCrt, String serverPrivKey, String caRoot) {
         this.channels = channels;
-        this.globalLock = new Object[channels];
+//        this.globalLock = new Object[channels];
         this.bbcConfig = bbcConfig;
         this.fVotes = new HashBasedTable[channels];
         this.pendingMsg =  new HashBasedTable[channels];
@@ -173,7 +173,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         this.regBbcCons = new HashBasedTable[channels];
         this.bbcMissedConsensusThreads = new Thread[channels];
         for (int i = 0 ; i < channels ; i++) {
-            globalLock[i] = new Object();
+//            globalLock[i] = new Object();
             recMsg[i] = HashBasedTable.create();
             pendingMsg[i] = HashBasedTable.create();
             fVotes[i] = HashBasedTable.create();
@@ -404,7 +404,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
           if (recMsg[channel].contains(cidSeries, cid)) return;
         }
         synchronized (pendingMsg[channel]) {
-        if (pendingMsg[channel].contains(cidSeries, cid) return;
+        if (pendingMsg[channel].contains(cidSeries, cid)) return;
         pendingMsg[channel].put(cidSeries, cid, request);
         logger.debug(format("[#%d-C[%d]] has received data message from [%d], [cidSeries=%d ; cid=%d]", id, channel,
                 sender, cidSeries, cid));
@@ -474,6 +474,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         Data msg;
         int cid = request.getMeta().getCid();
         int cidSeries = request.getMeta().getCidSeries();
+        int channel = request.getMeta().getChannel();
         synchronized (recMsg[channel]) {
             msg = recMsg[channel].get(cidSeries, cid);
         }
@@ -511,7 +512,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         long estimatedTime;
         synchronized (pendingMsg[channel]) {
             if (!pendingMsg[channel].contains(cidSeries, cid)) {
-                pendingMsg.wait(tmo);
+                pendingMsg[channel].wait(tmo);
             }
             estimatedTime = System.currentTimeMillis() - startTime;
             logger.debug(format("[#%d-C[%d]] have waited [%d] ms for data msg", id, channel, estimatedTime));
@@ -550,8 +551,8 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             }
             if (cVotes < n) {
                 startTime = System.currentTimeMillis();
-                globalLock.wait(Math.max(tmo - estimatedTime, 1));
-                long startFbbc = System.currentTimeMillis();
+//                globalLock.wait(Math.max(tmo - estimatedTime, 1));
+//                long startFbbc = System.currentTimeMillis();
                 while (cVotes < n && estimatedTime < tmo) {
                   fVotes[channel].wait(Math.max(tmo - estimatedTime, 1));
                   if (fVotes[channel].contains(cidSeries, cid)) {
@@ -561,8 +562,8 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                   if (cVotes == n) {
                       logger.debug(format("[#%d] deliver by fast vote [cidSeries=%d ; cid=%d]", id, cidSeries, cid));
                   } else {
-                      synchronized (regBbcCons) {
-                          regBbcCons.put(cidSeries, cid, BbcDecision.getDefaultInstance());
+                      synchronized (regBbcCons[channel]) {
+                          regBbcCons[channel].put(cidSeries, cid, BbcDecision.getDefaultInstance());
                       }
                   }
                 }
@@ -585,12 +586,8 @@ public class RmfService extends RmfGrpc.RmfImplBase {
 //                logger.debug(format("#(2)# have waited for more [%d] ms for fast bbc", System.currentTimeMillis() - startTime));
 //            }
 
-            if (fVotes.contains(cidSeries, cid)) {
-                cVotes = fVotes.get(cidSeries, cid).voters.size();
-            }
-
         if (cVotes < n) {
-            synchronized (pendingMs[channel]]) {
+            synchronized (pendingMsg[channel]) {
                 if (pendingMsg[channel].contains(cidSeries, cid) &&
                         pendingMsg[channel].get(cidSeries, cid).getMeta().getSender() == sender) { // &&
                     //   pendingMsg.get(cidSeries, cid).getMeta().getHeight() == height) {
