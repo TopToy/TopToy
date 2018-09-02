@@ -2,6 +2,7 @@ package app;
 import blockchain.asyncBcServer;
 import blockchain.byzantineBcServer;
 import com.google.protobuf.ByteString;
+import config.Config;
 import crypto.rmfDigSig;
 import org.apache.commons.cli.*;
 import proto.Types;
@@ -18,6 +19,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import static java.lang.Math.min;
+import static java.lang.StrictMath.max;
 import static java.lang.String.format;
 
 public class cli {
@@ -254,17 +257,19 @@ public class cli {
                 f.createNewFile();
                 FileWriter writer = new FileWriter(path.toString());
                 int nob = JToy.server.getBCSize();
-                long fts = -1;
-                long lts = -1;
+                long fts = 0;
+                long lts = 0;
                 int tCount = 0;
                 for (int i = 0 ; i < nob ; i++) {
                     Types.Block b = JToy.server.nonBlockingDeliver(i);
                     for (Types.Transaction t : b.getDataList()) {
-                        tCount++;
-                        if (fts == -1) {
+                        if (fts == 0) {
                             fts = b.getFooter().getTs();
+                            lts = fts;
                         }
-                        lts = b.getFooter().getTs();
+                        fts = min(fts, b.getFooter().getTs());
+                        lts = max(lts, b.getFooter().getTs());
+                        tCount++;
                         List<String> row = Arrays.asList(t.getTxID(),
                                 String.valueOf(t.getClientID()), String.valueOf(b.getFooter().getTs()),
                                 String.valueOf(t.getData().size()), String.valueOf(i),
@@ -291,8 +296,9 @@ public class cli {
             double time = ((double) lts - (double) fts) / 1000;
             int thrp = (int) (tCount / time);
             DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy-HH:mm:ss");
-            List<String> row = Arrays.asList(dateFormat.format(new Date()), String.valueOf(JToy.server.getID()), String.valueOf(tCount),
-                    String.valueOf(time), String.valueOf(thrp));
+            List<String> row = Arrays.asList(dateFormat.format(new Date()), String.valueOf(JToy.server.getID()),
+                    String.valueOf(Config.getC()), String.valueOf(Config.getMaxTransactionsInBlock()),
+                    String.valueOf(tCount), String.valueOf(time), String.valueOf(thrp));
             CSVUtils.writeLine(writer, row);
             writer.flush();
             writer.close();

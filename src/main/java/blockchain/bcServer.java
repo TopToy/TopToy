@@ -249,7 +249,7 @@ public abstract class bcServer extends Node {
 ////                            .setProof(msgSign)
 //                            .build())
 //                    .build();
-                Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+//                Timestamp timestamp = new Timestamp(System.currentTimeMillis());
                 recBlock = recBlock
                         .toBuilder()
                         .setFooter(recBlock.hasFooter() ?
@@ -257,12 +257,12 @@ public abstract class bcServer extends Node {
                                         .getFooter()
                                         .toBuilder()
                                         .setRmfProof(msgSign)
-                                        .setTs(timestamp.getTime())
+//                                        .setTs(timestamp.getTime())
                                         .build()
                                         : BlockFooter
                                         .newBuilder()
                                         .setRmfProof(msgSign)
-                                        .setTs(timestamp.getTime())
+//                                        .setTs(timestamp.getTime())
                                         .build())
                         .build();
                 if (currLeader == getID()) {

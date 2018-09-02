@@ -22,7 +22,6 @@ public class JToy {
     static sg server; // = new cbcServer(Config.getAddress(), Config.getPort(), Config.getID());
     static String type;
     public static void main(String argv[]) {
-        new Config();
         Path config = null;
         if (argv.length == 3) {
             config = Paths.get(argv[2]);

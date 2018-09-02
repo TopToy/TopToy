@@ -18,7 +18,7 @@ public class Config {
         String SYSTEM_KEY = "system";
         String SYSTEM_N_KEY = "system.n";
         String SYSTEM_F_KEY = "system.f";
-        String SYSTEM_C_KEY = "system.g";
+        String SYSTEM_C_KEY = "system.c";
         String SERVER_KEY = "server";
         String SERVER_ID_KEY = "server.id";
         String SERVER_IP_KEY = "server.ip";

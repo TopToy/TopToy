@@ -100,7 +100,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
 
         void shutdown() {
             try {
-                channel.shutdown().awaitTermination(3, TimeUnit.SECONDS);
+                channel.shutdown().awaitTermination(1, TimeUnit.SECONDS);
             } catch (InterruptedException e) {
                 logger.fatal(format("[#%d]", id), e);
             }

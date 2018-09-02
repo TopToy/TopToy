@@ -15,6 +15,7 @@ import proto.Types;
 import rmf.ByzantineRmfNode;
 import rmf.RmfNode;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -86,13 +87,18 @@ public class sg {
         int currBlock = 0;
         while (!stopped) {
             for (currChannel = 0 ; currChannel < c ; currChannel++) {
+//                Timestamp timestamp = new Timestamp(System.currentTimeMillis());
                 Types.Block cBlock = group[currChannel].deliver(currBlock);
+                if (cBlock.getDataCount() == 0) continue;
                 cBlock = cBlock.toBuilder()
                         .setHeader(cBlock.getHeader().toBuilder()
                             .setHeight(bc.getHeight() + 1)
                             .setPrev(ByteString.copyFrom(
                                 DigestMethod.hash(bc.getBlock(bc.getHeight()).getHeader().toByteArray())))
                             .build())
+                            .setFooter(cBlock.getFooter()
+                            .toBuilder()
+                            .setTs(System.currentTimeMillis()))
                         .build();
                 synchronized (bc) {
                     bc.addBlock(cBlock);
