@@ -320,7 +320,7 @@ public class cli {
 //            if (JToy.type.equals("m")) {
 //                Thread.sleep(60 * 1000);
 //            }
-            Thread.sleep(60 * 1000);
+            Thread.sleep(30 * 1000);
             stop();
             writeToScv(csvPath);
         }

@@ -15,6 +15,8 @@ import proto.Types.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Semaphore;
 
 import static java.lang.String.format;
 
@@ -25,15 +27,22 @@ public class RBrodcastService extends DefaultSingleRecoverable {
     private AsynchServiceProxy RBProxy;
     private ServiceReplica sr;
     private String configHome;
-    private final Object globalLock = new Object();
+//    private final Object globalLock = new Object();
+//    Semaphore[] notifyer;
+    Object[] cNotifyer;
     private int cid = 0;
     private boolean stopped = false;
 
-    public RBrodcastService(int id, String configHome) {
+    public RBrodcastService(int channels, int id, String configHome) {
         this.id = id;
         this.configHome = configHome;
         sr = null;
         recMsg = new HashMap<>();
+        cNotifyer = new Object[channels];
+//        notifyer = new Semaphore[channels];
+        for (int i = 0 ; i < channels ; i++) {
+            cNotifyer[i] = new Object();
+        }
     }
 
 
@@ -53,7 +62,7 @@ public class RBrodcastService extends DefaultSingleRecoverable {
     }
     public void shutdown() {
         stopped = true;
-        releaseWaiting();
+//        releaseWaiting();
         if (RBProxy != null) {
             RBProxy.close();
             logger.debug(format("[#%d] shut down rb client", id));
@@ -66,11 +75,11 @@ public class RBrodcastService extends DefaultSingleRecoverable {
         logger.info(format("[#%d] shutting down rb service", id));
     }
 
-    private void releaseWaiting() {
-        synchronized (globalLock) {
-            globalLock.notifyAll();
-        }
-    }
+//    private void releaseWaiting() {
+//        synchronized (globalLock) {
+//            globalLock.notifyAll();
+//        }
+//    }
 
     @Override
     public void installSnapshot(byte[] state) {
@@ -87,14 +96,23 @@ public class RBrodcastService extends DefaultSingleRecoverable {
     public byte[] appExecuteOrdered(byte[] command, MessageContext msgCtx) {
         try {
             RBMsg msg = RBMsg.parseFrom(command);
-            synchronized (globalLock) {
+//            synchronized (globalLock) {
                 int channel = msg.getM().getChannel();
-                if (!recMsg.containsKey(channel)) {
-                    recMsg.put(channel, new ArrayList<>());
+                synchronized (cNotifyer[channel]) {
+                    recMsg.computeIfAbsent(channel, k -> new ArrayList<>());
+//                if (!recMsg.containsKey(channel)) {
+//                    recMsg.put(channel, new ArrayList<>());
+//                }
+                    recMsg.computeIfPresent(channel, (k, v) -> {
+                        v.add(msg);
+                        cNotifyer[channel].notifyAll();
+                        return v;
+                    });
                 }
-                recMsg.get(msg.getM().getChannel()).add(msg);
-                globalLock.notifyAll();
-            }
+
+//                recMsg.get(msg.getM().getChannel()).add(msg);
+//                globalLock.notifyAll();
+//            }
         } catch (Exception e) {
             logger.error(format("[#%d]", id), e);
         }
@@ -108,14 +126,18 @@ public class RBrodcastService extends DefaultSingleRecoverable {
     }
 
     public byte[] deliver(int channel) throws InterruptedException {
-        synchronized (globalLock) {
+//        synchronized (globalLock) {
+        synchronized (cNotifyer[channel]) {
             while (!recMsg.containsKey(channel) || recMsg.get(channel).isEmpty()) {
-                globalLock.wait();
+//                globalLock.wait();
+                cNotifyer[channel].wait();
             }
+        }
+
             RBMsg msg = recMsg.get(channel).get(0);
             recMsg.get(channel).remove(0);
             return msg.getData().toByteArray();
-        }
+//        }
     }
 
 //    public void notifyOnNewBlock() throws InterruptedException {

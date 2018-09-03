@@ -15,8 +15,11 @@ import proto.Types.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Semaphore;
 
 import static java.lang.String.format;
+import static java.lang.String.valueOf;
 
 public class bbcService extends DefaultSingleRecoverable {
     class consVote {
@@ -33,23 +36,30 @@ public class bbcService extends DefaultSingleRecoverable {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(bbcService.class);
 
     private int id;
-    final Object globalLock = new Object();
+//    final Object globalLock = new Object();
+//    final Object keyLock = new Object();
+//    Semaphore[] notifyer;
+    Object[] channelNotifyer;
     private AsynchServiceProxy bbcProxy;
 
-    private final HashMap<Meta, consVote> rec;
+    private final ConcurrentHashMap<Meta, consVote> rec;
 
     private int quorumSize;
     private String configHome;
     private ServiceReplica sr;
     private boolean stopped = false;
-    private HashMap<Meta, fastVotePart> fastVote = new HashMap<>();
+    private ConcurrentHashMap<Meta, fastVotePart> fastVote = new ConcurrentHashMap<>();
 
-    public bbcService(int id, int quorumSize, String configHome) {
+    public bbcService(int channels, int id, int quorumSize, String configHome) {
         this.id = id;
-        rec = new HashMap<>();
+        rec = new ConcurrentHashMap<>();
         sr = null;
         this.quorumSize = quorumSize;
         this.configHome = configHome;
+        channelNotifyer = new Object[channels];
+        for (int i = 0 ; i < channels ; i++) {
+            channelNotifyer[i] = new Object();
+        }
     }
 
     public void start() {
@@ -66,7 +76,7 @@ public class bbcService extends DefaultSingleRecoverable {
     }
     public void shutdown() {
         stopped = true;
-        releaseWaiting();
+//        releaseWaiting();
         if (bbcProxy != null) {
             bbcProxy.close();
             logger.debug(format("[#%d] shutting down bbc client", id));
@@ -79,11 +89,11 @@ public class bbcService extends DefaultSingleRecoverable {
         logger.debug(format("[#%d] shutting down bbc service", id));
     }
 
-    private void releaseWaiting() {
-        synchronized (globalLock) {
-            globalLock.notifyAll();
-        }
-    }
+//    private void releaseWaiting() {
+//        synchronized (globalLock) {
+//            globalLock.notifyAll();
+//        }
+//    }
     @Override
     public void installSnapshot(byte[] state) {
         logger.debug(format("[#%d] installSnapshot called", id));
@@ -98,7 +108,7 @@ public class bbcService extends DefaultSingleRecoverable {
     @Override
     public byte[] appExecuteOrdered(byte[] command, MessageContext msgCtx) {
         try {
-            synchronized (globalLock) {
+//            synchronized (globalLock) {
             BbcMsg msg = BbcMsg.parseFrom(command);
             int channel = msg.getM().getChannel();
             int cidSeries = msg.getM().getCidSeries();
@@ -109,36 +119,85 @@ public class bbcService extends DefaultSingleRecoverable {
                     .setChannel(channel)
                     .build();
 //            logger.debug(format("[#%d] has received bbc message from [#%d]", id, msg.getPropserID()));
-                if (fastVote.containsKey(key) && !fastVote.get(key).done) {
-                    if (msg.getM().getSender() != id) {
+                fastVote.computeIfPresent(key, (k, v) -> {
+                    if (!v.done && msg.getM().getSender() != id) {
                         logger.debug(format("[#%d] re-participating in a consensus " +
                                 "[channel=%d ; cidSeries=%d ; cid=%d]", id, channel, cidSeries, cid));
-                        propose(fastVote.get(key).d.getDecosion(), channel, cidSeries, cid);
-                        fastVote.get(key).done = true;
+                        propose(v.d.getDecosion(), channel, cidSeries, cid);
+                        v.done = true;
                     }
-                }
-                if (!rec.containsKey(key)) {
-                    consVote v = new consVote();
-//                    v.dec.setCid(cid);
-//                    v.dec.setCidSeries(cidSeries);
-                    rec.put(key, v);
-                }
-                consVote curr = rec.get(key);
-                if (curr.proposers.contains(msg.getM().getSender())) return new byte[0];
-                if (curr.neg +  curr.pos < quorumSize) {
-                    curr.proposers.add(msg.getM().getSender());
-                    if (msg.getVote() == 1) {
-                        curr.pos++;
-                    } else {
-                        curr.neg++;
-                    }
-                    if (curr.neg + curr.pos == quorumSize) {
-                        logger.debug(format("[#%d] notifies on  [channel=%d ; cidSeries=%d ; cid=%d]", id, channel, cidSeries, cid));
-                        globalLock.notifyAll();
-                    }
-                }
+                    return v;
+                });
+//                if (fastVote.containsKey(key) && !fastVote.get(key).done) {
+//                    if (msg.getM().getSender() != id) {
+//                        logger.debug(format("[#%d] re-participating in a consensus " +
+//                                "[channel=%d ; cidSeries=%d ; cid=%d]", id, channel, cidSeries, cid));
+//                        propose(fastVote.get(key).d.getDecosion(), channel, cidSeries, cid);
+//                        fastVote.get(key).done = true;
+//                    }
+//                }
+                rec.computeIfAbsent(key, k -> new consVote());
+//                if (!rec.containsKey(key)) {
+//                    consVote v = new consVote();
+////                    v.dec.setCid(cid);
+////                    v.dec.setCidSeries(cidSeries);
+//                    rec.put(key, v);
+//                }
+            consVote vote = rec.get(key);
+            if (vote.pos + vote.neg + 1 == quorumSize) {
+                synchronized (channelNotifyer[channel]) {
+                    rec.computeIfPresent(key, (k, v) -> {
+                        if (!v.proposers.contains(msg.getM().getSender())) {
+                            if (v.neg + v.pos < quorumSize) {
+                                v.proposers.add(msg.getM().getSender());
+                                if (msg.getVote() == 1) {
+                                    v.pos++;
+                                } else {
+                                    v.neg++;
+                                }
 
+                                if (v.neg + v.pos == quorumSize) {
+                                    logger.debug(format("[#%d] notifies on  [channel=%d ; cidSeries=%d ; cid=%d]", id, channel, cidSeries, cid));
+                                    channelNotifyer[channel].notifyAll();
+                                }
+                            }
+                        }
+
+                        return v;
+                    });
+                }
+            } else {
+                rec.computeIfPresent(key, (k, v) -> {
+                    if (!v.proposers.contains(msg.getM().getSender())) {
+                        if (v.neg + v.pos < quorumSize) {
+                            v.proposers.add(msg.getM().getSender());
+                            if (msg.getVote() == 1) {
+                                v.pos++;
+                            } else {
+                                v.neg++;
+                            }
+                        }
+                    }
+                    return v;
+                });
             }
+
+//                consVote curr = rec.get(key);
+//                if (curr.proposers.contains(msg.getM().getSender())) return new byte[0];
+//                if (curr.neg +  curr.pos < quorumSize) {
+//                    curr.proposers.add(msg.getM().getSender());
+//                    if (msg.getVote() == 1) {
+//                        curr.pos++;
+//                    } else {
+//                        curr.neg++;
+//                    }
+//                    if (curr.neg + curr.pos == quorumSize) {
+//                        logger.debug(format("[#%d] notifies on  [channel=%d ; cidSeries=%d ; cid=%d]", id, channel, cidSeries, cid));
+//                        globalLock.notifyAll();
+//                    }
+//                }
+
+//            }
         } catch (Exception e) {
             logger.error(format("[#%d]", id), e);
         }
@@ -150,16 +209,22 @@ public class bbcService extends DefaultSingleRecoverable {
         return new byte[1];
     }
 
-    public BbcDecision decide(int channel, int cidSeries, int cid) throws InterruptedException {
-        synchronized (globalLock) {
+    public BbcDecision decide(int channel, int cidSeries, int cid) throws  InterruptedException {
+//        synchronized (globalLock) {
             Meta key = Meta.newBuilder()
                     .setCidSeries(cidSeries)
                     .setCid(cid)
                     .setChannel(channel)
                     .build();
-            while (!rec.containsKey(key) || rec.get(key).pos + rec.get(key).neg < quorumSize) {
-                globalLock.wait();
+
+            synchronized (channelNotifyer[channel]) {
+                consVote v = rec.get(key);
+                while (v == null || v.neg + v.pos < quorumSize) {
+                    channelNotifyer[channel].wait();
+                    v = rec.get(key);
+                }
             }
+
             return BbcDecision.newBuilder()
                     .setM(Meta.newBuilder()
                             .setChannel(channel)
@@ -169,7 +234,7 @@ public class bbcService extends DefaultSingleRecoverable {
                     .setDecosion(rec.get(key).pos > rec.get(key).neg ? 1: 0)
                     .build();
 
-        }
+//        }
     }
 
     public int propose(int vote, int channel, int cidSeries, int cid) {
@@ -199,43 +264,59 @@ public class bbcService extends DefaultSingleRecoverable {
 
 
     public void updateFastVote(BbcDecision b) {
-        synchronized (globalLock) {
+//        synchronized (globalLock) {
             Meta key = Meta.newBuilder()
                     .setChannel(b.getM().getChannel())
                     .setCidSeries(b.getM().getCidSeries())
                     .setCid(b.getM().getCid())
                     .build();
-            if (!fastVote.containsKey(key)) {
+            fastVote.computeIfAbsent(key, k -> {
                 fastVotePart fv = new fastVotePart();
                 fv.d = b;
                 fv.done = false;
-                fastVote.put(key, fv);
-            }
-        }
+                return fv;
+            });
+//            if (!fastVote.containsKey(key)) {
+//
+//                fastVote.put(key, fv);
+//            }
+//        }
     }
 
     public void periodicallyVoteMissingConsensus(BbcDecision b) {
-        synchronized (globalLock) {
+//        synchronized (globalLock) {
             Meta key = Meta.newBuilder()
                     .setChannel(b.getM().getChannel())
                     .setCidSeries(b.getM().getCidSeries())
                     .setCid(b.getM().getCid())
                     .build();
             if (rec.containsKey(key)) {
-                if (!fastVote.containsKey(key)) {
+                fastVote.computeIfAbsent(key, k -> {
                     fastVotePart fv = new fastVotePart();
                     fv.d = b;
                     fv.done = false;
-                    fastVote.put(key, fv);
-                }
-                if (!fastVote.get(key).done) {
-                    logger.debug(format("[#%d] re-participating in a consensus (periodicallyVoteMissingConsensus) " +
-                            "[channel=%d ; cidSeries=%d ; cid=%d]", id, key.getChannel(), key.getCidSeries()
-                            , key.getCid()));
-                    propose(b.getDecosion(), key.getChannel(), key.getCidSeries(), key.getCid());
-                    fastVote.get(key).done = true;
-                }
-            }
+                    return fv;
+                });
+//                if (!fastVote.containsKey(key)) {
+//                    fastVotePart fv = new fastVotePart();
+//                    fv.d = b;
+//                    fv.done = false;
+//                    fastVote.put(key, fv);
+//                }
+                fastVote.computeIfPresent(key, (k, v) -> {
+                    if (!v.done) {
+                        logger.debug(format("[#%d] re-participating in a consensus (periodicallyVoteMissingConsensus) " +
+                                        "[channel=%d ; cidSeries=%d ; cid=%d]", id, key.getChannel(), key.getCidSeries()
+                                , key.getCid()));
+                        propose(b.getDecosion(), key.getChannel(), key.getCidSeries(), key.getCid());
+                        v.done = true;
+                    }
+                    return v;
+                });
+//                if (!fastVote.get(key).done) {
+//
+//                }
+//            }
         }
     }
 

@@ -35,7 +35,7 @@ public class bbcTest {
 //        serversUp = 0;
         CountDownLatch latch = new CountDownLatch(1);
         deleteViewIfExist(SingleServerconfigHome.toString());
-        bbcService s = new bbcService(0, 1, SingleServerconfigHome.toString());
+        bbcService s = new bbcService(1, 0, 1, SingleServerconfigHome.toString());
         Thread t = new Thread(()-> {
             s.start();
             latch.countDown();
@@ -52,7 +52,7 @@ public class bbcTest {
         logger.info("Testing testSingleDecision...");
         CountDownLatch latch = new CountDownLatch(1);
         deleteViewIfExist(SingleServerconfigHome.toString());
-        bbcService s = new bbcService(0, 1, SingleServerconfigHome.toString());
+        bbcService s = new bbcService(1, 0, 1, SingleServerconfigHome.toString());
         Thread t1 = new Thread(()-> {
             s.start();
             latch.countDown();
@@ -77,7 +77,7 @@ public class bbcTest {
         Thread[] serversThread = new Thread[4];
         bbcService[] servers = new bbcService[4];
         for (int i = 0 ; i < 4 ; i++) {
-            servers[i] = new bbcService(i, 3, FourServerconfigHome.toString());
+            servers[i] = new bbcService(1, i, 3, FourServerconfigHome.toString());
             int finalI = i;
             serversThread[i] = new Thread(() -> { servers[finalI].start();
                 latch.countDown();
@@ -119,7 +119,7 @@ public class bbcTest {
         Thread[] serversThread = new Thread[4];
         bbcService[] servers = new bbcService[4];
         for (int i = 0 ; i < 4 ; i++) {
-            servers[i] = new bbcService(i, 3, FourServerconfigHome.toString());
+            servers[i] = new bbcService(1, i, 3, FourServerconfigHome.toString());
             int finalI = i;
             serversThread[i] = new Thread(() -> {servers[finalI].start();
                 count.countDown();
@@ -157,7 +157,7 @@ public class bbcTest {
         Thread[] serversThread = new Thread[4];
         bbcService[] servers = new bbcService[4];
         for (int i = 0 ; i < 4 ; i++) {
-            servers[i] = new bbcService(i, 3, FourServerconfigHome.toString());
+            servers[i] = new bbcService(1, i, 3, FourServerconfigHome.toString());
             int finalI = i;
             serversThread[i] = new Thread(() -> {servers[finalI].start();
                 latch.countDown();
@@ -195,7 +195,7 @@ public class bbcTest {
         Thread[] serversThread = new Thread[4];
         bbcService[] servers = new bbcService[4];
         for (int i = 0 ; i < 4 ; i++) {
-            servers[i] = new bbcService(i, 3, FourServerconfigHome.toString());
+            servers[i] = new bbcService(1, i, 3, FourServerconfigHome.toString());
             int finalI = i;
             serversThread[i] = new Thread(() -> { servers[finalI].start();
                 latch.countDown();

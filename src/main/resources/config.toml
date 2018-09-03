@@ -3,12 +3,12 @@ title = "configuration"
 [system]
     n = 4
     f = 1
-    c = 2
+    c = 1
 
 
 [setting]
-    tmo = 200
-    tmoInterval = 100
+    tmo = 100
+    tmoInterval = 10
     rmfBbcConfigPath = "src/main/resources/bbcConfig"
     panicRBroadcastConfigPath = "src/main/resources/panicRBConfig"
     syncRBroadcastConfigPath = "src/main/resources/syncRBConfig"

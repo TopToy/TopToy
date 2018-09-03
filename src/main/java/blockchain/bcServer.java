@@ -94,8 +94,8 @@ public abstract class bcServer extends Node {
         this.n = 3*f + 1;
         rmfServer = new RmfNode(1, id, addr, rmfPort, f,
                cluster, bbcConfig, serverCrt, serverPrivKey, caRoot);
-        panicRB = new RBrodcastService(id, panicConfig);
-        syncRB = new RBrodcastService(id, syncConfig);
+        panicRB = new RBrodcastService(1, id, panicConfig);
+        syncRB = new RBrodcastService(1, id, syncConfig);
         bc = initBC(id);
         currBlock = null;
 
@@ -192,13 +192,15 @@ public abstract class bcServer extends Node {
                 try {
                     long startTime = System.currentTimeMillis();
                     pmsg = rmfServer.deliver(channel, cidSeries, cid, currHeight, currLeader, tmo, next);
-                    logger.debug(format("deliver took about [%d] ms", System.currentTimeMillis() - startTime));
+                    logger.debug(format("[#%d-C[%d]] deliver took about [%d] ms [cidSeries=%d ; cid=%d]",
+                            getID(), channel, System.currentTimeMillis() - startTime, cidSeries, cid));
                 } catch (InterruptedException e) {
                     logger.debug(format("[#%d-C[%d]] main thread has been interrupted on rmf deliver",
                             getID(), channel));
                     continue;
                 }
-                byte[] msg = pmsg[0];
+
+            byte[] msg = pmsg[0];
                 fastMode = configuredFastMode;
 //            byte[] recData = msg.getData().toByteArray();
 //            int mcid = msg.getCid();

@@ -72,7 +72,10 @@ public class RmfNode extends Node{
         if (msg != null) {
             dMsg = buildData(msg, channel, cidSeries, cid + 1, height + 1, true);
         }
+        long start = System.currentTimeMillis();
         Data m = rmfService.deliver(channel, cidSeries, cid, tmo, sender, height, dMsg);
+        logger.debug(format("[#%d-C[%d]] Deliver on rmf node took about %d [cidSeries=%d ; cid=%d]", getID(), channel,
+                System.currentTimeMillis() - start, cidSeries, cid));
         return (m == null ? new byte[][] {null, null} :
                 new byte[][] {m.getData().toByteArray(), Base64.getDecoder().decode(m.getSig())});
 //        Data data = (td == null ? null : td.d);

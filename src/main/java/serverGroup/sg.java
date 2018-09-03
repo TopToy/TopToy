@@ -57,8 +57,8 @@ public class sg {
         if (type.equals("b")) {
             rmf = new ByzantineRmfNode(c, id, addr, port, f, cluster, bbcConfig, serverCrt, serverPrivKey, caRoot);
         }
-        deliverFork = new RBrodcastService(id, panicConfig);
-        sync = new RBrodcastService(id, syncConfig);
+        deliverFork = new RBrodcastService(c, id, panicConfig);
+        sync = new RBrodcastService(c, id, syncConfig);
         this.type = type;
         // TODO: Apply to more types
         if (type.equals("r")) {
