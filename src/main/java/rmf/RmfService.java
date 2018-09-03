@@ -27,6 +27,7 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
+import static java.lang.Math.log;
 import static java.lang.Math.max;
 import static java.lang.String.format;
 
@@ -138,6 +139,8 @@ public class RmfService extends RmfGrpc.RmfImplBase {
     Executor executor;
     EventLoopGroup beg;
     EventLoopGroup weg;
+    int alive = 200;
+    final Object aliveLock = new Object();
 
 //    public RmfService(int channels, int id, int f, ArrayList<Node> nodes, bbcService bbc) {
 //        this.channels = channels;
@@ -197,7 +200,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
 //                    .addService(this)
 //                    .build()
 //                    .start();
-            executor = Executors.newFixedThreadPool(n);
+            executor = Executors.newFixedThreadPool(channels * n);
             beg = new NioEventLoopGroup(n);
             weg = new NioEventLoopGroup(n);
             rmfServer = NettyServerBuilder.
@@ -267,14 +270,25 @@ public class RmfService extends RmfGrpc.RmfImplBase {
 
     private void bbcMissedConsensus(int channel) throws InterruptedException {
         while (!stopped) {
-            Thread.sleep(200);
+            int sleepFor = 0;
+            synchronized (aliveLock) {
+                sleepFor = alive;
+                alive = 0;
+            }
+            while (sleepFor > 0) {
+                Thread.sleep(sleepFor);
+                synchronized (aliveLock) {
+                    sleepFor = alive;
+                }
+            }
+
             if (fastBbcCons.isEmpty()) continue;
 //            synchronized (fastBbcCons[channel]) {
 //                if (fastBbcCons[channel].rowKeySet().isEmpty()) {
 ////                    logger.debug(format("[#%d] There are no fast bbc", id));
 //                    continue;
 //                }
-
+            try {
                 int fcidSeries = Collections.max(fastBbcCons
                         .keySet()
                         .stream()
@@ -294,6 +308,10 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                         .build();
 //                logger.debug(format("[#%d-C[%d]] Trying re-participate [cidSeries=%d ; cid=%d]", id, channel, fcidSeries, fcid));
                 bbcService.periodicallyVoteMissingConsensus(fastBbcCons.get(key));
+            } catch (Exception e) {
+                logger.error("", e);
+            }
+
             }
 
 //        }
@@ -684,6 +702,9 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         if (regBbcCons.containsKey(key)) {
             int v = regBbcCons.get(key).getDecosion();
             int dec = fullBbcConsensus(channel, v, cidSeries, cid);
+            synchronized (aliveLock) {
+                alive = tmo;
+            }
             logger.debug(format("[#%d-C[%d]] bbc returned [%d] for [cidSeries=%d ; cid=%d]", id, channel, dec, cidSeries, cid));
             if (dec == 0) {
                 pendingMsg.remove(key);
