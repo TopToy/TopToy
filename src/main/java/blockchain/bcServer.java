@@ -8,7 +8,6 @@ import consensus.RBroadcast.RBrodcastService;
 import consensus.bbc.bbcService;
 import crypto.DigestMethod;
 import crypto.blockDigSig;
-import crypto.rmfDigSig;
 import org.apache.commons.lang.ArrayUtils;
 import proto.*;
 import rmf.RmfNode;
@@ -65,7 +64,7 @@ public abstract class bcServer extends Node {
         this.n = 3*f + 1;
         this.panicRB = panic;
         this.syncRB = sync;
-        bc = initBC(id);
+        bc = initBC(id, channel);
         currBlock = null;
         stopped = false;
         currHeight = 1; // starts from 1 due to the genesis block
@@ -96,7 +95,7 @@ public abstract class bcServer extends Node {
                cluster, bbcConfig, serverCrt, serverPrivKey, caRoot);
         panicRB = new RBrodcastService(1, id, panicConfig);
         syncRB = new RBrodcastService(1, id, syncConfig);
-        bc = initBC(id);
+        bc = initBC(id, channel);
         currBlock = null;
 
         stopped = false;
@@ -180,7 +179,7 @@ public abstract class bcServer extends Node {
 
                     }
                 }
-                byte[] next;
+                Block next;
                 try {
                     next = leaderImpl();
                 } catch (InterruptedException e) {
@@ -188,10 +187,10 @@ public abstract class bcServer extends Node {
                             getID(), channel));
                     continue;
                 }
-                byte[][] pmsg;
+                Block recBlock;
                 try {
                     long startTime = System.currentTimeMillis();
-                    pmsg = rmfServer.deliver(channel, cidSeries, cid, currHeight, currLeader, tmo, next);
+                    recBlock = rmfServer.deliver(channel, cidSeries, cid, currHeight, currLeader, tmo, next);
                     logger.debug(format("[#%d-C[%d]] deliver took about [%d] ms [cidSeries=%d ; cid=%d]",
                             getID(), channel, System.currentTimeMillis() - startTime, cidSeries, cid));
                 } catch (InterruptedException e) {
@@ -200,12 +199,12 @@ public abstract class bcServer extends Node {
                     continue;
                 }
 
-            byte[] msg = pmsg[0];
+//            byte[] msg = pmsg[0];
                 fastMode = configuredFastMode;
 //            byte[] recData = msg.getData().toByteArray();
 //            int mcid = msg.getCid();
 //            int mcidSeries = msg.getCidSeries();
-                if (msg == null) {
+                if (recBlock == null) {
                     tmo += tmoInterval;
                     logger.debug(format("[#%d-C[%d]] Unable to receive block, timeout increased to [%d] ms"
                             , getID(), channel, tmo));
@@ -215,34 +214,34 @@ public abstract class bcServer extends Node {
                     continue;
                 }
 
-                String msgSign = Base64.getEncoder().encodeToString(pmsg[1]);
-                Block recBlock;
-                try {
-                    recBlock = Block.parseFrom(msg);
-                } catch (InvalidProtocolBufferException e) {
-                    logger.warn("Unable to parse received block", e);
-//                updateLeaderAndHeight();
-//                continue;
-                    recBlock = Block.newBuilder()
-                            .setHeader(BlockHeader.newBuilder()
-                                    .setCreatorID(currLeader)
-                                    .setHeight(currHeight)
-                                    .setCidSeries(cidSeries)
-                                    .setCid(cid)
-                                    .setPrev(ByteString.copyFrom(new byte[0]))
-                                    .build())
-                            .setFooter(BlockFooter
-                                    .newBuilder()
-                                    .setOrig(ByteString.copyFrom(msg))
-                                    .build())
-                            .build();
+//                String msgSign = Base64.getEncoder().encodeToString(pmsg[1]);
+//                Block recBlock;
+//                try {
+//                    recBlock = Block.parseFrom(msg);
+//                } catch (InvalidProtocolBufferException e) {
+//                    logger.warn("Unable to parse received block", e);
+////                updateLeaderAndHeight();
+////                continue;
+//                    recBlock = Block.newBuilder()
+//                            .setHeader(BlockHeader.newBuilder()
+//                                    .setCreatorID(currLeader)
+//                                    .setHeight(currHeight)
+//                                    .setCidSeries(cidSeries)
+//                                    .setCid(cid)
+//                                    .setPrev(ByteString.copyFrom(new byte[0]))
+//                                    .build())
+//                            .setFooter(BlockFooter
+//                                    .newBuilder()
+//                                    .setOrig(ByteString.copyFrom(msg))
+//                                    .build())
+//                            .build();
                 /*
                     We should create an empty block to the case in which a byzantine leader sends valid block to
                     part of the network and invalid one to the other part.
                     But, creating an empty block requires to change the fork proof mechanism (as the signature is not the
                     original one). Hence currently we leave it to a later development.
                  */
-                }
+//                }
 //            recBlock = recBlock
 //                    .toBuilder()
 //                    .setHeader(recBlock
@@ -251,25 +250,25 @@ public abstract class bcServer extends Node {
 ////                            .setProof(msgSign)
 //                            .build())
 //                    .build();
-//                Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-                recBlock = recBlock
-                        .toBuilder()
-                        .setFooter(recBlock.hasFooter() ?
-                                recBlock
-                                        .getFooter()
-                                        .toBuilder()
-                                        .setRmfProof(msgSign)
-//                                        .setTs(timestamp.getTime())
-                                        .build()
-                                        : BlockFooter
-                                        .newBuilder()
-                                        .setRmfProof(msgSign)
-//                                        .setTs(timestamp.getTime())
-                                        .build())
-                        .build();
+////                Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+//                recBlock = recBlock
+//                        .toBuilder()
+//                        .setFooter(recBlock.hasFooter() ?
+//                                recBlock
+//                                        .getFooter()
+//                                        .toBuilder()
+//                                        .setRmfProof(msgSign)
+////                                        .setTs(timestamp.getTime())
+//                                        .build()
+//                                        : BlockFooter
+//                                        .newBuilder()
+//                                        .setRmfProof(msgSign)
+////                                        .setTs(timestamp.getTime())
+//                                        .build())
+//                        .build();
                 if (currLeader == getID()) {
                     logger.debug(format("[#%d-C[%d]] nullifies currBlock [sender=%d] [height=%d] [cidSeries=%d, cid=%d]",
-                            getID(), channel, recBlock.getHeader().getCreatorID(), currHeight, cidSeries, cid));
+                            getID(), channel, recBlock.getHeader().getM().getSender(), currHeight, cidSeries, cid));
                     currBlock = null;
                 }
                 if (!bc.validateBlockHash(recBlock)) {
@@ -310,17 +309,17 @@ public abstract class bcServer extends Node {
 //        }
     }
 
-    abstract byte[] leaderImpl() throws InterruptedException;
+    abstract Block leaderImpl() throws InterruptedException;
 
-    abstract public blockchain initBC(int id);
+    abstract public blockchain initBC(int id, int channel);
 
     abstract public blockchain getBC(int start, int end);
 
 
     public String addTransaction(byte[] data, int clientID) {
-        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        long magic = timestamp.getTime();
-        String txID = new BigInteger(DigestMethod.hash(ArrayUtils.addAll(data, (String.valueOf(magic)).getBytes())))
+        long magic = System.currentTimeMillis();
+        String txID = new BigInteger(DigestMethod.hash(ArrayUtils.addAll(String.valueOf(channel).getBytes(),
+                ArrayUtils.addAll(data, (String.valueOf(magic)).getBytes()))))
                 .toString()
                 .replaceAll("-","N");
         Transaction t = Transaction.newBuilder()
@@ -400,80 +399,88 @@ public abstract class bcServer extends Node {
         Block prev = p.getPrev();
         int prevBlockH = prev.getHeader().getHeight();
 
-        if (bc.getBlock(prevBlockH).getHeader().getCreatorID() != prev.getHeader().getCreatorID()) {
+        if (bc.getBlock(prevBlockH).getHeader().getM().getSender() != prev.getHeader().getM().getSender()) {
             logger.debug(format("[#%d-C[%d]] invalid fork proof #1", getID(), channel));
             return -1;
         }
 
         int currCreator = currLeader;
         if (bc.getHeight() >= curr.getHeader().getHeight()) {
-            currCreator = bc.getBlock(curr.getHeader().getHeight()).getHeader().getCreatorID();
+            currCreator = bc.getBlock(curr.getHeader().getHeight()).getHeader().getM().getSender();
         }
-        if (currCreator != curr.getHeader().getCreatorID()) {
+        if (currCreator != curr.getHeader().getM().getSender()) {
             logger.debug(format("[#%d-C[%d]] invalid fork proof #2", getID(), channel));
             return -1;
         }
-        if (!curr.getFooter().getOrig().isEmpty()) {
-            Data asInRmf = Data
-                    .newBuilder()
-                    .setMeta(Meta
-                            .newBuilder()
-                          //  .setHeight(curr.getHeader().getHeight())
-                            .setSender(curr.getHeader().getCreatorID())
-                            .setCidSeries(curr.getHeader().getCidSeries())
-                            .setCid(curr.getHeader().getCid())
-                            .setChannel(channel)
-                            .build())
-                    .setData(curr.getFooter().getOrig())
-                    .setSig(curr.getFooter().getRmfProof())
-                    .build();
-            if (!rmfDigSig.verify(curr.getHeader().getCreatorID(), asInRmf)) {
-                logger.debug(format("[#%d-C[%d]] invalid fork proof #6", getID(), channel));
-                return -1;
-            }
-        } else {
-            Block.Builder dataAsInRmf = Block.newBuilder()
-                    .setHeader(curr.getHeader());
-            for (int i = 0 ; i < curr.getDataList().size() ; i++ ) {
-                dataAsInRmf.addData(i, curr.getData(i));
-            }
-            Data asInRmf = Data
-                    .newBuilder()
-                    .setMeta(Meta
-                            .newBuilder()
-                            //  .setHeight(curr.getHeader().getHeight())
-                            .setSender(curr.getHeader().getCreatorID())
-                            .setCidSeries(curr.getHeader().getCidSeries())
-                            .setCid(curr.getHeader().getCid())
-                            .setChannel(channel)
-                            .build())
-                    .setData(dataAsInRmf.build().toByteString())
-                    .setSig(curr.getFooter().getRmfProof())
-                    .build();
-            if (!rmfDigSig.verify(curr.getHeader().getCreatorID(), asInRmf)) {
+        if (!blockDigSig.verify(curr.getHeader().getM().getSender(), curr)) {
                 logger.debug(format("[#%d-C[%d]] invalid fork proof #3", getID(), channel));
                 return -1;
-            }
         }
-        Block.Builder dataAsInRmf = Block.newBuilder()
-                .setHeader(prev.getHeader());
-        for (int i = 0 ; i < prev.getDataList().size() ; i++ ) {
-            dataAsInRmf.addData(i, prev.getData(i));
-        }
-        Data asInRmf = Data
-                .newBuilder()
-                .setMeta(Meta
-                        .newBuilder()
-                        //  .setHeight(curr.getHeader().getHeight())
-                        .setSender(prev.getHeader().getCreatorID())
-                        .setCidSeries(prev.getHeader().getCidSeries())
-                        .setCid(prev.getHeader().getCid())
-                        .setChannel(channel)
-                        .build())
-                .setData(dataAsInRmf.build().toByteString())
-                .setSig(prev.getFooter().getRmfProof())
-                .build();
-        if (!rmfDigSig.verify(prev.getHeader().getCreatorID(), asInRmf)) {
+//        if (!curr.getFooter().getOrig().isEmpty()) {
+//            Data asInRmf = Data
+//                    .newBuilder()
+//                    .setMeta(Meta
+//                            .newBuilder()
+//                          //  .setHeight(curr.getHeader().getHeight())
+//                            .setSender(curr.getHeader().getCreatorID())
+//                            .setCidSeries(curr.getHeader().getCidSeries())
+//                            .setCid(curr.getHeader().getCid())
+//                            .setChannel(channel)
+//                            .build())
+//                    .setData(curr.getFooter().getOrig())
+//                    .setSig(curr.getFooter().getRmfProof())
+//                    .build();
+//            if (!rmfDigSig.verify(curr.getHeader().getCreatorID(), asInRmf)) {
+//                logger.debug(format("[#%d-C[%d]] invalid fork proof #6", getID(), channel));
+//                return -1;
+//            }
+//        } else {
+//            Block.Builder dataAsInRmf = Block.newBuilder()
+//                    .setHeader(curr.getHeader());
+//            for (int i = 0 ; i < curr.getDataList().size() ; i++ ) {
+//                dataAsInRmf.addData(i, curr.getData(i));
+//            }
+//            Data asInRmf = Data
+//                    .newBuilder()
+//                    .setMeta(Meta
+//                            .newBuilder()
+//                            //  .setHeight(curr.getHeader().getHeight())
+//                            .setSender(curr.getHeader().getCreatorID())
+//                            .setCidSeries(curr.getHeader().getCidSeries())
+//                            .setCid(curr.getHeader().getCid())
+//                            .setChannel(channel)
+//                            .build())
+//                    .setData(dataAsInRmf.build().toByteString())
+//                    .setSig(curr.getFooter().getRmfProof())
+//                    .build();
+//            if (!rmfDigSig.verify(curr.getHeader().getCreatorID(), asInRmf)) {
+//                logger.debug(format("[#%d-C[%d]] invalid fork proof #3", getID(), channel));
+//                return -1;
+//            }
+//        }
+//        Block.Builder dataAsInRmf = Block.newBuilder()
+//                .setHeader(prev.getHeader());
+//        for (int i = 0 ; i < prev.getDataList().size() ; i++ ) {
+//            dataAsInRmf.addData(i, prev.getData(i));
+//        }
+//        Data asInRmf = Data
+//                .newBuilder()
+//                .setMeta(Meta
+//                        .newBuilder()
+//                        //  .setHeight(curr.getHeader().getHeight())
+//                        .setSender(prev.getHeader().getCreatorID())
+//                        .setCidSeries(prev.getHeader().getCidSeries())
+//                        .setCid(prev.getHeader().getCid())
+//                        .setChannel(channel)
+//                        .build())
+//                .setData(dataAsInRmf.build().toByteString())
+//                .setSig(prev.getFooter().getRmfProof())
+//                .build();
+//        if (!rmfDigSig.verify(prev.getHeader().getCreatorID(), asInRmf)) {
+//            logger.debug(format("[#%d-C[%d]] invalid fork proof #4", getID(), channel));
+//            return -1;
+//        }
+        if (!blockDigSig.verify(prev.getHeader().getM().getSender(), prev)) {
             logger.debug(format("[#%d-C[%d]] invalid fork proof #4", getID(), channel));
             return -1;
         }
@@ -613,20 +620,20 @@ public abstract class bcServer extends Node {
             for (int i = 0 ; i < pb.getDataList().size() ; i++ ) {
                 dataAsInRmf.addData(i, pb.getData(i));
             }
-            Data asInRmf = Data
-                    .newBuilder()
-                    .setMeta(Meta
-                            .newBuilder()
-                            //  .setHeight(curr.getHeader().getHeight())
-                            .setSender(pb.getHeader().getCreatorID())
-                            .setCidSeries(pb.getHeader().getCidSeries())
-                            .setCid(pb.getHeader().getCid())
-                            .setChannel(channel)
-                            .build())
-                    .setData(dataAsInRmf.build().toByteString())
-                    .setSig(pb.getFooter().getRmfProof())
-                    .build();
-            if (!rmfDigSig.verify(pb.getHeader().getCreatorID(), asInRmf)) {
+//            Data asInRmf = Data
+//                    .newBuilder()
+//                    .setMeta(Meta
+//                            .newBuilder()
+//                            //  .setHeight(curr.getHeader().getHeight())
+//                            .setSender(pb.getHeader().getCreatorID())
+//                            .setCidSeries(pb.getHeader().getCidSeries())
+//                            .setCid(pb.getHeader().getCid())
+//                            .setChannel(channel)
+//                            .build())
+//                    .setData(dataAsInRmf.build().toByteString())
+//                    .setSig(pb.getFooter().getRmfProof())
+//                    .build();
+            if (!blockDigSig.verify(pb.getHeader().getM().getSender(), pb)) {
                 logger.debug(format("[#%d-C[%d]] invalid sub chain version, block [height=%d] digital signature is invalid " +
                         "[fp=%d ; sender=%d]", getID(),channel, pb.getHeader().getHeight(), forkPoint, v.getSender()));
                 return false;
@@ -669,7 +676,7 @@ public abstract class bcServer extends Node {
                 }
             }
             if (v == null) {
-                logger.debug(format("[#%d Unable to parse sub chain version [fp=%d]]", getID(),channel, forkPoint));
+                logger.debug(format("[#%d-C[%d]] Unable to parse sub chain version [fp=%d]]", getID(),channel, forkPoint));
                 continue;
             }
             if (!validateSubChainVersion(v, v.getForkPoint())) {
@@ -701,7 +708,7 @@ public abstract class bcServer extends Node {
             }
             newBlockNotifyer.notify();
         }
-        currLeader = (bc.getBlock(bc.getHeight()).getHeader().getCreatorID() + 2) % n;
+        currLeader = (bc.getBlock(bc.getHeight()).getHeader().getM().getSender() + 2) % n;
         currHeight = bc.getHeight() + 1;
         cid = 0;
         cidSeries++;

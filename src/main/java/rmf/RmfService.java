@@ -8,7 +8,8 @@ import config.Config;
 import config.Node;
 import consensus.bbc.bbcService;
 import crypto.DigestMethod;
-import crypto.rmfDigSig;
+//import crypto.rmfDigSig;
+import crypto.blockDigSig;
 import crypto.sslUtils;
 import io.grpc.*;
 import io.grpc.netty.NettyServerBuilder;
@@ -119,10 +120,10 @@ public class RmfService extends RmfGrpc.RmfImplBase {
     private bbcService bbcService;
 //    private final Object globalLock = new Object();
 
-    private final ConcurrentHashMap<Meta, Data> recMsg;
+    private final ConcurrentHashMap<Meta, Block> recMsg;
 
     private final ConcurrentHashMap<Meta, fvote> fVotes;
-    private final ConcurrentHashMap<Meta, Data> pendingMsg;
+    private final ConcurrentHashMap<Meta, Block> pendingMsg;
     private final ConcurrentHashMap<Meta, BbcDecision> fastBbcCons;
     Object[] fastVoteNotifyer;
     Object[] msgNotifyer;
@@ -352,7 +353,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         logger.info(format("[#%d] shutting down rmf service", id));
     }
 
-    void sendDataMessage(RmfGrpc.RmfStub stub, Data msg) {
+    void sendDataMessage(RmfGrpc.RmfStub stub, Block msg) {
         stub.disseminateMessage(msg, new StreamObserver<Empty>() {
             @Override
             public void onNext(Empty ans) {
@@ -398,22 +399,23 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                         .setCidSeries(cidSeries)
                         .setCid(cid)
                         .build();
-                if (res.getData().getMeta().getCid() == cid &&
-                        res.getData().getMeta().getCidSeries() == cidSeries
-                        && res.getMeta().getChannel() == channel && res.getData().getMeta().getChannel() == channel) {
+                if (res.getData().getHeader().getM().getCid() == cid &&
+                        res.getData().getHeader().getM().getCidSeries() == cidSeries
+                        && res.getM().getChannel() == channel &&
+                        res.getData().getHeader().getM().getChannel() == channel) {
 //                    synchronized (recMsg[channel]) {
                         if (recMsg.containsKey(key)) return;
                         if (pendingMsg.containsKey(key)) return;
 //                    }
 //                    synchronized (pendingMsg[channel]) {
 //                        if (!pendingMsg[channel].contains(cidSeries, cid)) {
-                            if (!rmfDigSig.verify(sender, res.getData())) {
+                            if (!blockDigSig.verify(sender, res.getData())) {
                                 logger.debug(format("[#%d-C[%d]] has received invalid response message from [#%d] for [cidSeries=%d ; cid=%d]",
-                                        id, channel, res.getMeta().getSender(), cidSeries, cid));
+                                        id, channel, res.getM().getSender(), cidSeries, cid));
                                 return;
                             }
                             logger.debug(format("[#%d-C[%d]] has received response message from [#%d] for [cidSeries=%d ; cid=%d]",
-                                    id, channel, res.getMeta().getSender(), cidSeries,  cid));
+                                    id, channel, res.getM().getSender(), cidSeries,  cid));
                             synchronized (msgNotifyer[channel]) {
                                 pendingMsg.put(key, res.getData());
                                 msgNotifyer[channel].notify();
@@ -448,17 +450,17 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         }
     }
 
-    void rmfBroadcast(Data msg) {
+    void rmfBroadcast(Block msg) {
         for (peer p : peers.values()) {
             sendDataMessage(p.stub, msg);
         }
     }
-    private void addToPendings(Data request) {
-        int sender = request.getMeta().getSender();
-        if (!rmfDigSig.verify(sender, request)) return;
-        int cid = request.getMeta().getCid();
-        int channel = request.getMeta().getChannel();
-        int cidSeries = request.getMeta().getCidSeries();
+    private void addToPendings(Block request) {
+        int sender = request.getHeader().getM().getSender();
+        if (!blockDigSig.verify(sender, request)) return;
+        int cid = request.getHeader().getM().getCid();
+        int channel = request.getHeader().getM().getChannel();
+        int cidSeries = request.getHeader().getM().getCidSeries();
         Meta key = Meta.newBuilder()
                 .setChannel(channel)
                 .setCidSeries(cidSeries)
@@ -475,14 +477,14 @@ public class RmfService extends RmfGrpc.RmfImplBase {
 
 //        if (pendingMsg.containsKey(key)) return;
 //        pendingMsg[channel].put(cidSeries, cid, request);
-        logger.debug(format("[#%d-C[%d]] has received data message from [%d], [cidSeries=%d ; cid=%d]", id, channel,
-                sender, cidSeries, cid));
+        logger.debug(format("[#%d-C[%d]] has received data message from [%d], [cidSeries=%d ; cid=%d]"
+                , id, channel, sender, cidSeries, cid));
 //        msgNotifyer[channel].release();
 //        }
     }
 
     @Override
-    public void disseminateMessage(Data request, StreamObserver<Empty> responseObserver) {
+    public void disseminateMessage(Block request, StreamObserver<Empty> responseObserver) {
 
 //        int cid = request.getMeta().getCid();
 //        int cidSeries = request.getMeta().getCidSeries();
@@ -497,7 +499,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
 
     @Override
     public void fastVote(BbcMsg request, StreamObserver<Empty> responeObserver) {
-        long start = System.currentTimeMillis();
+//        long start = System.currentTimeMillis();
         if (request.hasNext()) {
             addToPendings(request.getNext());
         }
@@ -572,7 +574,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
 
     @Override
     public void reqMessage(Req request,  StreamObserver<Res> responseObserver)  {
-        Data msg;
+        Block msg;
         int cid = request.getMeta().getCid();
         int cidSeries = request.getMeta().getCidSeries();
         int channel = request.getMeta().getChannel();
@@ -603,7 +605,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                     build();
             responseObserver.onNext(Res.newBuilder().
                     setData(msg).
-                    setMeta(meta).
+                    setM(meta).
                     build());
         } else {
             logger.debug(format("[#%d-C[%d]] has received request message from [#%d] of [cidSeries=%d ; cid=%d] but buffers are empty",
@@ -611,7 +613,8 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         }
     }
 
-    public Data deliver(int channel, int cidSeries, int cid, int tmo, int sender, int height, Data next) throws InterruptedException {
+    public Block deliver(int channel, int cidSeries, int cid, int tmo, int sender, int height, Block next)
+            throws InterruptedException {
         long startTime = System.currentTimeMillis();
         long estimatedTime;
         Meta key = Meta.newBuilder()
@@ -620,7 +623,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                 .setCid(cid)
                 .build();
         synchronized (msgNotifyer[channel]) {
-            while (!pendingMsg.containsKey(key)) {
+            if (!pendingMsg.containsKey(key)) {
                 msgNotifyer[channel].wait(tmo);
             }
         }
@@ -629,8 +632,10 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         logger.debug(format("[#%d-C[%d]] have waited [%d] ms for data msg [cidSeries=%d ; cid=%d]",
                 id, channel, estimatedTime, cidSeries, cid));
         pendingMsg.computeIfPresent(key, (k, val) -> {
-            if (val.getMeta().getSender() != sender || val.getMeta().getCidSeries() != cidSeries
-            || val.getMeta().getCid() != cid || val.getMeta().getChannel() != channel) return val;
+            if (val.getHeader().getM().getSender() != sender ||
+                    val.getHeader().getM().getCidSeries() != cidSeries ||
+                    val.getHeader().getM().getCid() != cid ||
+                    val.getHeader().getM().getChannel() != channel) return val;
             BbcMsg.Builder bv = BbcMsg
                     .newBuilder()
                     .setM(Meta.newBuilder()
@@ -642,12 +647,12 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                     .setVote(1);
             if (next != null) {
                 logger.debug(format("[#%d-C[%d]] broadcasts [cidSeries=%d ; cid=%d] via fast mode",
-                        id, channel, next.getMeta().getCidSeries(), next.getMeta().getCid()));
-                try {
-                    bv.setNext(setFastModeData(val, next));
-                } catch (InvalidProtocolBufferException e) {
-                    logger.error(format("[#%d-C[%d]]", id, channel), e);
-                }
+                        id, channel, next.getHeader().getM().getCidSeries(), next.getHeader().getM().getCid()));
+                long st = System.currentTimeMillis();
+                bv.setNext(setFastModeData(val, next));
+                logger.debug(format("[#%d-C[%d]] creating new block of [cidSeries=%d ; cid=%d] took about [%d] ms",
+                        id, channel, next.getHeader().getM().getCidSeries(), next.getHeader().getM().getCid(),
+                        System.currentTimeMillis() - st));
             }
             broadcastFastVoteMessage(bv.build());
             return val;
@@ -663,9 +668,11 @@ public class RmfService extends RmfGrpc.RmfImplBase {
 //                    System.currentTimeMillis() - waitStartTime, cidSeries, cid));
         synchronized (fastVoteNotifyer[channel]) {
             fvote fv = fVotes.get(key);
-            while (fv == null || fv.voters.size() < n) {
+            if (fv == null || fv.voters.size() < n) {
+                startTime = System.currentTimeMillis();
+                logger.debug(format("[#%d-C[%d]] will waits at most [%d] ms for fast bbc", id, channel,
+                        max(tmo - estimatedTime, 1)));
                 fastVoteNotifyer[channel].wait(max(tmo - estimatedTime, 1));
-                fv = fVotes.get(key);
             }
             logger.debug(format("[#%d-C[%d]] have waited for more [%d] ms for fast bbc", id, channel,
                     System.currentTimeMillis() - startTime));
@@ -714,7 +721,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
 
 
         requestData(channel, cidSeries, cid, sender, height);
-        Data msg = pendingMsg.get(key);
+        Block msg = pendingMsg.get(key);
         pendingMsg.remove(key);
         recMsg.put(key, msg);
         return msg;
@@ -741,7 +748,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                 .setCid(cid)
                 .build();
         if (pendingMsg.containsKey(key) &&
-                pendingMsg.get(key).getMeta().getSender() == sender) return; //&&
+                pendingMsg.get(key).getHeader().getM().getSender() == sender) return; //&&
 //                pendingMsg.get(cidSeries, cid).getMeta().getHeight() == height) return;
         pendingMsg.remove(key);
         Meta meta = Meta.
@@ -754,9 +761,9 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         Req req = Req.newBuilder().setMeta(meta).build();
         broadcastReqMsg(req,channel,  cidSeries, cid, sender, height);
         synchronized (msgNotifyer[channel]) {
-            Data msg = pendingMsg.get(key);
+            Block msg = pendingMsg.get(key);
             while ( msg == null ||
-                   msg.getMeta().getSender() != sender) { // ||
+                   msg.getHeader().getM().getSender() != sender) { // ||
 //                pendingMsg.get(cidSeries, cid).getMeta().getHeight() != height) {
                 pendingMsg.remove(key);
                 msg = pendingMsg.get(key);
@@ -766,38 +773,31 @@ public class RmfService extends RmfGrpc.RmfImplBase {
 
     }
 
-    String getMessageSig(int channel, int cidSeries, int cid) {
-        Meta key = Meta.newBuilder()
-                .setChannel(channel)
-                .setCidSeries(cidSeries)
-                .setCid(cid)
-                .build();
-        if (recMsg.containsKey(key)) {
-            return recMsg.get(key).getSig();
-        }
-        return null;
-    }
+//    String getMessageSig(int channel, int cidSeries, int cid) {
+//        Meta key = Meta.newBuilder()
+//                .setChannel(channel)
+//                .setCidSeries(cidSeries)
+//                .setCid(cid)
+//                .build();
+//        if (recMsg.containsKey(key)) {
+//            return recMsg.get(key).getSig();
+//        }
+//        return null;
+//    }
 
 
 
-    private Data setFastModeData(Data curr, Data next) throws InvalidProtocolBufferException {
-        Block currBlock = Block.parseFrom(curr.getData());
-        Block nextBlock = Block.parseFrom(next.getData());
-        nextBlock = nextBlock
-                .toBuilder()
-                .setHeader(nextBlock
-                        .getHeader()
-                        .toBuilder()
-                        .setPrev((ByteString.copyFrom(DigestMethod
-                                .hash(currBlock
-                                        .getHeader()
-                                        .toBuilder()
-                                        .build()
-                                        .toByteArray()))))
-                .build())
-                .build();
-        next = next.toBuilder().setData(ByteString.copyFrom(nextBlock.toByteArray())).build();
-        return next.toBuilder().setSig(rmfDigSig.sign(next.toBuilder())).build();
+    private Block setFastModeData(Block curr, Block next) {
+        Block.Builder nextBuilder = next
+                    .toBuilder()
+                    .setHeader(next.getHeader().toBuilder()
+                    .setPrev(ByteString
+                            .copyFrom(DigestMethod
+                                    .hash(curr.getHeader().toByteArray())))
+                            .build());
+
+        return nextBuilder.setHeader(nextBuilder.getHeader().toBuilder()
+                .setProof(blockDigSig.sign(next.getHeader())).build()).build();
 
     }
     

@@ -79,7 +79,7 @@ public class sg {
                         fastMode, cluster, rmf, deliverFork, sync);
             }
         }
-        bc = group[0].initBC(id);
+        bc = group[0].initBC(id, -1);
     }
 
     private void deliverFromGroup() throws InterruptedException {
@@ -96,9 +96,7 @@ public class sg {
                             .setPrev(ByteString.copyFrom(
                                 DigestMethod.hash(bc.getBlock(bc.getHeight()).getHeader().toByteArray())))
                             .build())
-                            .setFooter(cBlock.getFooter()
-                            .toBuilder()
-                            .setTs(System.currentTimeMillis()))
+                            .setTs(System.currentTimeMillis())
                         .build();
                 synchronized (bc) {
                     bc.addBlock(cBlock);

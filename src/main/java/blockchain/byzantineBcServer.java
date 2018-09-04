@@ -72,40 +72,40 @@ public class byzantineBcServer extends bcServer {
             currBlock.removeTransaction(0);
         }
     }
-     byte[] leaderImpl() {
+    Block leaderImpl() {
         if (currLeader != getID()) {
             return null;
         }
-        logger.debug(format("[#%d] prepare to disseminate a new block of [height=%d]", getID(), currHeight));
+    logger.debug(format("[#%d] prepare to disseminate a new block of [height=%d]", getID(), currHeight));
 
-//        synchronized (blockLock) {
-            addTransactionsToCurrBlock();
-            Block sealedBlock1 = currBlock.construct(getID(), currHeight, cidSeries, cid,
-                    DigestMethod.hash(bc.getBlock(currHeight - 1).getHeader().toByteArray()));
+    //        synchronized (blockLock) {
+        addTransactionsToCurrBlock();
+        Block sealedBlock1 = currBlock.construct(getID(), currHeight, cidSeries, cid,
+                channel, bc.getBlock(currHeight - 1).getHeader());
 
-            List<byte[]> msgs = new ArrayList<>();
-            List<Integer> heights = new ArrayList<>();
-            for (int i = 0 ; i < groups.size() ; i++) {
-                addByzData();
-                Block byzBlock = currBlock.construct(getID(), currHeight, cidSeries, cid,
-                        DigestMethod.hash(bc.getBlock(currHeight - 1).getHeader().toByteArray()));
-                msgs.add(byzBlock.toByteArray());
-                heights.add(currHeight);
-            }
+        List<Block> msgs = new ArrayList<>();
+        List<Integer> heights = new ArrayList<>();
+        for (int i = 0 ; i < groups.size() ; i++) {
+            addByzData();
+            Block byzBlock = currBlock.construct(getID(), currHeight, cidSeries, cid,
+                    channel, bc.getBlock(currHeight - 1).getHeader());
+            msgs.add(byzBlock);
+            heights.add(currHeight);
+        }
 
-            if (fullByz) {
-                ((ByzantineRmfNode)rmfServer).devidedBroadcast(channel, cidSeries, cid, msgs, heights, groups);
+        if (fullByz) {
+            ((ByzantineRmfNode)rmfServer).devidedBroadcast(msgs, groups);
 
-            } else {
-                ((ByzantineRmfNode)rmfServer).selectiveBroadcast(channel, cidSeries, cid, sealedBlock1.toByteArray(), currHeight, groups.get(0));
-            }
-//        }
-         return null;
+        } else {
+            ((ByzantineRmfNode)rmfServer).selectiveBroadcast(sealedBlock1, groups.get(0));
+        }
+    //        }
+     return null;
     }
 
     @Override
-    public blockchain initBC(int id) {
-        return new basicBlockchain(id);
+    public blockchain initBC(int id, int channel) {
+        return new basicBlockchain(id, channel);
     }
 
     @Override

@@ -3,7 +3,7 @@ title = "configuration"
 [system]
     n = 4
     f = 1
-    c = 1
+    c = 10
 
 
 [setting]
@@ -12,7 +12,7 @@ title = "configuration"
     rmfBbcConfigPath = "src/main/resources/bbcConfig"
     panicRBroadcastConfigPath = "src/main/resources/panicRBConfig"
     syncRBroadcastConfigPath = "src/main/resources/syncRBConfig"
-    maxTransactionInBlock = 1
+    maxTransactionInBlock = 1000
     caRootPath = ""
     fastMode = true
 

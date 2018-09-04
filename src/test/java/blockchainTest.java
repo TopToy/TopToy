@@ -116,7 +116,7 @@ public class blockchainTest {
 //
     @Test
     void TestSingleServerDisseminateMessage() throws InterruptedException {
-        setConfig(singleConfig, 0);
+        setConfig(null, 0);
         Thread.sleep(timeToWaitBetweenTests);
         logger.info("start TestSingleServer");
         Node[] rn1 = initLocalBCNodes(1, 0, singleBbc.toString(),
@@ -193,7 +193,7 @@ public class blockchainTest {
     }
     @Test
     void TestStressFourServersNoFailures() throws InterruptedException {
-        setConfig(fourConfig, 0);
+        setConfig(null, 0);
         Thread.sleep(timeToWaitBetweenTests);
         int nnodes = 4;
         logger.info("start TestFourServersNoFailures");
@@ -236,9 +236,9 @@ public class blockchainTest {
             ((cbcServer) allNodes[i]).shutdown(false);
         }
         for (int i = 0 ; i < 100 ; i++) {
-            logger.info(format("***** Assert creator = %d", res.get(0).get(i).getHeader().getCreatorID()));
+            logger.info(format("***** Assert creator = %d", res.get(0).get(i).getHeader().getM().getSender()));
             for (int k = 0 ; k < nnodes ;k++) {
-                assertEquals(res.get(0).get(i).getHeader().getCreatorID(), res.get(k).get(i).getHeader().getCreatorID());
+                assertEquals(res.get(0).get(i).getHeader().getM().getSender(), res.get(k).get(i).getHeader().getM().getSender());
             }
         }
 
@@ -291,9 +291,9 @@ void TestStressFourServersMuteFault() throws InterruptedException {
     }
 
     for (int i = 0 ; i < 100 ; i++) {
-        logger.info(format("***** Assert creator = %d", res.get(1).get(i).getHeader().getCreatorID()));
+        logger.info(format("***** Assert creator = %d", res.get(1).get(i).getHeader().getM().getSender()));
         for (int k = 1 ; k < nnodes ;k++) {
-            assertEquals(res.get(1).get(i).getHeader().getCreatorID(), res.get(k).get(i).getHeader().getCreatorID());
+            assertEquals(res.get(1).get(i).getHeader().getM().getSender(), res.get(k).get(i).getHeader().getM().getSender());
         }
     }
 
@@ -380,9 +380,9 @@ void TestStressFourServersMuteFault() throws InterruptedException {
         }
 
         for (int i = 0 ; i < 100 ; i++) {
-            logger.info(format("***** Assert creator = %d", res.get(0).get(i).getHeader().getCreatorID()));
+            logger.info(format("***** Assert creator = %d", res.get(0).get(i).getHeader().getM().getSender()));
             for (int k = 0 ; k < nnodes ;k++) {
-                assertEquals(res.get(0).get(i).getHeader().getCreatorID(), res.get(k).get(i).getHeader().getCreatorID());
+                assertEquals(res.get(0).get(i).getHeader().getM().getSender(), res.get(k).get(i).getHeader().getM().getSender());
             }
         }
 
@@ -445,9 +445,9 @@ void TestStressFourServersMuteFault() throws InterruptedException {
         }
 
         for (int i = 0 ; i < 100 ; i++) {
-            logger.info(format("***** Assert creator = %d", res.get(0).get(i).getHeader().getCreatorID()));
+            logger.info(format("***** Assert creator = %d", res.get(0).get(i).getHeader().getM().getSender()));
             for (int k = 0 ; k < nnodes ;k++) {
-                assertEquals(res.get(0).get(i).getHeader().getCreatorID(), res.get(k).get(i).getHeader().getCreatorID());
+                assertEquals(res.get(0).get(i).getHeader().getM().getSender(), res.get(k).get(i).getHeader().getM().getSender());
             }
         }
 
@@ -580,9 +580,9 @@ void TestStressFourServersMuteFault() throws InterruptedException {
         }
 
         for (int i = 0 ; i < 100 ; i++) {
-            logger.info(format("***** Assert creator = %d", res.get(0).get(i).getHeader().getCreatorID()));
+            logger.info(format("***** Assert creator = %d", res.get(0).get(i).getHeader().getM().getSender()));
             for (int k = 0 ; k < nnodes ;k++) {
-                assertEquals(res.get(0).get(i).getHeader().getCreatorID(), res.get(k).get(i).getHeader().getCreatorID());
+                assertEquals(res.get(0).get(i).getHeader().getM().getSender(), res.get(k).get(i).getHeader().getM().getSender());
                 for (int j = 0 ; j < res.get(0).get(i).getDataList().size() ; j++) {
                     logger.info(format("***** Assert data = %s",
                             new String(res.get(0).get(i).getData(j).getData().toByteArray())));
@@ -674,9 +674,9 @@ void TestStressFourServersMuteFault() throws InterruptedException {
         }
 
         for (int i = 0 ; i < 100 ; i++) {
-            logger.info(format("***** Assert creator = %d", res.get(0).get(i).getHeader().getCreatorID()));
+            logger.info(format("***** Assert creator = %d", res.get(0).get(i).getHeader().getM().getSender()));
             for (int k = 0 ; k < nnodes ;k++) {
-                assertEquals(res.get(0).get(i).getHeader().getCreatorID(), res.get(k).get(i).getHeader().getCreatorID());
+                assertEquals(res.get(0).get(i).getHeader().getM().getSender(), res.get(k).get(i).getHeader().getM().getSender());
                 for (int j = 0 ; j < res.get(0).get(i).getDataList().size() ; j++) {
                     logger.info(format("***** Assert data = %s",
                             new String(res.get(0).get(i).getData(j).getData().toByteArray())));

@@ -261,9 +261,9 @@ public class sgTest {
             allNodes[i].shutdown();
         }
         for (int i = 0 ; i < 100 ; i++) {
-            logger.info(format("***** Assert creator = %d", res.get(0).get(i).getHeader().getCreatorID()));
+            logger.info(format("***** Assert creator = %d", res.get(0).get(i).getHeader().getM().getSender()));
             for (int k = 0 ; k < nnodes ;k++) {
-                assertEquals(res.get(0).get(i).getHeader().getCreatorID(), res.get(k).get(i).getHeader().getCreatorID());
+                assertEquals(res.get(0).get(i).getHeader().getM().getSender(), res.get(k).get(i).getHeader().getM().getSender());
             }
         }
 
@@ -322,9 +322,9 @@ public class sgTest {
         }
 
         for (int i = 0 ; i < 100 ; i++) {
-            logger.info(format("***** Assert creator = %d", res.get(1).get(i).getHeader().getCreatorID()));
+            logger.info(format("***** Assert creator = %d", res.get(1).get(i).getHeader().getM().getSender()));
             for (int k = 1 ; k < nnodes ;k++) {
-                assertEquals(res.get(1).get(i).getHeader().getCreatorID(), res.get(k).get(i).getHeader().getCreatorID());
+                assertEquals(res.get(1).get(i).getHeader().getM().getSender(), res.get(k).get(i).getHeader().getM().getSender());
             }
         }
 
@@ -428,9 +428,9 @@ public class sgTest {
         }
 
         for (int i = 0 ; i < 100 ; i++) {
-            logger.info(format("***** Assert creator = %d", res.get(0).get(i).getHeader().getCreatorID()));
+            logger.info(format("***** Assert creator = %d", res.get(0).get(i).getHeader().getM().getSender()));
             for (int k = 0 ; k < nnodes ;k++) {
-                assertEquals(res.get(0).get(i).getHeader().getCreatorID(), res.get(k).get(i).getHeader().getCreatorID());
+                assertEquals(res.get(0).get(i).getHeader().getM().getSender(), res.get(k).get(i).getHeader().getM().getSender());
             }
         }
 
@@ -500,9 +500,9 @@ public class sgTest {
         }
 
         for (int i = 0 ; i < 100 ; i++) {
-            logger.info(format("***** Assert creator = %d", res.get(0).get(i).getHeader().getCreatorID()));
+            logger.info(format("***** Assert creator = %d", res.get(0).get(i).getHeader().getM().getSender()));
             for (int k = 0 ; k < nnodes ;k++) {
-                assertEquals(res.get(0).get(i).getHeader().getCreatorID(), res.get(k).get(i).getHeader().getCreatorID());
+                assertEquals(res.get(0).get(i).getHeader().getM().getSender(), res.get(k).get(i).getHeader().getM().getSender());
             }
         }
 
@@ -599,9 +599,9 @@ public class sgTest {
         }
 
         for (int i = 0 ; i < 100 ; i++) {
-            logger.info(format("***** Assert creator = %d", res.get(0).get(i).getHeader().getCreatorID()));
+            logger.info(format("***** Assert creator = %d", res.get(0).get(i).getHeader().getM().getSender()));
             for (int k = 0 ; k < nnodes ;k++) {
-                assertEquals(res.get(0).get(i).getHeader().getCreatorID(), res.get(k).get(i).getHeader().getCreatorID());
+                assertEquals(res.get(0).get(i).getHeader().getM().getSender(), res.get(k).get(i).getHeader().getM().getSender());
                 for (int j = 0 ; j < res.get(0).get(i).getDataList().size() ; j++) {
                     logger.info(format("***** Assert data = %s",
                             new String(res.get(0).get(i).getData(j).getData().toByteArray())));
@@ -691,9 +691,9 @@ public class sgTest {
         }
 
         for (int i = 0 ; i < 100 ; i++) {
-            logger.info(format("***** Assert creator = %d", res.get(0).get(i).getHeader().getCreatorID()));
+            logger.info(format("***** Assert creator = %d", res.get(0).get(i).getHeader().getM().getSender()));
             for (int k = 0 ; k < nnodes ;k++) {
-                assertEquals(res.get(0).get(i).getHeader().getCreatorID(), res.get(k).get(i).getHeader().getCreatorID());
+                assertEquals(res.get(0).get(i).getHeader().getM().getSender(), res.get(k).get(i).getHeader().getM().getSender());
                 for (int j = 0 ; j < res.get(0).get(i).getDataList().size() ; j++) {
                     logger.info(format("***** Assert data = %s",
                             new String(res.get(0).get(i).getData(j).getData().toByteArray())));

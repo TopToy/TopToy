@@ -29,7 +29,7 @@ public class asyncBcServer extends bcServer {
                 bbcConfig, panicConfig, syncConfig, serverCrt, serverPrivKey, caRoot);
     }
 
-    byte[] leaderImpl() throws InterruptedException {
+    Types.Block leaderImpl() throws InterruptedException {
         Random rand = new Random();
         int x = rand.nextInt(maxTime) + 1;
         logger.debug(format("[#%d] sleeps for %d ms", getID(), x));
@@ -43,34 +43,35 @@ public class asyncBcServer extends bcServer {
         return fastModePhase();
     }
 
-        byte[] normalLeaderPhase() {
-            if (currLeader != getID()) {
-                return null;
-            }
-            logger.debug(format("[#%d] prepare to disseminate a new block of [height=%d] [cidSeries=%d ; cid=%d]",
-                    getID(), currHeight, cidSeries, cid));
-            addTransactionsToCurrBlock();
-            Types.Block sealedBlock = currBlock.construct(getID(), currHeight, cidSeries, cid, DigestMethod.hash(bc.getBlock(currHeight - 1).getHeader().toByteArray()));
-            rmfServer.broadcast(channel, cidSeries, cid, sealedBlock.toByteArray(), currHeight);
+    Types.Block normalLeaderPhase() {
+        if (currLeader != getID()) {
             return null;
         }
+        logger.debug(format("[#%d] prepare to disseminate a new block of [height=%d] [cidSeries=%d ; cid=%d]",
+                getID(), currHeight, cidSeries, cid));
+        addTransactionsToCurrBlock();
+        Types.Block sealedBlock = currBlock.construct(getID(), currHeight, cidSeries, cid, channel, bc.getBlock(currHeight - 1).getHeader());
+        rmfServer.broadcast(sealedBlock);
+        return null;
+    }
 
-        byte[] fastModePhase() {
-            if ((currLeader + 1) % n != getID()) {
-                return null;
-            }
-            logger.debug(format("[#%d] prepare fast mode phase for [height=%d] [cidSeries=%d ; cid=%d]",
-                    getID(), currHeight + 1, cidSeries, cid + 1));
-            addTransactionsToCurrBlock();
-            return currBlock.construct(getID(), currHeight + 1, cidSeries, cid + 1, new byte[0]).toByteArray();
+    Types.Block fastModePhase() {
+        if ((currLeader + 1) % n != getID()) {
+            return null;
         }
+        logger.debug(format("[#%d] prepare fast mode phase for [height=%d] [cidSeries=%d ; cid=%d]",
+                getID(), currHeight + 1, cidSeries, cid + 1));
+        addTransactionsToCurrBlock();
+        return currBlock.construct(getID(), currHeight + 1, cidSeries, cid + 1, channel, null);
+    }
+
     public void setAsyncParam(int maxTime) {
         this.maxTime = maxTime;
 
     }
     @Override
-    public blockchain initBC(int id) {
-        return new basicBlockchain(id);
+    public blockchain initBC(int id, int channel) {
+        return new basicBlockchain(id, channel);
     }
 
     @Override

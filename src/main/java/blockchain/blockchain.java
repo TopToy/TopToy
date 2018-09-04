@@ -17,9 +17,9 @@ public abstract class blockchain {
     private final List<Block> blocks = new ArrayList<>();
     private final int creatorID;
 
-    public blockchain(int creatorID) {
+    public blockchain(int creatorID, int channel) {
         this.creatorID = creatorID;
-        createGenesis();
+        createGenesis(channel);
     }
 
     public blockchain(blockchain orig, int start, int end) {
@@ -29,14 +29,14 @@ public abstract class blockchain {
 
     public abstract block createNewBLock();
 
-    abstract void createGenesis();
+    abstract void createGenesis(int channel);
 
     boolean validateBlockCreator(Block b, int f) {
         if (blocks.size() >= f && blocks.subList(blocks.size() - f, blocks.size()).
         stream().
-        map(bl -> bl.getHeader().getCreatorID()).
+        map(bl -> bl.getHeader().getM().getSender()).
         collect(Collectors.toList()).
-        contains(b.getHeader().getCreatorID())) {
+        contains(b.getHeader().getM().getSender())) {
             logger.debug(format("[#%d] invalid block", creatorID));
             return false;
         }

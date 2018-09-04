@@ -35,7 +35,9 @@ wait
 for i in `seq 0 $((${#servers[@]} - 1))`; do
     echo "collecting results summery from server ${servers[$i]}"
     cat $outputDir/res/${ids[i]}/summery.csv >> $outputDir/res/summery.csv
+    cat $outputDir/res/${ids[i]}/sig_summery.csv >> $outputDir/res/sig_summery.csv
     rm -f $outputDir/res/${ids[i]}/summery.csv
+    rm -f $outputDir/res/${ids[i]}/sig_summery.csv
 done
 
 

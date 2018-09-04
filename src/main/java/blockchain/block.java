@@ -3,6 +3,7 @@ package blockchain;
 import com.google.protobuf.ByteString;
 import crypto.DigestMethod;
 import crypto.blockDigSig;
+import org.apache.commons.lang.ArrayUtils;
 import proto.Types.*;
 
 import java.util.ArrayList;
@@ -33,27 +34,50 @@ public abstract class block {
         blockBuilder.removeData(index);
     }
 
-    public Block construct(int creatorID, int height, int cidSeries, int cid, byte[] prevHash) {
+    public Block construct(int creatorID, int height, int cidSeries, int cid, int channel, BlockHeader header) {
         byte[] tHash = new byte[0];
         for (Transaction t : blockBuilder.getDataList()) {
-            tHash = DigestMethod.hash(t.toByteArray());
+            tHash = DigestMethod.hash(ArrayUtils.addAll(tHash, t.toByteArray()));
         }
-        blockBuilder.setHeader(blockBuilder.
-                getHeaderBuilder().
-                    setCreatorID(creatorID).
-                    setHeight(height).
-                    setCidSeries(cidSeries).
-                    setCid(cid).
-                    setPrev(ByteString.copyFrom(prevHash)).
-                    setTransactionHash(ByteString.copyFrom(tHash)));
+        byte[] headerArray = new byte[0];
+        if (header != null) {
+            headerArray = header.toByteArray();
+        }
+        blockBuilder.setHeader(BlockHeader.newBuilder()
+                        .setM(Meta.newBuilder()
+                                .setCid(cid)
+                                .setCidSeries(cidSeries)
+                                .setSender(creatorID)
+                                .setChannel(channel)
+                                .build())
+                        .setHeight(height)
+                        .setPrev(ByteString.copyFrom(DigestMethod.hash(headerArray)))
+                        .setTransactionHash(ByteString.copyFrom(tHash))
+                        .build());
+//        Block
+//                blockBuilder.
+//                getHeaderBuilder().
+//                    setCreatorID(creatorID).
+//                    setHeight(height).
+//                    setCidSeries(cidSeries).
+//                    setCid(cid).
+//                    setPrev(ByteString.copyFrom(prevHash)).
+//                    setTransactionHash(ByteString.copyFrom(tHash)));
         if (creatorID == -1) {
             return blockBuilder.build();
         }
+//        return blockBuilder
+//                .setHeader(blockBuilder
+//                        .getHeader()
+//                        .toBuilder()
+//                        .build())
+//                .build();
         return blockBuilder
                 .setHeader(blockBuilder
                         .getHeader()
                         .toBuilder()
-                        .build())
+                .setProof(blockDigSig.sign(blockBuilder.getHeader()))
+                .build())
                 .build();
     }
 
