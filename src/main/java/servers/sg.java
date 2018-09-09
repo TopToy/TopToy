@@ -1,28 +1,21 @@
-package serverGroup;
+package servers;
 
-import blockchain.bcServer;
-import blockchain.byzantineBcServer;
-import blockchain.asyncBcServer;
 import blockchain.blockchain;
-import blockchain.cbcServer;
 import com.google.protobuf.ByteString;
-import config.Config;
 import config.Node;
 import consensus.RBroadcast.RBrodcastService;
-import consensus.bbc.bbcService;
 import crypto.DigestMethod;
 import proto.Types;
 import rmf.ByzantineRmfNode;
 import rmf.RmfNode;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 import static java.lang.String.format;
 
-public class sg {
+public class sg implements server {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(sg.class);
     RmfNode rmf;
     RBrodcastService deliverFork;
@@ -87,6 +80,7 @@ public class sg {
         int currBlock = 0;
         while (!stopped) {
             for (currChannel = 0 ; currChannel < c ; currChannel++) {
+                long start = System.currentTimeMillis();
 //                Timestamp timestamp = new Timestamp(System.currentTimeMillis());
                 Types.Block cBlock = group[currChannel].deliver(currBlock);
                 if (cBlock.getDataCount() == 0) continue;
@@ -102,12 +96,14 @@ public class sg {
                     bc.addBlock(cBlock);
                     bc.notify();
                 }
-
+                logger.info(format("[#%d-C[%d]] deliver took about [%d] ms [height=%d], [cidSeries=%d ; cid=%d]",
+                        getID(), currChannel, System.currentTimeMillis() - start, cBlock.getHeader().getHeight(),
+                        cBlock.getHeader().getM().getCidSeries() ,cBlock.getHeader().getM().getCid()));
             }
             currBlock++;
         }
     }
-    public void start() throws InterruptedException {
+    public void start() {
         CountDownLatch latch = new CountDownLatch(3);
         new Thread(() -> {
             this.rmf.start();
@@ -121,7 +117,13 @@ public class sg {
             this.sync.start();
             latch.countDown();
         }).run();
-        latch.await();
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            logger.error("", e);
+            shutdown();
+            return;
+        }
         for (int i = 0 ; i < c ; i++) {
             group[i].start(true);
         }

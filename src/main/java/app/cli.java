@@ -1,6 +1,4 @@
 package app;
-import blockchain.asyncBcServer;
-import blockchain.byzantineBcServer;
 import com.google.protobuf.ByteString;
 import config.Config;
 //import crypto.rmfDigSig;
@@ -8,14 +6,12 @@ import crypto.DigestMethod;
 import crypto.blockDigSig;
 import org.apache.commons.cli.*;
 import org.apache.commons.lang.ArrayUtils;
-import org.omg.CORBA.INTERNAL;
 import proto.Types;
 import utils.CSVUtils;
 
 import java.io.FileWriter;
 import java.io.File;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.SecureRandom;
@@ -27,6 +23,7 @@ import java.util.*;
 import static java.lang.Math.min;
 import static java.lang.StrictMath.max;
 import static java.lang.String.format;
+import static java.lang.String.valueOf;
 
 public class cli {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(cli.class);
@@ -98,6 +95,7 @@ public class cli {
                     if (args.length == 2) {
                         int sec = Integer.parseInt(args[1]);
                         Thread.sleep(sec * 1000);
+
                     }
                     return;
                 }
@@ -109,7 +107,7 @@ public class cli {
                     }
                     if (args.length == 2) {
                         int sec = Integer.parseInt(args[1]);
-                        JToy.server.setAsyncParam(sec);
+                        JToy.s.setAsyncParam(sec);
                     }
                     return;
                 }
@@ -139,7 +137,7 @@ public class cli {
                         if (!args[5].equals("-p")) return;
                         String path = args[6];
                         int txSize = Integer.parseInt(args[4]);
-                        int txNum = Integer.parseInt(args[1]);
+                        int txNum = Integer.parseInt(args[2]);
                         sigTets(txNum, txSize, path);
 
                     }
@@ -190,26 +188,26 @@ public class cli {
             formatter.printHelp("Optimistic Total Ordering System ", options);
         }
 
-        private void init() throws InterruptedException {
-            JToy.server.start();
+        private void init() {
+            JToy.s.start();
         }
 
         private void serve() {
             if (JToy.type.equals("m")) return;
             logger.debug("start serving");
-            JToy.server.serve();
+            JToy.s.serve();
         }
         private void stop() {
-            JToy.server.shutdown();
+            JToy.s.shutdown();
         }
 
 
         private String addtx(String data, int clientID) {
-            return JToy.server.addTransaction(data.getBytes(), clientID);
+            return JToy.s.addTransaction(data.getBytes(), clientID);
         }
 
         private String txStatus(String txID) {
-            int stat = JToy.server.isTxPresent(txID);
+            int stat = JToy.s.isTxPresent(txID);
 
             switch (stat) {
                 case -1: return "Not exist";
@@ -230,7 +228,7 @@ public class cli {
                 byte[] tx = new byte[txSize];
                 random.nextBytes(tx);
                 bb.addData(Types.Transaction.newBuilder()
-                        .setTxID(new BigInteger("1234").toString())
+                        .setTxID(UUID.randomUUID().toString())
                         .setClientID(0)
                         .setData(ByteString.copyFrom(tx))
                         .build());
@@ -262,7 +260,7 @@ public class cli {
 //                    .setData(ByteString.copyFrom(tx));
 //            d.setSig(rmfDigSig.sign(d));
 //            Types.Data db = d.build();
-            if (!blockDigSig.verify(JToy.server.getID(), b)) {
+            if (!blockDigSig.verify(JToy.s.getID(), b)) {
                 return;
             }
             int sigCount = 0;
@@ -275,11 +273,11 @@ public class cli {
             int verCount = 0;
             t = System.currentTimeMillis();
             while (System.currentTimeMillis() - t < 10 * 1000) {
-                blockDigSig.verify(JToy.server.getID(), b);
+                blockDigSig.verify(JToy.s.getID(), b);
                 verCount++;
             }
 
-            Path path = Paths.get(pathString,   String.valueOf(JToy.server.getID()), "sig_summery.csv");
+            Path path = Paths.get(pathString,   String.valueOf(JToy.s.getID()), "sig_summery.csv");
             File f = new File(path.toString());
             if (!f.exists()) {
                 f.getParentFile().mkdirs();
@@ -288,7 +286,7 @@ public class cli {
             FileWriter writer = new FileWriter(path.toString(), true);
             DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy-HH:mm:ss");
             List<String> row = Arrays.asList(dateFormat.format(new Date()),
-                    String.valueOf(JToy.server.getID()), String.valueOf(sigCount), String.valueOf(verCount));
+                    String.valueOf(JToy.s.getID()), String.valueOf(sigCount), String.valueOf(verCount));
             CSVUtils.writeLine(writer, row);
             writer.flush();
             writer.close();
@@ -296,19 +294,20 @@ public class cli {
         private void writeToScv(String pathString) {
             if (JToy.type.equals("m")) return;
             DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy-HH:mm:ss");
-            Path path = Paths.get(pathString, String.valueOf(JToy.server.getID()), dateFormat.format(new Date()) + ".csv");
+            Path path = Paths.get(pathString, String.valueOf(JToy.s.getID()), dateFormat.format(new Date()) + ".csv");
             try {
                 File f = new File(path.toString());
 
                 f.getParentFile().mkdirs();
                 f.createNewFile();
                 FileWriter writer = new FileWriter(path.toString());
-                int nob = JToy.server.getBCSize();
+                int nob = JToy.s.getBCSize();
                 long fts = 0;
                 long lts = 0;
                 int tCount = 0;
+                int txSize = -1;
                 for (int i = 0 ; i < nob ; i++) {
-                    Types.Block b = JToy.server.nonBlockingDeliver(i);
+                    Types.Block b = JToy.s.nonBlockingDeliver(i);
                     for (Types.Transaction t : b.getDataList()) {
                         if (fts == 0) {
                             fts = b.getTs();
@@ -317,6 +316,9 @@ public class cli {
                         fts = min(fts, b.getTs());
                         lts = max(lts, b.getTs());
                         tCount++;
+                        if (txSize == -1) {
+                            txSize = t.getSerializedSize();
+                        }
                         List<String> row = Arrays.asList(t.getTxID(),
                                 String.valueOf(t.getClientID()), String.valueOf(b.getTs()),
                                 String.valueOf(t.getData().size()), String.valueOf(i),
@@ -326,14 +328,14 @@ public class cli {
                 }
                 writer.flush();
                 writer.close();
-                writeSummery(pathString, tCount, fts, lts);
+                writeSummery(pathString, tCount, txSize, fts, lts);
             } catch (IOException e) {
                 logger.error("", e);
             }
         }
 
-        void writeSummery(String pathString, int tCount, long fts, long lts) throws IOException {
-            Path path = Paths.get(pathString,   String.valueOf(JToy.server.getID()), "summery.csv");
+        void writeSummery(String pathString, int tCount, int txSize, long fts, long lts) throws IOException {
+            Path path = Paths.get(pathString,   String.valueOf(JToy.s.getID()), "summery.csv");
             File f = new File(path.toString());
             if (!f.exists()) {
                 f.getParentFile().mkdirs();
@@ -343,9 +345,9 @@ public class cli {
             double time = ((double) lts - (double) fts) / 1000;
             int thrp = (int) (tCount / time);
             DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy-HH:mm:ss");
-            List<String> row = Arrays.asList(dateFormat.format(new Date()), String.valueOf(JToy.server.getID()),
-                    String.valueOf(Config.getC()), String.valueOf(Config.getMaxTransactionsInBlock()),
-                    String.valueOf(Config.getFastMode()), String.valueOf(tCount),
+            List<String> row = Arrays.asList(dateFormat.format(new Date()), String.valueOf(JToy.s.getID()),
+                    JToy.type, String.valueOf(Config.getC()), String.valueOf(Config.getFastMode()),
+                    String.valueOf(txSize), String.valueOf(Config.getMaxTransactionsInBlock()), String.valueOf(tCount),
                     String.valueOf(time), String.valueOf(thrp));
             CSVUtils.writeLine(writer, row);
             writer.flush();
@@ -359,8 +361,10 @@ public class cli {
                 SecureRandom random = new SecureRandom();
                 byte[] tx = new byte[tSize];
                 random.nextBytes(tx);
-                last = JToy.server.addTransaction(tx, cID);
+                last = JToy.s.addTransaction(tx, cID);
             }
+            Thread.sleep(10 * 1000);
+            logger.info(format("[#%d] start serving...", JToy.s.getID()));
             serve();
 //            while ((!JToy.type.equals("m")) && (!last.equals("")) && JToy.server.isTxPresent(last) != 2) {
 //                Thread.sleep(5 * 1000);
@@ -368,7 +372,7 @@ public class cli {
 //            if (JToy.type.equals("m")) {
 //                Thread.sleep(60 * 1000);
 //            }
-            Thread.sleep(60 * 1000);
+            Thread.sleep( 1 * 60 * 1000);
             stop();
             writeToScv(csvPath);
         }
@@ -386,7 +390,7 @@ public class cli {
                 }
                 groups.add(group);
             }
-            JToy.server.setByzSetting(fullByz, groups);
+            JToy.s.setByzSetting(fullByz, groups);
         }
 
 }

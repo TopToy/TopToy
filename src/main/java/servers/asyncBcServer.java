@@ -1,8 +1,9 @@
-package blockchain;
+package servers;
 
+import blockchain.basicBlockchain;
+import blockchain.blockchain;
 import config.Node;
 import consensus.RBroadcast.RBrodcastService;
-import crypto.DigestMethod;
 import proto.Types;
 import rmf.RmfNode;
 

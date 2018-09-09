@@ -1,6 +1,6 @@
-import blockchain.asyncBcServer;
-import blockchain.cbcServer;
-import blockchain.byzantineBcServer;
+import servers.asyncBcServer;
+import servers.cbcServer;
+import servers.byzantineBcServer;
 
 import config.Config;
 import config.Node;

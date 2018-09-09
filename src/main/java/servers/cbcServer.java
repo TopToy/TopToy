@@ -1,9 +1,9 @@
-package blockchain;
+package servers;
 
+import blockchain.blockchain;
+import blockchain.basicBlockchain;
 import config.Node;
 import consensus.RBroadcast.RBrodcastService;
-import consensus.bbc.bbcService;
-import crypto.DigestMethod;
 
 import proto.Types.*;
 import rmf.RmfNode;
@@ -41,8 +41,8 @@ public class cbcServer extends bcServer {
         if (currLeader != getID()) {
             return null;
         }
-        logger.debug(format("[#%d] prepare to disseminate a new block of [height=%d] [cidSeries=%d ; cid=%d]",
-                getID(), currHeight, cidSeries, cid));
+        logger.debug(format("[#%d -C[%d]] prepare to disseminate a new block of [height=%d] [cidSeries=%d ; cid=%d]",
+                getID(), channel, currHeight, cidSeries, cid));
         addTransactionsToCurrBlock();
         Block sealedBlock = currBlock.construct(getID(), currHeight, cidSeries, cid, channel, bc.getBlock(currHeight - 1).getHeader());
         rmfServer.broadcast(sealedBlock);
@@ -53,8 +53,8 @@ public class cbcServer extends bcServer {
         if ((currLeader + 1) % n != getID()) {
             return null;
         }
-        logger.debug(format("[#%d] prepare fast mode phase for [height=%d] [cidSeries=%d ; cid=%d]",
-                getID(), currHeight + 1, cidSeries, cid + 1));
+        logger.debug(format("[#%d-C[%d]] prepare fast mode phase for [height=%d] [cidSeries=%d ; cid=%d]",
+                getID(), channel, currHeight + 1, cidSeries, cid + 1));
         addTransactionsToCurrBlock();
         return currBlock.construct(getID(), currHeight + 1, cidSeries, cid + 1, channel, null);
     }

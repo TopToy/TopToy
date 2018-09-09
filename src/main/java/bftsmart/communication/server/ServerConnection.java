@@ -444,6 +444,8 @@ public class ServerConnection {
 
         @Override
         public void run() {
+            //TODO: MY change in order to preent exception on startup
+            while (controller.getStaticConf() == null);
             byte[] data = null;
 
             while (doWork) {

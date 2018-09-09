@@ -1,20 +1,16 @@
-package blockchain;
+package servers;
 
+import blockchain.blockchain;
+import blockchain.block;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import config.Config;
 import config.Node;
 import consensus.RBroadcast.RBrodcastService;
-import consensus.bbc.bbcService;
-import crypto.DigestMethod;
 import crypto.blockDigSig;
-import org.apache.commons.lang.ArrayUtils;
 import proto.*;
 import rmf.RmfNode;
 import proto.Types.*;
 
-import java.math.BigInteger;
-import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -206,8 +202,8 @@ public abstract class bcServer extends Node {
 //            int mcidSeries = msg.getCidSeries();
                 if (recBlock == null) {
                     tmo += tmoInterval;
-                    logger.debug(format("[#%d-C[%d]] Unable to receive block, timeout increased to [%d] ms"
-                            , getID(), channel, tmo));
+                    logger.debug(format("[#%d-C[%d]] Unable to receive block [cidSeries=%d ; cid=%d], timeout increased to [%d] ms"
+                            , getID(), channel, cidSeries, cid, tmo));
                     updateLeaderAndHeight();
                     fastMode = false;
                     cid++;
@@ -289,10 +285,10 @@ public abstract class bcServer extends Node {
                     bc.addBlock(recBlock);
                     logger.debug(String.format("[#%d-C[%d]] adds new block with [height=%d] [cidSeries=%d ; cid=%d] [size=%d]",
                             getID(), channel, recBlock.getHeader().getHeight(), cidSeries, cid, recBlock.getDataCount()));
-                    if (currHeight % 500 == 0) {
-                        logger.info(String.format("[#%d-C[%d]] adds new block with [height=%d] [cidSeries=%d ; cid=%d]",
-                                getID(), channel, recBlock.getHeader().getHeight(), cidSeries, cid));
-                    }
+//                    if (currHeight % 500 == 0) {
+//                        logger.info(String.format("[#%d-C[%d]] adds new block with [height=%d] [cidSeries=%d ; cid=%d]",
+//                                getID(), channel, recBlock.getHeader().getHeight(), cidSeries, cid));
+//                    }
                     newBlockNotifyer.notify();
                 }
                 if (bc.getHeight() - f >= 0) {
@@ -317,11 +313,7 @@ public abstract class bcServer extends Node {
 
 
     public String addTransaction(byte[] data, int clientID) {
-        long magic = System.currentTimeMillis();
-        String txID = new BigInteger(DigestMethod.hash(ArrayUtils.addAll(String.valueOf(channel).getBytes(),
-                ArrayUtils.addAll(data, (String.valueOf(magic)).getBytes()))))
-                .toString()
-                .replaceAll("-","N");
+        String txID = UUID.randomUUID().toString();
         Transaction t = Transaction.newBuilder()
                 .setClientID(clientID)
                 .setTxID(txID)

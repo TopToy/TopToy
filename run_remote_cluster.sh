@@ -8,6 +8,9 @@ outputDir=/home/yoni/toy
 rm -r target
 rm -r -f bin
 mvn install -DskipTests
+if [[ "$?" -ne 0 ]] ; then
+  echo 'could compile the project'; exit $1
+fi
 rm -r -f ./bin/src/main/resources/*
 cp -r $configDir/* ./bin/src/main/resources/
 for i in `seq 0 $((${#servers[@]} - 1))`; do

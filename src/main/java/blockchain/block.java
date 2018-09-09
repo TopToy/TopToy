@@ -12,7 +12,7 @@ import java.util.List;
 public abstract class block {
     private Block.Builder blockBuilder = Block.newBuilder();
 
-    abstract boolean validateTransaction(Transaction t);
+    abstract public boolean validateTransaction(Transaction t);
 
 
     public Transaction getTransaction(int index) {

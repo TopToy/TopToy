@@ -1,5 +1,8 @@
-package blockchain;
+package servers;
 
+import blockchain.blockchain;
+
+import blockchain.basicBlockchain;
 import com.google.protobuf.ByteString;
 import config.Config;
 import config.Node;

@@ -1,12 +1,9 @@
-import blockchain.asyncBcServer;
-import blockchain.byzantineBcServer;
-import blockchain.cbcServer;
 import config.Config;
 import config.Node;
 import org.apache.commons.lang.ArrayUtils;
 import org.junit.jupiter.api.Test;
 import proto.Types;
-import serverGroup.sg;
+import servers.sg;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -156,11 +153,7 @@ public class sgTest {
         for (int i = 0 ; i < nnodes ; i++) {
             int finalI = i;
             servers[i]  = new Thread(() -> {
-                try {
-                    (allNodes[finalI]).start();
-                } catch (InterruptedException e) {
-                    logger.error("", e);
-                }
+                (allNodes[finalI]).start();
             });
             servers[i].start();
         }
@@ -222,11 +215,8 @@ public class sgTest {
         for (int i = 0 ; i < nnodes ; i++) {
             int finalI = i;
             servers[i]  = new Thread(() -> {
-                try {
                     allNodes[finalI].start();
-                } catch (InterruptedException e) {
-                    logger.error("", e);
-                }
+
             });
             servers[i].start();
         }
@@ -281,11 +271,7 @@ public class sgTest {
         for (int i = 0 ; i < nnodes ; i++) {
             int finalI = i;
             servers[i]  = new Thread(() -> {
-                try {
                     allNodes[finalI].start();
-                } catch (InterruptedException e) {
-                    logger.error("", e);
-                }
             });
             servers[i].start();
         }
@@ -353,21 +339,13 @@ public class sgTest {
             int finalI = i;
             if (i == 0) {
                 servers[i]  = new Thread(() -> {
-                    try {
                         allNodes[finalI].start();
-                    } catch (InterruptedException e) {
-                        logger.error(e);
-                    }
                 });
                 servers[i].start();
                 continue;
             }
             servers[i]  = new Thread(() -> {
-                try {
                     allNodes[finalI].start();
-                } catch (InterruptedException e) {
-                    logger.error(e);
-                }
             });
             servers[i].start();
         }
@@ -461,11 +439,7 @@ public class sgTest {
         for (int i = 0 ; i < nnodes ; i++) {
             int finalI = i;
             servers[i]  = new Thread(() -> {
-                try {
                     allNodes[finalI].start();
-                } catch (InterruptedException e) {
-                    logger.error(e);
-                }
             });
             servers[i].start();
         }
@@ -524,21 +498,13 @@ public class sgTest {
             int finalI = i;
             if (i == 0) {
                 servers[i]  = new Thread(() -> {
-                    try {
                         allNodes[finalI].start();
-                    } catch (InterruptedException e) {
-                        logger.error(e);
-                    }
                 });
                 servers[i].start();
                 continue;
             }
             servers[i]  = new Thread(() -> {
-                try {
                     allNodes[finalI].start();
-                } catch (InterruptedException e) {
-                    logger.error(e);
-                }
             });
             servers[i].start();
         }
@@ -625,11 +591,7 @@ public class sgTest {
         for (int i = 0 ; i < nnodes ; i++) {
             int finalI = i;
             servers[i]  = new Thread(() -> {
-                try {
                     allNodes[finalI].start();
-                } catch (InterruptedException e) {
-                    logger.error(e);
-                }
             });
             servers[i].start();
         }
@@ -646,7 +608,7 @@ public class sgTest {
                 allNodes[i].serve();
                 continue;
             }
-            allNodes[i].setAsyncParam(1500);
+            allNodes[i].setAsyncParam(2000);
             allNodes[i].serve();
         }
 

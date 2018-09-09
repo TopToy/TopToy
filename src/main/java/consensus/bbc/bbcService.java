@@ -118,7 +118,8 @@ public class bbcService extends DefaultSingleRecoverable {
                     .setCid(cid)
                     .setChannel(channel)
                     .build();
-//            logger.debug(format("[#%d] has received bbc message from [#%d]", id, msg.getPropserID()));
+            logger.debug(format("[#%d] has received bbc message from [sender=%d ; channel=%d ; cidSeries=%d ; cid=%d]",
+                    id, msg.getM().getSender(), channel, cidSeries, cid));
                 fastVote.computeIfPresent(key, (k, v) -> {
                     if (!v.done && msg.getM().getSender() != id) {
                         logger.debug(format("[#%d] re-participating in a consensus " +
@@ -156,17 +157,17 @@ public class bbcService extends DefaultSingleRecoverable {
                                     v.neg++;
                                 }
 
-                                if (v.neg + v.pos == quorumSize) {
+//                                if (v.neg + v.pos == quorumSize) {
                                     logger.debug(format("[#%d] notifies on  [channel=%d ; cidSeries=%d ; cid=%d]", id, channel, cidSeries, cid));
                                     channelNotifyer[channel].notifyAll();
-                                }
+//                                }
                             }
                         }
 
                         return v;
                     });
                 }
-            } else {
+            } else if (vote.pos + vote.neg + 1 < quorumSize){
                 rec.computeIfPresent(key, (k, v) -> {
                     if (!v.proposers.contains(msg.getM().getSender())) {
                         if (v.neg + v.pos < quorumSize) {
