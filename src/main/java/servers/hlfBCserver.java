@@ -1,7 +1,7 @@
 package servers;
 
-import blockchain.blockchain;
 import blockchain.basicBlockchain;
+import blockchain.blockchain;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import consensus.RBroadcast.RBrodcastService;
@@ -9,8 +9,6 @@ import crypto.DigestMethod;
 import org.apache.commons.lang.ArrayUtils;
 import proto.Types;
 
-
-import javax.print.DocFlavor;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,8 +16,8 @@ import java.util.UUID;
 
 import static java.lang.String.format;
 
-public class bftsmartBCserver implements server {
-    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(bftsmartBCserver.class);
+public class hlfBCserver implements server {
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(hlfBCserver.class);
     final blockchain bc;
     int id;
     int n;
@@ -28,24 +26,25 @@ public class bftsmartBCserver implements server {
     RBrodcastService rbService;
     final ArrayList<Types.Transaction> txPool;
     final ArrayList<Types.Transaction> pendingsTx;
+    final ArrayList<Types.Transaction> recTx =  new ArrayList<>();
     final HashMap<String, Types.Transaction> approvedTx;
     boolean stopped;
     Thread deliverThread = new Thread(() -> {
         try {
-            deliverBlock();
+            deliverTx();
         } catch (InvalidProtocolBufferException | InterruptedException e) {
             logger.error(format("[#%d]", id), e);
         }
     });
     Thread broadcastThread = new Thread(()-> {
         try {
-            broadcastBlock();
+            broadcastTx();
         } catch (InterruptedException e) {
             logger.error(format("[#%d]", id), e);
         }
     });
 
-    public bftsmartBCserver(int id, int f, int txNum, String configHome) {
+    public hlfBCserver(int id, int f, int txNum, String configHome) {
         this.bc = new basicBlockchain(id, 0);
         this.id = id;
         this.f = f;
@@ -154,72 +153,75 @@ public class bftsmartBCserver implements server {
         logger.warn(format("[#%d] setAsyncParam not implemented", id));
     }
 
-    void deliverBlock() throws InvalidProtocolBufferException, InterruptedException {
+    void deliverTx() throws InvalidProtocolBufferException, InterruptedException {
         while (!stopped) {
             byte[] msg = rbService.deliver(0);
+            Types.Transaction tx = Types.Transaction.parseFrom(msg);
+            recTx.add(tx);
+            if (recTx.size() >= txNum) {
+                Types.Block recBlock = createNewBlock();
+                for (int i = 0; i < recBlock.getDataCount(); i++) {
+                    synchronized (approvedTx) {
+                        approvedTx.put(recBlock.getData(i).getTxID(), recBlock.getData(i));
+                    }
 
-            Types.Block recBlock = Types.Block.parseFrom(msg);
-            recBlock = recBlock.toBuilder()
-                    .setHeader(recBlock.getHeader().toBuilder()
-                            .setHeight(bc.getHeight() + 1)
-                            .setPrev(ByteString.copyFrom(DigestMethod.hash(
-                                    bc.getBlock(bc.getHeight()).getHeader().toByteArray())))
-                            .build())
-                    .setTs(System.currentTimeMillis())
-                    .build();
-            for (int i = 0; i < recBlock.getDataCount(); i++) {
-                synchronized (approvedTx) {
-                    approvedTx.put(recBlock.getData(i).getTxID(), recBlock.getData(i));
+                    synchronized (pendingsTx) {
+                        pendingsTx.remove(recBlock.getData(i));
+                    }
+
                 }
-
-                synchronized (pendingsTx) {
-                    pendingsTx.remove(recBlock.getData(i));
+                synchronized (bc) {
+                    bc.addBlock(recBlock);
+                    bc.notify();
                 }
-
-            }
-            synchronized (bc) {
-                bc.addBlock(recBlock);
-                bc.notify();
             }
         }
     }
-    void broadcastBlock() throws InterruptedException {
+    void broadcastTx() throws InterruptedException {
         while (!stopped) {
             Types.Block b;
             synchronized (txPool) {
                 while (txPool.size() == 0) {
                     txPool.wait();
                 }
-                b = createNewBlock();
+                rbService.broadcast(txPool.get(0).toByteArray(), 0, id);
+                synchronized (pendingsTx) {
+                    pendingsTx.add(txPool.get(0));
+                }
+                txPool.remove(0);
 //                logger.debug(format("[#%d] created new block", id));
             }
-            rbService.broadcast(b.toByteArray(), 0, id);
+
         }
 
     }
 
     Types.Block createNewBlock() {
 //        logger.debug(format("txPool is [%d]", txPool.size()));
+
         Types.Block.Builder b = Types.Block.newBuilder()
                 .setHeader(Types.BlockHeader.newBuilder()
                         .setM(Types.Meta.newBuilder()
                                 .setSender(id)
                                 .build())
                         .build());
+        for (int i = 0 ; i < txNum ; i++) {
+            b.addData(recTx.get(0));
+            recTx.remove(0);
+        }
         byte[] tHash = new byte[0];
-        int bound = Math.min(txNum, txPool.size());
-//        logger.debug(format("going to add [%d] tx to block", bound));
-        for (int i = 0 ; i < bound ; i++) {
-            Types.Transaction tx = txPool.get(i);
-            tHash = DigestMethod.hash(ArrayUtils.addAll(tHash, tx.toByteArray()));
-            txPool.remove(i);
-            synchronized (pendingsTx) {
-                pendingsTx.add(tx);
-            }
-            b.addData(tx);
+//        int bound = Math.min(txNum, txPool.size());
+////        logger.debug(format("going to add [%d] tx to block", bound));
+        for (int i = 0 ; i < b.getDataCount() ; i++) {
+            tHash = DigestMethod.hash(ArrayUtils.addAll(tHash, b.getData(i).toByteArray()));
         }
         b.setHeader(b.getHeader().toBuilder()
-        .setTransactionHash(ByteString.copyFrom(tHash)));
+                .setTransactionHash(ByteString.copyFrom(tHash))
+                .setHeight(bc.getHeight() + 1)
+                .setPrev(ByteString.copyFrom(DigestMethod.hash(
+                        bc.getBlock(bc.getHeight()).getHeader().toByteArray())))
+                .build())
+        .setTs(System.currentTimeMillis());
         return b.build();
 
     }

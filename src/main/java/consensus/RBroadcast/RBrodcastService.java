@@ -13,6 +13,7 @@ import com.google.protobuf.ByteString;
 import proto.Types.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -96,6 +97,9 @@ public class RBrodcastService extends DefaultSingleRecoverable {
     public byte[] appExecuteOrdered(byte[] command, MessageContext msgCtx) {
         try {
             RBMsg msg = RBMsg.parseFrom(command);
+            if (msg == null) {
+                logger.debug("Received NULL message!!!!!");
+            }
 //            synchronized (globalLock) {
                 int channel = msg.getM().getChannel();
                 synchronized (cNotifyer[channel]) {
@@ -132,11 +136,26 @@ public class RBrodcastService extends DefaultSingleRecoverable {
 //                globalLock.wait();
                 cNotifyer[channel].wait();
             }
-        }
-
             RBMsg msg = recMsg.get(channel).get(0);
             recMsg.get(channel).remove(0);
             return msg.getData().toByteArray();
+        }
+
+
+//            if (msg == null) {
+//                logger.debug(format("[#%d] received NULL [size of queue=%d]", id, recMsg.get(channel).size()));
+//                for (RBMsg m : recMsg.get(channel)) {
+//                    if (m == null) {
+//                        logger.debug("---------------------------NULL MSG -----------------");
+//                        continue;
+//                    }
+//                    logger.debug(format("------ [%s]------",  Arrays.toString(m.toByteArray())));
+//                }
+////            }
+//        logger.debug(format("[#%d] #1 received msg, [size=%d]", id, recMsg.get(channel).size()));
+//
+//            logger.debug(format("[#%d] #2 received msg, [size=%d]", id, recMsg.get(channel).size()));
+
 //        }
     }
 

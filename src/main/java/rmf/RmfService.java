@@ -135,7 +135,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
     EventLoopGroup weg;
     int[] alive;
     Object[] aliveLock;
-    ReentrantLock mutex = new ReentrantLock(true);
+//    ReentrantLock mutex = new ReentrantLock(true);
 
 //    public RmfService(int channels, int id, int f, ArrayList<Node> nodes, bbcService bbc) {
 //        this.channels = channels;
@@ -631,7 +631,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
     public Block deliver(int channel, int cidSeries, int cid, int tmo, int sender, int height, Block next)
             throws InterruptedException
     {
-        mutex.lock();
+//        mutex.lock();
         long startTime = System.currentTimeMillis();
         long estimatedTime;
         Meta key = Meta.newBuilder()
@@ -641,9 +641,9 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                 .build();
         synchronized (msgNotifyer[channel]) {
             if (!pendingMsg[channel].containsKey(key)) {
-                mutex.unlock();
+//                mutex.unlock();
                 msgNotifyer[channel].wait(tmo);
-                mutex.lock();
+//                mutex.lock();
             }
         }
 
@@ -695,9 +695,9 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             if (tmo - estimatedTime > 0 && (fv == null || fv.voters.size() < n)) {
                 logger.debug(format("[#%d-C[%d]] will wait at most [%d] ms for fast bbc", id, channel,
                         max(tmo - estimatedTime, 1)));
-                mutex.unlock();
+//                mutex.unlock();
                 fastVoteNotifyer[channel].wait(tmo - estimatedTime);
-                mutex.lock();
+//                mutex.lock();
             }
             logger.debug(format("[#%d-C[%d]] have waited for more [%d] ms for fast bbc", id, channel,
                     System.currentTimeMillis() - startTime));
@@ -737,7 +737,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             logger.debug(format("[#%d-C[%d]] bbc returned [%d] for [cidSeries=%d ; cid=%d]", id, channel, dec, cidSeries, cid));
             if (dec == 0) {
                 pendingMsg[channel].remove(key);
-                mutex.unlock();
+//                mutex.unlock();
                 synchronized (aliveLock[channel]) {
                     alive[channel] = tmo;
                 }
@@ -753,7 +753,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         Block msg = pendingMsg[channel].get(key);
         pendingMsg[channel].remove(key);
         recMsg[channel].put(key, msg);
-        mutex.unlock();
+//        mutex.unlock();
         return msg;
     }
 
@@ -765,9 +765,9 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                 .setCid(cid)
                 .build();
         bbcService.propose(vote, channel, cidSeries, cid);
-        mutex.unlock();
+//        mutex.unlock();
         BbcDecision dec = bbcService.decide(channel, cidSeries, cid);
-        mutex.lock();
+//        mutex.lock();
         regBbcCons[channel].remove(key);
         regBbcCons[channel].put(key, dec);
         return dec.getDecosion();
@@ -799,9 +799,9 @@ public class RmfService extends RmfGrpc.RmfImplBase {
 //                pendingMsg.get(cidSeries, cid).getMeta().getHeight() != height) {
                 pendingMsg[channel].remove(key);
                 msg = pendingMsg[channel].get(key);
-                mutex.unlock();
+//                mutex.unlock();
                 msgNotifyer[channel].wait();
-                mutex.lock();
+//                mutex.lock();
             }
         }
 

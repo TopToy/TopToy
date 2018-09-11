@@ -1,6 +1,4 @@
-import servers.asyncBcServer;
-import servers.cbcServer;
-import servers.byzantineBcServer;
+import servers.*;
 
 import config.Config;
 import config.Node;
@@ -177,6 +175,60 @@ public class blockchainTest {
             assertEquals(msg, ret[i]);
 //            ((RmfNode) allNodes[i]).stop();
         }
+
+    }
+
+    @Test
+    void TestFourbftSmartServersNoFailuresSingleMessage() throws InterruptedException {
+        setConfig(null, 0);
+        Thread.sleep(timeToWaitBetweenTests);
+        int nnodes = 4;
+        logger.info("start TestFourServersNoFailures");
+        Thread[] servers = new Thread[4];
+        bftsmartBCserver[] allNodes = new bftsmartBCserver[4];
+        for (int i = 0 ; i < 4 ; i++) {
+            allNodes[i] = new bftsmartBCserver(i, 1, 1, Config.getSyncRBConfigHome());
+        }
+        for (int i = 0 ; i < nnodes ; i++) {
+            int finalI = i;
+            servers[i]  = new Thread(() ->(allNodes[finalI]).start());
+            servers[i].start();
+        }
+        for (int i = 0 ; i < nnodes ; i++) {
+            servers[i].join();
+        }
+        String msg = "Hello";
+        for (int i = 0 ; i < 100000 ; i++) {
+            (allNodes[i % 4]).addTransaction((msg + i).getBytes(), 0);
+        }
+
+        for (int i = 0 ; i < nnodes ; i++) {
+            (allNodes[i]).serve();
+        }
+        String[] ret = new String[4];
+        Thread[] tasks = new Thread[4];
+        for (int i = 0 ; i < nnodes ; i++) {
+            int finalI = i;
+            tasks[i] = new Thread(()-> {
+                try {
+                    ret[finalI] = new String((allNodes[finalI]).deliver(1).getData(0).getData().toByteArray());
+                } catch (InterruptedException e) {
+                    logger.error("", e);
+                }
+            });
+            tasks[i].start();
+        }
+        Thread.sleep(10 * 1000);
+        for (int i = 0 ; i < nnodes ; i++) {
+            tasks[i].join();
+        }
+        for (int i = 0 ; i < 4 ; i++) {
+            ( allNodes[i]).shutdown();
+        }
+//        for (int i = 0 ; i < 4 ; i++) {
+//            assertEquals(msg, ret[i]);
+////            ((RmfNode) allNodes[i]).stop();
+//        }
 
     }
 //

@@ -2,6 +2,7 @@ package app;
 
 import config.Config;
 import servers.bftsmartBCserver;
+import servers.hlfBCserver;
 import servers.server;
 import servers.sg;
 
@@ -29,17 +30,23 @@ public class JToy {
         logger = org.apache.log4j.Logger.getLogger(cli.class);
         type = argv[1];
         logger.debug("type is " + type);
-        if (type.equals("smr")) {
-            s = new bftsmartBCserver(serverID, Config.getF(),
-                    Config.getMaxTransactionsInBlock(), Config.getSyncRBConfigHome());
-        } else {
-            s = new sg(Config.getAddress(serverID), Config.getPort(serverID), serverID, Config.getF(), Config.getC(),
-                    Config.getTMO(), Config.getTMOInterval(), Config.getMaxTransactionsInBlock(), Config.getFastMode(),
-                    Config.getCluster(), Config.getRMFbbcConfigHome(), Config.getPanicRBConfigHome(),
-                    Config.getSyncRBConfigHome(), type,
-                    Config.getServerCrtPath(), Config.getServerTlsPrivKeyPath(), Config.getCaRootPath());
+        switch (type) {
+            case "smr":
+                s = new bftsmartBCserver(serverID, Config.getF(),
+                        Config.getMaxTransactionsInBlock(), Config.getSyncRBConfigHome());
+                break;
+            case "hlf":
+                s = new hlfBCserver(serverID, Config.getF(),
+                        Config.getMaxTransactionsInBlock(), Config.getSyncRBConfigHome());
+                break;
+            default:
+                s = new sg(Config.getAddress(serverID), Config.getPort(serverID), serverID, Config.getF(), Config.getC(),
+                        Config.getTMO(), Config.getTMOInterval(), Config.getMaxTransactionsInBlock(), Config.getFastMode(),
+                        Config.getCluster(), Config.getRMFbbcConfigHome(), Config.getPanicRBConfigHome(),
+                        Config.getSyncRBConfigHome(), type,
+                        Config.getServerCrtPath(), Config.getServerTlsPrivKeyPath(), Config.getCaRootPath());
+                break;
         }
-
 
         cli parser = new cli();
         Scanner scan = new Scanner(System.in).useDelimiter("\\n");
