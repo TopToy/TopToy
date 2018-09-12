@@ -415,6 +415,9 @@ public class sgTest {
     }
 
     void asyncServerDoing(List<Types.Block> res, sg s) throws InterruptedException {
+        if (s.getID() == 1) {
+            Thread.sleep(20 * 1000);
+        }
         for(int i = 0; i < 100 ; i++) {
             String msg = "Hello" + i;
             if (i % 4 == s.getID()) {

@@ -2,6 +2,7 @@ package servers;
 
 import blockchain.blockchain;
 import blockchain.block;
+import com.google.common.collect.Lists;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import config.Node;
@@ -14,8 +15,10 @@ import proto.Types.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.lang.Math.log;
 import static java.lang.Math.max;
 import static java.lang.String.format;
+import static java.util.Collections.min;
 
 public abstract class bcServer extends Node {
     class fpEntry {
@@ -36,11 +39,12 @@ public abstract class bcServer extends Node {
     block currBlock;
     private final Object newBlockNotifyer = new Object();
     private int maxTransactionInBlock;
-    private int tmo;
-    private int tmoInterval;
-    private int initTmo;
+//    private int tmo;
+//    private int tmoInterval;
+//    private int initTmo;
     private Thread mainThread;
     private Thread panicThread;
+    private Thread gcThread;
     int cid = 0;
     int cidSeries = 0;
     private final HashMap<Integer, fpEntry> fp;
@@ -51,6 +55,7 @@ public abstract class bcServer extends Node {
     boolean configuredFastMode;
     boolean fastMode;
     int channel;
+    final Integer[] lastReceivedBlock;
 
     public bcServer(String addr, int rmfPort, int id, int channel, int f, int tmo, int tmoInterval,
                     int maxTx, boolean fastMode, ArrayList<Node> cluster,
@@ -65,18 +70,27 @@ public abstract class bcServer extends Node {
         stopped = false;
         currHeight = 1; // starts from 1 due to the genesis block
         currLeader = 0;
-        this.tmo = tmo;
-        this.tmoInterval = tmoInterval;
-        initTmo = tmo;
+//        this.tmo = tmo;
+//        this.tmoInterval = tmoInterval;
+//        initTmo = tmo;
         this.maxTransactionInBlock = maxTx;
         fp = new HashMap<>();
         scVersions = new HashMap<>();
         mainThread = new Thread(this::mainLoop);
         panicThread = new Thread(this::deliverForkAnnounce);
+        gcThread = new Thread(() -> {
+            try {
+                gc();
+            } catch (InterruptedException e) {
+                logger.error("", e);
+            }
+        });
         this.configuredFastMode = fastMode;
         this.fastMode = fastMode;
         this.channel = channel;
         rmfServer = rmf;
+        this.lastReceivedBlock = new Integer[n];
+        Arrays.fill(lastReceivedBlock, 0);
     }
 
     public bcServer(String addr, int rmfPort, int id, int channel, int f, int tmo, int tmoInterval,
@@ -87,7 +101,7 @@ public abstract class bcServer extends Node {
         super(addr, rmfPort, id);
         this.f = f;
         this.n = 3*f + 1;
-        rmfServer = new RmfNode(1, id, addr, rmfPort, f,
+        rmfServer = new RmfNode(1, id, addr, rmfPort, f, tmo, tmoInterval,
                cluster, bbcConfig, serverCrt, serverPrivKey, caRoot);
         panicRB = new RBrodcastService(1, id, panicConfig);
         syncRB = new RBrodcastService(1, id, syncConfig);
@@ -97,17 +111,25 @@ public abstract class bcServer extends Node {
         stopped = false;
         currHeight = 1; // starts from 1 due to the genesis block
         currLeader = 0;
-        this.tmo =  tmo;
-        this.tmoInterval = tmoInterval;
-        initTmo = tmo;
+//        this.tmo =  tmo;
+//        this.tmoInterval = tmoInterval;
+//        initTmo = tmo;
         this.maxTransactionInBlock = maxTx;
         fp = new HashMap<>();
         scVersions = new HashMap<>();
         mainThread = new Thread(this::mainLoop);
         panicThread = new Thread(this::deliverForkAnnounce);
+        gcThread = new Thread(() -> {
+            try {
+                gc();
+            } catch (InterruptedException e) {
+                logger.error(format("[#%d-C[%d]]", getID(), channel), e);
+            }
+        });
         this.configuredFastMode = fastMode;
         this.fastMode = fastMode;
-        this.channel = channel;
+        this.lastReceivedBlock = new Integer[n];
+        Arrays.fill(lastReceivedBlock, 0);
 
     }
 
@@ -128,6 +150,8 @@ public abstract class bcServer extends Node {
         logger.debug(format("[#%d-C[%d]] starts panic thread", getID(), channel));
         mainThread.start();
         logger.debug(format("[#%d-C[%d]] starts main thread", getID(), channel));
+        gcThread.start();
+        logger.debug(format("[#%d-C[%d]] gc thread is up", getID(), channel));
         logger.info(format("[#%d-C[%d]] starts serving", getID(), channel));
     }
 
@@ -159,6 +183,42 @@ public abstract class bcServer extends Node {
         cid++;
     }
 
+    private void gc() throws InterruptedException {
+        int lastGc = 0;
+        while (!stopped) {
+            Thread.sleep(10 * 1000); // TODO: HC Timeout
+            int tmpLastGc;
+            ArrayList<Integer> data;
+            synchronized (lastReceivedBlock) {
+                data = Lists.newArrayList(lastReceivedBlock);
+            }
+                if (data.contains(lastGc)) {
+                    logger.debug(format("[#%d-C[%d]] will not evacuate buffers" +
+                            " [lastGC=%d ; index=%d]", getID(), channel, lastGc, data.indexOf(lastGc)));
+                    continue;
+                }
+                tmpLastGc = min(data);
+
+            for (int i = lastGc ; i < tmpLastGc - f ; i++) {
+                clearBuffers(i);
+            }
+            lastGc = max(lastGc, tmpLastGc - f);
+
+        }
+    }
+
+    void clearBuffers(int index) {
+        logger.debug(format("[#%d-C[%d]] clear buffers of [height=%d]", getID(), channel, index));
+        Meta key = bc.getBlock(index).getHeader().getM();
+        Meta rKey = Meta.newBuilder()
+                .setChannel(key.getChannel())
+                .setCidSeries(key.getCidSeries())
+                .setCid(key.getCid())
+                .build();
+        rmfServer.clearBuffers(rKey);
+        syncRB.clearBuffers(rKey);
+        panicRB.clearBuffers(rKey);
+    }
     private void mainLoop() {
         while (!stopped) {
 //            synchronized (bc) {
@@ -186,7 +246,7 @@ public abstract class bcServer extends Node {
                 Block recBlock;
                 try {
                     long startTime = System.currentTimeMillis();
-                    recBlock = rmfServer.deliver(channel, cidSeries, cid, currHeight, currLeader, tmo, next);
+                    recBlock = rmfServer.deliver(channel, cidSeries, cid, currHeight, currLeader, next);
                     logger.debug(format("[#%d-C[%d]] deliver took about [%d] ms [cidSeries=%d ; cid=%d]",
                             getID(), channel, System.currentTimeMillis() - startTime, cidSeries, cid));
                 } catch (InterruptedException e) {
@@ -201,9 +261,9 @@ public abstract class bcServer extends Node {
 //            int mcid = msg.getCid();
 //            int mcidSeries = msg.getCidSeries();
                 if (recBlock == null) {
-                    tmo += tmoInterval;
-                    logger.debug(format("[#%d-C[%d]] Unable to receive block [cidSeries=%d ; cid=%d], timeout increased to [%d] ms"
-                            , getID(), channel, cidSeries, cid, tmo));
+//                    tmo += tmoInterval;
+//                    logger.debug(format("[#%d-C[%d]] Unable to receive block [cidSeries=%d ; cid=%d], timeout increased to [%d] ms"
+//                            , getID(), channel, cidSeries, cid, tmo));
                     updateLeaderAndHeight();
                     fastMode = false;
                     cid++;
@@ -275,13 +335,16 @@ public abstract class bcServer extends Node {
                 }
                 if (!bc.validateBlockCreator(recBlock, f)) {
                     updateLeaderAndHeight();
-                    tmo += tmoInterval;
+//                    tmo += tmoInterval;
                     continue;
                 }
 
 
-                tmo = initTmo;
+//                tmo = initTmo;
                 synchronized (newBlockNotifyer) {
+                    synchronized (lastReceivedBlock) {
+                        lastReceivedBlock[recBlock.getHeader().getM().getSender()] = recBlock.getHeader().getHeight();
+                    }
                     bc.addBlock(recBlock);
                     logger.debug(String.format("[#%d-C[%d]] adds new block with [height=%d] [cidSeries=%d ; cid=%d] [size=%d]",
                             getID(), channel, recBlock.getHeader().getHeight(), cidSeries, cid, recBlock.getDataCount()));

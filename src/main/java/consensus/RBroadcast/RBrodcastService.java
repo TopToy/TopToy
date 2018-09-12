@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
@@ -46,7 +47,17 @@ public class RBrodcastService extends DefaultSingleRecoverable {
         }
     }
 
-
+    public void clearBuffers(Meta key) {
+        synchronized (recMsg) {
+            int channel = key.getChannel();
+            int cid = key.getCid();
+            recMsg.replace(channel, recMsg
+                    .get(key.getChannel())
+                    .stream()
+                    .filter(m -> m.getM().getChannel() == channel && m.getM().getCid() == cid)
+                    .collect(Collectors.toList()));
+        }
+    }
 
     public void start() {
         sr = new ServiceReplica(id, this, this, configHome);

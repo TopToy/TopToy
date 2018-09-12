@@ -45,10 +45,10 @@ public class sg implements server {
         this.group = new bcServer[c];
         this.id = id;
         if (type.equals("r") || type.equals("a")) {
-            rmf = new RmfNode(c, id, addr, port, f, cluster, bbcConfig, serverCrt, serverPrivKey, caRoot);
+            rmf = new RmfNode(c, id, addr, port, f, tmo, tmoInterval, cluster, bbcConfig, serverCrt, serverPrivKey, caRoot);
         }
         if (type.equals("b")) {
-            rmf = new ByzantineRmfNode(c, id, addr, port, f, cluster, bbcConfig, serverCrt, serverPrivKey, caRoot);
+            rmf = new ByzantineRmfNode(c, id, addr, port, f, tmo, tmoInterval, cluster, bbcConfig, serverCrt, serverPrivKey, caRoot);
         }
         deliverFork = new RBrodcastService(c, id, panicConfig);
         sync = new RBrodcastService(c, id, syncConfig);

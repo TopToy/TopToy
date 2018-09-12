@@ -49,11 +49,11 @@ public class rmfTest {
         for (int id = 0 ; id < nnodes ; id++) {
             logger.info("init server #" + id);
             if (ArrayUtils.contains(byzIds, id)) {
-                ret[id] = new ByzantineRmfNode(1, id, localHost, rmfPorts[id], f,  currentNodes, configHome,
+                ret[id] = new ByzantineRmfNode(1, id, localHost, rmfPorts[id], f, 1000, 100, currentNodes, configHome,
                         Config.getServerCrtPath(), Config.getServerTlsPrivKeyPath(), Config.getCaRootPath());
                 continue;
             }
-            ret[id] =  new RmfNode(1, id, localHost, rmfPorts[id], f, currentNodes, configHome,
+            ret[id] =  new RmfNode(1, id, localHost, rmfPorts[id], f, 1000, 100, currentNodes, configHome,
                     Config.getServerCrtPath(), Config.getServerTlsPrivKeyPath(), Config.getCaRootPath());
         }
         return ret;

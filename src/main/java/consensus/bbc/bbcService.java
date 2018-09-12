@@ -62,6 +62,11 @@ public class bbcService extends DefaultSingleRecoverable {
         }
     }
 
+    public void clearBuffers(Meta key) {
+        rec.remove(key);
+        fastVote.remove(key);
+    }
+
     public void start() {
         sr = new ServiceReplica(id, this, this, configHome);
         bbcProxy = new AsynchServiceProxy(id, configHome);

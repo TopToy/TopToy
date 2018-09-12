@@ -39,7 +39,7 @@ public class byzantineBcServer extends bcServer {
         super(addr, rmfPort, id, channel, f, tmo, tmoInterval, maxTx, fastMode, cluster,
                 bbcConfig, panicConfig, syncConfig, serverCrt, serverPrivKey, caRoot);
         rmfServer.stop();
-        rmfServer = new ByzantineRmfNode(1, id, addr, rmfPort, Config.getF(),
+        rmfServer = new ByzantineRmfNode(1, id, addr, rmfPort, f, tmo, tmoInterval,
                 cluster, bbcConfig, serverCrt, serverPrivKey, caRoot);
         groups.add(new ArrayList<>());
         for (int i = 0 ; i < n ; i++) {

@@ -17,10 +17,10 @@ public class RmfNode extends Node{
     protected boolean stopped = false;
     RmfService rmfService;
 
-    public RmfNode(int channels, int id, String addr, int rmfPort, int f , ArrayList<Node> nodes, String bbcConfig,
+    public RmfNode(int channels, int id, String addr, int rmfPort, int f , int tmo, int tmoInterval, ArrayList<Node> nodes, String bbcConfig,
                    String serverCrt, String serverPrivKey, String caRoot) {
         super(addr, rmfPort,  id);
-        rmfService = new RmfService(channels, id, f, nodes, bbcConfig, serverCrt, serverPrivKey, caRoot);
+        rmfService = new RmfService(channels, id, f, tmo, tmoInterval, nodes, bbcConfig, serverCrt, serverPrivKey, caRoot);
     }
 
 //    public RmfNode(int channel, int id, String addr, int rmfPort, int f , ArrayList<Node> nodes, bbcService bbc) {
@@ -67,14 +67,14 @@ public class RmfNode extends Node{
         rmfService.rmfBroadcast(data);
     }
 
-    public Block deliver(int channel, int cidSeries, int cid, int height, int sender, int tmo, Block msg)
+    public Block deliver(int channel, int cidSeries, int cid, int height, int sender, Block msg)
             throws InterruptedException {
 //        Data dMsg = null;
 //        if (msg != null) {
 //            dMsg = buildData(msg, channel, cidSeries, cid + 1, height + 1, true);
 //        }
         long start = System.currentTimeMillis();
-        Block m = rmfService.deliver(channel, cidSeries, cid, tmo, sender, height, msg);
+        Block m = rmfService.deliver(channel, cidSeries, cid, sender, height, msg);
         logger.debug(format("[#%d-C[%d]] Deliver on rmf node took about %d [cidSeries=%d ; cid=%d]", getID(), channel,
                 System.currentTimeMillis() - start, cidSeries, cid));
         return m;
@@ -92,4 +92,7 @@ public class RmfNode extends Node{
 //    public String getRmfDataSig(int channel, int cidSeries, int cid) {
 //        return rmfService.getMessageSig(channel, cidSeries, cid);
 //    }
+    public void clearBuffers(Meta key) {
+        rmfService.clearBuffers(key);
+    }
 }
