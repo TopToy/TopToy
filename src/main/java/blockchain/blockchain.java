@@ -17,9 +17,9 @@ public abstract class blockchain {
     private final List<Block> blocks = new ArrayList<>();
     private final int creatorID;
 
-    public blockchain(int creatorID) {
+    public blockchain(int creatorID, int channel) {
         this.creatorID = creatorID;
-        createGenesis();
+        createGenesis(channel);
     }
 
     public blockchain(blockchain orig, int start, int end) {
@@ -27,16 +27,16 @@ public abstract class blockchain {
         this.blocks.addAll(orig.getBlocks(start, end));
     }
 
-    abstract block createNewBLock();
+    public abstract block createNewBLock();
 
-    abstract void createGenesis();
+    abstract void createGenesis(int channel);
 
-    boolean validateBlockCreator(Block b, int f) {
+    public boolean validateBlockCreator(Block b, int f) {
         if (blocks.size() >= f && blocks.subList(blocks.size() - f, blocks.size()).
         stream().
-        map(bl -> bl.getHeader().getCreatorID()).
+        map(bl -> bl.getHeader().getM().getSender()).
         collect(Collectors.toList()).
-        contains(b.getHeader().getCreatorID())) {
+        contains(b.getHeader().getM().getSender())) {
             logger.debug(format("[#%d] invalid block", creatorID));
             return false;
         }
@@ -45,7 +45,7 @@ public abstract class blockchain {
 
 //    public abstract boolean validateBlockData(Block b);
 
-    void setBlocks(List<Block> Nblocks, int start) {
+    public void setBlocks(List<Block> Nblocks, int start) {
         for (int i = start ; i < start + Nblocks.size() ; i++) {
             if (blocks.size() <= i) {
                 blocks.add(Nblocks.get(i - start));
@@ -55,25 +55,25 @@ public abstract class blockchain {
 
         }
     }
-    boolean validateBlockHash(Block b) {
+    public boolean validateBlockHash(Block b) {
         byte[] d = DigestMethod.hash(blocks.get(b.getHeader().getHeight() - 1).getHeader().toByteArray());
         return DigestMethod.validate(b.getHeader().getPrev().toByteArray(),
                 Objects.requireNonNull(d));
     }
 
-    void addBlock(Block b) {
+    public void addBlock(Block b) {
         synchronized (blocks) {
             blocks.add(b);
         }
     }
 
-    Block getBlock(int index) {
+    public Block getBlock(int index) {
         synchronized (blocks) {
             return blocks.get(index);
         }
     }
 
-    List<Block> getBlocks(int start, int end) {
+    public List<Block> getBlocks(int start, int end) {
         synchronized (blocks) {
             return blocks.subList(start, end);
         }
@@ -85,7 +85,7 @@ public abstract class blockchain {
         }
     }
 
-    void removeBlock(int index) {
+    public void removeBlock(int index) {
         blocks.remove(index);
     }
 

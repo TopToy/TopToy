@@ -180,8 +180,10 @@ public class ServerConnection {
         boolean abort = false;
         do {
             if (abort) return; // if there is a need to reconnect, abort this method
-            if (socket != null && socketOutStream != null) {
+            if (socket != null && socketOutStream != null) { // && controller.getStaticConf() != null && macSend != null) {// TODO: Check this add
                 try {
+                    while (controller.getStaticConf() == null);// TODO: Check this add
+                    while (macSend == null);
                     //do an extra copy of the data to be sent, but on a single out stream write
                     byte[] mac = (useMAC && this.controller.getStaticConf().getUseMACs() == 1) ? macSend.doFinal(messageData) : null;
                     byte[] data = new byte[5 +messageData.length+((mac!=null)?mac.length:0)];
@@ -444,6 +446,8 @@ public class ServerConnection {
 
         @Override
         public void run() {
+//            //TODO: MY change in order to preent exception on startup
+//            while (controller.getStaticConf() == null);
             byte[] data = null;
 
             while (doWork) {

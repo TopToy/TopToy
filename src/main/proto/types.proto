@@ -2,40 +2,48 @@ syntax = "proto3";
 option java_package = "proto";
 package proto;
 
+
+message Meta {
+    int32 channel = 1;
+    int32 sender = 2;
+    int32 cid = 3;
+    int32 cidSeries = 4;
+}
+
+
 message BbcMsg {
-    int32 propserID = 1;
-    int32 cid = 2;
-    int32 cidSeries = 3;
-    int32 vote = 4;
-    Data next = 5;
-    bytes auth = 6;
+    Meta m = 1;
+    int32 vote = 2;
+    Block next = 3;
 }
 
 
 message BbcDecision {
-    int32 cid = 1;
-    int32 cidSeries = 2;
-    int32 decosion = 3;
+    Meta m = 1;
+    int32 decosion = 2;
 }
 
 message BlockHeader {
-    bytes prev= 1;
-    int32 creatorID = 2;
+    Meta m = 1;
+    bytes prev= 2;
+//    int32 creatorID = 2;
     int32 height = 3;
     bytes transactionHash = 4;
-    int32 cid = 5;
-    int32 cidSeries = 6;
+    string proof = 5;
+//    int32 cid = 5;
+//    int32 cidSeries = 6;
 }
 
-message BlockFooter {
-    string rmfProof = 1;
-    int64 ts = 2;
-    bytes orig = 3; // Enable to cerate an empty block
-}
+//message BlockFooter {
+////    string rmfProof = 1;
+//    int64 ts = 2;
+////    bytes orig = 3; // Enable to cerate an empty block
+//}
 message Block {
     BlockHeader header = 1;
     repeated Transaction data = 2;
-    BlockFooter footer = 3;
+    int64 ts = 3;
+//    BlockFooter footer = 3;
 }
 
 //TODO: Adding: client signature, client public key etc.
@@ -58,8 +66,7 @@ message ForkProof {
 }
 
 message RBMsg {
-    int32 id = 1;
-    int32 cid = 2;
+    Meta m = 1;
     bytes data = 3;
 }
 
@@ -67,31 +74,26 @@ message Empty {
 
 }
 
-message Meta {
-    int32 sender = 1;
-//    int32 height = 2;
-    int32 cid = 2;
-    int32 cidSeries = 3;
-}
+
 
 //message Auth {
 //    Meta m = 1;
 //    bytes hash = 2;
 //}
 
-message Data {
-    Meta _meta = 1;
-    bytes data = 2;
-    string sig = 3;
-}
+//message Data {
+//    Meta _meta = 1;
+//    bytes data = 2;
+//    string sig = 3;
+//}
 
 message Req {
     Meta _meta = 1;
 }
 
 message Res {
-    Meta _meta = 1;
-    Data _data = 2;
+    Meta m = 1;
+    Block data = 2;
 }
 
 //message RmfResult {

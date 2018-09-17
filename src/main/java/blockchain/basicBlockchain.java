@@ -7,19 +7,19 @@ public class basicBlockchain extends blockchain {
     public basicBlockchain(blockchain orig, int start, int end) {
         super(orig, start, end);
     }
-    public basicBlockchain(int creatorID) {
-        super(creatorID);
+    public basicBlockchain(int creatorID, int channel) {
+        super(creatorID, channel);
     }
 
     @Override
-    block createNewBLock() {
+    public block createNewBLock() {
         return new basicBlock();
     }
 
     @Override
-    void createGenesis() {
+    void createGenesis(int channel) {
         addBlock(new basicBlock()
-                .construct(-1, 0, -1, -1, new byte[0]));
+                .construct(-1, 0, -1, -1, channel,  null));
     }
 
 //    @Override

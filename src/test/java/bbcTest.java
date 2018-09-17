@@ -15,8 +15,8 @@ public class bbcTest {
     private int timeToWaitBetweenTest = 1; //15 * 1000;
 //    static Config conf = new Config();
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(bbcTest.class);
-    private static Path SingleServerconfigHome = Paths.get("config", "Configurations/single server/bbcConfig", "bbcSingleServer");
-    private static Path FourServerconfigHome = Paths.get("config", "bbcFourConfig");
+    private static Path SingleServerconfigHome = Paths.get("Configurations", "single server", "bbcConfig");
+    private static Path FourServerconfigHome = Paths.get("Configurations", "4Servers", "local", "bbcConfig");
     private static void deleteViewIfExist(String configHome){
         File file2 = new File(Paths.get(configHome, "currentView").toString());
         if (file2.exists()) {
@@ -35,7 +35,7 @@ public class bbcTest {
 //        serversUp = 0;
         CountDownLatch latch = new CountDownLatch(1);
         deleteViewIfExist(SingleServerconfigHome.toString());
-        bbcService s = new bbcService(0, 1, SingleServerconfigHome.toString());
+        bbcService s = new bbcService(1, 0, 1, SingleServerconfigHome.toString());
         Thread t = new Thread(()-> {
             s.start();
             latch.countDown();
@@ -52,17 +52,17 @@ public class bbcTest {
         logger.info("Testing testSingleDecision...");
         CountDownLatch latch = new CountDownLatch(1);
         deleteViewIfExist(SingleServerconfigHome.toString());
-        bbcService s = new bbcService(0, 1, SingleServerconfigHome.toString());
+        bbcService s = new bbcService(1, 0, 1, SingleServerconfigHome.toString());
         Thread t1 = new Thread(()-> {
             s.start();
             latch.countDown();
         });
         t1.start();
         latch.await();
-        s.propose(1, cidSeries, 0);
-        s.propose(0, cidSeries, 1);
-        assertEquals(1, s.decide(cidSeries, 0).getDecosion());
-        assertEquals(0, s.decide(cidSeries, 1).getDecosion());
+        s.propose(1, 0, cidSeries, 0);
+        s.propose(0, 0, cidSeries, 1);
+        assertEquals(1, s.decide(0, cidSeries, 0).getDecosion());
+        assertEquals(0, s.decide(0, cidSeries, 1).getDecosion());
         s.shutdown();
         t1.join();
 
@@ -77,7 +77,7 @@ public class bbcTest {
         Thread[] serversThread = new Thread[4];
         bbcService[] servers = new bbcService[4];
         for (int i = 0 ; i < 4 ; i++) {
-            servers[i] = new bbcService(i, 3, FourServerconfigHome.toString());
+            servers[i] = new bbcService(1, i, 3, FourServerconfigHome.toString());
             int finalI = i;
             serversThread[i] = new Thread(() -> { servers[finalI].start();
                 latch.countDown();
@@ -86,19 +86,19 @@ public class bbcTest {
         }
         latch.await();
         for (int i = 0 ; i < 4 ; i++) {
-            servers[i].propose(consID % 2, cidSeries, consID);
+            servers[i].propose( consID % 2, 0, cidSeries, consID);
         }
 
         for (int i = 0 ; i < 4 ; i++) {
-            assertEquals(consID % 2, servers[i].decide(cidSeries, consID).getDecosion());
+            assertEquals(consID % 2, servers[i].decide(0, cidSeries, consID).getDecosion());
         }
         consID++;
         for (int i = 0 ; i < 4 ; i++) {
-            servers[i].propose(consID % 2, cidSeries, consID);
+            servers[i].propose(consID % 2, 0, cidSeries, consID);
         }
 
         for (int i = 0 ; i < 4 ; i++) {
-            assertEquals(consID % 2, servers[i].decide(cidSeries, consID).getDecosion());
+            assertEquals(consID % 2, servers[i].decide(0, cidSeries, consID).getDecosion());
         }
         for (int i = 0 ; i < 4 ; i++) {
             servers[i].shutdown();
@@ -119,7 +119,7 @@ public class bbcTest {
         Thread[] serversThread = new Thread[4];
         bbcService[] servers = new bbcService[4];
         for (int i = 0 ; i < 4 ; i++) {
-            servers[i] = new bbcService(i, 3, FourServerconfigHome.toString());
+            servers[i] = new bbcService(1, i, 3, FourServerconfigHome.toString());
             int finalI = i;
             serversThread[i] = new Thread(() -> {servers[finalI].start();
                 count.countDown();
@@ -131,10 +131,10 @@ public class bbcTest {
         for (int i = 0 ; i < 4 ; i++) {
             for (int k = 0 ; k < 4 ; k++) {
                 if (i == k) continue;
-                servers[k].propose(consID % 2, cidSeries, consID);
+                servers[k].propose( consID % 2, 0, cidSeries, consID);
             }
             for (int k = 0 ; k < 4 ;k++) {
-                assertEquals(consID % 2, servers[k].decide(cidSeries, consID).getDecosion());
+                assertEquals(consID % 2, servers[k].decide(0, cidSeries, consID).getDecosion());
             }
             consID++;
         }
@@ -157,7 +157,7 @@ public class bbcTest {
         Thread[] serversThread = new Thread[4];
         bbcService[] servers = new bbcService[4];
         for (int i = 0 ; i < 4 ; i++) {
-            servers[i] = new bbcService(i, 3, FourServerconfigHome.toString());
+            servers[i] = new bbcService(1, i, 3, FourServerconfigHome.toString());
             int finalI = i;
             serversThread[i] = new Thread(() -> {servers[finalI].start();
                 latch.countDown();
@@ -168,10 +168,10 @@ public class bbcTest {
         logger.info("Testing testFourServersAllCorrect1 -> STARTS");
         for (int i = 0 ; i < 100 ; i++) {
             for (int k = 0 ; k < 4 ; k++) {
-                servers[k].propose(consID % 2, cidSeries, consID);
+                servers[k].propose(0, consID % 2, cidSeries, consID);
             }
             for (int k = 0 ; k < 4 ; k++) {
-                assertEquals(consID % 2, servers[k].decide(cidSeries, consID).getDecosion());
+                assertEquals(consID % 2, servers[k].decide(0, cidSeries, consID).getDecosion());
             }
             consID++;
 
@@ -195,7 +195,7 @@ public class bbcTest {
         Thread[] serversThread = new Thread[4];
         bbcService[] servers = new bbcService[4];
         for (int i = 0 ; i < 4 ; i++) {
-            servers[i] = new bbcService(i, 3, FourServerconfigHome.toString());
+            servers[i] = new bbcService(1, i, 3, FourServerconfigHome.toString());
             int finalI = i;
             serversThread[i] = new Thread(() -> { servers[finalI].start();
                 latch.countDown();
@@ -204,14 +204,14 @@ public class bbcTest {
         }
         latch.await();
         for (int i = 0 ; i < 1000 ; i++) {
-            servers[0].propose(0, cidSeries, i);
-            servers[1].propose(1, cidSeries, i);
-            servers[2].propose(1, cidSeries, i);
+            servers[0].propose(0, 0, cidSeries, i);
+            servers[1].propose(0, 1, cidSeries, i);
+            servers[2].propose(0 ,1, cidSeries, i);
         }
 
         for (int i = 0 ; i < 1000 ; i++) {
             for (int k = 0 ; k < 4 ; k++) {
-                assertEquals(1, servers[k].decide(cidSeries, i).getDecosion());
+                assertEquals(1, servers[k].decide(0, cidSeries, i).getDecosion());
             }
 
         }

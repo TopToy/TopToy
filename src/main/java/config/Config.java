@@ -18,10 +18,12 @@ public class Config {
         String SYSTEM_KEY = "system";
         String SYSTEM_N_KEY = "system.n";
         String SYSTEM_F_KEY = "system.f";
+        String SYSTEM_C_KEY = "system.c";
+        String SYSTEM_TESTING_KEY = "system.testing";
         String SERVER_KEY = "server";
         String SERVER_ID_KEY = "server.id";
         String SERVER_IP_KEY = "server.ip";
-        String SERVER_RMFPORT_KEY = "server.rmfPort";
+//        String SERVER_RMFPORT_KEY = "server.rmfPort";
         String SERVER_CRT_PATH = "server.TlsCertPath";
         String SERVER_TLS_PRIV_KEY_PATH = "server.TlsPrivKeyPath";
         String RMFCLUSTER_KEY = "cluster";
@@ -53,7 +55,7 @@ public class Config {
     }
 
     public static void setConfig(Path path, int id) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy:hh:m");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy:hh:mm:ss");
         System.setProperty("current.date.time", dateFormat.format(new Date()));
         tomlPath =  Paths.get("src", "main", "resources", "config.toml");
         if (path != null) {
@@ -99,13 +101,19 @@ public class Config {
         return node.getString("ip");
     }
 
-    public static int getPort(int id) {
+    public static int getPort( int id) {
         Toml t = conf.getTables(tKeys.RMFCLUSTER_KEY).get(0);
         Toml node = t.getTable("s" + id);
-        return Math.toIntExact(node.getLong("rmfPort"));
+        return Math.toIntExact(node.getLong("port"));
     }
-//
-//    public static int getID() { return Math.toIntExact(conf.getLong(tKeys.SERVER_ID_KEY)); }
+
+    public static int getC() {
+        return Math.toIntExact(conf.getLong(tKeys.SYSTEM_C_KEY));
+    }
+
+    public static boolean getTesting() {
+        return conf.getBoolean(tKeys.SYSTEM_TESTING_KEY);
+    }
 
     public static ArrayList<Node> getCluster() {
         Toml t = conf.getTables(tKeys.RMFCLUSTER_KEY).get(0);
@@ -113,7 +121,7 @@ public class Config {
         for (int i = 0 ; i < getN() ; i++) {
             Toml node = t.getTable("s" + i);
             ret.add(new Node(node.getString("ip"),
-                    Math.toIntExact(node.getLong("rmfPort")),
+                    Math.toIntExact(node.getLong("port")),
                     Math.toIntExact(node.getLong("id"))));
         }
         return ret;

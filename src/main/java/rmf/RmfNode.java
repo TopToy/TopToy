@@ -2,7 +2,8 @@ package rmf;
 
 import com.google.protobuf.ByteString;
 import config.Node;
-import crypto.rmfDigSig;
+import consensus.bbc.bbcService;
+//import crypto.rmfDigSig;
 
 import proto.Types.*;
 import java.util.ArrayList;
@@ -16,10 +17,16 @@ public class RmfNode extends Node{
     protected boolean stopped = false;
     RmfService rmfService;
 
-    public RmfNode(int id, String addr, int rmfPort, int f , ArrayList<Node> nodes, String bbcConfig) {
+    public RmfNode(int channels, int id, String addr, int rmfPort, int f , int tmo, int tmoInterval, ArrayList<Node> nodes, String bbcConfig,
+                   String serverCrt, String serverPrivKey, String caRoot) {
         super(addr, rmfPort,  id);
-        rmfService = new RmfService(id, f, nodes, bbcConfig);
+        rmfService = new RmfService(channels, id, f, tmo, tmoInterval, nodes, bbcConfig, serverCrt, serverPrivKey, caRoot);
     }
+
+//    public RmfNode(int channel, int id, String addr, int rmfPort, int f , ArrayList<Node> nodes, bbcService bbc) {
+//        super(addr, rmfPort,  id);
+//        rmfService = new RmfService(channel, id, f, nodes, bbc);
+//    }
 
     public void stop() {
         stopped = true;
@@ -27,46 +34,50 @@ public class RmfNode extends Node{
             rmfService.shutdown();
     }
 
-    public void blockUntilShutdown() throws InterruptedException {
-        rmfService.shutdown();
-    }
+//    public void blockUntilShutdown() throws InterruptedException {
+//        rmfService.shutdown();
+//    }
 
     // This should be called only after all servers are running (as this object contains also the client logic)
     public void start() {
         rmfService.start();
     }
 
-    Data buildData(byte[] msg, int cidSeries, int cid, int height, boolean fm) {
-        Meta metaMsg = Meta.
-                newBuilder().
-                setSender(getID()).
-               // setHeight(height).
-                setCid(cid).
-                setCidSeries(cidSeries).
-                build();
-        Data.Builder dataMsg = Data.
-                newBuilder().
-                setData(ByteString.copyFrom(msg)).
-                setMeta(metaMsg);
-        if (!fm) {
-            dataMsg = dataMsg.setSig(rmfDigSig.sign(dataMsg));
-        }
-        return dataMsg.build();
-    }
-    public void broadcast(int cidSeries, int cid, byte[] msg, int height) {
-        logger.debug(format("[#%d] broadcasts data message with [height=%d]", getID(), height));
+//    Data buildData(byte[] msg, int channel, int cidSeries, int cid, int height, boolean fm) {
+//        Meta metaMsg = Meta.
+//                newBuilder().
+//                setSender(getID()).
+//               // setHeight(height).
+//                setCid(cid).
+//                setCidSeries(cidSeries).
+//                setChannel(channel).
+//                build();
+//        Data.Builder dataMsg = Data.
+//                newBuilder().
+//                setData(ByteString.copyFrom(msg)).
+//                setMeta(metaMsg);
+//        if (!fm) {
+//            dataMsg = dataMsg.setSig(rmfDigSig.sign(dataMsg));
+//        }
+//        return dataMsg.build();
+//    }
+    public void broadcast(Block data) {
+        logger.debug(format("[#%d] broadcasts data message with [height=%d]", getID(), data.getHeader().getHeight()));
 
-        rmfService.rmfBroadcast(buildData(msg, cidSeries, cid, height, false));
+        rmfService.rmfBroadcast(data);
     }
 
-    public byte[][] deliver(int cidSeries, int cid, int height, int sender, int tmo, byte[] msg) throws InterruptedException {
-        Data dMsg = null;
-        if (msg != null) {
-            dMsg = buildData(msg, cidSeries, cid + 1, height + 1, true);
-        }
-        Data m = rmfService.deliver(cidSeries, cid, tmo, sender, height, dMsg);
-        return (m == null ? new byte[][] {null, null} :
-                new byte[][] {m.getData().toByteArray(), Base64.getDecoder().decode(m.getSig())});
+    public Block deliver(int channel, int cidSeries, int cid, int height, int sender, Block msg)
+            throws InterruptedException {
+//        Data dMsg = null;
+//        if (msg != null) {
+//            dMsg = buildData(msg, channel, cidSeries, cid + 1, height + 1, true);
+//        }
+        long start = System.currentTimeMillis();
+        Block m = rmfService.deliver(channel, cidSeries, cid, sender, height, msg);
+        logger.debug(format("[#%d-C[%d]] Deliver on rmf node took about %d [cidSeries=%d ; cid=%d]", getID(), channel,
+                System.currentTimeMillis() - start, cidSeries, cid));
+        return m;
 //        Data data = (td == null ? null : td.d);
 //        String type = (data == null ? "FULL" : td.t.name());
 //        return RmfResult.
@@ -78,7 +89,10 @@ public class RmfNode extends Node{
 //                build();
     }
 
-    public String getRmfDataSig(int cidSeries, int cid) {
-        return rmfService.getMessageSig(cidSeries, cid);
+//    public String getRmfDataSig(int channel, int cidSeries, int cid) {
+//        return rmfService.getMessageSig(channel, cidSeries, cid);
+//    }
+    public void clearBuffers(Meta key) {
+        rmfService.clearBuffers(key);
     }
 }

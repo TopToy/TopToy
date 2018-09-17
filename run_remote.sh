@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-toyHome=JToy
+toyHome=~/JToy
 rm -r -f /tmp/JToy/logs
 rm -r -f /tmp/JToy/res
 mkdir -p /tmp/JToy/logs
