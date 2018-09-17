@@ -19,6 +19,7 @@ public class Config {
         String SYSTEM_N_KEY = "system.n";
         String SYSTEM_F_KEY = "system.f";
         String SYSTEM_C_KEY = "system.c";
+        String SYSTEM_TESTING_KEY = "system.testing";
         String SERVER_KEY = "server";
         String SERVER_ID_KEY = "server.id";
         String SERVER_IP_KEY = "server.ip";
@@ -54,7 +55,7 @@ public class Config {
     }
 
     public static void setConfig(Path path, int id) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy:hh:m");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy:hh:mm:ss");
         System.setProperty("current.date.time", dateFormat.format(new Date()));
         tomlPath =  Paths.get("src", "main", "resources", "config.toml");
         if (path != null) {
@@ -108,6 +109,10 @@ public class Config {
 
     public static int getC() {
         return Math.toIntExact(conf.getLong(tKeys.SYSTEM_C_KEY));
+    }
+
+    public static boolean getTesting() {
+        return conf.getBoolean(tKeys.SYSTEM_TESTING_KEY);
     }
 
     public static ArrayList<Node> getCluster() {

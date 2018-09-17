@@ -5,6 +5,7 @@ import blockchain.block;
 import com.google.common.collect.Lists;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
+import config.Config;
 import config.Node;
 import consensus.RBroadcast.RBrodcastService;
 import crypto.blockDigSig;
@@ -13,6 +14,7 @@ import rmf.RmfNode;
 import proto.Types.*;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 
 import static java.lang.Math.log;
@@ -44,18 +46,21 @@ public abstract class bcServer extends Node {
 //    private int initTmo;
     private Thread mainThread;
     private Thread panicThread;
-    private Thread gcThread;
+//    private Thread gcThread;
     int cid = 0;
     int cidSeries = 0;
     private final HashMap<Integer, fpEntry> fp;
     private HashMap<Integer, ArrayList<Types.subChainVersion>> scVersions;
-    private final ArrayList<Types.Transaction> transactionsPool = new ArrayList<>();
-    private final ArrayList<String> proposedTx = new ArrayList<>();
+//    private final ArrayList<Types.Transaction> transactionsPool = new ArrayList<>();
+    private final ConcurrentLinkedQueue<Transaction> transactionsPool = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<String> proposedTx = new ConcurrentLinkedQueue<>();
     private final HashMap<String, Transaction> approvedTx = new HashMap<>();
     boolean configuredFastMode;
     boolean fastMode;
     int channel;
     final Integer[] lastReceivedBlock;
+    int lastGc = 0;
+    boolean testing = Config.getTesting();
 
     public bcServer(String addr, int rmfPort, int id, int channel, int f, int tmo, int tmoInterval,
                     int maxTx, boolean fastMode, ArrayList<Node> cluster,
@@ -78,19 +83,20 @@ public abstract class bcServer extends Node {
         scVersions = new HashMap<>();
         mainThread = new Thread(this::mainLoop);
         panicThread = new Thread(this::deliverForkAnnounce);
-        gcThread = new Thread(() -> {
-            try {
-                gc();
-            } catch (InterruptedException e) {
-                logger.error("", e);
-            }
-        });
+//        gcThread = new Thread(() -> {
+//            try {
+//                gc();
+//            } catch (InterruptedException e) {
+//                logger.error("", e);
+//            }
+//        });
         this.configuredFastMode = fastMode;
         this.fastMode = fastMode;
         this.channel = channel;
         rmfServer = rmf;
         this.lastReceivedBlock = new Integer[n];
         Arrays.fill(lastReceivedBlock, 0);
+        currLeader = channel % n;
     }
 
     public bcServer(String addr, int rmfPort, int id, int channel, int f, int tmo, int tmoInterval,
@@ -119,17 +125,18 @@ public abstract class bcServer extends Node {
         scVersions = new HashMap<>();
         mainThread = new Thread(this::mainLoop);
         panicThread = new Thread(this::deliverForkAnnounce);
-        gcThread = new Thread(() -> {
-            try {
-                gc();
-            } catch (InterruptedException e) {
-                logger.error(format("[#%d-C[%d]]", getID(), channel), e);
-            }
-        });
+//        gcThread = new Thread(() -> {
+//            try {
+//                gc();
+//            } catch (InterruptedException e) {
+//                logger.error(format("[#%d-C[%d]]", getID(), channel), e);
+//            }
+//        });
         this.configuredFastMode = fastMode;
         this.fastMode = fastMode;
         this.lastReceivedBlock = new Integer[n];
         Arrays.fill(lastReceivedBlock, 0);
+        currLeader = channel % n;
 
     }
 
@@ -150,8 +157,8 @@ public abstract class bcServer extends Node {
         logger.debug(format("[#%d-C[%d]] starts panic thread", getID(), channel));
         mainThread.start();
         logger.debug(format("[#%d-C[%d]] starts main thread", getID(), channel));
-        gcThread.start();
-        logger.debug(format("[#%d-C[%d]] gc thread is up", getID(), channel));
+//        gcThread.start();
+//        logger.debug(format("[#%d-C[%d]] gc thread is up", getID(), channel));
         logger.info(format("[#%d-C[%d]] starts serving", getID(), channel));
     }
 
@@ -183,28 +190,29 @@ public abstract class bcServer extends Node {
         cid++;
     }
 
-    private void gc() throws InterruptedException {
-        int lastGc = 0;
-        while (!stopped) {
-            Thread.sleep(10 * 1000); // TODO: HC Timeout
+    private void gc()  {
+//        int lastGc = 0;
+//        while (!stopped) {
+//            Thread.sleep(10 * 1000); // TODO: HC Timeout
             int tmpLastGc;
             ArrayList<Integer> data;
-            synchronized (lastReceivedBlock) {
-                data = Lists.newArrayList(lastReceivedBlock);
+            data = Lists.newArrayList(lastReceivedBlock);
+//            synchronized (lastReceivedBlock) {
+//                data = Lists.newArrayList(lastReceivedBlock);
+//            }
+            if (data.contains(lastGc)) {
+                logger.debug(format("[#%d-C[%d]] will not evacuate buffers" +
+                        " [lastGC=%d ; index=%d]", getID(), channel, lastGc, data.indexOf(lastGc)));
+                return;
             }
-                if (data.contains(lastGc)) {
-                    logger.debug(format("[#%d-C[%d]] will not evacuate buffers" +
-                            " [lastGC=%d ; index=%d]", getID(), channel, lastGc, data.indexOf(lastGc)));
-                    continue;
-                }
-                tmpLastGc = min(data);
+            tmpLastGc = min(data);
 
             for (int i = lastGc ; i < tmpLastGc - f ; i++) {
                 clearBuffers(i);
             }
             lastGc = max(lastGc, tmpLastGc - f);
 
-        }
+//        }
     }
 
     void clearBuffers(int index) {
@@ -342,9 +350,9 @@ public abstract class bcServer extends Node {
 
 //                tmo = initTmo;
                 synchronized (newBlockNotifyer) {
-                    synchronized (lastReceivedBlock) {
-                        lastReceivedBlock[recBlock.getHeader().getM().getSender()] = recBlock.getHeader().getHeight();
-                    }
+//                    synchronized (lastReceivedBlock) {
+
+//                    }
                     bc.addBlock(recBlock);
                     logger.debug(String.format("[#%d-C[%d]] adds new block with [height=%d] [cidSeries=%d ; cid=%d] [size=%d]",
                             getID(), channel, recBlock.getHeader().getHeight(), cidSeries, cid, recBlock.getDataCount()));
@@ -353,7 +361,11 @@ public abstract class bcServer extends Node {
 //                                getID(), channel, recBlock.getHeader().getHeight(), cidSeries, cid));
 //                    }
                     newBlockNotifyer.notify();
+
                 }
+                // TODO: Improve mechanism
+//              lastReceivedBlock[recBlock.getHeader().getM().getSender()] = recBlock.getHeader().getHeight();
+//              gc();     lastReceivedBlock[recBlock.getHeader().getM().getSender()] = recBlock.getHeader().getHeight();
                 if (bc.getHeight() - f >= 0) {
                     synchronized (approvedTx) {
                         addApprovedTransactions(bc.getBlock(bc.getHeight() - f).getDataList());
@@ -382,10 +394,10 @@ public abstract class bcServer extends Node {
                 .setTxID(txID)
                 .setData(ByteString.copyFrom(data))
                 .build();
-        synchronized (transactionsPool) {
-//            logger.debug(format("[#%d-C[%d]] adds transaction from [client=%d ; txID=%s]", getID(), t.getClientID(), t.getTxID()));
+//        synchronized (transactionsPool) {
+            logger.debug(format("[#%d-C[%d]] adds transaction from [client=%d ; txID=%s]", getID(), channel, t.getClientID(), t.getTxID()));
             transactionsPool.add(t);
-        }
+//        }
         return txID;
     }
     private void addApprovedTransactions(List<Transaction> txs) {
@@ -402,14 +414,14 @@ public abstract class bcServer extends Node {
                 return 2;
             }
         }
-        synchronized (transactionsPool) {
+//        synchronized (transactionsPool) {
             if (transactionsPool.stream().map(Transaction::getTxID).anyMatch(tid -> tid.equals(txID))) {
                 return 0;
             }
             if (proposedTx.contains(txID)) {
                 return 1;
             }
-        }
+//        }
         ArrayList<Block> cbc;
         synchronized (bc) {
             cbc = new ArrayList<Block>(bc.getBlocks(bc.getHeight() - f + 1, bc.getHeight() + 1));
@@ -427,11 +439,12 @@ public abstract class bcServer extends Node {
     void addTransactionsToCurrBlock() {
         if (currBlock != null) return;
         currBlock = bc.createNewBLock();
-        synchronized (transactionsPool) {
+        if (testing && currHeight < 10) return;
+//        synchronized (transactionsPool) {
             if (transactionsPool.isEmpty()) return;
             while ((!transactionsPool.isEmpty()) && currBlock.getTransactionCount() < maxTransactionInBlock) {
-                Transaction t = transactionsPool.get(0);
-                transactionsPool.remove(0);
+                Transaction t = transactionsPool.poll();
+//                transactionsPool.remove(0);
                 proposedTx.add(t.getTxID());
                 if (!currBlock.validateTransaction(t)) {
                     logger.debug(format("[#%d-C[%d]] detects an invalid transaction from [client=%d]",
@@ -441,7 +454,7 @@ public abstract class bcServer extends Node {
                 currBlock.addTransaction(t);
 
             }
-        }
+//        }
     }
 
     void removeFromProposed(List<Transaction> txs) {

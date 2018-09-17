@@ -1,13 +1,17 @@
 #!/usr/bin/env bash
 servers=(yon_b@10.10.43.55 yon_b@10.10.43.57 yon_b@10.10.43.56 yon_b@10.10.43.58)
-types=(r r r r)
+types=(hlf hlf hlf hlf)
 ids=(0 1 2 3)
 pass=yon_b@2017@
 configDir=$PWD/Configurations/4Servers/remote
 outputDir=/home/yoni/toy
+if [ "$#" -eq 1 ] ; then
+    outputDir=${1}
+fi
+echo "output directory is ${outputDir}"
 rm -r target
 rm -r -f bin
-mvn install -DskipTests
+mvn install -DskipTests > /dev/null
 if [[ "$?" -ne 0 ]] ; then
   echo 'could compile the project'; exit $1
 fi

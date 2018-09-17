@@ -205,7 +205,7 @@ public class sgTest {
     }
     @Test
     void TestStressFourServersNoFailures() throws InterruptedException {
-        setConfig(fourConfig, 0);
+        setConfig(null, 0);
         Thread.sleep(timeToWaitBetweenTests);
         int nnodes = 4;
         logger.info("start TestFourServersNoFailures");
@@ -584,7 +584,7 @@ public class sgTest {
 
     @Test
     void TestStressAsyncFourServersSplitBrodacastFault() throws InterruptedException {
-        setConfig(fourConfig, 0);
+        setConfig(null, 0);
         Thread.sleep(timeToWaitBetweenTests);
         int nnodes = 4;
         logger.info("start TestFourServersNoFailures");

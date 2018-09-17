@@ -363,7 +363,7 @@ public class cli {
                 random.nextBytes(tx);
                 last = JToy.s.addTransaction(tx, cID);
             }
-            Thread.sleep(10 * 1000);
+            Thread.sleep(30 * 1000);
             logger.info(format("[#%d] start serving...", JToy.s.getID()));
             serve();
 //            while ((!JToy.type.equals("m")) && (!last.equals("")) && JToy.server.isTxPresent(last) != 2) {
@@ -372,9 +372,21 @@ public class cli {
 //            if (JToy.type.equals("m")) {
 //                Thread.sleep(60 * 1000);
 //            }
+            Thread.sleep(2 * 1000);
+            long start = System.currentTimeMillis();
+//            while (System.currentTimeMillis() - start < (15 * 1000)) {
+//                int cID = rand.nextInt( 100 );
+//                SecureRandom random = new SecureRandom();
+//                byte[] tx = new byte[tSize];
+//                random.nextBytes(tx);
+//                JToy.s.addTransaction(tx, cID);
+//            }
             Thread.sleep( 1 * 60 * 1000);
-            stop();
+            Thread t = new Thread(() -> JToy.s.shutdown());
+            t.start();
+            Thread.sleep(5 * 1000);
             writeToScv(csvPath);
+            System.exit(0);
         }
 
         private void setByzSetting(String[] args) {

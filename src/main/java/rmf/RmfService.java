@@ -125,7 +125,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
     Map<Integer, peer> peers;
     private List<Node> nodes;
     private Thread bbcServiceThread;
-    private Thread[] bbcMissedConsensusThreads;
+//    private Thread[] bbcMissedConsensusThreads;
 //    protected Server server;
     private String bbcConfig;
     private final ConcurrentHashMap<Meta, BbcDecision>[] regBbcCons;
@@ -186,7 +186,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         this.nodes = nodes;
         this.fastBbcCons = new ConcurrentHashMap[channels];
         this.regBbcCons = new ConcurrentHashMap[channels];
-        this.bbcMissedConsensusThreads = new Thread[channels];
+//        this.bbcMissedConsensusThreads = new Thread[channels];
         this.alive = new int[channels];
         this.aliveLock = new Object[channels];
         fastVoteNotifyer = new Object[channels];
@@ -199,7 +199,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             fVotes[i] = new ConcurrentHashMap<>();
             fastBbcCons[i] = new ConcurrentHashMap<>();
             regBbcCons[i] = new ConcurrentHashMap<>();
-            alive[i] = 1000;
+            alive[i] = tmo;
             aliveLock[i] = new Object();
             this.currentTmo[i] = tmo;
 
@@ -256,18 +256,18 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             bbcServiceThread.start();
 //        }
 
-        for (int i = 0 ; i < channels ; i++) {
-            int finalI = i;
-            bbcMissedConsensusThreads[i] = new Thread(() ->
-            {
-                try {
-                    bbcMissedConsensus(finalI);
-                } catch (InterruptedException e) {
-                    logger.error(format("[#%d-C[%d]]", id, finalI), e);
-                }
-            });
-            bbcMissedConsensusThreads[i].start();
-        }
+//        for (int i = 0 ; i < channels ; i++) {
+//            int finalI = i;
+//            bbcMissedConsensusThreads[i] = new Thread(() ->
+//            {
+//                try {
+//                    bbcMissedConsensus(finalI);
+//                } catch (InterruptedException e) {
+//                    logger.error(format("[#%d-C[%d]]", id, finalI), e);
+//                }
+//            });
+//            bbcMissedConsensusThreads[i].start();
+//        }
 
         try {
 //            if (!group)
@@ -290,10 +290,10 @@ public class RmfService extends RmfGrpc.RmfImplBase {
     }
 
     private void bbcMissedConsensus(int channel) throws InterruptedException {
-        int sleepFor = 1000;
+        int sleepFor = tmo;
         while (!stopped) {
             synchronized (aliveLock[channel]) {
-                alive[channel] = 1000; // TODO: Hard coded time out
+                alive[channel] = currentTmo[channel]; // TODO: Hard coded time out
                 sleepFor = alive[channel];
                 while (sleepFor > 0) {
                     alive[channel] = 0;
@@ -358,14 +358,14 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                 bbcServiceThread.interrupt();
                 bbcServiceThread.join();
             }
-            if (bbcMissedConsensusThreads != null) {
-                for (int i = 0 ; i < channels ; i++) {
-                    if (bbcMissedConsensusThreads[i] != null) {
-                        bbcMissedConsensusThreads[i].interrupt();
-                        bbcMissedConsensusThreads[i].join();
-                    }
-                }
-            }
+//            if (bbcMissedConsensusThreads != null) {
+//                for (int i = 0 ; i < channels ; i++) {
+//                    if (bbcMissedConsensusThreads[i] != null) {
+//                        bbcMissedConsensusThreads[i].interrupt();
+//                        bbcMissedConsensusThreads[i].join();
+//                    }
+//                }
+//            }
 
         } catch (InterruptedException e) {
             logger.error("", e);
@@ -747,7 +747,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         });
 
         if (currentTmo[channel] != tmo) {
-            logger.debug(format("unable to receive message, timeout increased to [%d] ms", currentTmo[channel]));
+            logger.debug(format("[#%d-C[%d]] unable to receive message, timeout increased to [%d] ms", id, channel, currentTmo[channel]));
         }
         if (regBbcCons[channel].containsKey(key)) {
             int v = regBbcCons[channel].get(key).getDecosion();
@@ -757,14 +757,14 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                 pendingMsg[channel].remove(key);
 //                mutex.unlock();
                 synchronized (aliveLock[channel]) {
-                    alive[channel] = tmo;
+                    alive[channel] = currentTmo[channel];
                 }
                 return null;
             }
         }
 
         synchronized (aliveLock[channel]) {
-            alive[channel] = tmo;
+            alive[channel] = currentTmo[channel];
         }
 
         requestData(channel, cidSeries, cid, sender, height);
