@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 servers=(yon_b@10.10.43.55 yon_b@10.10.43.57 yon_b@10.10.43.56 yon_b@10.10.43.58)
-types=(hlf hlf hlf hlf)
+types=(r r r r)
 ids=(0 1 2 3)
 pass=yon_b@2017@
 configDir=$PWD/Configurations/4Servers/remote

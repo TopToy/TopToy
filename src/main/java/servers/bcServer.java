@@ -17,6 +17,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 
+import static java.lang.Math.incrementExact;
 import static java.lang.Math.log;
 import static java.lang.Math.max;
 import static java.lang.String.format;
@@ -58,8 +59,8 @@ public abstract class bcServer extends Node {
     boolean configuredFastMode;
     boolean fastMode;
     int channel;
-    final Integer[] lastReceivedBlock;
-    int lastGc = 0;
+//    final Integer[] lastReceivedBlock;
+//    int lastGc = 0;
     boolean testing = Config.getTesting();
 
     public bcServer(String addr, int rmfPort, int id, int channel, int f, int tmo, int tmoInterval,
@@ -94,8 +95,8 @@ public abstract class bcServer extends Node {
         this.fastMode = fastMode;
         this.channel = channel;
         rmfServer = rmf;
-        this.lastReceivedBlock = new Integer[n];
-        Arrays.fill(lastReceivedBlock, 0);
+//        this.lastReceivedBlock = new Integer[n];
+//        Arrays.fill(lastReceivedBlock, 0);
         currLeader = channel % n;
     }
 
@@ -134,8 +135,8 @@ public abstract class bcServer extends Node {
 //        });
         this.configuredFastMode = fastMode;
         this.fastMode = fastMode;
-        this.lastReceivedBlock = new Integer[n];
-        Arrays.fill(lastReceivedBlock, 0);
+//        this.lastReceivedBlock = new Integer[n];
+//        Arrays.fill(lastReceivedBlock, 0);
         currLeader = channel % n;
 
     }
@@ -190,33 +191,9 @@ public abstract class bcServer extends Node {
         cid++;
     }
 
-    private void gc()  {
-//        int lastGc = 0;
-//        while (!stopped) {
-//            Thread.sleep(10 * 1000); // TODO: HC Timeout
-            int tmpLastGc;
-            ArrayList<Integer> data;
-            data = Lists.newArrayList(lastReceivedBlock);
-//            synchronized (lastReceivedBlock) {
-//                data = Lists.newArrayList(lastReceivedBlock);
-//            }
-            if (data.contains(lastGc)) {
-                logger.debug(format("[#%d-C[%d]] will not evacuate buffers" +
-                        " [lastGC=%d ; index=%d]", getID(), channel, lastGc, data.indexOf(lastGc)));
-                return;
-            }
-            tmpLastGc = min(data);
-
-            for (int i = lastGc ; i < tmpLastGc - f ; i++) {
-                clearBuffers(i);
-            }
-            lastGc = max(lastGc, tmpLastGc - f);
-
-//        }
-    }
-
-    void clearBuffers(int index) {
+     void gc(int index)  {
         logger.debug(format("[#%d-C[%d]] clear buffers of [height=%d]", getID(), channel, index));
+        if (bc.getBlock(index) == null) return;
         Meta key = bc.getBlock(index).getHeader().getM();
         Meta rKey = Meta.newBuilder()
                 .setChannel(key.getChannel())
@@ -226,7 +203,13 @@ public abstract class bcServer extends Node {
         rmfServer.clearBuffers(rKey);
         syncRB.clearBuffers(rKey);
         panicRB.clearBuffers(rKey);
+        bc.setBlock(index, null);
+//
     }
+
+//    void clearBuffers(int index) {
+//
+//    }
     private void mainLoop() {
         while (!stopped) {
 //            synchronized (bc) {

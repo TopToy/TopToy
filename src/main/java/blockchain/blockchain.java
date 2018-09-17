@@ -55,6 +55,10 @@ public abstract class blockchain {
 
         }
     }
+
+    public void setBlock(int index, Block b) {
+        blocks.set(index, b);
+    }
     public boolean validateBlockHash(Block b) {
         byte[] d = DigestMethod.hash(blocks.get(b.getHeader().getHeight() - 1).getHeader().toByteArray());
         return DigestMethod.validate(b.getHeader().getPrev().toByteArray(),

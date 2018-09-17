@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
+import static java.lang.Math.min;
 import static java.lang.String.format;
 
 public class sg implements server {
@@ -20,9 +21,12 @@ public class sg implements server {
     RmfNode rmf;
     RBrodcastService deliverFork;
     RBrodcastService sync;
-
+    int n;
+    int gcCount = 0;
+    int gcLimit = 1000;
     bcServer[] group;
-
+    int[][] lastDelivered;
+    int[] lastGCpoint;
     final blockchain bc;
     int id;
     int c;
@@ -41,6 +45,17 @@ public class sg implements server {
     public sg(String addr, int port, int id, int f, int c, int tmo, int tmoInterval,
               int maxTx, boolean fastMode, ArrayList<Node> cluster, String bbcConfig, String panicConfig,
               String syncConfig, String type,  String serverCrt, String serverPrivKey, String caRoot) {
+        n = 3 *f +1;
+        lastDelivered = new int[c][];
+        lastGCpoint = new int[c];
+        for (int i = 0 ; i < c ; i++) {
+            lastDelivered[i] = new int[n];
+            lastGCpoint[i] = 0;
+            for (int j = 0 ; j < n ; j++) {
+                lastDelivered[i][j] = 0;
+
+            }
+        }
         this.c = c;
         this.group = new bcServer[c];
         this.id = id;
@@ -83,6 +98,7 @@ public class sg implements server {
                 long start = System.currentTimeMillis();
 //                Timestamp timestamp = new Timestamp(System.currentTimeMillis());
                 Types.Block cBlock = group[currChannel].deliver(currBlock);
+                gc(cBlock.getHeader().getHeight(), cBlock.getHeader().getM().getSender(), currChannel);
                 if (cBlock.getDataCount() == 0) continue;
                 cBlock = cBlock.toBuilder()
                         .setHeader(cBlock.getHeader().toBuilder()
@@ -102,6 +118,37 @@ public class sg implements server {
             }
             currBlock++;
         }
+    }
+
+    void gc(int origHeight, int sender, int channel) {
+        if (sender < 0 || sender > n - 1 || channel < 0 || channel > c -1 || origHeight < 0) {
+            logger.debug(format("G-%d GC invalid argument [OrigHeight=%d ; sender=%d ; channel=%d]"
+                    ,id, origHeight, sender, channel));
+            return;
+        }
+        lastDelivered[channel][sender] = origHeight;
+        gcCount++;
+        if (gcCount < gcLimit) return;
+        gcCount = 0;
+        new Thread(() -> {
+            for (int i = 0 ; i < c ; i++) {
+                gcForChannel(i);
+            }
+        }).start();
+
+
+    }
+    void gcForChannel(int channel) {
+        int minHeight = lastDelivered[channel][0];
+        for (int i = 0 ; i < n ; i++) {
+            minHeight = min(minHeight, lastDelivered[channel][i]);
+        }
+        logger.debug(format("G-%d starting GC [OrigHeight=%d ; channel=%d]",id, minHeight, channel));
+        for (int i = lastGCpoint[channel] ; i < minHeight ; i++) {
+            group[channel].gc(minHeight);
+        }
+        lastGCpoint[channel] = minHeight;
+
     }
     public void start() {
         CountDownLatch latch = new CountDownLatch(3);

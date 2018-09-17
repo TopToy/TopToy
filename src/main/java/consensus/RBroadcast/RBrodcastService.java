@@ -25,7 +25,7 @@ import static java.lang.String.format;
 public class RBrodcastService extends DefaultSingleRecoverable {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(RBrodcastService.class);
     private int id;
-    private HashMap<Integer, List<RBMsg>> recMsg;
+    private final HashMap<Integer, List<RBMsg>> recMsg;
     private AsynchServiceProxy RBProxy;
     private ServiceReplica sr;
     private String configHome;
@@ -51,6 +51,7 @@ public class RBrodcastService extends DefaultSingleRecoverable {
         synchronized (recMsg) {
             int channel = key.getChannel();
             int cid = key.getCid();
+            if (!recMsg.containsKey(channel)) return;
             recMsg.replace(channel, recMsg
                     .get(key.getChannel())
                     .stream()

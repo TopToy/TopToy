@@ -374,17 +374,17 @@ public class cli {
 //            }
             Thread.sleep(2 * 1000);
             long start = System.currentTimeMillis();
-//            while (System.currentTimeMillis() - start < (15 * 1000)) {
-//                int cID = rand.nextInt( 100 );
-//                SecureRandom random = new SecureRandom();
-//                byte[] tx = new byte[tSize];
-//                random.nextBytes(tx);
-//                JToy.s.addTransaction(tx, cID);
-//            }
-            Thread.sleep( 1 * 60 * 1000);
+            while (System.currentTimeMillis() - start < (30 * 1000)) {
+                int cID = rand.nextInt( 100 );
+                SecureRandom random = new SecureRandom();
+                byte[] tx = new byte[tSize];
+                random.nextBytes(tx);
+                JToy.s.addTransaction(tx, cID);
+            }
+//            Thread.sleep( 2 * 60 * 1000);
             Thread t = new Thread(() -> JToy.s.shutdown());
             t.start();
-            Thread.sleep(5 * 1000);
+            Thread.sleep(10 * 1000);
             writeToScv(csvPath);
             System.exit(0);
         }

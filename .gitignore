@@ -8,6 +8,7 @@
 *.iml
 output*
 *.iws
+resources*
 
 # Mac
 .DS_Store
@@ -21,6 +22,7 @@ target/
 
 Dockerfile
 
-Configurations
+Configurations*
+*.sh
 
 bin*
