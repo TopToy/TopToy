@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
+import static java.lang.Math.log;
 import static java.lang.Math.min;
 import static java.lang.String.format;
 
@@ -23,7 +24,7 @@ public class sg implements server {
     RBrodcastService sync;
     int n;
     int gcCount = 0;
-    int gcLimit = 1000;
+    int gcLimit = 1;
     bcServer[] group;
     int[][] lastDelivered;
     int[] lastGCpoint;
@@ -50,7 +51,7 @@ public class sg implements server {
         lastGCpoint = new int[c];
         for (int i = 0 ; i < c ; i++) {
             lastDelivered[i] = new int[n];
-            lastGCpoint[i] = 0;
+            lastGCpoint[i] = 1;
             for (int j = 0 ; j < n ; j++) {
                 lastDelivered[i][j] = 0;
 
@@ -130,11 +131,14 @@ public class sg implements server {
         gcCount++;
         if (gcCount < gcLimit) return;
         gcCount = 0;
-        new Thread(() -> {
-            for (int i = 0 ; i < c ; i++) {
-                gcForChannel(i);
-            }
-        }).start();
+        for (int i = 0 ; i < c ; i++) {
+            gcForChannel(i);
+        }
+//        new Thread(() -> {
+//            for (int i = 0 ; i < c ; i++) {
+//                gcForChannel(i);
+//            }
+//        }).start();
 
 
     }
@@ -143,9 +147,10 @@ public class sg implements server {
         for (int i = 0 ; i < n ; i++) {
             minHeight = min(minHeight, lastDelivered[channel][i]);
         }
-        logger.debug(format("G-%d starting GC [OrigHeight=%d ; channel=%d]",id, minHeight, channel));
+        logger.debug(format("G-%d starting GC [OrigHeight=%d ; lastGCPoint=%d ;" +
+                " channel=%d]",id, minHeight, lastGCpoint[channel], channel));
         for (int i = lastGCpoint[channel] ; i < minHeight ; i++) {
-            group[channel].gc(minHeight);
+            group[channel].gc(i);
         }
         lastGCpoint[channel] = minHeight;
 
@@ -206,7 +211,13 @@ public class sg implements server {
     }
 
     public String addTransaction(byte[] data, int clientID) {
-        String ret = group[lastChannel].addTransaction(data, clientID);
+        String ret = null;
+        try {
+            ret = group[lastChannel].addTransaction(data, clientID);
+        } catch (InterruptedException e) {
+            logger.error("", e);
+            return ret;
+        }
         lastChannel = (lastChannel + 1) % c;
         return ret;
     }

@@ -19,6 +19,7 @@ import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.lang.Math.min;
 import static java.lang.StrictMath.max;
@@ -323,7 +324,7 @@ public class cli {
                                 String.valueOf(t.getClientID()), String.valueOf(b.getTs()),
                                 String.valueOf(t.getData().size()), String.valueOf(i),
                                 String.valueOf(b.getHeader().getM().getSender()));
-                        CSVUtils.writeLine(writer, row);
+//                        CSVUtils.writeLine(writer, row);
                     }
                 }
                 writer.flush();
@@ -373,20 +374,32 @@ public class cli {
 //                Thread.sleep(60 * 1000);
 //            }
             Thread.sleep(2 * 1000);
+            AtomicBoolean stopped = new AtomicBoolean(false);
             long start = System.currentTimeMillis();
-            while (System.currentTimeMillis() - start < (30 * 1000)) {
-                int cID = rand.nextInt( 100 );
-                SecureRandom random = new SecureRandom();
-                byte[] tx = new byte[tSize];
-                random.nextBytes(tx);
-                JToy.s.addTransaction(tx, cID);
-            }
-//            Thread.sleep( 2 * 60 * 1000);
-            Thread t = new Thread(() -> JToy.s.shutdown());
+//            Object lock = new Object();
+            Thread t = new Thread(() -> {
+                while (!stopped.get()) {
+                    int cID = rand.nextInt( 100 );
+                    SecureRandom random = new SecureRandom();
+                    byte[] tx = new byte[tSize];
+                    random.nextBytes(tx);
+                    JToy.s.addTransaction(tx, cID);
+                }
+            });
             t.start();
-            Thread.sleep(10 * 1000);
+            Thread.sleep(60 * 1 * 1000);
+            stopped.set(true);
+            t.interrupt();
+            t.join();
+            JToy.s.shutdown();
+
+//            Thread.sleep( 2 * 60 * 1000);
+
+//            Thread t = new Thread(() -> );
+//            t.start();
+//            Thread.sleep(10 * 1000);
             writeToScv(csvPath);
-            System.exit(0);
+//            System.exit(0);
         }
 
         private void setByzSetting(String[] args) {

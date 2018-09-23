@@ -15,6 +15,7 @@ import proto.Types.*;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.Semaphore;
 import java.util.stream.Collectors;
 
 import static java.lang.Math.incrementExact;
@@ -54,14 +55,15 @@ public abstract class bcServer extends Node {
     private HashMap<Integer, ArrayList<Types.subChainVersion>> scVersions;
 //    private final ArrayList<Types.Transaction> transactionsPool = new ArrayList<>();
     private final ConcurrentLinkedQueue<Transaction> transactionsPool = new ConcurrentLinkedQueue<>();
-    private final ConcurrentLinkedQueue<String> proposedTx = new ConcurrentLinkedQueue<>();
-    private final HashMap<String, Transaction> approvedTx = new HashMap<>();
+//    private final ConcurrentLinkedQueue<String> proposedTx = new ConcurrentLinkedQueue<>();
+//    private final HashMap<String, Transaction> approvedTx = new HashMap<>();
     boolean configuredFastMode;
     boolean fastMode;
     int channel;
 //    final Integer[] lastReceivedBlock;
 //    int lastGc = 0;
     boolean testing = Config.getTesting();
+    Semaphore txSem = new Semaphore(100000);
 
     public bcServer(String addr, int rmfPort, int id, int channel, int f, int tmo, int tmoInterval,
                     int maxTx, boolean fastMode, ArrayList<Node> cluster,
@@ -82,7 +84,14 @@ public abstract class bcServer extends Node {
         this.maxTransactionInBlock = maxTx;
         fp = new HashMap<>();
         scVersions = new HashMap<>();
-        mainThread = new Thread(this::mainLoop);
+        mainThread = new Thread(() -> {
+            try {
+                mainLoop();
+            } catch (RuntimeException ex) {
+                logger.error(format("[#%d-C[%d]]", getID(), channel), ex);
+                shutdown(true);
+            }
+        });
         panicThread = new Thread(this::deliverForkAnnounce);
 //        gcThread = new Thread(() -> {
 //            try {
@@ -165,6 +174,7 @@ public abstract class bcServer extends Node {
 
     public void shutdown(boolean group) {
         stopped =  true;
+        logger.debug(format("[#%d-C[%d]] interrupt main thread", getID(), channel));
         mainThread.interrupt();
         try {
             mainThread.join();
@@ -177,12 +187,14 @@ public abstract class bcServer extends Node {
             if (panicRB != null) panicRB.shutdown();
             if (syncRB != null) syncRB.shutdown();
         }
+        logger.debug(format("[#%d-C[%d]] interrupt panic thread", getID(), channel));
         panicThread.interrupt();
         try {
             panicThread.join();
         } catch (InterruptedException e) {
             logger.error(format("[#%d-C[%d]]", getID(), channel), e);
         }
+        txSem.release();
         logger.info(format("[#%d-C[%d]] shutdown bc server", getID(), channel));
     }
     private void updateLeaderAndHeight() {
@@ -193,7 +205,7 @@ public abstract class bcServer extends Node {
 
      void gc(int index)  {
         logger.debug(format("[#%d-C[%d]] clear buffers of [height=%d]", getID(), channel, index));
-        if (bc.getBlock(index) == null) return;
+//        if (bc.getBlock(index) == null) return;
         Meta key = bc.getBlock(index).getHeader().getM();
         Meta rKey = Meta.newBuilder()
                 .setChannel(key.getChannel())
@@ -210,7 +222,7 @@ public abstract class bcServer extends Node {
 //    void clearBuffers(int index) {
 //
 //    }
-    private void mainLoop() {
+    private void mainLoop() throws RuntimeException {
         while (!stopped) {
 //            synchronized (bc) {
                 synchronized (fp) {
@@ -232,6 +244,7 @@ public abstract class bcServer extends Node {
                 } catch (InterruptedException e) {
                     logger.debug(format("[#%d-C[%d]] main thread has been interrupted on leader impl",
                             getID(), channel));
+//                    if (stopped) return;
                     continue;
                 }
                 Block recBlock;
@@ -243,6 +256,7 @@ public abstract class bcServer extends Node {
                 } catch (InterruptedException e) {
                     logger.debug(format("[#%d-C[%d]] main thread has been interrupted on rmf deliver",
                             getID(), channel));
+//                    if (stopped) return;
                     continue;
                 }
 
@@ -349,11 +363,11 @@ public abstract class bcServer extends Node {
                 // TODO: Improve mechanism
 //              lastReceivedBlock[recBlock.getHeader().getM().getSender()] = recBlock.getHeader().getHeight();
 //              gc();     lastReceivedBlock[recBlock.getHeader().getM().getSender()] = recBlock.getHeader().getHeight();
-                if (bc.getHeight() - f >= 0) {
-                    synchronized (approvedTx) {
-                        addApprovedTransactions(bc.getBlock(bc.getHeight() - f).getDataList());
-                    }
-                }
+//                if (bc.getHeight() - f >= 0) {
+////                    synchronized (approvedTx) {
+////                        addApprovedTransactions(bc.getBlock(bc.getHeight() - f).getDataList());
+////                    }
+//                }
 
                 if (currLeader == getID()) {
                     removeFromProposed(recBlock.getDataList());
@@ -370,7 +384,8 @@ public abstract class bcServer extends Node {
     abstract public blockchain getBC(int start, int end);
 
 
-    public String addTransaction(byte[] data, int clientID) {
+    public String addTransaction(byte[] data, int clientID) throws InterruptedException {
+        txSem.acquire();
         String txID = UUID.randomUUID().toString();
         Transaction t = Transaction.newBuilder()
                 .setClientID(clientID)
@@ -378,45 +393,45 @@ public abstract class bcServer extends Node {
                 .setData(ByteString.copyFrom(data))
                 .build();
 //        synchronized (transactionsPool) {
-            logger.debug(format("[#%d-C[%d]] adds transaction from [client=%d ; txID=%s]", getID(), channel, t.getClientID(), t.getTxID()));
+//            logger.debug(format("[#%d-C[%d]] adds transaction from [client=%d ; txID=%s]", getID(), channel, t.getClientID(), t.getTxID()));
             transactionsPool.add(t);
 //        }
         return txID;
     }
     private void addApprovedTransactions(List<Transaction> txs) {
-        synchronized (approvedTx) {
-            for (Transaction tx :txs) {
-                approvedTx.put(tx.getTxID(), tx);
-            }
-        }
+//        synchronized (approvedTx) {
+//            for (Transaction tx :txs) {
+//                approvedTx.put(tx.getTxID(), tx);
+//            }
+//        }
 
     }
     public int isTxPresent(String txID) {
-        synchronized (approvedTx) {
-            if (approvedTx.containsKey(txID)) {
-                return 2;
-            }
-        }
-//        synchronized (transactionsPool) {
-            if (transactionsPool.stream().map(Transaction::getTxID).anyMatch(tid -> tid.equals(txID))) {
-                return 0;
-            }
-            if (proposedTx.contains(txID)) {
-                return 1;
-            }
+//        synchronized (approvedTx) {
+//            if (approvedTx.containsKey(txID)) {
+//                return 2;
+//            }
 //        }
-        ArrayList<Block> cbc;
-        synchronized (bc) {
-            cbc = new ArrayList<Block>(bc.getBlocks(bc.getHeight() - f + 1, bc.getHeight() + 1));
-        }
-        if (cbc.stream()
-                .map(Block::getDataList)
-                .anyMatch(tl -> tl
-                        .stream()
-                        .map(Transaction::getTxID)
-                        .anyMatch(tid -> tid.equals(txID)))) {
-            return 3;
-        }
+////        synchronized (transactionsPool) {
+//            if (transactionsPool.stream().map(Transaction::getTxID).anyMatch(tid -> tid.equals(txID))) {
+//                return 0;
+//            }
+//            if (proposedTx.contains(txID)) {
+//                return 1;
+//            }
+////        }
+//        ArrayList<Block> cbc;
+//        synchronized (bc) {
+//            cbc = new ArrayList<Block>(bc.getBlocks(bc.getHeight() - f + 1, bc.getHeight() + 1));
+//        }
+//        if (cbc.stream()
+//                .map(Block::getDataList)
+//                .anyMatch(tl -> tl
+//                        .stream()
+//                        .map(Transaction::getTxID)
+//                        .anyMatch(tid -> tid.equals(txID)))) {
+//            return 3;
+//        }
         return -1;
     }
     void addTransactionsToCurrBlock() {
@@ -428,20 +443,20 @@ public abstract class bcServer extends Node {
             while ((!transactionsPool.isEmpty()) && currBlock.getTransactionCount() < maxTransactionInBlock) {
                 Transaction t = transactionsPool.poll();
 //                transactionsPool.remove(0);
-                proposedTx.add(t.getTxID());
+//                proposedTx.add(t.getTxID());
                 if (!currBlock.validateTransaction(t)) {
                     logger.debug(format("[#%d-C[%d]] detects an invalid transaction from [client=%d]",
                             getID(), channel, t.getClientID()));
                     continue;
                 }
                 currBlock.addTransaction(t);
-
             }
+            txSem.release(currBlock.getTransactionCount());
 //        }
     }
 
     void removeFromProposed(List<Transaction> txs) {
-        proposedTx.removeAll(txs.stream().map(Transaction::getTxID).collect(Collectors.toList()));
+//        proposedTx.removeAll(txs.stream().map(Transaction::getTxID).collect(Collectors.toList()));
     }
 
     private int validateForkProof(ForkProof p)  {

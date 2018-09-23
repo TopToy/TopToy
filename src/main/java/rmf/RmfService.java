@@ -101,11 +101,11 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         }
 
         void shutdown() {
-            try {
-                channel.shutdown().awaitTermination(1, TimeUnit.SECONDS);
-            } catch (InterruptedException e) {
-                logger.fatal(format("[#%d]", id), e);
-            }
+//            try {
+                channel.shutdown();//. awaitTermination(1, TimeUnit.SECONDS);
+//            } catch (InterruptedException e) {
+//                logger.fatal(format("[#%d]", id), e);
+//            }
         }
     }
 //    int channel;
@@ -348,6 +348,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         for (peer p : peers.values()) {
             p.shutdown();
         }
+
         logger.debug(format("[#%d] shutting down rmf clients", id));
 //        if (!group) {
             if (bbcService != null) bbcService.shutdown();
