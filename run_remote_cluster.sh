@@ -46,7 +46,3 @@ for i in `seq 0 $((${#servers[@]} - 1))`; do
     rm -f $outputDir/res/${ids[i]}/summery.csv
     rm -f $outputDir/res/${ids[i]}/sig_summery.csv
 done
-
-
-
-

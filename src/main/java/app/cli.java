@@ -199,6 +199,7 @@ public class cli {
             JToy.s.serve();
         }
         private void stop() {
+            JToy.s.stop();
             JToy.s.shutdown();
         }
 
@@ -297,38 +298,42 @@ public class cli {
             DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy-HH:mm:ss");
             Path path = Paths.get(pathString, String.valueOf(JToy.s.getID()), dateFormat.format(new Date()) + ".csv");
             try {
-                File f = new File(path.toString());
-
-                f.getParentFile().mkdirs();
-                f.createNewFile();
-                FileWriter writer = new FileWriter(path.toString());
+//                File f = new File(path.toString());
+//
+//                f.getParentFile().mkdirs();
+//                f.createNewFile();
+//                FileWriter writer = new FileWriter(path.toString());
                 int nob = JToy.s.getBCSize();
                 long fts = 0;
                 long lts = 0;
                 int tCount = 0;
                 int txSize = -1;
-                for (int i = 0 ; i < nob ; i++) {
-                    Types.Block b = JToy.s.nonBlockingDeliver(i);
-                    for (Types.Transaction t : b.getDataList()) {
-                        if (fts == 0) {
-                            fts = b.getTs();
-                            lts = fts;
-                        }
-                        fts = min(fts, b.getTs());
-                        lts = max(lts, b.getTs());
-                        tCount++;
-                        if (txSize == -1) {
-                            txSize = t.getSerializedSize();
-                        }
-                        List<String> row = Arrays.asList(t.getTxID(),
-                                String.valueOf(t.getClientID()), String.valueOf(b.getTs()),
-                                String.valueOf(t.getData().size()), String.valueOf(i),
-                                String.valueOf(b.getHeader().getM().getSender()));
-//                        CSVUtils.writeLine(writer, row);
-                    }
-                }
-                writer.flush();
-                writer.close();
+                fts = JToy.s.nonBlockingDeliver(1).getTs();
+                lts = JToy.s.nonBlockingDeliver(nob - 1).getTs();
+                tCount = (nob - 1) * Config.getMaxTransactionsInBlock();
+                txSize = JToy.s.nonBlockingDeliver(1).getData(0).getSerializedSize();
+//                for (int i = 0 ; i < nob ; i++) {
+//                    Types.Block b = JToy.s.nonBlockingDeliver(i);
+//                    for (Types.Transaction t : b.getDataList()) {
+//                        if (fts == 0) {
+//                            fts = b.getTs();
+//                            lts = fts;
+//                        }
+//                        fts = min(fts, b.getTs());
+//                        lts = max(lts, b.getTs());
+//                        tCount++;
+//                        if (txSize == -1) {
+//                            txSize = t.getSerializedSize();
+//                        }
+//                        List<String> row = Arrays.asList(t.getTxID(),
+//                                String.valueOf(t.getClientID()), String.valueOf(b.getTs()),
+//                                String.valueOf(t.getData().size()), String.valueOf(i),
+//                                String.valueOf(b.getHeader().getM().getSender()));
+////                        CSVUtils.writeLine(writer, row);
+//                    }
+//                }
+//                writer.flush();
+//                writer.close();
                 writeSummery(pathString, tCount, txSize, fts, lts);
             } catch (IOException e) {
                 logger.error("", e);
@@ -391,7 +396,8 @@ public class cli {
             stopped.set(true);
             t.interrupt();
             t.join();
-            JToy.s.shutdown();
+            JToy.s.stop();
+
 
 //            Thread.sleep( 2 * 60 * 1000);
 
@@ -399,6 +405,7 @@ public class cli {
 //            t.start();
 //            Thread.sleep(10 * 1000);
             writeToScv(csvPath);
+            JToy.s.shutdown();
 //            System.exit(0);
         }
 
