@@ -199,7 +199,7 @@ public class cli {
             JToy.s.serve();
         }
         private void stop() {
-            JToy.s.stop();
+//            JToy.s.stop();
             JToy.s.shutdown();
         }
 
@@ -396,7 +396,7 @@ public class cli {
             stopped.set(true);
             t.interrupt();
             t.join();
-            JToy.s.stop();
+//            JToy.s.stop();
 
 
 //            Thread.sleep( 2 * 60 * 1000);

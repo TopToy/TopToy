@@ -5,7 +5,7 @@ import servers.bftsmartBCserver;
 import servers.hlfBCserver;
 import servers.server;
 import servers.sg;
-import utils.derbyUtils;
+//import utils.derbyUtils;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -39,7 +39,7 @@ public class JToy {
 
     static void mainImpl(String argv[]) {
         try {
-            Config.setConfig(null, 0);
+//            Config.setConfig(null, 0);
 //        sg.createTxTable();
             Path config = null;
             if (argv.length == 3) {

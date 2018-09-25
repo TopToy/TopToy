@@ -1,5 +1,6 @@
 package servers;
 
+import app.JToy;
 import blockchain.blockchain;
 import blockchain.block;
 import com.google.common.collect.Lists;
@@ -13,9 +14,11 @@ import proto.*;
 import rmf.RmfNode;
 import proto.Types.*;
 
+import java.security.SecureRandom;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import static java.lang.Math.incrementExact;
@@ -87,7 +90,7 @@ public abstract class bcServer extends Node {
         mainThread = new Thread(() -> {
             try {
                 mainLoop();
-            } catch (RuntimeException ex) {
+            } catch (Exception ex) {
                 logger.error(format("[#%d-C[%d]]", getID(), channel), ex);
                 shutdown(true);
             }
@@ -175,9 +178,30 @@ public abstract class bcServer extends Node {
     public void shutdown(boolean group) {
         stopped =  true;
         logger.debug(format("[#%d-C[%d]] interrupt main thread", getID(), channel));
-        mainThread.interrupt();
+//        AtomicBoolean joined = new AtomicBoolean(false);
+//        Thread t = new Thread(() -> {
+//            while (!joined.get())
+//        });
+//        t.start();
+        AtomicBoolean j = new AtomicBoolean(false);
+        long start = System.currentTimeMillis();
+//            Object lock = new Object();
+        Thread t = new Thread(() -> {
+            while (!j.get()) {
+                mainThread.interrupt();
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    logger.error("", e);
+                }
+            }
+        });
+        t.start();
         try {
             mainThread.join();
+            j.set(true);
+//            t.interrupt();
+            t.join();
         } catch (InterruptedException e) {
             logger.error(format("[#%d-C[%d]]", getID(), channel), e);
         }
@@ -188,9 +212,23 @@ public abstract class bcServer extends Node {
             if (syncRB != null) syncRB.shutdown();
         }
         logger.debug(format("[#%d-C[%d]] interrupt panic thread", getID(), channel));
-        panicThread.interrupt();
+        j.set(false);
+        t = new Thread(() -> {
+            while (!j.get()) {
+                panicThread.interrupt();
+                try {
+                    Thread.sleep( 1000);
+                } catch (InterruptedException e) {
+                    logger.error("", e);
+                }
+            }
+        });
+        t.start();
+
         try {
             panicThread.join();
+            j.set(true);
+            t.join();
         } catch (InterruptedException e) {
             logger.error(format("[#%d-C[%d]]", getID(), channel), e);
         }
