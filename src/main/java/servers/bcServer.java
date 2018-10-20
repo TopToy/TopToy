@@ -68,6 +68,7 @@ public abstract class bcServer extends Node {
     boolean testing = Config.getTesting();
     Semaphore txSem = new Semaphore(100000);
 
+
     public bcServer(String addr, int rmfPort, int id, int channel, int f, int tmo, int tmoInterval,
                     int maxTx, boolean fastMode, ArrayList<Node> cluster,
                     RmfNode rmf, RBrodcastService panic, RBrodcastService sync) {
@@ -475,9 +476,13 @@ public abstract class bcServer extends Node {
     void addTransactionsToCurrBlock() {
         if (currBlock != null) return;
         currBlock = bc.createNewBLock();
-        if (testing && currHeight < 10) return;
+//        if (transactionsPool.size() < maxTransactionInBlock) return;
+//            if (testing && currHeight < 10) return;
 //        synchronized (transactionsPool) {
-            if (transactionsPool.isEmpty()) return;
+            if (transactionsPool.size() < maxTransactionInBlock) {
+                logger.debug(format("There are not enugh transactions in pool [%d, %d]", cidSeries, cid));
+                return;
+            }
             while ((!transactionsPool.isEmpty()) && currBlock.getTransactionCount() < maxTransactionInBlock) {
                 Transaction t = transactionsPool.poll();
 //                transactionsPool.remove(0);
@@ -644,7 +649,7 @@ public abstract class bcServer extends Node {
 
     public Block deliver(int index) throws InterruptedException {
         synchronized (newBlockNotifyer) {
-            while (index > bc.getHeight() - f) {
+            while (index > bc.getHeight() - (f + 1)) {
                 newBlockNotifyer.wait();
             }
         }
@@ -653,7 +658,7 @@ public abstract class bcServer extends Node {
 
     public Block nonBlockingdeliver(int index) {
         synchronized (newBlockNotifyer) {
-            if (index > bc.getHeight() - f) {
+            if (index > bc.getHeight() - (f + 1)) {
                 return null;
             }
         }

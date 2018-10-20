@@ -1,4 +1,5 @@
 package app;
+import com.google.common.primitives.Longs;
 import com.google.protobuf.ByteString;
 import config.Config;
 //import crypto.rmfDigSig;
@@ -7,6 +8,7 @@ import crypto.blockDigSig;
 import org.apache.commons.cli.*;
 import org.apache.commons.lang.ArrayUtils;
 import proto.Types;
+import servers.statistics;
 import utils.CSVUtils;
 
 import java.io.FileWriter;
@@ -19,6 +21,8 @@ import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.lang.Math.min;
@@ -298,11 +302,11 @@ public class cli {
             DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy-HH:mm:ss");
             Path path = Paths.get(pathString, String.valueOf(JToy.s.getID()), dateFormat.format(new Date()) + ".csv");
             try {
-//                File f = new File(path.toString());
-//
-//                f.getParentFile().mkdirs();
-//                f.createNewFile();
-//                FileWriter writer = new FileWriter(path.toString());
+                File f = new File(path.toString());
+
+                f.getParentFile().mkdirs();
+                f.createNewFile();
+                FileWriter writer = new FileWriter(path.toString());
                 int nob = JToy.s.getBCSize();
                 long fts = 0;
                 long lts = 0;
@@ -312,55 +316,82 @@ public class cli {
                 lts = JToy.s.nonBlockingDeliver(nob - 1).getTs();
                 tCount = (nob - 1) * Config.getMaxTransactionsInBlock();
                 txSize = JToy.s.nonBlockingDeliver(1).getData(0).getSerializedSize();
-//                for (int i = 0 ; i < nob ; i++) {
-//                    Types.Block b = JToy.s.nonBlockingDeliver(i);
-//                    for (Types.Transaction t : b.getDataList()) {
-//                        if (fts == 0) {
-//                            fts = b.getTs();
-//                            lts = fts;
-//                        }
-//                        fts = min(fts, b.getTs());
-//                        lts = max(lts, b.getTs());
-//                        tCount++;
-//                        if (txSize == -1) {
-//                            txSize = t.getSerializedSize();
-//                        }
-//                        List<String> row = Arrays.asList(t.getTxID(),
-//                                String.valueOf(t.getClientID()), String.valueOf(b.getTs()),
-//                                String.valueOf(t.getData().size()), String.valueOf(i),
-//                                String.valueOf(b.getHeader().getM().getSender()));
-////                        CSVUtils.writeLine(writer, row);
-//                    }
-//                }
-//                writer.flush();
-//                writer.close();
-                writeSummery(pathString, tCount, txSize, fts, lts);
+                for (int i = 0 ; i < nob ; i++) {
+                    Types.Block b = JToy.s.nonBlockingDeliver(i);
+                    for (Types.Transaction t : b.getDataList()) {
+                        if (fts == 0) {
+                            fts = b.getTs();
+                            lts = fts;
+                        }
+                        fts = min(fts, b.getTs());
+                        lts = max(lts, b.getTs());
+                        tCount++;
+                        if (txSize == -1) {
+                            txSize = t.getSerializedSize();
+                        }
+                        List<String> row = Arrays.asList(t.getTxID(),
+                                String.valueOf(t.getClientID()), String.valueOf(b.getTs()),
+                                String.valueOf(t.getData().size()), String.valueOf(i),
+                                String.valueOf(b.getHeader().getM().getSender()));
+                        CSVUtils.writeLine(writer, row);
+                    }
+                }
+                writer.flush();
+                writer.close();
+//                writeSummery(pathString, tCount, txSize, fts, lts);
             } catch (IOException e) {
                 logger.error("", e);
             }
         }
 
-        void writeSummery(String pathString, int tCount, int txSize, long fts, long lts) throws IOException {
+        void writeSummery(String pathString) {
+            long avgWt = 0;
+            int newTxCount = 0;
+            int nob = JToy.s.getBCSize();
+            for (int i = 0 ; i < nob ; i++) {
+
+                Types.Block b = JToy.s.nonBlockingDeliver(i);
+                for (Types.Transaction t : b.getDataList()) {
+                    avgWt += b.getTs() - Longs.fromByteArray(Arrays.copyOfRange(t.getData().toByteArray(), 0, 8));
+                }
+            }
             Path path = Paths.get(pathString,   String.valueOf(JToy.s.getID()), "summery.csv");
             File f = new File(path.toString());
-            if (!f.exists()) {
-                f.getParentFile().mkdirs();
-                f.createNewFile();
+
+            try {
+                if (!f.exists()) {
+                    f.getParentFile().mkdirs();
+                    f.createNewFile();
+                }
+                statistics st = JToy.s.getStatistics();
+                FileWriter writer = null;
+                writer = new FileWriter(path.toString(), true);
+                double time = ((double) st.lastTxTs - (double) st.firstTxTs) / 1000;
+                int thrp = ((int) (st.txCount / time)); // / 1000;
+                double opRate = ((double) st.optemisticDec) / ((double) st.totalDec);
+                long delaysAvgMs = 0; //avgWt / st.txCount;
+                DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy-HH:mm:ss");
+                List<String> row = Arrays.asList(dateFormat.format(new Date()), String.valueOf(JToy.s.getID()),
+                        JToy.type, String.valueOf(Config.getC()), String.valueOf(Config.getFastMode()),
+                        String.valueOf(st.txSize), String.valueOf(Config.getMaxTransactionsInBlock()),
+                        String.valueOf(st.txCount), String.valueOf(time), String.valueOf(thrp),
+                        String.valueOf(delaysAvgMs), String.valueOf(st.totalDec), String.valueOf(st.optemisticDec),
+                        String.valueOf(opRate), String.valueOf(nob));
+                CSVUtils.writeLine(writer, row);
+                writer.flush();
+                writer.close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            FileWriter writer = new FileWriter(path.toString(), true);
-            double time = ((double) lts - (double) fts) / 1000;
-            int thrp = (int) (tCount / time);
-            DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy-HH:mm:ss");
-            List<String> row = Arrays.asList(dateFormat.format(new Date()), String.valueOf(JToy.s.getID()),
-                    JToy.type, String.valueOf(Config.getC()), String.valueOf(Config.getFastMode()),
-                    String.valueOf(txSize), String.valueOf(Config.getMaxTransactionsInBlock()), String.valueOf(tCount),
-                    String.valueOf(time), String.valueOf(thrp));
-            CSVUtils.writeLine(writer, row);
-            writer.flush();
-            writer.close();
+
         }
         private void runBenchMark(int tSize, int tNumber, String csvPath) throws InterruptedException {
             Random rand = new Random();
+            int bareTxSize = Types.Transaction.newBuilder()
+                    .setClientID(0)
+                    .setTxID(UUID.randomUUID().toString())
+                    .build().getSerializedSize() + 8;
+            int txSize = max(0, tSize - bareTxSize);
             String last = "";
             for (int i = 0 ; i < tNumber ; i++) {
                 int cID = rand.nextInt( 100 );
@@ -381,31 +412,50 @@ public class cli {
             Thread.sleep(2 * 1000);
             AtomicBoolean stopped = new AtomicBoolean(false);
             long start = System.currentTimeMillis();
-//            Object lock = new Object();
+            Object lock = new Object();
             Thread t = new Thread(() -> {
                 while (!stopped.get()) {
                     int cID = rand.nextInt( 100 );
+                    byte[] ts = Longs.toByteArray(System.currentTimeMillis());
                     SecureRandom random = new SecureRandom();
-                    byte[] tx = new byte[tSize];
+                    byte[] tx = new byte[txSize];
                     random.nextBytes(tx);
-                    JToy.s.addTransaction(tx, cID);
+                    JToy.s.addTransaction(ArrayUtils.addAll(ts, tx), cID);
                 }
             });
-            t.start();
+            int clients = 2;
+            ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(clients);
+            for (int i = 0 ; i < clients ;i++) {
+                int finalI = i;
+                executor.submit( () -> {
+                    while (!stopped.get()) {
+                        int cID = rand.nextInt(finalI);
+                        byte[] ts = Longs.toByteArray(System.currentTimeMillis());
+                        SecureRandom random = new SecureRandom();
+                        byte[] tx = new byte[txSize];
+                        random.nextBytes(tx);
+                        JToy.s.addTransaction(ArrayUtils.addAll(ts, tx), cID);
+                    }
+                });
+            }
+//            t.start();
             Thread.sleep(60 * 1 * 1000);
             stopped.set(true);
-            t.interrupt();
-            t.join();
+            Thread.sleep(2* 1000);
+            executor.shutdownNow();
+//            t.interrupt();
+//            t.join();
 //            JToy.s.stop();
-
+            JToy.s.shutdown();
 
 //            Thread.sleep( 2 * 60 * 1000);
 
 //            Thread t = new Thread(() -> );
 //            t.start();
 //            Thread.sleep(10 * 1000);
-            writeToScv(csvPath);
-            JToy.s.shutdown();
+//            writeToScv(csvPath);
+            writeSummery(csvPath);
+
 //            System.exit(0);
         }
 

@@ -95,4 +95,12 @@ public class RmfNode extends Node{
     public void clearBuffers(Meta key) {
         rmfService.clearBuffers(key);
     }
+
+    public long getTotolDec() {
+        return rmfService.getTotalDeliveredTries();
+    }
+
+    public long getOptemisticDec() {
+        return rmfService.getOptimialDec();
+    }
 }

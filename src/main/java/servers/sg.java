@@ -1,24 +1,35 @@
 package servers;
 
 import blockchain.blockchain;
+import com.google.common.primitives.Longs;
 import com.google.protobuf.ByteString;
 import config.Node;
 import consensus.RBroadcast.RBrodcastService;
 import crypto.DigestMethod;
+import io.grpc.Server;
+import io.grpc.ServerBuilder;
+import io.grpc.stub.StreamObserver;
 import proto.Types;
 import rmf.ByzantineRmfNode;
 import rmf.RmfNode;
+import proto.blockchainServiceGrpc.blockchainServiceImplBase;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import static java.lang.Math.log;
+import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.String.format;
 
 public class sg implements server {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(sg.class);
+
     RmfNode rmf;
     RBrodcastService deliverFork;
     RBrodcastService sync;
@@ -34,6 +45,7 @@ public class sg implements server {
     String type;
     int lastChannel = 0;
     boolean stopped = false;
+    statistics sts = new statistics();
     Thread deliverThread = new Thread(() -> {
         try {
             deliverFromGroup();
@@ -41,12 +53,16 @@ public class sg implements server {
             logger.debug(format("G-%d interrupted while delivering from group", id));
         }
     });
+    int maxTx;
+    Server txsServer;
+    ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(2);
 
 
     public sg(String addr, int port, int id, int f, int c, int tmo, int tmoInterval,
               int maxTx, boolean fastMode, ArrayList<Node> cluster, String bbcConfig, String panicConfig,
               String syncConfig, String type,  String serverCrt, String serverPrivKey, String caRoot) {
         n = 3 *f +1;
+        this.maxTx = maxTx;
         lastDelivered = new int[c][];
         lastGCpoint = new int[c];
         for (int i = 0 ; i < c ; i++) {
@@ -89,6 +105,17 @@ public class sg implements server {
             }
         }
         bc = group[0].initBC(id, -1);
+        try {
+            txsServer = ServerBuilder
+                    .forPort(9876)
+                    .executor(executor)
+                    .addService(new txServer(this))
+                    .build()
+                    .start();
+            logger.info("starting tx server");
+        } catch (IOException e) {
+            logger.error("", e);
+        }
     }
 
     private void deliverFromGroup() throws InterruptedException {
@@ -113,12 +140,35 @@ public class sg implements server {
                     bc.addBlock(cBlock);
                     bc.notify();
                 }
+                updateStat(cBlock);
                 logger.info(format("[#%d-C[%d]] deliver took about [%d] ms [height=%d], [cidSeries=%d ; cid=%d]",
                         getID(), currChannel, System.currentTimeMillis() - start, cBlock.getHeader().getHeight(),
                         cBlock.getHeader().getM().getCidSeries() ,cBlock.getHeader().getM().getCid()));
             }
             currBlock++;
         }
+    }
+
+    void updateStat(Types.Block b) {
+        if (b.getHeader().getHeight() == 1) {
+            sts.firstTxTs = b.getTs();
+            sts.txSize = b.getData(0).getSerializedSize();
+        }
+        sts.lastTxTs = max(sts.lastTxTs, b.getTs());
+        sts.txCount += b.getDataCount();
+        logger.info(format("data count is %d, bc size is: %d, total: %d", b.getDataCount(), bc.getHeight(), sts.txCount));
+        long bTs = b.getTs();
+//        for (Types.Transaction t : b.getDataList()) {
+//            long diff = bTs - Longs.fromByteArray(Arrays.copyOfRange(t.getData().toByteArray(), 0, 8));
+//            logger.info(format("---%d---", diff));
+//            sts.delaysSum += diff;
+//        }
+    }
+
+    public statistics getStatistics() {
+        sts.totalDec = rmf.getTotolDec();
+        sts.optemisticDec = rmf.getOptemisticDec();
+        return sts;
     }
 
     void gc(int origHeight, int sender, int channel) {
@@ -195,11 +245,14 @@ public class sg implements server {
         }
         logger.debug(format("G-%d shutdown deliverThread", id));
         rmf.stop();
+//        sts.totalDec = rmf.getTotolDec();
+//        sts.optemisticDec = rmf.getOptemisticDec();
         logger.debug(format("G-%d shutdown rmf Service", id));
         deliverFork.shutdown();
         logger.debug(format("G-%d shutdown panic service", id));
         sync.shutdown();
         logger.debug(format("G-%d shutdown sync service", id));
+        txsServer.shutdownNow();
 
     }
 
@@ -272,4 +325,20 @@ public class sg implements server {
         return bc.getHeight() + 1;
     }
 
+}
+class txServer extends blockchainServiceImplBase {
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(txServer.class);
+    sg server;
+
+    public txServer(sg server) {
+        super();
+        this.server = server;
+    }
+    @Override
+    public void addTransaction(Types.Transaction request, StreamObserver<Types.accepted> responseObserver) {
+//        logger.info("add tx...");
+        server.addTransaction(request.getData().toByteArray(), request.getClientID());
+        responseObserver.onNext(Types.accepted.newBuilder().build());
+        responseObserver.onCompleted();
+    }
 }

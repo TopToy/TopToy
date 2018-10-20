@@ -26,3 +26,6 @@ Configurations*
 *.sh
 
 bin*
+scripts/python/.idea*
+scripts/python/venv*
+scripts/python/*.html

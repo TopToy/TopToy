@@ -20,6 +20,7 @@ import javax.net.ssl.SSLException;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
@@ -136,10 +137,12 @@ public class RmfService extends RmfGrpc.RmfImplBase {
     EventLoopGroup beg;
     EventLoopGroup weg;
     int[] alive;
-    Object[] aliveLock;
+//    Object[] aliveLock;
     int tmo;
     int tmoInterval;
     int[] currentTmo;
+    AtomicInteger totalDeliveredTries = new AtomicInteger(0);
+    AtomicInteger optimialDec = new AtomicInteger(0);;
 //    ReentrantLock mutex = new ReentrantLock(true);
 
 //    public RmfService(int channels, int id, int f, ArrayList<Node> nodes, bbcService bbc) {
@@ -188,7 +191,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         this.regBbcCons = new ConcurrentHashMap[channels];
 //        this.bbcMissedConsensusThreads = new Thread[channels];
         this.alive = new int[channels];
-        this.aliveLock = new Object[channels];
+//        this.aliveLock = new Object[channels];
         fastVoteNotifyer = new Object[channels];
         msgNotifyer = new Object[channels];
         for (int i = 0 ; i < channels ; i++) {
@@ -200,7 +203,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             fastBbcCons[i] = new ConcurrentHashMap<>();
             regBbcCons[i] = new ConcurrentHashMap<>();
             alive[i] = tmo;
-            aliveLock[i] = new Object();
+//            aliveLock[i] = new Object();
             this.currentTmo[i] = tmo;
 
         }
@@ -289,55 +292,62 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         }));
     }
 
+    long getTotalDeliveredTries() {
+        return totalDeliveredTries.get();
+    }
+
+    long getOptimialDec() {
+        return optimialDec.get();
+    }
     private void bbcMissedConsensus(int channel) throws InterruptedException {
-        int sleepFor = tmo;
-        while (!stopped) {
-            synchronized (aliveLock[channel]) {
-                alive[channel] = currentTmo[channel]; // TODO: Hard coded time out
-                sleepFor = alive[channel];
-                while (sleepFor > 0) {
-                    alive[channel] = 0;
-                    logger.debug(format("[#%d]-C[%d]] will sleep for [%d] ms", id, channel, sleepFor));
-                    aliveLock[channel].wait(sleepFor);
-                    sleepFor = alive[channel];
-                }
-            }
-
-            if (fastBbcCons[channel].isEmpty()) continue;
-//            synchronized (fastBbcCons[channel]) {
-//                if (fastBbcCons[channel].rowKeySet().isEmpty()) {
-////                    logger.debug(format("[#%d] There are no fast bbc", id));
-//                    continue;
+//        int sleepFor = tmo;
+//        while (!stopped) {
+//            synchronized (aliveLock[channel]) {
+//                alive[channel] = currentTmo[channel]; // TODO: Hard coded time out
+//                sleepFor = alive[channel];
+//                while (sleepFor > 0) {
+//                    alive[channel] = 0;
+//                    logger.debug(format("[#%d]-C[%d]] will sleep for [%d] ms", id, channel, sleepFor));
+//                    aliveLock[channel].wait(sleepFor);
+//                    sleepFor = alive[channel];
 //                }
+//            }
+//
+//            if (fastBbcCons[channel].isEmpty()) continue;
+////            synchronized (fastBbcCons[channel]) {
+////                if (fastBbcCons[channel].rowKeySet().isEmpty()) {
+//////                    logger.debug(format("[#%d] There are no fast bbc", id));
+////                    continue;
+////                }
+//
+//            try {
+//                int fcidSeries = Collections.max(fastBbcCons[channel]
+//                        .keySet()
+//                        .stream()
+//                       // .filter(m -> m.getChannel() == channel)
+//                        .map(Meta::getCidSeries)
+//                        .collect(Collectors.toList()));
+//                int fcid = Collections.max(fastBbcCons[channel]
+//                        .keySet()
+//                        .stream()
+//                        .filter(m -> m.getCidSeries() == fcidSeries)
+//                        .map(Meta::getCid)
+//                        .collect(Collectors.toList()));
+//                Meta key = Meta.newBuilder()
+//                        .setChannel(channel)
+//                        .setCidSeries(fcidSeries)
+//                        .setCid(fcid)
+//                        .build();
+//                logger.debug(format("[#%d-C[%d]] starting missed consensus for [cidSeries=%d ; cid=%d]",
+//                        id, channel, fcidSeries, fcid));
+//
+////                logger.debug(format("[#%d-C[%d]] Trying re-participate [cidSeries=%d ; cid=%d]", id, channel, fcidSeries, fcid));
+//                bbcService.periodicallyVoteMissingConsensus(fastBbcCons[channel].get(key));
+//            } catch (Exception e) {
+//                logger.error("", e);
+//            }
 
-            try {
-                int fcidSeries = Collections.max(fastBbcCons[channel]
-                        .keySet()
-                        .stream()
-                       // .filter(m -> m.getChannel() == channel)
-                        .map(Meta::getCidSeries)
-                        .collect(Collectors.toList()));
-                int fcid = Collections.max(fastBbcCons[channel]
-                        .keySet()
-                        .stream()
-                        .filter(m -> m.getCidSeries() == fcidSeries)
-                        .map(Meta::getCid)
-                        .collect(Collectors.toList()));
-                Meta key = Meta.newBuilder()
-                        .setChannel(channel)
-                        .setCidSeries(fcidSeries)
-                        .setCid(fcid)
-                        .build();
-                logger.debug(format("[#%d-C[%d]] starting missed consensus for [cidSeries=%d ; cid=%d]",
-                        id, channel, fcidSeries, fcid));
-
-//                logger.debug(format("[#%d-C[%d]] Trying re-participate [cidSeries=%d ; cid=%d]", id, channel, fcidSeries, fcid));
-                bbcService.periodicallyVoteMissingConsensus(fastBbcCons[channel].get(key));
-            } catch (Exception e) {
-                logger.error("", e);
-            }
-
-        }
+//        }
 //
 
 //        }
@@ -643,6 +653,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             throws InterruptedException
     {
 //        mutex.lock();
+        totalDeliveredTries.getAndIncrement();
         long startTime = System.currentTimeMillis();
         long estimatedTime;
         Meta key = Meta.newBuilder()
@@ -757,16 +768,18 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             if (dec == 0) {
                 pendingMsg[channel].remove(key);
 //                mutex.unlock();
-                synchronized (aliveLock[channel]) {
-                    alive[channel] = currentTmo[channel];
-                }
+//                synchronized (aliveLock[channel]) {
+//                    alive[channel] = currentTmo[channel];
+//                }
                 return null;
             }
+        }  else {
+            optimialDec.getAndIncrement();
         }
 
-        synchronized (aliveLock[channel]) {
-            alive[channel] = currentTmo[channel];
-        }
+//        synchronized (aliveLock[channel]) {
+//            alive[channel] = currentTmo[channel];
+//        }
 
         requestData(channel, cidSeries, cid, sender, height);
         Block msg = pendingMsg[channel].get(key);

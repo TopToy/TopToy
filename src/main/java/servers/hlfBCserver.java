@@ -153,6 +153,11 @@ public class hlfBCserver implements server {
         logger.warn(format("[#%d] setAsyncParam not implemented", id));
     }
 
+    @Override
+    public statistics getStatistics() {
+        return null;
+    }
+
     void deliverTx() throws InvalidProtocolBufferException, InterruptedException {
         while (!stopped) {
             byte[] msg = rbService.deliver(0);
