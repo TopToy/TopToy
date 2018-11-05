@@ -1,0 +1,35 @@
+version: "3"
+services:
+  s0:
+    image: toy:0.1
+    environment:
+      - id=0
+      - type="r"
+#    deploy:
+#      replicas: 1
+#      restart_policy:
+#        condition: on-failure
+#      resources:
+#        limits:
+#          cpus: "1"
+#          memory: 512M
+
+    ports:
+      - "30010:30000"
+      - "11010:11000"
+      - "12010:12000"
+      - "13010:13000"
+      - "14010:14000"
+    volumes:
+      - /home/yoni/Desktop/Research/github.com/JToy/Configurations/docker/single:/JToy/bin/src/main/resources
+      - /home/yoni/Desktop/tout:/tmp/JToy
+    networks:
+      toynet:
+        ipv4_address: 10.0.0.3
+networks:
+  toynet:
+    driver: overlay
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.0.0.0/16

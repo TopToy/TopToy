@@ -329,7 +329,7 @@ public class cli {
                         if (txSize == -1) {
                             txSize = t.getSerializedSize();
                         }
-                        List<String> row = Arrays.asList(t.getTxID(),
+                        List<String> row = Arrays.asList(t.getTxID(), String.valueOf(t.getSerializedSize()),
                                 String.valueOf(t.getClientID()), String.valueOf(b.getTs()),
                                 String.valueOf(t.getData().size()), String.valueOf(i),
                                 String.valueOf(b.getHeader().getM().getSender()));
@@ -370,13 +370,17 @@ public class cli {
                 int thrp = ((int) (st.txCount / time)); // / 1000;
                 double opRate = ((double) st.optemisticDec) / ((double) st.totalDec);
                 long delaysAvgMs = 0; //avgWt / st.txCount;
+                int avgTxInBlock = st.txCount / nob;
+                double eRate = ((double)st.eb) / ((double) st.all);
+                double dRate = ((double)st.deliveredTime) / ((double) st.all);
                 DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy-HH:mm:ss");
                 List<String> row = Arrays.asList(dateFormat.format(new Date()), String.valueOf(JToy.s.getID()),
                         JToy.type, String.valueOf(Config.getC()), String.valueOf(Config.getFastMode()),
                         String.valueOf(st.txSize), String.valueOf(Config.getMaxTransactionsInBlock()),
                         String.valueOf(st.txCount), String.valueOf(time), String.valueOf(thrp),
-                        String.valueOf(delaysAvgMs), String.valueOf(st.totalDec), String.valueOf(st.optemisticDec),
-                        String.valueOf(opRate), String.valueOf(nob));
+//                        String.valueOf(delaysAvgMs), String.valueOf(st.totalDec), String.valueOf(st.optemisticDec), String.valueOf(opRate),
+                        String.valueOf(nob),String.valueOf(avgTxInBlock), String.valueOf(eRate),
+                        String.valueOf(dRate));
                 CSVUtils.writeLine(writer, row);
                 writer.flush();
                 writer.close();
@@ -386,43 +390,27 @@ public class cli {
 
         }
         private void runBenchMark(int tSize, int tNumber, String csvPath) throws InterruptedException {
+
+            Thread.sleep(30 * 1000);
+            logger.info(format("[#%d] start serving...", JToy.s.getID()));
+            serve();
+            Thread.sleep(2 * 1000);
+//            loadServer(tSize);
+            Thread.sleep(60 * 1 * 1000);
+            JToy.s.shutdown();
+//            writeToScv(csvPath);
+            writeSummery(csvPath);
+
+//            System.exit(0);
+        }
+        private void loadServer(int tSize) throws InterruptedException {
             Random rand = new Random();
             int bareTxSize = Types.Transaction.newBuilder()
                     .setClientID(0)
                     .setTxID(UUID.randomUUID().toString())
                     .build().getSerializedSize() + 8;
             int txSize = max(0, tSize - bareTxSize);
-            String last = "";
-            for (int i = 0 ; i < tNumber ; i++) {
-                int cID = rand.nextInt( 100 );
-                SecureRandom random = new SecureRandom();
-                byte[] tx = new byte[tSize];
-                random.nextBytes(tx);
-                last = JToy.s.addTransaction(tx, cID);
-            }
-            Thread.sleep(30 * 1000);
-            logger.info(format("[#%d] start serving...", JToy.s.getID()));
-            serve();
-//            while ((!JToy.type.equals("m")) && (!last.equals("")) && JToy.server.isTxPresent(last) != 2) {
-//                Thread.sleep(5 * 1000);
-//            }
-//            if (JToy.type.equals("m")) {
-//                Thread.sleep(60 * 1000);
-//            }
-            Thread.sleep(2 * 1000);
             AtomicBoolean stopped = new AtomicBoolean(false);
-            long start = System.currentTimeMillis();
-            Object lock = new Object();
-            Thread t = new Thread(() -> {
-                while (!stopped.get()) {
-                    int cID = rand.nextInt( 100 );
-                    byte[] ts = Longs.toByteArray(System.currentTimeMillis());
-                    SecureRandom random = new SecureRandom();
-                    byte[] tx = new byte[txSize];
-                    random.nextBytes(tx);
-                    JToy.s.addTransaction(ArrayUtils.addAll(ts, tx), cID);
-                }
-            });
             int clients = 2;
             ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(clients);
             for (int i = 0 ; i < clients ;i++) {
@@ -438,27 +426,11 @@ public class cli {
                     }
                 });
             }
-//            t.start();
             Thread.sleep(60 * 1 * 1000);
             stopped.set(true);
             Thread.sleep(2* 1000);
             executor.shutdownNow();
-//            t.interrupt();
-//            t.join();
-//            JToy.s.stop();
-            JToy.s.shutdown();
-
-//            Thread.sleep( 2 * 60 * 1000);
-
-//            Thread t = new Thread(() -> );
-//            t.start();
-//            Thread.sleep(10 * 1000);
-//            writeToScv(csvPath);
-            writeSummery(csvPath);
-
-//            System.exit(0);
         }
-
         private void setByzSetting(String[] args) {
             boolean fullByz = Integer.parseInt(args[1]) == 1;
             List<List<Integer>> groups = new ArrayList<>();

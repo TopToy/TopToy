@@ -4,12 +4,14 @@ import app.JToy;
 import blockchain.blockchain;
 import blockchain.block;
 import com.google.common.collect.Lists;
+import com.google.common.primitives.Longs;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import config.Config;
 import config.Node;
 import consensus.RBroadcast.RBrodcastService;
 import crypto.blockDigSig;
+import org.apache.commons.lang.ArrayUtils;
 import proto.*;
 import rmf.RmfNode;
 import proto.Types.*;
@@ -41,7 +43,7 @@ public abstract class bcServer extends Node {
     protected int f;
     protected int n;
     int currLeader;
-    protected boolean stopped;
+    protected AtomicBoolean stopped = new AtomicBoolean(false);
 //    final Object blockLock = new Object();
     block currBlock;
     private final Object newBlockNotifyer = new Object();
@@ -66,7 +68,14 @@ public abstract class bcServer extends Node {
 //    final Integer[] lastReceivedBlock;
 //    int lastGc = 0;
     boolean testing = Config.getTesting();
-    Semaphore txSem = new Semaphore(100000);
+    int txPoolMax = 100000;
+    int bareTxSize = Types.Transaction.newBuilder()
+            .setClientID(0)
+            .setTxID(UUID.randomUUID().toString())
+            .build().getSerializedSize() + 8;
+    int txSize = 0;
+    int cID = new Random().nextInt(10000);
+//    Semaphore txSem = new Semaphore(txPoolMax);
 
 
     public bcServer(String addr, int rmfPort, int id, int channel, int f, int tmo, int tmoInterval,
@@ -79,7 +88,6 @@ public abstract class bcServer extends Node {
         this.syncRB = sync;
         bc = initBC(id, channel);
         currBlock = null;
-        stopped = false;
         currHeight = 1; // starts from 1 due to the genesis block
         currLeader = 0;
 //        this.tmo = tmo;
@@ -111,6 +119,10 @@ public abstract class bcServer extends Node {
 //        this.lastReceivedBlock = new Integer[n];
 //        Arrays.fill(lastReceivedBlock, 0);
         currLeader = channel % n;
+
+        if (testing) {
+            txSize = StrictMath.max(0, Config.getTxSize() - bareTxSize);
+        }
     }
 
     public bcServer(String addr, int rmfPort, int id, int channel, int f, int tmo, int tmoInterval,
@@ -127,8 +139,6 @@ public abstract class bcServer extends Node {
         syncRB = new RBrodcastService(1, id, syncConfig);
         bc = initBC(id, channel);
         currBlock = null;
-
-        stopped = false;
         currHeight = 1; // starts from 1 due to the genesis block
         currLeader = 0;
 //        this.tmo =  tmo;
@@ -151,6 +161,9 @@ public abstract class bcServer extends Node {
 //        this.lastReceivedBlock = new Integer[n];
 //        Arrays.fill(lastReceivedBlock, 0);
         currLeader = channel % n;
+        if (testing) {
+            txSize = StrictMath.max(0, Config.getTxSize() - bareTxSize);
+        }
 
     }
 
@@ -177,7 +190,7 @@ public abstract class bcServer extends Node {
     }
 
     public void shutdown(boolean group) {
-        stopped =  true;
+        stopped.set(true);
         logger.debug(format("[#%d-C[%d]] interrupt main thread", getID(), channel));
 //        AtomicBoolean joined = new AtomicBoolean(false);
 //        Thread t = new Thread(() -> {
@@ -233,7 +246,7 @@ public abstract class bcServer extends Node {
         } catch (InterruptedException e) {
             logger.error(format("[#%d-C[%d]]", getID(), channel), e);
         }
-        txSem.release();
+//        txSem.release(txPoolMax);
         logger.info(format("[#%d-C[%d]] shutdown bc server", getID(), channel));
     }
     private void updateLeaderAndHeight() {
@@ -262,7 +275,7 @@ public abstract class bcServer extends Node {
 //
 //    }
     private void mainLoop() throws RuntimeException {
-        while (!stopped) {
+        while (!stopped.get()) {
 //            synchronized (bc) {
                 synchronized (fp) {
                     for (Integer key : fp.keySet().stream().filter(k -> k < currHeight).collect(Collectors.toList())) {
@@ -276,6 +289,11 @@ public abstract class bcServer extends Node {
                         }
 
                     }
+                }
+                if (!bc.validateCurrentLeader(currLeader, f)) {
+                    currLeader = (currLeader + 1) % n;
+                    fastMode = false;
+                    cid += 2;
                 }
                 Block next;
                 try {
@@ -308,9 +326,10 @@ public abstract class bcServer extends Node {
 //                    tmo += tmoInterval;
 //                    logger.debug(format("[#%d-C[%d]] Unable to receive block [cidSeries=%d ; cid=%d], timeout increased to [%d] ms"
 //                            , getID(), channel, cidSeries, cid, tmo));
-                    updateLeaderAndHeight();
+//                    updateLeaderAndHeight();
+                    currLeader = (currLeader + 1) % n;
                     fastMode = false;
-                    cid++;
+                    cid += 2;
                     continue;
                 }
 
@@ -377,11 +396,11 @@ public abstract class bcServer extends Node {
                     fastMode = false;
                     continue;
                 }
-                if (!bc.validateBlockCreator(recBlock, f)) {
-                    updateLeaderAndHeight();
-//                    tmo += tmoInterval;
-                    continue;
-                }
+//                if (!bc.validateBlockCreator(recBlock, f)) {
+//                    updateLeaderAndHeight();
+////                    tmo += tmoInterval;
+//                    continue;
+//                }
 
 
 //                tmo = initTmo;
@@ -422,9 +441,12 @@ public abstract class bcServer extends Node {
 
     abstract public blockchain getBC(int start, int end);
 
-
-    public String addTransaction(byte[] data, int clientID) throws InterruptedException {
-        txSem.acquire();
+    public int getTxPoolSize() {
+        return transactionsPool.size();
+    }
+    public String addTransaction(byte[] data, int clientID) {
+//        txSem.acquire();
+        if (transactionsPool.size() > txPoolMax) return "";
         String txID = UUID.randomUUID().toString();
         Transaction t = Transaction.newBuilder()
                 .setClientID(clientID)
@@ -473,16 +495,38 @@ public abstract class bcServer extends Node {
 //        }
         return -1;
     }
+
+    void createTxToBlock() {
+        for (int i = 0 ; i < maxTransactionInBlock ; i++) {
+            byte[] ts = Longs.toByteArray(System.currentTimeMillis());
+            SecureRandom random = new SecureRandom();
+            byte[] tx = new byte[txSize];
+            random.nextBytes(tx);
+            currBlock.addTransaction(Types.Transaction.newBuilder()
+                    .setTxID(UUID.randomUUID().toString())
+                    .setClientID(cID)
+                    .setData(ByteString.copyFrom(ArrayUtils.addAll(ts, tx)))
+                    .build());
+        }
+
+    }
+
     void addTransactionsToCurrBlock() {
         if (currBlock != null) return;
         currBlock = bc.createNewBLock();
+        if (testing) {
+            createTxToBlock();
+            return;
+        }
+//        if (transactionsPool.size() < maxTransactionInBlock) return;
 //        if (transactionsPool.size() < maxTransactionInBlock) return;
 //            if (testing && currHeight < 10) return;
 //        synchronized (transactionsPool) {
-            if (transactionsPool.size() < maxTransactionInBlock) {
-                logger.debug(format("There are not enugh transactions in pool [%d, %d]", cidSeries, cid));
-                return;
-            }
+//            if (transactionsPool.size() < maxTransactionInBlock) {
+//                logger.debug(format("There are not enough transactions in pool [%d, %d]", cidSeries, cid));
+//                return;
+//            }
+            if (transactionsPool.size() == 0) return;
             while ((!transactionsPool.isEmpty()) && currBlock.getTransactionCount() < maxTransactionInBlock) {
                 Transaction t = transactionsPool.poll();
 //                transactionsPool.remove(0);
@@ -494,7 +538,7 @@ public abstract class bcServer extends Node {
                 }
                 currBlock.addTransaction(t);
             }
-            txSem.release(currBlock.getTransactionCount());
+//            txSem.release(currBlock.getTransactionCount());
 //        }
     }
 
@@ -599,7 +643,7 @@ public abstract class bcServer extends Node {
     }
 
     private void deliverForkAnnounce() {
-        while (!stopped) {
+        while (!stopped.get()) {
             ForkProof p;
             try {
                 p = ForkProof.parseFrom(panicRB.deliver(channel));
@@ -775,7 +819,7 @@ public abstract class bcServer extends Node {
             try {
                 v = subChainVersion.parseFrom(syncRB.deliver(channel));
             } catch (InterruptedException e) {
-                if (!stopped) {
+                if (!stopped.get()) {
                     // might interrupted if more then one panic message received.
                     logger.debug(format("[#%d-C[%d]] sync operation has been interrupted, try again...",
                             getID(), channel));

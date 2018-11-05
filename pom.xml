@@ -82,6 +82,24 @@
                             </resources>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>copy-docker-run-script</id>
+                        <!-- here the phase you need -->
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>bin</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>.</directory>
+                                    <filtering>true</filtering>
+                                    <includes>run_docker.sh</includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
@@ -316,6 +334,14 @@
             <artifactId>commons-cli</artifactId>
             <version>1.3.1</version>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-io -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>1.3.2</version>
+        </dependency>
+
         <!--&lt;!&ndash; https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-iostreams &ndash;&gt;-->
         <!--<dependency>-->
             <!--<groupId>org.apache.logging.log4j</groupId>-->
