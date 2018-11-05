@@ -2176,6 +2176,7 @@ public final class Types {
 
     /**
      * <pre>
+     *    bool present = 6;
      *    int32 cid = 5;
      *    int32 cidSeries = 6;
      * </pre>
@@ -2185,6 +2186,7 @@ public final class Types {
     java.lang.String getProof();
     /**
      * <pre>
+     *    bool present = 6;
      *    int32 cid = 5;
      *    int32 cidSeries = 6;
      * </pre>
@@ -2358,6 +2360,7 @@ public final class Types {
     private volatile java.lang.Object proof_;
     /**
      * <pre>
+     *    bool present = 6;
      *    int32 cid = 5;
      *    int32 cidSeries = 6;
      * </pre>
@@ -2378,6 +2381,7 @@ public final class Types {
     }
     /**
      * <pre>
+     *    bool present = 6;
      *    int32 cid = 5;
      *    int32 cidSeries = 6;
      * </pre>
@@ -2978,6 +2982,7 @@ public final class Types {
       private java.lang.Object proof_ = "";
       /**
        * <pre>
+       *    bool present = 6;
        *    int32 cid = 5;
        *    int32 cidSeries = 6;
        * </pre>
@@ -2998,6 +3003,7 @@ public final class Types {
       }
       /**
        * <pre>
+       *    bool present = 6;
        *    int32 cid = 5;
        *    int32 cidSeries = 6;
        * </pre>
@@ -3019,6 +3025,7 @@ public final class Types {
       }
       /**
        * <pre>
+       *    bool present = 6;
        *    int32 cid = 5;
        *    int32 cidSeries = 6;
        * </pre>
@@ -3037,6 +3044,7 @@ public final class Types {
       }
       /**
        * <pre>
+       *    bool present = 6;
        *    int32 cid = 5;
        *    int32 cidSeries = 6;
        * </pre>
@@ -3051,6 +3059,7 @@ public final class Types {
       }
       /**
        * <pre>
+       *    bool present = 6;
        *    int32 cid = 5;
        *    int32 cidSeries = 6;
        * </pre>

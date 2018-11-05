@@ -20,6 +20,8 @@ public class Config {
         String SYSTEM_F_KEY = "system.f";
         String SYSTEM_C_KEY = "system.c";
         String SYSTEM_TESTING_KEY = "system.testing";
+        String SYSTEM_TX_SIZE = "system.txSize";
+        String SYSTEM_CUTTER_BATCH = "system.cutterBatch";
         String SERVER_KEY = "server";
         String SERVER_ID_KEY = "server.id";
         String SERVER_IP_KEY = "server.ip";
@@ -163,6 +165,14 @@ public class Config {
     public static String getServerTlsPrivKeyPath() { return conf.getString(tKeys.SERVER_TLS_PRIV_KEY_PATH); }
 
     public static boolean getFastMode() { return conf.getBoolean(tKeys.SETTING_FAST_MODE); }
+
+    public static int getTxSize() {
+        return Math.toIntExact(conf.getLong(tKeys.SYSTEM_TX_SIZE));
+    }
+
+    public static int getCutterBatch() {
+        return Math.toIntExact(conf.getLong(tKeys.SYSTEM_CUTTER_BATCH));
+    }
 
 
 }

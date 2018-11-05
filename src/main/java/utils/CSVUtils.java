@@ -1,6 +1,9 @@
 package utils;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.Reader;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.List;
 
 public class CSVUtils {
@@ -53,6 +56,19 @@ public class CSVUtils {
         w.append(sb.toString());
 
 
+    }
+
+    public static ArrayList<String[]> readLines(Reader r) throws IOException {
+        ArrayList<String[]> ret = new ArrayList<>();
+        String line;
+        String sep = String.valueOf(DEFAULT_SEPARATOR);
+        try (BufferedReader br = new BufferedReader(r)) {
+            while ((line = br.readLine()) != null) {
+                String[] row = line.split(sep);
+                ret.add(row);
+            }
+        }
+        return ret;
     }
 
 }
