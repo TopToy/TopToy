@@ -20,6 +20,7 @@ import javax.net.ssl.SSLException;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
@@ -130,11 +131,11 @@ public class RmfService extends RmfGrpc.RmfImplBase {
 //    protected Server server;
     private String bbcConfig;
     private final ConcurrentHashMap<Meta, BbcDecision>[] regBbcCons;
-    private boolean stopped = false;
+    private AtomicBoolean stopped = new AtomicBoolean(false);
     private Server rmfServer;
     int channels;
     Executor executor;
-    EventLoopGroup beg;
+//    EventLoopGroup beg;
     EventLoopGroup weg;
     int[] alive;
 //    Object[] aliveLock;
@@ -225,13 +226,13 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             int cores = Runtime.getRuntime().availableProcessors();
             logger.debug(format("[#%d] There are %d CPU's in the system", id, cores));
             executor = Executors.newFixedThreadPool(channels * n);
-            beg = new NioEventLoopGroup(cores + 1);
-            weg = new NioEventLoopGroup(cores + 1);
+//            beg = new NioEventLoopGroup(cores + 1);
+            weg = new NioEventLoopGroup( 1);
             rmfServer = NettyServerBuilder.
                     forPort(nodes.get(id).getRmfPort()).
                     executor(executor)
-//                    .workerEventLoopGroup(weg)
-//                    .bossEventLoopGroup(beg)
+                    .workerEventLoopGroup(weg)
+                    .bossEventLoopGroup(weg)
                     .sslContext(sslUtils.buildSslContextForServer(serverCrt,
                             caRoot, serverPrivKey)).
                     addService(this).
@@ -285,7 +286,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         logger.debug(format("[#%d] starting rmf service", id));
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            if (stopped) return;
+            if (stopped.get()) return;
             // Use stderr here since the logger may have been reset by its JVM shutdown hook.
             logger.warn(format("[#%d] *** shutting down rmf service since JVM is shutting down", id));
             shutdown();
@@ -354,7 +355,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
     }
 
     public void shutdown() {
-        stopped = true;
+        stopped.set(true);
         for (peer p : peers.values()) {
             p.shutdown();
         }

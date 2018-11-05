@@ -31,6 +31,17 @@ public abstract class blockchain {
 
     abstract void createGenesis(int channel);
 
+    public boolean validateCurrentLeader(int leader, int f) {
+        if (blocks.size() >= f && blocks.subList(blocks.size() - f, blocks.size()).
+                stream().
+                map(bl -> bl.getHeader().getM().getSender()).
+                collect(Collectors.toList()).
+                contains(leader)) {
+            logger.debug(format("[#%d] leader is in the last f proposers", creatorID));
+            return false;
+        }
+        return true;
+    }
     public boolean validateBlockCreator(Block b, int f) {
         if (blocks.size() >= f && blocks.subList(blocks.size() - f, blocks.size()).
         stream().

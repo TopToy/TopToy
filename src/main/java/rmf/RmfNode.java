@@ -8,13 +8,14 @@ import consensus.bbc.bbcService;
 import proto.Types.*;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.lang.String.format;
 
 public class RmfNode extends Node{
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(RmfNode.class);
 
-    protected boolean stopped = false;
+//    protected AtomicBoolean stopped = new AtomicBoolean(false);
     RmfService rmfService;
 
     public RmfNode(int channels, int id, String addr, int rmfPort, int f , int tmo, int tmoInterval, ArrayList<Node> nodes, String bbcConfig,
@@ -29,7 +30,7 @@ public class RmfNode extends Node{
 //    }
 
     public void stop() {
-        stopped = true;
+//        stopped = true;
         if (rmfService != null)
             rmfService.shutdown();
     }
