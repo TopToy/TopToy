@@ -52,10 +52,22 @@ message Transaction {
     int32 clientID = 1;
     string txID = 2;
     bytes data = 3; // generic type of data
+    int64 clientTs = 4;
+    int64 serverTs = 5;
 }
 
 message accepted {
     bool accepted = 1;
+    string txID = 2;
+}
+
+message approved {
+    Transaction tx = 1;
+    int64 ts = 2;
+}
+
+message read {
+    string txID = 1;
 }
 
 message ForkProof {

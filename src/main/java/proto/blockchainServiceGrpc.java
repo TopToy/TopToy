@@ -54,6 +54,33 @@ public final class blockchainServiceGrpc {
      return getAddTransactionMethod;
   }
 
+  private static volatile io.grpc.MethodDescriptor<proto.Types.read,
+      proto.Types.approved> getGetTransactionMethod;
+
+  public static io.grpc.MethodDescriptor<proto.Types.read,
+      proto.Types.approved> getGetTransactionMethod() {
+    io.grpc.MethodDescriptor<proto.Types.read, proto.Types.approved> getGetTransactionMethod;
+    if ((getGetTransactionMethod = blockchainServiceGrpc.getGetTransactionMethod) == null) {
+      synchronized (blockchainServiceGrpc.class) {
+        if ((getGetTransactionMethod = blockchainServiceGrpc.getGetTransactionMethod) == null) {
+          blockchainServiceGrpc.getGetTransactionMethod = getGetTransactionMethod = 
+              io.grpc.MethodDescriptor.<proto.Types.read, proto.Types.approved>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+              .setFullMethodName(generateFullMethodName(
+                  "proto.blockchainService", "getTransaction"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  proto.Types.read.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  proto.Types.approved.getDefaultInstance()))
+                  .setSchemaDescriptor(new blockchainServiceMethodDescriptorSupplier("getTransaction"))
+                  .build();
+          }
+        }
+     }
+     return getGetTransactionMethod;
+  }
+
   /**
    * Creates a new async stub that supports all call types for the service
    */
@@ -82,13 +109,17 @@ public final class blockchainServiceGrpc {
   public static abstract class blockchainServiceImplBase implements io.grpc.BindableService {
 
     /**
-     * <pre>
-     * BLocking call for client!
-     * </pre>
      */
     public void addTransaction(proto.Types.Transaction request,
         io.grpc.stub.StreamObserver<proto.Types.accepted> responseObserver) {
       asyncUnimplementedUnaryCall(getAddTransactionMethod(), responseObserver);
+    }
+
+    /**
+     */
+    public void getTransaction(proto.Types.read request,
+        io.grpc.stub.StreamObserver<proto.Types.approved> responseObserver) {
+      asyncUnimplementedUnaryCall(getGetTransactionMethod(), responseObserver);
     }
 
     @java.lang.Override public final io.grpc.ServerServiceDefinition bindService() {
@@ -100,6 +131,13 @@ public final class blockchainServiceGrpc {
                 proto.Types.Transaction,
                 proto.Types.accepted>(
                   this, METHODID_ADD_TRANSACTION)))
+          .addMethod(
+            getGetTransactionMethod(),
+            asyncUnaryCall(
+              new MethodHandlers<
+                proto.Types.read,
+                proto.Types.approved>(
+                  this, METHODID_GET_TRANSACTION)))
           .build();
     }
   }
@@ -123,14 +161,19 @@ public final class blockchainServiceGrpc {
     }
 
     /**
-     * <pre>
-     * BLocking call for client!
-     * </pre>
      */
     public void addTransaction(proto.Types.Transaction request,
         io.grpc.stub.StreamObserver<proto.Types.accepted> responseObserver) {
       asyncUnaryCall(
           getChannel().newCall(getAddTransactionMethod(), getCallOptions()), request, responseObserver);
+    }
+
+    /**
+     */
+    public void getTransaction(proto.Types.read request,
+        io.grpc.stub.StreamObserver<proto.Types.approved> responseObserver) {
+      asyncUnaryCall(
+          getChannel().newCall(getGetTransactionMethod(), getCallOptions()), request, responseObserver);
     }
   }
 
@@ -153,13 +196,17 @@ public final class blockchainServiceGrpc {
     }
 
     /**
-     * <pre>
-     * BLocking call for client!
-     * </pre>
      */
     public proto.Types.accepted addTransaction(proto.Types.Transaction request) {
       return blockingUnaryCall(
           getChannel(), getAddTransactionMethod(), getCallOptions(), request);
+    }
+
+    /**
+     */
+    public proto.Types.approved getTransaction(proto.Types.read request) {
+      return blockingUnaryCall(
+          getChannel(), getGetTransactionMethod(), getCallOptions(), request);
     }
   }
 
@@ -182,18 +229,24 @@ public final class blockchainServiceGrpc {
     }
 
     /**
-     * <pre>
-     * BLocking call for client!
-     * </pre>
      */
     public com.google.common.util.concurrent.ListenableFuture<proto.Types.accepted> addTransaction(
         proto.Types.Transaction request) {
       return futureUnaryCall(
           getChannel().newCall(getAddTransactionMethod(), getCallOptions()), request);
     }
+
+    /**
+     */
+    public com.google.common.util.concurrent.ListenableFuture<proto.Types.approved> getTransaction(
+        proto.Types.read request) {
+      return futureUnaryCall(
+          getChannel().newCall(getGetTransactionMethod(), getCallOptions()), request);
+    }
   }
 
   private static final int METHODID_ADD_TRANSACTION = 0;
+  private static final int METHODID_GET_TRANSACTION = 1;
 
   private static final class MethodHandlers<Req, Resp> implements
       io.grpc.stub.ServerCalls.UnaryMethod<Req, Resp>,
@@ -215,6 +268,10 @@ public final class blockchainServiceGrpc {
         case METHODID_ADD_TRANSACTION:
           serviceImpl.addTransaction((proto.Types.Transaction) request,
               (io.grpc.stub.StreamObserver<proto.Types.accepted>) responseObserver);
+          break;
+        case METHODID_GET_TRANSACTION:
+          serviceImpl.getTransaction((proto.Types.read) request,
+              (io.grpc.stub.StreamObserver<proto.Types.approved>) responseObserver);
           break;
         default:
           throw new AssertionError();
@@ -278,6 +335,7 @@ public final class blockchainServiceGrpc {
           serviceDescriptor = result = io.grpc.ServiceDescriptor.newBuilder(SERVICE_NAME)
               .setSchemaDescriptor(new blockchainServiceFileDescriptorSupplier())
               .addMethod(getAddTransactionMethod())
+              .addMethod(getGetTransactionMethod())
               .build();
         }
       }

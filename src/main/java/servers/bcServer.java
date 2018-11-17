@@ -444,6 +444,13 @@ public abstract class bcServer extends Node {
     public int getTxPoolSize() {
         return transactionsPool.size();
     }
+
+    public String addTransaction(Transaction tx) {
+        if (transactionsPool.size() > txPoolMax) return "";
+        transactionsPool.add(tx);
+        return tx.getTxID();
+    }
+
     public String addTransaction(byte[] data, int clientID) {
 //        txSem.acquire();
         if (transactionsPool.size() > txPoolMax) return "";
@@ -498,14 +505,16 @@ public abstract class bcServer extends Node {
 
     void createTxToBlock() {
         for (int i = 0 ; i < maxTransactionInBlock ; i++) {
-            byte[] ts = Longs.toByteArray(System.currentTimeMillis());
+            long ts = System.currentTimeMillis();
             SecureRandom random = new SecureRandom();
             byte[] tx = new byte[txSize];
             random.nextBytes(tx);
             currBlock.addTransaction(Types.Transaction.newBuilder()
                     .setTxID(UUID.randomUUID().toString())
                     .setClientID(cID)
-                    .setData(ByteString.copyFrom(ArrayUtils.addAll(ts, tx)))
+                    .setClientTs(ts)
+                    .setServerTs(ts)
+                    .setData(ByteString.copyFrom(tx))
                     .build());
         }
 
@@ -514,10 +523,13 @@ public abstract class bcServer extends Node {
     void addTransactionsToCurrBlock() {
         if (currBlock != null) return;
         currBlock = bc.createNewBLock();
-        if (testing) {
-            createTxToBlock();
-            return;
-        }
+//        if (testing && bc.getHeight() < 20) return;
+
+//        if (testing) {
+//            createTxToBlock();
+//            return;
+//        }
+
 //        if (transactionsPool.size() < maxTransactionInBlock) return;
 //        if (transactionsPool.size() < maxTransactionInBlock) return;
 //            if (testing && currHeight < 10) return;

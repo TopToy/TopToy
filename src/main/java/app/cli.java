@@ -5,6 +5,7 @@ import config.Config;
 //import crypto.rmfDigSig;
 import crypto.DigestMethod;
 import crypto.blockDigSig;
+import io.opencensus.stats.Aggregation;
 import org.apache.commons.cli.*;
 import org.apache.commons.lang.ArrayUtils;
 import proto.Types;
@@ -21,9 +22,9 @@ import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.lang.Math.min;
 import static java.lang.StrictMath.max;
@@ -64,6 +65,10 @@ public class cli {
                             "Note that this method should run write after init!\n" +
                             "Usage: bm -t [transaction size] -s [amount of loaded transactions] -p [path to csv]")
                     .build());
+
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                writeSummery("/tmp/JToy/res/");
+            }));
         }
 
 
@@ -78,6 +83,12 @@ public class cli {
                 if (args[0].equals("init")) {
                     init();
                     System.out.println("Init server... [OK]");
+                    return;
+                }
+
+                if (args[0].equals("latency")) {
+                    latency();
+                    System.out.println("latency... [OK]");
                     return;
                 }
 
@@ -136,15 +147,15 @@ public class cli {
                 }
 
                 if (args[0].equals("sigTest")) {
-                    if (args.length == 7) {
-                        if (!args[1].equals("-t")) return;
-                        if (!args[3].equals("-s")) return;
-                        if (!args[5].equals("-p")) return;
-                        String path = args[6];
-                        int txSize = Integer.parseInt(args[4]);
-                        int txNum = Integer.parseInt(args[2]);
-                        sigTets(txNum, txSize, path);
+                    logger.info("Accepted sigTest");
+                    if (args.length == 3) {
+                        logger.info("Three params");
+                        if (!args[1].equals("-p")) return;
+                        String path = args[2];
+                        sigTets(path);
 
+                    } else {
+                        logger.info("param problem");
                     }
                     return;
 
@@ -207,7 +218,13 @@ public class cli {
             JToy.s.shutdown();
         }
 
-
+        private void latency() throws InterruptedException {
+            init();
+            serve();
+            while (true) {
+                Thread.sleep(10 * 60 * 1000);
+            }
+        }
         private String addtx(String data, int clientID) {
             return JToy.s.addTransaction(data.getBytes(), clientID);
         }
@@ -225,18 +242,49 @@ public class cli {
             return null;
         }
 
-        private void sigTets(int txNum, int txSize, String pathString) throws IOException {
+        int signForExec(Types.Block b, int c) {
+            logger.info(format("starting signForExec [%d]", c));
+            int sigCount = 0;
+            long t = System.currentTimeMillis();
+            while (System.currentTimeMillis()- t < 30 * 1000) {
+                blockDigSig.sign(b.getHeader());
+                sigCount++;
+            }
+            int avgSig = sigCount / 30;
+            logger.info(format("finishing signForExec [%d] avg is [%d]", c, avgSig));
+            return avgSig;
+        }
 
-
+        int verForExec(Types.Block b, int c) {
+            logger.info(format("starting verForExec [%d]", c));
+            int verCount = 0;
+            long t = System.currentTimeMillis();
+            while (System.currentTimeMillis() - t < 30 * 1000) {
+                blockDigSig.verify(JToy.s.getID(), b);
+                verCount++;
+            }
+            int avgVer = verCount / 30;
+            logger.info(format("finishing verForExec [%d] avg is [%d]", c, avgVer));
+            return avgVer;
+        }
+        private void sigTets(String pathString) throws IOException, InterruptedException {
+            logger.info(format("Starting sigTest [%d, %d]", Config.getTxSize(), Config.getMaxTransactionsInBlock()));
+            ExecutorService executor = Executors.newFixedThreadPool(Config.getC());
+            int bareTxSize = Types.Transaction.newBuilder()
+                    .setClientID(0)
+                    .setTxID(UUID.randomUUID().toString())
+                    .build().getSerializedSize() + 8;
+            int tSize = max(0, Config.getTxSize() - bareTxSize);
             Types.Block.Builder bb = Types.Block.newBuilder();
-            for (int i = 0 ; i < txNum ; i++) {
+            for (int i = 0 ; i < Config.getMaxTransactionsInBlock() ; i++) {
                 SecureRandom random = new SecureRandom();
-                byte[] tx = new byte[txSize];
+                byte[] tx = new byte[tSize];
+                byte[] ts = Longs.toByteArray(System.currentTimeMillis());
                 random.nextBytes(tx);
                 bb.addData(Types.Transaction.newBuilder()
                         .setTxID(UUID.randomUUID().toString())
                         .setClientID(0)
-                        .setData(ByteString.copyFrom(tx))
+                        .setData(ByteString.copyFrom(ArrayUtils.addAll(ts, tx)))
                         .build());
             }
             byte[] tHash = new byte[0];
@@ -258,41 +306,51 @@ public class cli {
                     .setTransactionHash(ByteString.copyFrom(tHash))
                     .build());
             Types.Block b = bb.setHeader(bb.getHeader().toBuilder().setProof(blockDigSig.sign(bb.getHeader()))).build();
-//            Types.Data.Builder d = Types.Data.newBuilder()
-//                    .setMeta(Types.Meta.newBuilder()
-//                            .setCid(0)
-//                            .setCidSeries(0)
-//                            .setSender(JToy.server.getID()))
-//                    .setData(ByteString.copyFrom(tx));
-//            d.setSig(rmfDigSig.sign(d));
-//            Types.Data db = d.build();
-            if (!blockDigSig.verify(JToy.s.getID(), b)) {
+            if (!blockDigSig.verify(0, b)) {
+                logger.error("cant verify block");
                 return;
             }
-            int sigCount = 0;
-            long t = System.currentTimeMillis();
-            while (new Timestamp(System.currentTimeMillis()).getTime() - t < 10 * 1000) {
-                blockDigSig.sign(bb.getHeader());
-                sigCount++;
+            CountDownLatch latch1 = new CountDownLatch(Config.getC());
+            AtomicInteger avgSig = new AtomicInteger(0);
+            AtomicBoolean stop = new AtomicBoolean(false);
+            long start = System.currentTimeMillis();
+            for (int c = 0 ; c < Config.getC() ; c++) {
+                int finalC = c;
+                (executor).submit(() -> {
+                    int sigCount = 0;
+                    while (!stop.get()) {
+                        blockDigSig.sign(b.getHeader());
+                        sigCount++;
+                    }
+                    logger.info(format("finishing verForExec [%d] avg is [%d]", finalC, sigCount));
+                    avgSig.addAndGet(sigCount);
+                    latch1.countDown();
+                });
             }
-            sigCount = sigCount / 10;
-            int verCount = 0;
-            t = System.currentTimeMillis();
-            while (System.currentTimeMillis() - t < 10 * 1000) {
-                blockDigSig.verify(JToy.s.getID(), b);
-                verCount++;
-            }
-
-            Path path = Paths.get(pathString,   String.valueOf(JToy.s.getID()), "sig_summery.csv");
+            logger.info(format("Await termination 1"));
+            Thread.sleep(40 * 1000);
+            stop.set(true);
+//            executor.awaitTermination(120, TimeUnit.SECONDS);
+            latch1.await();
+            int total = (int) ((System.currentTimeMillis() - start) / 1000);
+            executor.shutdownNow();
+            logger.info(format("res [%d, %d]",  avgSig.get(), total));
+            int sigPerSec = avgSig.get() / total;
+            int verPerSec = 0; //avgVer.get() / Config.getC();
+            Path path = Paths.get(pathString,   String.valueOf(0), "sig_summery.csv");
             File f = new File(path.toString());
             if (!f.exists()) {
                 f.getParentFile().mkdirs();
                 f.createNewFile();
             }
+            logger.info(format("Collecting results"));
             FileWriter writer = new FileWriter(path.toString(), true);
             DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy-HH:mm:ss");
             List<String> row = Arrays.asList(dateFormat.format(new Date()),
-                    String.valueOf(JToy.s.getID()), String.valueOf(sigCount), String.valueOf(verCount));
+                    String.valueOf(0), String.valueOf(Config.getC()),
+                    String.valueOf(bareTxSize + tSize), String.valueOf(Config.getMaxTransactionsInBlock()),
+                    String.valueOf(b.getSerializedSize()),
+                    String.valueOf(sigPerSec), String.valueOf(verPerSec));
             CSVUtils.writeLine(writer, row);
             writer.flush();
             writer.close();
@@ -363,13 +421,18 @@ public class cli {
                     f.getParentFile().mkdirs();
                     f.createNewFile();
                 }
-                statistics st = JToy.s.getStatistics();
                 FileWriter writer = null;
                 writer = new FileWriter(path.toString(), true);
+//                List<String> head = Arrays.asList("ts","id","type","channels","fm","txSize","txInBlock","txTotal"
+//                        ,"duration","txPsec","blocksNum","avgTxInBlock","eRate","dRate");
+//
+//                CSVUtils.writeLine(writer, head);
+                statistics st = JToy.s.getStatistics();
+
                 double time = ((double) st.lastTxTs - (double) st.firstTxTs) / 1000;
                 int thrp = ((int) (st.txCount / time)); // / 1000;
                 double opRate = ((double) st.optemisticDec) / ((double) st.totalDec);
-                long delaysAvgMs = 0; //avgWt / st.txCount;
+                long delaysAvgMs = 0; //st.delaysSum / st.txCount;
                 int avgTxInBlock = st.txCount / nob;
                 double eRate = ((double)st.eb) / ((double) st.all);
                 double dRate = ((double)st.deliveredTime) / ((double) st.all);
@@ -378,8 +441,8 @@ public class cli {
                         JToy.type, String.valueOf(Config.getC()), String.valueOf(Config.getFastMode()),
                         String.valueOf(st.txSize), String.valueOf(Config.getMaxTransactionsInBlock()),
                         String.valueOf(st.txCount), String.valueOf(time), String.valueOf(thrp),
-//                        String.valueOf(delaysAvgMs), String.valueOf(st.totalDec), String.valueOf(st.optemisticDec), String.valueOf(opRate),
-                        String.valueOf(nob),String.valueOf(avgTxInBlock), String.valueOf(eRate),
+//                        String.valueOf(st.totalDec), String.valueOf(st.optemisticDec), String.valueOf(opRate),
+                        String.valueOf(nob), String.valueOf(avgTxInBlock), String.valueOf(delaysAvgMs), String.valueOf(eRate),
                         String.valueOf(dRate));
                 CSVUtils.writeLine(writer, row);
                 writer.flush();
@@ -391,10 +454,10 @@ public class cli {
         }
         private void runBenchMark(int tSize, int tNumber, String csvPath) throws InterruptedException {
 
-            Thread.sleep(30 * 1000);
+            Thread.sleep(15 * 1000);
             logger.info(format("[#%d] start serving...", JToy.s.getID()));
             serve();
-            Thread.sleep(2 * 1000);
+//            Thread.sleep(10 * 1000);
 //            loadServer(tSize);
             Thread.sleep(60 * 1 * 1000);
             JToy.s.shutdown();
@@ -405,10 +468,13 @@ public class cli {
         }
         private void loadServer(int tSize) throws InterruptedException {
             Random rand = new Random();
+            long tts = System.currentTimeMillis();
             int bareTxSize = Types.Transaction.newBuilder()
                     .setClientID(0)
                     .setTxID(UUID.randomUUID().toString())
-                    .build().getSerializedSize() + 8;
+                    .setClientTs(tts)
+                    .setServerTs(tts)
+                    .build().getSerializedSize();
             int txSize = max(0, tSize - bareTxSize);
             AtomicBoolean stopped = new AtomicBoolean(false);
             int clients = 2;
@@ -418,15 +484,15 @@ public class cli {
                 executor.submit( () -> {
                     while (!stopped.get()) {
                         int cID = rand.nextInt(finalI);
-                        byte[] ts = Longs.toByteArray(System.currentTimeMillis());
+//                        byte[] ts = Longs.toByteArray(System.currentTimeMillis());
                         SecureRandom random = new SecureRandom();
                         byte[] tx = new byte[txSize];
                         random.nextBytes(tx);
-                        JToy.s.addTransaction(ArrayUtils.addAll(ts, tx), cID);
+                        JToy.s.addTransaction(tx, cID);
                     }
                 });
             }
-            Thread.sleep(60 * 1 * 1000);
+            Thread.sleep(60 * 1* 1000);
             stopped.set(true);
             Thread.sleep(2* 1000);
             executor.shutdownNow();

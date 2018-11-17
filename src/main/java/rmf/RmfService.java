@@ -227,7 +227,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             logger.debug(format("[#%d] There are %d CPU's in the system", id, cores));
             executor = Executors.newFixedThreadPool(channels * n);
 //            beg = new NioEventLoopGroup(cores + 1);
-            weg = new NioEventLoopGroup( 1);
+            weg = new NioEventLoopGroup(cores);
             rmfServer = NettyServerBuilder.
                     forPort(nodes.get(id).getRmfPort()).
                     executor(executor)
@@ -655,18 +655,46 @@ public class RmfService extends RmfGrpc.RmfImplBase {
     {
 //        mutex.lock();
         totalDeliveredTries.getAndIncrement();
-        long startTime = System.currentTimeMillis();
+
         long estimatedTime;
         Meta key = Meta.newBuilder()
                 .setChannel(channel)
                 .setCidSeries(cidSeries)
                 .setCid(cid)
                 .build();
+//        int realTmo = currentTmo[channel];
+//        long startTime = System.currentTimeMillis();
+//        synchronized (msgNotifyer[channel]) {
+//            while (realTmo > 0 && !pendingMsg[channel].containsKey(key)) {
+////                mutex.unlock();
+//                msgNotifyer[channel].wait(realTmo);
+////                mutex.lock();
+//                realTmo -= System.currentTimeMillis() - startTime;
+//            }
+//        }
+
+//        long startTime = System.currentTimeMillis();
+//        synchronized (msgNotifyer[channel]) {
+//            if (!pendingMsg[channel].containsKey(key)) {
+////                mutex.unlock();
+//                msgNotifyer[channel].wait(currentTmo[channel]);
+////                mutex.lock();
+//            }
+//        }
+        Meta key2 = Meta.newBuilder()
+                .setChannel(channel)
+                .setCidSeries(cidSeries)
+                .setCid(cid + 2)
+                .build();
+        int realTmo = currentTmo[channel];
+        long startTime = System.currentTimeMillis();
         synchronized (msgNotifyer[channel]) {
-            if (!pendingMsg[channel].containsKey(key)) {
+            while (realTmo > 0 && !pendingMsg[channel].containsKey(key)) {
+                if (pendingMsg[channel].containsKey(key2)) break;
 //                mutex.unlock();
-                msgNotifyer[channel].wait(currentTmo[channel]);
+                msgNotifyer[channel].wait(realTmo);
 //                mutex.lock();
+                realTmo -= System.currentTimeMillis() - startTime;
             }
         }
 
@@ -759,9 +787,9 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             return vi;
         });
 
-        if (currentTmo[channel] != tmo) {
-            logger.debug(format("[#%d-C[%d]] unable to receive message, timeout increased to [%d] ms", id, channel, currentTmo[channel]));
-        }
+//        if (currentTmo[channel] != tmo) {
+//            logger.debug(format("[#%d-C[%d]] unable to receive message, timeout increased to [%d] ms", id, channel, currentTmo[channel]));
+//        }
         if (regBbcCons[channel].containsKey(key)) {
             int v = regBbcCons[channel].get(key).getDecosion();
             int dec = fullBbcConsensus(channel, v, cidSeries, cid);
@@ -831,9 +859,9 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                    msg.getHeader().getM().getSender() != sender) { // ||
 //                pendingMsg.get(cidSeries, cid).getMeta().getHeight() != height) {
                 pendingMsg[channel].remove(key);
-                msg = pendingMsg[channel].get(key);
 //                mutex.unlock();
                 msgNotifyer[channel].wait();
+                msg = pendingMsg[channel].get(key);
 //                mutex.lock();
             }
         }

@@ -6,9 +6,6 @@ package proto;
 import "types.proto";
 
 service blockchainService {
-    // BLocking call for client!
     rpc addTransaction(Transaction) returns (accepted) {};
-    // synchronized between servers!
-//    rpc synchronzieOnError(stream Block) returns (stream Block) {}
-//    rpc panic(PanicMsg) returns(empty) {};
+    rpc getTransaction(read) returns (approved) {};
 }

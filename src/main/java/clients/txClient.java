@@ -38,7 +38,7 @@ public class txClient {
         return clientID;
     }
 
-    public int addTx(byte[] data) {
+    public Types.accepted addTx(byte[] data) {
         if (txCount  == 0) {
             startTime = System.currentTimeMillis();
         }
@@ -46,17 +46,21 @@ public class txClient {
             Types.Transaction t = Types.Transaction.newBuilder()
                     .setClientID(clientID)
                     .setData(ByteString.copyFrom(data))
+                    .setClientTs(System.currentTimeMillis())
                     .build();
-            if (stub.addTransaction(t).getAccepted()) {
+            Types.accepted ret = stub.addTransaction(t);
+            if (ret.getAccepted()) {
                 txCount++;
-            };
+            }
+            return ret;
         } catch (Exception e) {
 //            System.out.println(e.getMessage());
-            return -1;
+            return null;
         }
-        return 0;
-//        System.out.println(format("Sending tx of size %d", data.length));
+    }
 
+    public Types.approved getTx(Types.read r) {
+        return stub.getTransaction(r);
     }
 
     public double shutdown() {

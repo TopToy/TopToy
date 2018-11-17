@@ -68,7 +68,9 @@ public abstract class blockchain {
     }
 
     public void setBlock(int index, Block b) {
-        blocks.set(index, b);
+        synchronized (blocks) {
+            blocks.set(index, b);
+        }
     }
     public boolean validateBlockHash(Block b) {
         byte[] d = DigestMethod.hash(blocks.get(b.getHeader().getHeight() - 1).getHeader().toByteArray());
@@ -94,6 +96,12 @@ public abstract class blockchain {
         }
     }
 
+    public List<Block> getBlocksCopy(int start, int end) {
+        synchronized (blocks) {
+            return new ArrayList<Block>(blocks.subList(start, end));
+        }
+    }
+
     public int getHeight() {
         synchronized (blocks) {
             return blocks.size() - 1;
@@ -101,7 +109,10 @@ public abstract class blockchain {
     }
 
     public void removeBlock(int index) {
-        blocks.remove(index);
+
+        synchronized (blocks) {
+            blocks.remove(index);
+        }
     }
 
 }
