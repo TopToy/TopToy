@@ -3126,6 +3126,814 @@ public final class Types {
 
   }
 
+  public interface blockStatisticsOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:proto.blockStatistics)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <pre>
+     * creation ts
+     * </pre>
+     *
+     * <code>int64 created = 1;</code>
+     */
+    long getCreated();
+
+    /**
+     * <pre>
+     * the time that signature took
+     * </pre>
+     *
+     * <code>int64 sign = 2;</code>
+     */
+    long getSign();
+
+    /**
+     * <pre>
+     * propose ts
+     * </pre>
+     *
+     * <code>int64 proposed = 3;</code>
+     */
+    long getProposed();
+
+    /**
+     * <pre>
+     * verification time
+     * </pre>
+     *
+     * <code>int64 verified = 4;</code>
+     */
+    long getVerified();
+
+    /**
+     * <pre>
+     * decision ts
+     * </pre>
+     *
+     * <code>int64 decided = 5;</code>
+     */
+    long getDecided();
+  }
+  /**
+   * Protobuf type {@code proto.blockStatistics}
+   */
+  public  static final class blockStatistics extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:proto.blockStatistics)
+      blockStatisticsOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use blockStatistics.newBuilder() to construct.
+    private blockStatistics(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private blockStatistics() {
+      created_ = 0L;
+      sign_ = 0L;
+      proposed_ = 0L;
+      verified_ = 0L;
+      decided_ = 0L;
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private blockStatistics(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownFieldProto3(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 8: {
+
+              created_ = input.readInt64();
+              break;
+            }
+            case 16: {
+
+              sign_ = input.readInt64();
+              break;
+            }
+            case 24: {
+
+              proposed_ = input.readInt64();
+              break;
+            }
+            case 32: {
+
+              verified_ = input.readInt64();
+              break;
+            }
+            case 40: {
+
+              decided_ = input.readInt64();
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return proto.Types.internal_static_proto_blockStatistics_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return proto.Types.internal_static_proto_blockStatistics_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              proto.Types.blockStatistics.class, proto.Types.blockStatistics.Builder.class);
+    }
+
+    public static final int CREATED_FIELD_NUMBER = 1;
+    private long created_;
+    /**
+     * <pre>
+     * creation ts
+     * </pre>
+     *
+     * <code>int64 created = 1;</code>
+     */
+    public long getCreated() {
+      return created_;
+    }
+
+    public static final int SIGN_FIELD_NUMBER = 2;
+    private long sign_;
+    /**
+     * <pre>
+     * the time that signature took
+     * </pre>
+     *
+     * <code>int64 sign = 2;</code>
+     */
+    public long getSign() {
+      return sign_;
+    }
+
+    public static final int PROPOSED_FIELD_NUMBER = 3;
+    private long proposed_;
+    /**
+     * <pre>
+     * propose ts
+     * </pre>
+     *
+     * <code>int64 proposed = 3;</code>
+     */
+    public long getProposed() {
+      return proposed_;
+    }
+
+    public static final int VERIFIED_FIELD_NUMBER = 4;
+    private long verified_;
+    /**
+     * <pre>
+     * verification time
+     * </pre>
+     *
+     * <code>int64 verified = 4;</code>
+     */
+    public long getVerified() {
+      return verified_;
+    }
+
+    public static final int DECIDED_FIELD_NUMBER = 5;
+    private long decided_;
+    /**
+     * <pre>
+     * decision ts
+     * </pre>
+     *
+     * <code>int64 decided = 5;</code>
+     */
+    public long getDecided() {
+      return decided_;
+    }
+
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (created_ != 0L) {
+        output.writeInt64(1, created_);
+      }
+      if (sign_ != 0L) {
+        output.writeInt64(2, sign_);
+      }
+      if (proposed_ != 0L) {
+        output.writeInt64(3, proposed_);
+      }
+      if (verified_ != 0L) {
+        output.writeInt64(4, verified_);
+      }
+      if (decided_ != 0L) {
+        output.writeInt64(5, decided_);
+      }
+      unknownFields.writeTo(output);
+    }
+
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (created_ != 0L) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(1, created_);
+      }
+      if (sign_ != 0L) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(2, sign_);
+      }
+      if (proposed_ != 0L) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(3, proposed_);
+      }
+      if (verified_ != 0L) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(4, verified_);
+      }
+      if (decided_ != 0L) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(5, decided_);
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof proto.Types.blockStatistics)) {
+        return super.equals(obj);
+      }
+      proto.Types.blockStatistics other = (proto.Types.blockStatistics) obj;
+
+      boolean result = true;
+      result = result && (getCreated()
+          == other.getCreated());
+      result = result && (getSign()
+          == other.getSign());
+      result = result && (getProposed()
+          == other.getProposed());
+      result = result && (getVerified()
+          == other.getVerified());
+      result = result && (getDecided()
+          == other.getDecided());
+      result = result && unknownFields.equals(other.unknownFields);
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + CREATED_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          getCreated());
+      hash = (37 * hash) + SIGN_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          getSign());
+      hash = (37 * hash) + PROPOSED_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          getProposed());
+      hash = (37 * hash) + VERIFIED_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          getVerified());
+      hash = (37 * hash) + DECIDED_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          getDecided());
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static proto.Types.blockStatistics parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static proto.Types.blockStatistics parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static proto.Types.blockStatistics parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static proto.Types.blockStatistics parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static proto.Types.blockStatistics parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static proto.Types.blockStatistics parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static proto.Types.blockStatistics parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static proto.Types.blockStatistics parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static proto.Types.blockStatistics parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static proto.Types.blockStatistics parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static proto.Types.blockStatistics parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static proto.Types.blockStatistics parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(proto.Types.blockStatistics prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code proto.blockStatistics}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:proto.blockStatistics)
+        proto.Types.blockStatisticsOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return proto.Types.internal_static_proto_blockStatistics_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return proto.Types.internal_static_proto_blockStatistics_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                proto.Types.blockStatistics.class, proto.Types.blockStatistics.Builder.class);
+      }
+
+      // Construct using proto.Types.blockStatistics.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      public Builder clear() {
+        super.clear();
+        created_ = 0L;
+
+        sign_ = 0L;
+
+        proposed_ = 0L;
+
+        verified_ = 0L;
+
+        decided_ = 0L;
+
+        return this;
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return proto.Types.internal_static_proto_blockStatistics_descriptor;
+      }
+
+      public proto.Types.blockStatistics getDefaultInstanceForType() {
+        return proto.Types.blockStatistics.getDefaultInstance();
+      }
+
+      public proto.Types.blockStatistics build() {
+        proto.Types.blockStatistics result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public proto.Types.blockStatistics buildPartial() {
+        proto.Types.blockStatistics result = new proto.Types.blockStatistics(this);
+        result.created_ = created_;
+        result.sign_ = sign_;
+        result.proposed_ = proposed_;
+        result.verified_ = verified_;
+        result.decided_ = decided_;
+        onBuilt();
+        return result;
+      }
+
+      public Builder clone() {
+        return (Builder) super.clone();
+      }
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return (Builder) super.setField(field, value);
+      }
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return (Builder) super.clearField(field);
+      }
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return (Builder) super.clearOneof(oneof);
+      }
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return (Builder) super.setRepeatedField(field, index, value);
+      }
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return (Builder) super.addRepeatedField(field, value);
+      }
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof proto.Types.blockStatistics) {
+          return mergeFrom((proto.Types.blockStatistics)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(proto.Types.blockStatistics other) {
+        if (other == proto.Types.blockStatistics.getDefaultInstance()) return this;
+        if (other.getCreated() != 0L) {
+          setCreated(other.getCreated());
+        }
+        if (other.getSign() != 0L) {
+          setSign(other.getSign());
+        }
+        if (other.getProposed() != 0L) {
+          setProposed(other.getProposed());
+        }
+        if (other.getVerified() != 0L) {
+          setVerified(other.getVerified());
+        }
+        if (other.getDecided() != 0L) {
+          setDecided(other.getDecided());
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        proto.Types.blockStatistics parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (proto.Types.blockStatistics) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      private long created_ ;
+      /**
+       * <pre>
+       * creation ts
+       * </pre>
+       *
+       * <code>int64 created = 1;</code>
+       */
+      public long getCreated() {
+        return created_;
+      }
+      /**
+       * <pre>
+       * creation ts
+       * </pre>
+       *
+       * <code>int64 created = 1;</code>
+       */
+      public Builder setCreated(long value) {
+        
+        created_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * creation ts
+       * </pre>
+       *
+       * <code>int64 created = 1;</code>
+       */
+      public Builder clearCreated() {
+        
+        created_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      private long sign_ ;
+      /**
+       * <pre>
+       * the time that signature took
+       * </pre>
+       *
+       * <code>int64 sign = 2;</code>
+       */
+      public long getSign() {
+        return sign_;
+      }
+      /**
+       * <pre>
+       * the time that signature took
+       * </pre>
+       *
+       * <code>int64 sign = 2;</code>
+       */
+      public Builder setSign(long value) {
+        
+        sign_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * the time that signature took
+       * </pre>
+       *
+       * <code>int64 sign = 2;</code>
+       */
+      public Builder clearSign() {
+        
+        sign_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      private long proposed_ ;
+      /**
+       * <pre>
+       * propose ts
+       * </pre>
+       *
+       * <code>int64 proposed = 3;</code>
+       */
+      public long getProposed() {
+        return proposed_;
+      }
+      /**
+       * <pre>
+       * propose ts
+       * </pre>
+       *
+       * <code>int64 proposed = 3;</code>
+       */
+      public Builder setProposed(long value) {
+        
+        proposed_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * propose ts
+       * </pre>
+       *
+       * <code>int64 proposed = 3;</code>
+       */
+      public Builder clearProposed() {
+        
+        proposed_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      private long verified_ ;
+      /**
+       * <pre>
+       * verification time
+       * </pre>
+       *
+       * <code>int64 verified = 4;</code>
+       */
+      public long getVerified() {
+        return verified_;
+      }
+      /**
+       * <pre>
+       * verification time
+       * </pre>
+       *
+       * <code>int64 verified = 4;</code>
+       */
+      public Builder setVerified(long value) {
+        
+        verified_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * verification time
+       * </pre>
+       *
+       * <code>int64 verified = 4;</code>
+       */
+      public Builder clearVerified() {
+        
+        verified_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      private long decided_ ;
+      /**
+       * <pre>
+       * decision ts
+       * </pre>
+       *
+       * <code>int64 decided = 5;</code>
+       */
+      public long getDecided() {
+        return decided_;
+      }
+      /**
+       * <pre>
+       * decision ts
+       * </pre>
+       *
+       * <code>int64 decided = 5;</code>
+       */
+      public Builder setDecided(long value) {
+        
+        decided_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * decision ts
+       * </pre>
+       *
+       * <code>int64 decided = 5;</code>
+       */
+      public Builder clearDecided() {
+        
+        decided_ = 0L;
+        onChanged();
+        return this;
+      }
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFieldsProto3(unknownFields);
+      }
+
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:proto.blockStatistics)
+    }
+
+    // @@protoc_insertion_point(class_scope:proto.blockStatistics)
+    private static final proto.Types.blockStatistics DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new proto.Types.blockStatistics();
+    }
+
+    public static proto.Types.blockStatistics getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<blockStatistics>
+        PARSER = new com.google.protobuf.AbstractParser<blockStatistics>() {
+      public blockStatistics parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new blockStatistics(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<blockStatistics> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<blockStatistics> getParserForType() {
+      return PARSER;
+    }
+
+    public proto.Types.blockStatistics getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   public interface BlockOrBuilder extends
       // @@protoc_insertion_point(interface_extends:proto.Block)
       com.google.protobuf.MessageOrBuilder {
@@ -3168,23 +3976,19 @@ public final class Types {
         int index);
 
     /**
-     * <pre>
-     *    BlockFooter footer = 3;
-     * </pre>
-     *
-     * <code>int64 ts = 3;</code>
+     * <code>.proto.blockStatistics st = 3;</code>
      */
-    long getTs();
+    boolean hasSt();
+    /**
+     * <code>.proto.blockStatistics st = 3;</code>
+     */
+    proto.Types.blockStatistics getSt();
+    /**
+     * <code>.proto.blockStatistics st = 3;</code>
+     */
+    proto.Types.blockStatisticsOrBuilder getStOrBuilder();
   }
   /**
-   * <pre>
-   *message BlockFooter {
-   * //    string rmfProof = 1;
-   *    int64 ts = 2;
-   * //    bytes orig = 3; // Enable to cerate an empty block
-   *}
-   * </pre>
-   *
    * Protobuf type {@code proto.Block}
    */
   public  static final class Block extends
@@ -3198,7 +4002,6 @@ public final class Types {
     }
     private Block() {
       data_ = java.util.Collections.emptyList();
-      ts_ = 0L;
     }
 
     @java.lang.Override
@@ -3254,9 +4057,17 @@ public final class Types {
                   input.readMessage(proto.Types.Transaction.parser(), extensionRegistry));
               break;
             }
-            case 24: {
+            case 26: {
+              proto.Types.blockStatistics.Builder subBuilder = null;
+              if (st_ != null) {
+                subBuilder = st_.toBuilder();
+              }
+              st_ = input.readMessage(proto.Types.blockStatistics.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(st_);
+                st_ = subBuilder.buildPartial();
+              }
 
-              ts_ = input.readInt64();
               break;
             }
           }
@@ -3343,17 +4154,25 @@ public final class Types {
       return data_.get(index);
     }
 
-    public static final int TS_FIELD_NUMBER = 3;
-    private long ts_;
+    public static final int ST_FIELD_NUMBER = 3;
+    private proto.Types.blockStatistics st_;
     /**
-     * <pre>
-     *    BlockFooter footer = 3;
-     * </pre>
-     *
-     * <code>int64 ts = 3;</code>
+     * <code>.proto.blockStatistics st = 3;</code>
      */
-    public long getTs() {
-      return ts_;
+    public boolean hasSt() {
+      return st_ != null;
+    }
+    /**
+     * <code>.proto.blockStatistics st = 3;</code>
+     */
+    public proto.Types.blockStatistics getSt() {
+      return st_ == null ? proto.Types.blockStatistics.getDefaultInstance() : st_;
+    }
+    /**
+     * <code>.proto.blockStatistics st = 3;</code>
+     */
+    public proto.Types.blockStatisticsOrBuilder getStOrBuilder() {
+      return getSt();
     }
 
     private byte memoizedIsInitialized = -1;
@@ -3374,8 +4193,8 @@ public final class Types {
       for (int i = 0; i < data_.size(); i++) {
         output.writeMessage(2, data_.get(i));
       }
-      if (ts_ != 0L) {
-        output.writeInt64(3, ts_);
+      if (st_ != null) {
+        output.writeMessage(3, getSt());
       }
       unknownFields.writeTo(output);
     }
@@ -3393,9 +4212,9 @@ public final class Types {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(2, data_.get(i));
       }
-      if (ts_ != 0L) {
+      if (st_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt64Size(3, ts_);
+          .computeMessageSize(3, getSt());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -3420,8 +4239,11 @@ public final class Types {
       }
       result = result && getDataList()
           .equals(other.getDataList());
-      result = result && (getTs()
-          == other.getTs());
+      result = result && (hasSt() == other.hasSt());
+      if (hasSt()) {
+        result = result && getSt()
+            .equals(other.getSt());
+      }
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -3441,9 +4263,10 @@ public final class Types {
         hash = (37 * hash) + DATA_FIELD_NUMBER;
         hash = (53 * hash) + getDataList().hashCode();
       }
-      hash = (37 * hash) + TS_FIELD_NUMBER;
-      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
-          getTs());
+      if (hasSt()) {
+        hash = (37 * hash) + ST_FIELD_NUMBER;
+        hash = (53 * hash) + getSt().hashCode();
+      }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -3538,14 +4361,6 @@ public final class Types {
       return builder;
     }
     /**
-     * <pre>
-     *message BlockFooter {
-     * //    string rmfProof = 1;
-     *    int64 ts = 2;
-     * //    bytes orig = 3; // Enable to cerate an empty block
-     *}
-     * </pre>
-     *
      * Protobuf type {@code proto.Block}
      */
     public static final class Builder extends
@@ -3594,8 +4409,12 @@ public final class Types {
         } else {
           dataBuilder_.clear();
         }
-        ts_ = 0L;
-
+        if (stBuilder_ == null) {
+          st_ = null;
+        } else {
+          st_ = null;
+          stBuilder_ = null;
+        }
         return this;
       }
 
@@ -3634,7 +4453,11 @@ public final class Types {
         } else {
           result.data_ = dataBuilder_.build();
         }
-        result.ts_ = ts_;
+        if (stBuilder_ == null) {
+          result.st_ = st_;
+        } else {
+          result.st_ = stBuilder_.build();
+        }
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -3706,8 +4529,8 @@ public final class Types {
             }
           }
         }
-        if (other.getTs() != 0L) {
-          setTs(other.getTs());
+        if (other.hasSt()) {
+          mergeSt(other.getSt());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -4094,42 +4917,121 @@ public final class Types {
         return dataBuilder_;
       }
 
-      private long ts_ ;
+      private proto.Types.blockStatistics st_ = null;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          proto.Types.blockStatistics, proto.Types.blockStatistics.Builder, proto.Types.blockStatisticsOrBuilder> stBuilder_;
       /**
-       * <pre>
-       *    BlockFooter footer = 3;
-       * </pre>
-       *
-       * <code>int64 ts = 3;</code>
+       * <code>.proto.blockStatistics st = 3;</code>
        */
-      public long getTs() {
-        return ts_;
+      public boolean hasSt() {
+        return stBuilder_ != null || st_ != null;
       }
       /**
-       * <pre>
-       *    BlockFooter footer = 3;
-       * </pre>
-       *
-       * <code>int64 ts = 3;</code>
+       * <code>.proto.blockStatistics st = 3;</code>
        */
-      public Builder setTs(long value) {
-        
-        ts_ = value;
-        onChanged();
+      public proto.Types.blockStatistics getSt() {
+        if (stBuilder_ == null) {
+          return st_ == null ? proto.Types.blockStatistics.getDefaultInstance() : st_;
+        } else {
+          return stBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>.proto.blockStatistics st = 3;</code>
+       */
+      public Builder setSt(proto.Types.blockStatistics value) {
+        if (stBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          st_ = value;
+          onChanged();
+        } else {
+          stBuilder_.setMessage(value);
+        }
+
         return this;
       }
       /**
-       * <pre>
-       *    BlockFooter footer = 3;
-       * </pre>
-       *
-       * <code>int64 ts = 3;</code>
+       * <code>.proto.blockStatistics st = 3;</code>
        */
-      public Builder clearTs() {
-        
-        ts_ = 0L;
-        onChanged();
+      public Builder setSt(
+          proto.Types.blockStatistics.Builder builderForValue) {
+        if (stBuilder_ == null) {
+          st_ = builderForValue.build();
+          onChanged();
+        } else {
+          stBuilder_.setMessage(builderForValue.build());
+        }
+
         return this;
+      }
+      /**
+       * <code>.proto.blockStatistics st = 3;</code>
+       */
+      public Builder mergeSt(proto.Types.blockStatistics value) {
+        if (stBuilder_ == null) {
+          if (st_ != null) {
+            st_ =
+              proto.Types.blockStatistics.newBuilder(st_).mergeFrom(value).buildPartial();
+          } else {
+            st_ = value;
+          }
+          onChanged();
+        } else {
+          stBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <code>.proto.blockStatistics st = 3;</code>
+       */
+      public Builder clearSt() {
+        if (stBuilder_ == null) {
+          st_ = null;
+          onChanged();
+        } else {
+          st_ = null;
+          stBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <code>.proto.blockStatistics st = 3;</code>
+       */
+      public proto.Types.blockStatistics.Builder getStBuilder() {
+        
+        onChanged();
+        return getStFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.proto.blockStatistics st = 3;</code>
+       */
+      public proto.Types.blockStatisticsOrBuilder getStOrBuilder() {
+        if (stBuilder_ != null) {
+          return stBuilder_.getMessageOrBuilder();
+        } else {
+          return st_ == null ?
+              proto.Types.blockStatistics.getDefaultInstance() : st_;
+        }
+      }
+      /**
+       * <code>.proto.blockStatistics st = 3;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          proto.Types.blockStatistics, proto.Types.blockStatistics.Builder, proto.Types.blockStatisticsOrBuilder> 
+          getStFieldBuilder() {
+        if (stBuilder_ == null) {
+          stBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              proto.Types.blockStatistics, proto.Types.blockStatistics.Builder, proto.Types.blockStatisticsOrBuilder>(
+                  getSt(),
+                  getParentForChildren(),
+                  isClean());
+          st_ = null;
+        }
+        return stBuilder_;
       }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -4201,7 +5103,7 @@ public final class Types {
 
     /**
      * <pre>
-     * generic type of data
+     * generic data type
      * </pre>
      *
      * <code>bytes data = 3;</code>
@@ -4370,7 +5272,7 @@ public final class Types {
     private com.google.protobuf.ByteString data_;
     /**
      * <pre>
-     * generic type of data
+     * generic data type
      * </pre>
      *
      * <code>bytes data = 3;</code>
@@ -4852,7 +5754,7 @@ public final class Types {
       private com.google.protobuf.ByteString data_ = com.google.protobuf.ByteString.EMPTY;
       /**
        * <pre>
-       * generic type of data
+       * generic data type
        * </pre>
        *
        * <code>bytes data = 3;</code>
@@ -4862,7 +5764,7 @@ public final class Types {
       }
       /**
        * <pre>
-       * generic type of data
+       * generic data type
        * </pre>
        *
        * <code>bytes data = 3;</code>
@@ -4878,7 +5780,7 @@ public final class Types {
       }
       /**
        * <pre>
-       * generic type of data
+       * generic data type
        * </pre>
        *
        * <code>bytes data = 3;</code>
@@ -5597,9 +6499,17 @@ public final class Types {
     proto.Types.TransactionOrBuilder getTxOrBuilder();
 
     /**
-     * <code>int64 ts = 2;</code>
+     * <code>.proto.blockStatistics st = 3;</code>
      */
-    long getTs();
+    boolean hasSt();
+    /**
+     * <code>.proto.blockStatistics st = 3;</code>
+     */
+    proto.Types.blockStatistics getSt();
+    /**
+     * <code>.proto.blockStatistics st = 3;</code>
+     */
+    proto.Types.blockStatisticsOrBuilder getStOrBuilder();
   }
   /**
    * Protobuf type {@code proto.approved}
@@ -5614,7 +6524,6 @@ public final class Types {
       super(builder);
     }
     private approved() {
-      ts_ = 0L;
     }
 
     @java.lang.Override
@@ -5661,9 +6570,17 @@ public final class Types {
 
               break;
             }
-            case 16: {
+            case 26: {
+              proto.Types.blockStatistics.Builder subBuilder = null;
+              if (st_ != null) {
+                subBuilder = st_.toBuilder();
+              }
+              st_ = input.readMessage(proto.Types.blockStatistics.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(st_);
+                st_ = subBuilder.buildPartial();
+              }
 
-              ts_ = input.readInt64();
               break;
             }
           }
@@ -5711,13 +6628,25 @@ public final class Types {
       return getTx();
     }
 
-    public static final int TS_FIELD_NUMBER = 2;
-    private long ts_;
+    public static final int ST_FIELD_NUMBER = 3;
+    private proto.Types.blockStatistics st_;
     /**
-     * <code>int64 ts = 2;</code>
+     * <code>.proto.blockStatistics st = 3;</code>
      */
-    public long getTs() {
-      return ts_;
+    public boolean hasSt() {
+      return st_ != null;
+    }
+    /**
+     * <code>.proto.blockStatistics st = 3;</code>
+     */
+    public proto.Types.blockStatistics getSt() {
+      return st_ == null ? proto.Types.blockStatistics.getDefaultInstance() : st_;
+    }
+    /**
+     * <code>.proto.blockStatistics st = 3;</code>
+     */
+    public proto.Types.blockStatisticsOrBuilder getStOrBuilder() {
+      return getSt();
     }
 
     private byte memoizedIsInitialized = -1;
@@ -5735,8 +6664,8 @@ public final class Types {
       if (tx_ != null) {
         output.writeMessage(1, getTx());
       }
-      if (ts_ != 0L) {
-        output.writeInt64(2, ts_);
+      if (st_ != null) {
+        output.writeMessage(3, getSt());
       }
       unknownFields.writeTo(output);
     }
@@ -5750,9 +6679,9 @@ public final class Types {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(1, getTx());
       }
-      if (ts_ != 0L) {
+      if (st_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt64Size(2, ts_);
+          .computeMessageSize(3, getSt());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -5775,8 +6704,11 @@ public final class Types {
         result = result && getTx()
             .equals(other.getTx());
       }
-      result = result && (getTs()
-          == other.getTs());
+      result = result && (hasSt() == other.hasSt());
+      if (hasSt()) {
+        result = result && getSt()
+            .equals(other.getSt());
+      }
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -5792,9 +6724,10 @@ public final class Types {
         hash = (37 * hash) + TX_FIELD_NUMBER;
         hash = (53 * hash) + getTx().hashCode();
       }
-      hash = (37 * hash) + TS_FIELD_NUMBER;
-      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
-          getTs());
+      if (hasSt()) {
+        hash = (37 * hash) + ST_FIELD_NUMBER;
+        hash = (53 * hash) + getSt().hashCode();
+      }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -5930,8 +6863,12 @@ public final class Types {
           tx_ = null;
           txBuilder_ = null;
         }
-        ts_ = 0L;
-
+        if (stBuilder_ == null) {
+          st_ = null;
+        } else {
+          st_ = null;
+          stBuilder_ = null;
+        }
         return this;
       }
 
@@ -5959,7 +6896,11 @@ public final class Types {
         } else {
           result.tx_ = txBuilder_.build();
         }
-        result.ts_ = ts_;
+        if (stBuilder_ == null) {
+          result.st_ = st_;
+        } else {
+          result.st_ = stBuilder_.build();
+        }
         onBuilt();
         return result;
       }
@@ -6004,8 +6945,8 @@ public final class Types {
         if (other.hasTx()) {
           mergeTx(other.getTx());
         }
-        if (other.getTs() != 0L) {
-          setTs(other.getTs());
+        if (other.hasSt()) {
+          mergeSt(other.getSt());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -6151,30 +7092,121 @@ public final class Types {
         return txBuilder_;
       }
 
-      private long ts_ ;
+      private proto.Types.blockStatistics st_ = null;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          proto.Types.blockStatistics, proto.Types.blockStatistics.Builder, proto.Types.blockStatisticsOrBuilder> stBuilder_;
       /**
-       * <code>int64 ts = 2;</code>
+       * <code>.proto.blockStatistics st = 3;</code>
        */
-      public long getTs() {
-        return ts_;
+      public boolean hasSt() {
+        return stBuilder_ != null || st_ != null;
       }
       /**
-       * <code>int64 ts = 2;</code>
+       * <code>.proto.blockStatistics st = 3;</code>
        */
-      public Builder setTs(long value) {
-        
-        ts_ = value;
-        onChanged();
+      public proto.Types.blockStatistics getSt() {
+        if (stBuilder_ == null) {
+          return st_ == null ? proto.Types.blockStatistics.getDefaultInstance() : st_;
+        } else {
+          return stBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>.proto.blockStatistics st = 3;</code>
+       */
+      public Builder setSt(proto.Types.blockStatistics value) {
+        if (stBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          st_ = value;
+          onChanged();
+        } else {
+          stBuilder_.setMessage(value);
+        }
+
         return this;
       }
       /**
-       * <code>int64 ts = 2;</code>
+       * <code>.proto.blockStatistics st = 3;</code>
        */
-      public Builder clearTs() {
-        
-        ts_ = 0L;
-        onChanged();
+      public Builder setSt(
+          proto.Types.blockStatistics.Builder builderForValue) {
+        if (stBuilder_ == null) {
+          st_ = builderForValue.build();
+          onChanged();
+        } else {
+          stBuilder_.setMessage(builderForValue.build());
+        }
+
         return this;
+      }
+      /**
+       * <code>.proto.blockStatistics st = 3;</code>
+       */
+      public Builder mergeSt(proto.Types.blockStatistics value) {
+        if (stBuilder_ == null) {
+          if (st_ != null) {
+            st_ =
+              proto.Types.blockStatistics.newBuilder(st_).mergeFrom(value).buildPartial();
+          } else {
+            st_ = value;
+          }
+          onChanged();
+        } else {
+          stBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <code>.proto.blockStatistics st = 3;</code>
+       */
+      public Builder clearSt() {
+        if (stBuilder_ == null) {
+          st_ = null;
+          onChanged();
+        } else {
+          st_ = null;
+          stBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <code>.proto.blockStatistics st = 3;</code>
+       */
+      public proto.Types.blockStatistics.Builder getStBuilder() {
+        
+        onChanged();
+        return getStFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.proto.blockStatistics st = 3;</code>
+       */
+      public proto.Types.blockStatisticsOrBuilder getStOrBuilder() {
+        if (stBuilder_ != null) {
+          return stBuilder_.getMessageOrBuilder();
+        } else {
+          return st_ == null ?
+              proto.Types.blockStatistics.getDefaultInstance() : st_;
+        }
+      }
+      /**
+       * <code>.proto.blockStatistics st = 3;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          proto.Types.blockStatistics, proto.Types.blockStatistics.Builder, proto.Types.blockStatisticsOrBuilder> 
+          getStFieldBuilder() {
+        if (stBuilder_ == null) {
+          stBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              proto.Types.blockStatistics, proto.Types.blockStatistics.Builder, proto.Types.blockStatisticsOrBuilder>(
+                  getSt(),
+                  getParentForChildren(),
+                  isClean());
+          st_ = null;
+        }
+        return stBuilder_;
       }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -11124,6 +12156,11 @@ public final class Types {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_proto_BlockHeader_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_proto_blockStatistics_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_proto_blockStatistics_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_proto_Block_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -11195,23 +12232,27 @@ public final class Types {
       "oto.Meta\022\020\n\010decosion\030\002 \001(\005\"k\n\013BlockHeade" +
       "r\022\026\n\001m\030\001 \001(\0132\013.proto.Meta\022\014\n\004prev\030\002 \001(\014\022" +
       "\016\n\006height\030\003 \001(\005\022\027\n\017transactionHash\030\004 \001(\014" +
-      "\022\r\n\005proof\030\005 \001(\t\"Y\n\005Block\022\"\n\006header\030\001 \001(\013" +
-      "2\022.proto.BlockHeader\022 \n\004data\030\002 \003(\0132\022.pro" +
-      "to.Transaction\022\n\n\002ts\030\003 \001(\003\"_\n\013Transactio" +
-      "n\022\020\n\010clientID\030\001 \001(\005\022\014\n\004txID\030\002 \001(\t\022\014\n\004dat" +
-      "a\030\003 \001(\014\022\020\n\010clientTs\030\004 \001(\003\022\020\n\010serverTs\030\005 " +
-      "\001(\003\"*\n\010accepted\022\020\n\010accepted\030\001 \001(\010\022\014\n\004txI" +
-      "D\030\002 \001(\t\"6\n\010approved\022\036\n\002tx\030\001 \001(\0132\022.proto." +
-      "Transaction\022\n\n\002ts\030\002 \001(\003\"\024\n\004read\022\014\n\004txID\030" +
-      "\001 \001(\t\"S\n\tForkProof\022\016\n\006sender\030\001 \001(\005\022\032\n\004cu" +
-      "rr\030\002 \001(\0132\014.proto.Block\022\032\n\004prev\030\004 \001(\0132\014.p" +
-      "roto.Block\"-\n\005RBMsg\022\026\n\001m\030\001 \001(\0132\013.proto.M" +
-      "eta\022\014\n\004data\030\003 \001(\014\"\007\n\005Empty\"!\n\003Req\022\032\n\005_me" +
-      "ta\030\001 \001(\0132\013.proto.Meta\"9\n\003Res\022\026\n\001m\030\001 \001(\0132" +
-      "\013.proto.Meta\022\032\n\004data\030\002 \001(\0132\014.proto.Block" +
-      "\"`\n\017subChainVersion\022\021\n\tforkPoint\030\001 \001(\005\022\021" +
-      "\n\tsuggested\030\002 \001(\005\022\027\n\001v\030\003 \003(\0132\014.proto.Blo" +
-      "ck\022\016\n\006sender\030\004 \001(\005B\007\n\005protob\006proto3"
+      "\022\r\n\005proof\030\005 \001(\t\"e\n\017blockStatistics\022\017\n\007cr" +
+      "eated\030\001 \001(\003\022\014\n\004sign\030\002 \001(\003\022\020\n\010proposed\030\003 " +
+      "\001(\003\022\020\n\010verified\030\004 \001(\003\022\017\n\007decided\030\005 \001(\003\"q" +
+      "\n\005Block\022\"\n\006header\030\001 \001(\0132\022.proto.BlockHea" +
+      "der\022 \n\004data\030\002 \003(\0132\022.proto.Transaction\022\"\n" +
+      "\002st\030\003 \001(\0132\026.proto.blockStatistics\"_\n\013Tra" +
+      "nsaction\022\020\n\010clientID\030\001 \001(\005\022\014\n\004txID\030\002 \001(\t" +
+      "\022\014\n\004data\030\003 \001(\014\022\020\n\010clientTs\030\004 \001(\003\022\020\n\010serv" +
+      "erTs\030\005 \001(\003\"*\n\010accepted\022\020\n\010accepted\030\001 \001(\010" +
+      "\022\014\n\004txID\030\002 \001(\t\"N\n\010approved\022\036\n\002tx\030\001 \001(\0132\022" +
+      ".proto.Transaction\022\"\n\002st\030\003 \001(\0132\026.proto.b" +
+      "lockStatistics\"\024\n\004read\022\014\n\004txID\030\001 \001(\t\"S\n\t" +
+      "ForkProof\022\016\n\006sender\030\001 \001(\005\022\032\n\004curr\030\002 \001(\0132" +
+      "\014.proto.Block\022\032\n\004prev\030\004 \001(\0132\014.proto.Bloc" +
+      "k\"-\n\005RBMsg\022\026\n\001m\030\001 \001(\0132\013.proto.Meta\022\014\n\004da" +
+      "ta\030\003 \001(\014\"\007\n\005Empty\"!\n\003Req\022\032\n\005_meta\030\001 \001(\0132" +
+      "\013.proto.Meta\"9\n\003Res\022\026\n\001m\030\001 \001(\0132\013.proto.M" +
+      "eta\022\032\n\004data\030\002 \001(\0132\014.proto.Block\"`\n\017subCh" +
+      "ainVersion\022\021\n\tforkPoint\030\001 \001(\005\022\021\n\tsuggest" +
+      "ed\030\002 \001(\005\022\027\n\001v\030\003 \003(\0132\014.proto.Block\022\016\n\006sen" +
+      "der\030\004 \001(\005B\007\n\005protob\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -11249,68 +12290,74 @@ public final class Types {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_BlockHeader_descriptor,
         new java.lang.String[] { "M", "Prev", "Height", "TransactionHash", "Proof", });
-    internal_static_proto_Block_descriptor =
+    internal_static_proto_blockStatistics_descriptor =
       getDescriptor().getMessageTypes().get(4);
+    internal_static_proto_blockStatistics_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_proto_blockStatistics_descriptor,
+        new java.lang.String[] { "Created", "Sign", "Proposed", "Verified", "Decided", });
+    internal_static_proto_Block_descriptor =
+      getDescriptor().getMessageTypes().get(5);
     internal_static_proto_Block_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_Block_descriptor,
-        new java.lang.String[] { "Header", "Data", "Ts", });
+        new java.lang.String[] { "Header", "Data", "St", });
     internal_static_proto_Transaction_descriptor =
-      getDescriptor().getMessageTypes().get(5);
+      getDescriptor().getMessageTypes().get(6);
     internal_static_proto_Transaction_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_Transaction_descriptor,
         new java.lang.String[] { "ClientID", "TxID", "Data", "ClientTs", "ServerTs", });
     internal_static_proto_accepted_descriptor =
-      getDescriptor().getMessageTypes().get(6);
+      getDescriptor().getMessageTypes().get(7);
     internal_static_proto_accepted_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_accepted_descriptor,
         new java.lang.String[] { "Accepted", "TxID", });
     internal_static_proto_approved_descriptor =
-      getDescriptor().getMessageTypes().get(7);
+      getDescriptor().getMessageTypes().get(8);
     internal_static_proto_approved_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_approved_descriptor,
-        new java.lang.String[] { "Tx", "Ts", });
+        new java.lang.String[] { "Tx", "St", });
     internal_static_proto_read_descriptor =
-      getDescriptor().getMessageTypes().get(8);
+      getDescriptor().getMessageTypes().get(9);
     internal_static_proto_read_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_read_descriptor,
         new java.lang.String[] { "TxID", });
     internal_static_proto_ForkProof_descriptor =
-      getDescriptor().getMessageTypes().get(9);
+      getDescriptor().getMessageTypes().get(10);
     internal_static_proto_ForkProof_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_ForkProof_descriptor,
         new java.lang.String[] { "Sender", "Curr", "Prev", });
     internal_static_proto_RBMsg_descriptor =
-      getDescriptor().getMessageTypes().get(10);
+      getDescriptor().getMessageTypes().get(11);
     internal_static_proto_RBMsg_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_RBMsg_descriptor,
         new java.lang.String[] { "M", "Data", });
     internal_static_proto_Empty_descriptor =
-      getDescriptor().getMessageTypes().get(11);
+      getDescriptor().getMessageTypes().get(12);
     internal_static_proto_Empty_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_Empty_descriptor,
         new java.lang.String[] { });
     internal_static_proto_Req_descriptor =
-      getDescriptor().getMessageTypes().get(12);
+      getDescriptor().getMessageTypes().get(13);
     internal_static_proto_Req_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_Req_descriptor,
         new java.lang.String[] { "Meta", });
     internal_static_proto_Res_descriptor =
-      getDescriptor().getMessageTypes().get(13);
+      getDescriptor().getMessageTypes().get(14);
     internal_static_proto_Res_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_Res_descriptor,
         new java.lang.String[] { "M", "Data", });
     internal_static_proto_subChainVersion_descriptor =
-      getDescriptor().getMessageTypes().get(14);
+      getDescriptor().getMessageTypes().get(15);
     internal_static_proto_subChainVersion_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_subChainVersion_descriptor,

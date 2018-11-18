@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class block {
-    private Block.Builder blockBuilder = Block.newBuilder();
+    public Block.Builder blockBuilder = Block.newBuilder();
 
     abstract public boolean validateTransaction(Transaction t);
 
@@ -43,7 +43,8 @@ public abstract class block {
         if (header != null) {
             headerArray = header.toByteArray();
         }
-        blockBuilder.setHeader(BlockHeader.newBuilder()
+        blockBuilder
+                .setHeader(BlockHeader.newBuilder()
                         .setM(Meta.newBuilder()
                                 .setCid(cid)
                                 .setCidSeries(cidSeries)
@@ -72,12 +73,15 @@ public abstract class block {
 //                        .toBuilder()
 //                        .build())
 //                .build();
+        long start = System.currentTimeMillis();
+        String signature = blockDigSig.sign(blockBuilder.getHeader());
         return blockBuilder
                 .setHeader(blockBuilder
                         .getHeader()
                         .toBuilder()
-                .setProof(blockDigSig.sign(blockBuilder.getHeader()))
+                .setProof(signature)
                 .build())
+                .setSt(blockBuilder.getSt().toBuilder().setSign(System.currentTimeMillis() - start))
                 .build();
     }
 

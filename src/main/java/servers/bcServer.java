@@ -504,7 +504,7 @@ public abstract class bcServer extends Node {
     }
 
     void createTxToBlock() {
-        for (int i = 0 ; i < maxTransactionInBlock ; i++) {
+        while (currBlock.getTransactionCount() < maxTransactionInBlock) {
             long ts = System.currentTimeMillis();
             SecureRandom random = new SecureRandom();
             byte[] tx = new byte[txSize];
@@ -523,12 +523,11 @@ public abstract class bcServer extends Node {
     void addTransactionsToCurrBlock() {
         if (currBlock != null) return;
         currBlock = bc.createNewBLock();
+        currBlock.blockBuilder.setSt(blockStatistics
+                .newBuilder()
+                .setCreated(System.currentTimeMillis())
+                .build());
 //        if (testing && bc.getHeight() < 20) return;
-
-//        if (testing) {
-//            createTxToBlock();
-//            return;
-//        }
 
 //        if (transactionsPool.size() < maxTransactionInBlock) return;
 //        if (transactionsPool.size() < maxTransactionInBlock) return;
@@ -538,7 +537,7 @@ public abstract class bcServer extends Node {
 //                logger.debug(format("There are not enough transactions in pool [%d, %d]", cidSeries, cid));
 //                return;
 //            }
-            if (transactionsPool.size() == 0) return;
+//            if (transactionsPool.size() == 0) return;
             while ((!transactionsPool.isEmpty()) && currBlock.getTransactionCount() < maxTransactionInBlock) {
                 Transaction t = transactionsPool.poll();
 //                transactionsPool.remove(0);
@@ -549,6 +548,9 @@ public abstract class bcServer extends Node {
                     continue;
                 }
                 currBlock.addTransaction(t);
+            }
+            if (testing) {
+                createTxToBlock();
             }
 //            txSem.release(currBlock.getTransactionCount());
 //        }

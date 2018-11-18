@@ -29,7 +29,7 @@ public class chainCutter {
             cutBlock(b);
             bc.setBlock(b.getHeader().getHeight(), Types.Block.newBuilder()
                     .setHeader(b.getHeader())
-                    .setTs(b.getTs())
+                    .setSt(b.getSt())
                     .build());
         }
     }
