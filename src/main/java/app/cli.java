@@ -66,10 +66,10 @@ public class cli {
                             "Usage: bm -t [transaction size] -s [amount of loaded transactions] -p [path to csv]")
                     .build());
 
-//            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-//                writeSummery(outPath);
-//                writeBlocksStatistics(outPath);
-//            }));
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                writeSummery(outPath);
+                writeBlocksStatistics(outPath);
+            }));
         }
 
 
@@ -104,7 +104,7 @@ public class cli {
                     return;
                 }
                 if (args[0].equals("quit")) {
-                    writeSummery("/tmp/JToy/res");
+//                    writeSummery("/tmp/JToy/res");
                     System.exit(0);
                     return;
                 }
@@ -348,25 +348,25 @@ public class cli {
                 long lts = 0;
                 int tCount = 0;
                 int txSize = -1;
-                fts = JToy.s.nonBlockingDeliver(1).getTs();
-                lts = JToy.s.nonBlockingDeliver(nob - 1).getTs();
+                fts = JToy.s.nonBlockingDeliver(1).getSt().getDecided();
+                lts = JToy.s.nonBlockingDeliver(nob - 1).getSt().getDecided();
                 tCount = (nob - 1) * Config.getMaxTransactionsInBlock();
                 txSize = JToy.s.nonBlockingDeliver(1).getData(0).getSerializedSize();
                 for (int i = 0 ; i < nob ; i++) {
                     Types.Block b = JToy.s.nonBlockingDeliver(i);
                     for (Types.Transaction t : b.getDataList()) {
                         if (fts == 0) {
-                            fts = b.getTs();
+                            fts = b.getSt().getDecided();
                             lts = fts;
                         }
-                        fts = min(fts, b.getTs());
-                        lts = max(lts, b.getTs());
+                        fts = min(fts, b.getSt().getDecided());
+                        lts = max(lts, b.getSt().getDecided());
                         tCount++;
                         if (txSize == -1) {
                             txSize = t.getSerializedSize();
                         }
                         List<String> row = Arrays.asList(t.getTxID(), String.valueOf(t.getSerializedSize()),
-                                String.valueOf(t.getClientID()), String.valueOf(b.getTs()),
+                                String.valueOf(t.getClientID()), String.valueOf(b.getSt().getDecided()),
                                 String.valueOf(t.getData().size()), String.valueOf(i),
                                 String.valueOf(b.getHeader().getM().getSender()));
                         CSVUtils.writeLine(writer, row);
@@ -387,7 +387,7 @@ public class cli {
             for (int i = 0 ; i < nob ; i++) {
                 Types.Block b = JToy.s.nonBlockingDeliver(i);
                 for (Types.Transaction t : b.getDataList()) {
-                    avgWt += b.getTs() - Longs.fromByteArray(Arrays.copyOfRange(t.getData().toByteArray(), 0, 8));
+                    avgWt += b.getSt().getDecided() - Longs.fromByteArray(Arrays.copyOfRange(t.getData().toByteArray(), 0, 8));
                 }
             }
             Path path = Paths.get(pathString,   String.valueOf(JToy.s.getID()), "summery.csv");
@@ -431,35 +431,35 @@ public class cli {
         }
 
         void writeBlocksStatistics(String pathString)  {
-//            Path path = Paths.get(pathString,   String.valueOf(JToy.s.getID()), "blocksStat.csv");
-//            try {
-//                File f = new File(path.toString());
-//                if (!f.exists()) {
-//                    f.getParentFile().mkdirs();
-//                    f.createNewFile();
-//                }
-//                FileWriter writer = null;
-//                writer = new FileWriter(path.toString(), true);
-//                int nob = JToy.s.getBCSize();
-//                DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy-HH:mm:ss");
-//                statistics st = JToy.s.getStatistics();
-//                for (int i = 0 ; i < nob ; i++) {
-//                    Types.Block b = JToy.s.nonBlockingDeliver(i);
-//                    List<String> row = Arrays.asList(String.valueOf(JToy.s.getID()),
-//                            JToy.type, String.valueOf(Config.getC()), String.valueOf(st.txSize),
-//                            String.valueOf(Config.getMaxTransactionsInBlock()),
-//                            String.valueOf(b.getDataCount()),
-//                            String.valueOf(b.getHeader().getHeight()),
-//                            String.valueOf(b.getSt().getSign()), String.valueOf(b.getSt().getProposed() - b.getSt().getCreated()),
-//                            String.valueOf(b.getSt().getVerified()), String.valueOf(b.getSt().getDecided() - b.getSt().getProposed()),
-//                            String.valueOf(b.getSt().getDecided() - b.getSt().getCreated()));
-//                    CSVUtils.writeLine(writer, row);
-//                }
-//                writer.flush();
-//                writer.close();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
+            Path path = Paths.get(pathString,   String.valueOf(JToy.s.getID()), "blocksStat.csv");
+            try {
+                File f = new File(path.toString());
+                if (!f.exists()) {
+                    f.getParentFile().mkdirs();
+                    f.createNewFile();
+                }
+                FileWriter writer = null;
+                writer = new FileWriter(path.toString(), true);
+                int nob = JToy.s.getBCSize();
+                DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy-HH:mm:ss");
+                statistics st = JToy.s.getStatistics();
+                for (int i = 0 ; i < nob ; i++) {
+                    Types.Block b = JToy.s.nonBlockingDeliver(i);
+                    List<String> row = Arrays.asList(String.valueOf(JToy.s.getID()),
+                            JToy.type, String.valueOf(Config.getC()), String.valueOf(st.txSize),
+                            String.valueOf(Config.getMaxTransactionsInBlock()),
+                            String.valueOf(b.getDataCount()),
+                            String.valueOf(b.getHeader().getHeight()),
+                            String.valueOf(b.getSt().getSign()), String.valueOf(b.getSt().getProposed() - b.getSt().getCreated()),
+                            String.valueOf(b.getSt().getVerified()), String.valueOf(b.getSt().getDecided() - b.getSt().getProposed()),
+                            String.valueOf(b.getSt().getDecided() - b.getSt().getCreated()));
+                    CSVUtils.writeLine(writer, row);
+                }
+                writer.flush();
+                writer.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         private void runBenchMark(int tSize, int tNumber, String csvPath) throws InterruptedException {
 

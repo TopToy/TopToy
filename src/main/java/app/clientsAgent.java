@@ -135,7 +135,7 @@ public class clientsAgent {
     static void collectSummery(stat st, Types.approved app) {
         st.txCount++;
         st.diff += System.currentTimeMillis() - app.getTx().getClientTs();
-        st.diffServer = app.getTs() - app.getTx().getServerTs();
+        st.diffServer = app.getSt().getDecided() - app.getTx().getServerTs();
         st.txSize = app.getTx().getSerializedSize();
     }
 

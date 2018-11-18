@@ -170,7 +170,7 @@ public class bftsmartBCserver implements server {
                             .setPrev(ByteString.copyFrom(DigestMethod.hash(
                                     bc.getBlock(bc.getHeight()).getHeader().toByteArray())))
                             .build())
-                    .setTs(System.currentTimeMillis())
+                    .setSt(recBlock.getSt().toBuilder().setDecided(System.currentTimeMillis()).build())
                     .build();
             for (int i = 0; i < recBlock.getDataCount(); i++) {
                 synchronized (approvedTx) {

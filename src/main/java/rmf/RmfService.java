@@ -488,13 +488,23 @@ public class RmfService extends RmfGrpc.RmfImplBase {
     }
 
     void rmfBroadcast(Block msg) {
+        msg = msg
+                .toBuilder()
+                .setSt(msg.getSt()
+                        .toBuilder()
+                        .setProposed(System.currentTimeMillis()))
+                .build();
         for (peer p : peers.values()) {
             sendDataMessage(p.stub, msg);
         }
     }
     private void addToPendings(Block request) {
         int sender = request.getHeader().getM().getSender();
+        long start = System.currentTimeMillis();
         if (!blockDigSig.verify(sender, request)) return;
+        request = request.toBuilder()
+                .setSt(request.getSt().toBuilder().setVerified(System.currentTimeMillis() - start))
+                .build();
         int cid = request.getHeader().getM().getCid();
         int channel = request.getHeader().getM().getChannel();
         int cidSeries = request.getHeader().getM().getCidSeries();
@@ -901,10 +911,14 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                             .copyFrom(DigestMethod
                                     .hash(curr.getHeader().toByteArray())))
                             .build());
-
+        long start = System.currentTimeMillis();
+        String signature = blockDigSig.sign(next.getHeader());
         return nextBuilder.setHeader(nextBuilder.getHeader().toBuilder()
-                .setProof(blockDigSig.sign(next.getHeader())).build()).build();
-
+                .setProof(signature))
+                .setSt(nextBuilder.getSt().toBuilder()
+                        .setSign(System.currentTimeMillis() - start)
+                        .setProposed(System.currentTimeMillis()))
+                .build();
     }
     
 }

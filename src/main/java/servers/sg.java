@@ -67,8 +67,8 @@ public class sg implements server {
     Path cutterDirName = Paths.get(System.getProperty("user.dir"), "blocks");
     private Server txsServer;
 //    private ExecutorService chainCutterExecutor =  Executors.newSingleThreadExecutor();
-    private ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(2);
-    private EventLoopGroup gnio = new NioEventLoopGroup(2);
+//    private ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(2);
+//    private EventLoopGroup gnio = new NioEventLoopGroup(2);
 
 
     public sg(String addr, int port, int id, int f, int c, int tmo, int tmoInterval,
@@ -118,19 +118,19 @@ public class sg implements server {
             }
         }
         bc = group[0].initBC(id, -1);
-        try {
-            txsServer = NettyServerBuilder
-                    .forPort(9876)
-                    .executor(executor)
-                    .bossEventLoopGroup(gnio)
-                    .workerEventLoopGroup(gnio)
-                    .addService(new txServer(this))
-                    .build()
-                    .start();
-            logger.info("starting tx server");
-        } catch (IOException e) {
-            logger.error("", e);
-        }
+//        try {
+//            txsServer = NettyServerBuilder
+//                    .forPort(9876)
+//                    .executor(executor)
+//                    .bossEventLoopGroup(gnio)
+//                    .workerEventLoopGroup(gnio)
+//                    .addService(new txServer(this))
+//                    .build()
+//                    .start();
+//            logger.info("starting tx server");
+//        } catch (IOException e) {
+//            logger.error("", e);
+//        }
         new chainCutter(cutterDirName);
         logger.info(format("cutter batch is %d", cutterBatch));
     }
@@ -161,7 +161,7 @@ public class sg implements server {
                                 DigestMethod.hash(bc.getBlock(bc.getHeight()).getHeader().toByteArray())))
 //                                .setPresent(true)
                             .build())
-                            .setTs(System.currentTimeMillis())
+                            .setSt(cBlock.getSt().toBuilder().setDecided(System.currentTimeMillis()))
                         .build();
                 synchronized (bc) {
                     bc.addBlock(cBlock);
@@ -189,13 +189,13 @@ public class sg implements server {
 
     void updateStat(Types.Block b) {
         if (b.getHeader().getHeight() == 1) {
-            sts.firstTxTs = b.getTs();
+            sts.firstTxTs = b.getSt().getDecided();
             sts.txSize = b.getData(0).getSerializedSize();
         }
-        sts.lastTxTs = max(sts.lastTxTs, b.getTs());
+        sts.lastTxTs = max(sts.lastTxTs, b.getSt().getDecided());
         sts.txCount += b.getDataCount();
 //        logger.info(format("data count is %d, bc size is: %d, total: %d", b.getDataCount(), bc.getHeight(), sts.txCount));
-        long bTs = b.getTs();
+        long bTs = b.getSt().getDecided();
         for (Types.Transaction t : b.getDataList()) {
             txMap.put(t.getTxID(), b.getHeader().getHeight());
 //            long diff = bTs - Longs.fromByteArray(Arrays.copyOfRange(t.getData().toByteArray(), 0, 8));
@@ -330,12 +330,9 @@ public class sg implements server {
                 chan = i;
             }
         }
-        Types.Transaction ntx = Types.Transaction.newBuilder()
-                .setClientID(tx.getClientID())
-                .setData(tx.getData())
+        Types.Transaction ntx = tx.toBuilder()
                 .setServerTs(System.currentTimeMillis())
                 .setTxID(UUID.randomUUID().toString())
-                .setClientTs(tx.getClientTs())
                 .build();
         return group[chan].addTransaction(ntx);
     }
@@ -375,7 +372,7 @@ public class sg implements server {
         if (b == null) return Types.approved.getDefaultInstance();
         for (Types.Transaction t : b.getDataList()) {
             if (t.getTxID().equals(txID)) {
-                return Types.approved.newBuilder().setTs(b.getTs()).setTx(t).build();
+                return Types.approved.newBuilder().setSt(b.getSt()).setTx(t).build();
             }
         }
         return Types.approved.getDefaultInstance();

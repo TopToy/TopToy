@@ -225,8 +225,7 @@ public class hlfBCserver implements server {
                 .setHeight(bc.getHeight() + 1)
                 .setPrev(ByteString.copyFrom(DigestMethod.hash(
                         bc.getBlock(bc.getHeight()).getHeader().toByteArray())))
-                .build())
-        .setTs(System.currentTimeMillis());
+                .build());
         return b.build();
 
     }
