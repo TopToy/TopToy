@@ -34,7 +34,7 @@ import static java.lang.String.valueOf;
 public class cli {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(cli.class);
         private Options options = new Options();
-
+        static String outPath = "/tmp/JToy/res/";
         public cli() {
             options.addOption("help", "print this message");
             options.addOption("init", "init the server");
@@ -66,15 +66,16 @@ public class cli {
                             "Usage: bm -t [transaction size] -s [amount of loaded transactions] -p [path to csv]")
                     .build());
 
-            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                writeSummery("/tmp/JToy/res/");
-            }));
+//            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+//                writeSummery(outPath);
+//                writeBlocksStatistics(outPath);
+//            }));
         }
 
 
-        void parse(String[] args) {
+        void parse(String[] args) throws InterruptedException, IOException {
 //            CommandLineParser parser = new DefaultParser();
-            try {
+//            try {
 //                CommandLine line = parser.parse(options, args);
                 if (args[0].equals("help")) {
                     help();
@@ -103,6 +104,7 @@ public class cli {
                     return;
                 }
                 if (args[0].equals("quit")) {
+                    writeSummery("/tmp/JToy/res");
                     System.exit(0);
                     return;
                 }
@@ -121,9 +123,10 @@ public class cli {
                         logger.debug("Unable to set async behaviour to non async server");
                         return;
                     }
-                    if (args.length == 2) {
+                    if (args.length == 3) {
                         int sec = Integer.parseInt(args[1]);
-                        JToy.s.setAsyncParam(sec);
+                        int duration = Integer.parseInt(args[2]);
+                        asyncPeriod(sec * 1000, duration);
                     }
                     return;
                 }
@@ -193,10 +196,10 @@ public class cli {
 
 
                 }
-                System.out.println(format("Invalid command %s", Arrays.toString(args)));
-            } catch (Exception e) {
-                logger.error("", e);
-            }
+                logger.error(format("Invalid command %s", Arrays.toString(args)));
+//            } catch (Exception e) {
+//                logger.error("", e);
+//            }
 
         }
         private void help() {
@@ -242,31 +245,6 @@ public class cli {
             return null;
         }
 
-        int signForExec(Types.Block b, int c) {
-            logger.info(format("starting signForExec [%d]", c));
-            int sigCount = 0;
-            long t = System.currentTimeMillis();
-            while (System.currentTimeMillis()- t < 30 * 1000) {
-                blockDigSig.sign(b.getHeader());
-                sigCount++;
-            }
-            int avgSig = sigCount / 30;
-            logger.info(format("finishing signForExec [%d] avg is [%d]", c, avgSig));
-            return avgSig;
-        }
-
-        int verForExec(Types.Block b, int c) {
-            logger.info(format("starting verForExec [%d]", c));
-            int verCount = 0;
-            long t = System.currentTimeMillis();
-            while (System.currentTimeMillis() - t < 30 * 1000) {
-                blockDigSig.verify(JToy.s.getID(), b);
-                verCount++;
-            }
-            int avgVer = verCount / 30;
-            logger.info(format("finishing verForExec [%d] avg is [%d]", c, avgVer));
-            return avgVer;
-        }
         private void sigTets(String pathString) throws IOException, InterruptedException {
             logger.info(format("Starting sigTest [%d, %d]", Config.getTxSize(), Config.getMaxTransactionsInBlock()));
             ExecutorService executor = Executors.newFixedThreadPool(Config.getC());
@@ -407,7 +385,6 @@ public class cli {
             int newTxCount = 0;
             int nob = JToy.s.getBCSize();
             for (int i = 0 ; i < nob ; i++) {
-
                 Types.Block b = JToy.s.nonBlockingDeliver(i);
                 for (Types.Transaction t : b.getDataList()) {
                     avgWt += b.getTs() - Longs.fromByteArray(Arrays.copyOfRange(t.getData().toByteArray(), 0, 8));
@@ -438,12 +415,12 @@ public class cli {
                 double dRate = ((double)st.deliveredTime) / ((double) st.all);
                 DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy-HH:mm:ss");
                 List<String> row = Arrays.asList(dateFormat.format(new Date()), String.valueOf(JToy.s.getID()),
-                        JToy.type, String.valueOf(Config.getC()), String.valueOf(Config.getFastMode()),
+                        JToy.type, String.valueOf(Config.getC()), String.valueOf(Config.getTMO()), String.valueOf(Config.getFastMode()),
                         String.valueOf(st.txSize), String.valueOf(Config.getMaxTransactionsInBlock()),
                         String.valueOf(st.txCount), String.valueOf(time), String.valueOf(thrp),
 //                        String.valueOf(st.totalDec), String.valueOf(st.optemisticDec), String.valueOf(opRate),
-                        String.valueOf(nob), String.valueOf(avgTxInBlock), String.valueOf(delaysAvgMs), String.valueOf(eRate),
-                        String.valueOf(dRate));
+                        String.valueOf(nob), String.valueOf(avgTxInBlock),String.valueOf(delaysAvgMs), String.valueOf(opRate),
+                        String.valueOf(eRate), String.valueOf(dRate));
                 CSVUtils.writeLine(writer, row);
                 writer.flush();
                 writer.close();
@@ -451,6 +428,38 @@ public class cli {
                 e.printStackTrace();
             }
 
+        }
+
+        void writeBlocksStatistics(String pathString)  {
+//            Path path = Paths.get(pathString,   String.valueOf(JToy.s.getID()), "blocksStat.csv");
+//            try {
+//                File f = new File(path.toString());
+//                if (!f.exists()) {
+//                    f.getParentFile().mkdirs();
+//                    f.createNewFile();
+//                }
+//                FileWriter writer = null;
+//                writer = new FileWriter(path.toString(), true);
+//                int nob = JToy.s.getBCSize();
+//                DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy-HH:mm:ss");
+//                statistics st = JToy.s.getStatistics();
+//                for (int i = 0 ; i < nob ; i++) {
+//                    Types.Block b = JToy.s.nonBlockingDeliver(i);
+//                    List<String> row = Arrays.asList(String.valueOf(JToy.s.getID()),
+//                            JToy.type, String.valueOf(Config.getC()), String.valueOf(st.txSize),
+//                            String.valueOf(Config.getMaxTransactionsInBlock()),
+//                            String.valueOf(b.getDataCount()),
+//                            String.valueOf(b.getHeader().getHeight()),
+//                            String.valueOf(b.getSt().getSign()), String.valueOf(b.getSt().getProposed() - b.getSt().getCreated()),
+//                            String.valueOf(b.getSt().getVerified()), String.valueOf(b.getSt().getDecided() - b.getSt().getProposed()),
+//                            String.valueOf(b.getSt().getDecided() - b.getSt().getCreated()));
+//                    CSVUtils.writeLine(writer, row);
+//                }
+//                writer.flush();
+//                writer.close();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
         }
         private void runBenchMark(int tSize, int tNumber, String csvPath) throws InterruptedException {
 
@@ -511,6 +520,12 @@ public class cli {
                 groups.add(group);
             }
             JToy.s.setByzSetting(fullByz, groups);
+        }
+
+        private void asyncPeriod(int sec, int duration) throws InterruptedException {
+            JToy.s.setAsyncParam(sec);
+            Thread.sleep(duration);
+            JToy.s.setAsyncParam(0);
         }
 
 }

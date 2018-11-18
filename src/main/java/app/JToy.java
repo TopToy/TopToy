@@ -73,6 +73,9 @@ public class JToy {
             Scanner scan = new Scanner(System.in).useDelimiter("\\n");
             while (true) {
                 System.out.print("Toy>> ");
+                if (!scan.hasNext()) {
+                    break;
+                }
                 parser.parse(getArgs(scan.next()));
             }
         } catch (Exception ex) {

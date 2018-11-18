@@ -525,10 +525,10 @@ public abstract class bcServer extends Node {
         currBlock = bc.createNewBLock();
 //        if (testing && bc.getHeight() < 20) return;
 
-//        if (testing) {
-//            createTxToBlock();
-//            return;
-//        }
+        if (testing) {
+            createTxToBlock();
+            return;
+        }
 
 //        if (transactionsPool.size() < maxTransactionInBlock) return;
 //        if (transactionsPool.size() < maxTransactionInBlock) return;
