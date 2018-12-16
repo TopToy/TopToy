@@ -8,6 +8,7 @@ import crypto.blockDigSig;
 import io.opencensus.stats.Aggregation;
 import org.apache.commons.cli.*;
 import org.apache.commons.lang.ArrayUtils;
+import org.bouncycastle.math.ec.custom.sec.SecT113R1Curve;
 import proto.Types;
 import servers.statistics;
 import utils.CSVUtils;
@@ -34,6 +35,7 @@ import static java.lang.String.valueOf;
 public class cli {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(cli.class);
         private Options options = new Options();
+        private long totalRT = 0;
         static String outPath = "/tmp/JToy/res/";
         public cli() {
             options.addOption("help", "print this message");
@@ -69,6 +71,7 @@ public class cli {
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 writeSummery(outPath);
                 writeBlocksStatistics(outPath);
+                writeBlocksStatisticsSummery(outPath);
             }));
         }
 
@@ -87,11 +90,11 @@ public class cli {
                     return;
                 }
 
-                if (args[0].equals("latency")) {
-                    latency();
-                    System.out.println("latency... [OK]");
-                    return;
-                }
+//                if (args[0].equals("latency")) {
+//                    latency();
+//                    System.out.println("latency... [OK]");
+//                    return;
+//                }
 
                 if (args[0].equals("serve")) {
                     serve();
@@ -100,6 +103,7 @@ public class cli {
                 }
                 if (args[0].equals("stop")) {
                     stop();
+                    totalRT = System.currentTimeMillis();
                     System.out.println("stop server... [OK]");
                     return;
                 }
@@ -112,8 +116,12 @@ public class cli {
                 if (args[0].equals("wait")) {
                     if (args.length == 2) {
                         int sec = Integer.parseInt(args[1]);
-                        Thread.sleep(sec * 1000);
+                        if (sec > 0) {
 
+                            logger.info(format("waits for %d seconds ", sec));
+                            Thread.sleep(sec * 1000);
+                            totalRT = System.currentTimeMillis();
+                        }
                     }
                     return;
                 }
@@ -126,16 +134,16 @@ public class cli {
                     if (args.length == 3) {
                         int sec = Integer.parseInt(args[1]);
                         int duration = Integer.parseInt(args[2]);
-                        asyncPeriod(sec * 1000, duration);
+                        asyncPeriod(sec * 1000, duration * 1000);
                     }
                     return;
                 }
 
                 if (args[0].equals("byz")) {
-                    if (!JToy.type.equals("bs") && !JToy.type.equals("bf")) {
-                        logger.debug("Unable to set byzantine behaviour to non async server");
-                        return;
-                    }
+//                    if (!JToy.type.equals("bs") && !JToy.type.equals("bf")) {
+//                        logger.debug("Unable to set byzantine behaviour to non async server");
+//                        return;
+//                    }
                     setByzSetting(args);
                 }
 
@@ -151,26 +159,18 @@ public class cli {
 
                 if (args[0].equals("sigTest")) {
                     logger.info("Accepted sigTest");
-                    if (args.length == 3) {
-                        logger.info("Three params");
-                        if (!args[1].equals("-p")) return;
-                        String path = args[2];
-                        sigTets(path);
-
-                    } else {
-                        logger.info("param problem");
-                    }
+                    sigTets(outPath);
                     return;
 
                 }
-                if (args[0].equals("bm")) {
-                    if (args.length != 7) return;
-                    if (!args[1].equals("-t")) return;
-                    if (!args[3].equals("-s")) return;
-                    if (!args[5].equals("-p")) return;
-                    runBenchMark(Integer.parseInt(args[2]), Integer.parseInt(args[4]), args[6]);
-                    return;
-                }
+//                if (args[0].equals("bm")) {
+//                    if (args.length != 7) return;
+//                    if (!args[1].equals("-t")) return;
+//                    if (!args[3].equals("-s")) return;
+//                    if (!args[5].equals("-p")) return;
+//                    runBenchMark(Integer.parseInt(args[2]), Integer.parseInt(args[4]), args[6]);
+//                    return;
+//                }
 
                 if (args[0].equals("tx")) {
                     if (args.length >= 3) {
@@ -221,13 +221,13 @@ public class cli {
             JToy.s.shutdown();
         }
 
-        private void latency() throws InterruptedException {
-            init();
-            serve();
-            while (true) {
-                Thread.sleep(10 * 60 * 1000);
-            }
-        }
+//        private void latency() throws InterruptedException {
+//            init();
+//            serve();
+//            while (true) {
+//                Thread.sleep(10 * 60 * 1000);
+//            }
+//        }
         private String addtx(String data, int clientID) {
             return JToy.s.addTransaction(data.getBytes(), clientID);
         }
@@ -244,60 +244,65 @@ public class cli {
             }
             return null;
         }
-
-        private void sigTets(String pathString) throws IOException, InterruptedException {
-            logger.info(format("Starting sigTest [%d, %d]", Config.getTxSize(), Config.getMaxTransactionsInBlock()));
-            ExecutorService executor = Executors.newFixedThreadPool(Config.getC());
-            int bareTxSize = Types.Transaction.newBuilder()
-                    .setClientID(0)
-                    .setTxID(UUID.randomUUID().toString())
-                    .build().getSerializedSize() + 8;
-            int tSize = max(0, Config.getTxSize() - bareTxSize);
+        private void signBlockFromBuilder(Types.Block.Builder b) {
+            byte[] tHash = new byte[0];
+            for (Types.Transaction t : b.getDataList()) {
+                tHash = DigestMethod.hash(ArrayUtils.addAll(tHash, t.toByteArray()));
+            }
+            b.setHeader(b.getHeader().toBuilder().setProof(blockDigSig.sign(b.getHeader()))).build();
+        }
+        private Types.Block.Builder createBlock(int txSize) {
             Types.Block.Builder bb = Types.Block.newBuilder();
             for (int i = 0 ; i < Config.getMaxTransactionsInBlock() ; i++) {
                 SecureRandom random = new SecureRandom();
-                byte[] tx = new byte[tSize];
-                byte[] ts = Longs.toByteArray(System.currentTimeMillis());
+                byte[] tx = new byte[txSize];
                 random.nextBytes(tx);
                 bb.addData(Types.Transaction.newBuilder()
-                        .setTxID(UUID.randomUUID().toString())
+                        .setId(Types.txID.newBuilder().setTxID(UUID.randomUUID().toString()).build())
                         .setClientID(0)
-                        .setData(ByteString.copyFrom(ArrayUtils.addAll(ts, tx)))
+                        .setData(ByteString.copyFrom(tx))
                         .build());
             }
-            byte[] tHash = new byte[0];
-            for (Types.Transaction t : bb.getDataList()) {
-                tHash = DigestMethod.hash(ArrayUtils.addAll(tHash, t.toByteArray()));
-            }
+
             SecureRandom random = new SecureRandom();
-            byte[] tx = new byte[8];
+            byte[] tx = new byte[32];
             random.nextBytes(tx);
 
-            bb = bb.setHeader(Types.BlockHeader.newBuilder()
+            return bb.setHeader(Types.BlockHeader.newBuilder()
                     .setM(Types.Meta.newBuilder()
                             .setChannel(0)
                             .setSender(0)
                             .setCidSeries(0)
                             .setCid(0).build())
                     .setHeight(0)
-                    .setPrev(ByteString.copyFrom(tx))
-                    .setTransactionHash(ByteString.copyFrom(tHash))
-                    .build());
-            Types.Block b = bb.setHeader(bb.getHeader().toBuilder().setProof(blockDigSig.sign(bb.getHeader()))).build();
-            if (!blockDigSig.verify(0, b)) {
-                logger.error("cant verify block");
-                return;
-            }
+                    .setPrev(ByteString.copyFrom(tx)));
+
+
+        }
+        private void sigTets(String pathString) throws IOException, InterruptedException {
+            logger.info(format("Starting sigTest [%d, %d]", Config.getTxSize(), Config.getMaxTransactionsInBlock()));
+            ExecutorService executor = Executors.newFixedThreadPool(Config.getC());
+            int bareTxSize = Types.Transaction.newBuilder()
+                    .setClientID(0)
+                    .setId(Types.txID.newBuilder().setTxID(UUID.randomUUID().toString()).build())
+                    .setClientTs(System.currentTimeMillis())
+                    .setServerTs(System.currentTimeMillis())
+                    .build().getSerializedSize();
+            int tSize = max(0, Config.getTxSize() - bareTxSize);
+
             CountDownLatch latch1 = new CountDownLatch(Config.getC());
             AtomicInteger avgSig = new AtomicInteger(0);
             AtomicBoolean stop = new AtomicBoolean(false);
             long start = System.currentTimeMillis();
+            Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
             for (int c = 0 ; c < Config.getC() ; c++) {
                 int finalC = c;
                 (executor).submit(() -> {
+                    Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
                     int sigCount = 0;
+                    Types.Block.Builder b = createBlock(tSize);
                     while (!stop.get()) {
-                        blockDigSig.sign(b.getHeader());
+                        signBlockFromBuilder(b);
                         sigCount++;
                     }
                     logger.info(format("finishing verForExec [%d] avg is [%d]", finalC, sigCount));
@@ -325,10 +330,10 @@ public class cli {
             FileWriter writer = new FileWriter(path.toString(), true);
             DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy-HH:mm:ss");
             List<String> row = Arrays.asList(dateFormat.format(new Date()),
-                    String.valueOf(0), String.valueOf(Config.getC()),
-                    String.valueOf(bareTxSize + tSize), String.valueOf(Config.getMaxTransactionsInBlock()),
-                    String.valueOf(b.getSerializedSize()),
-                    String.valueOf(sigPerSec), String.valueOf(verPerSec));
+                    String.valueOf(Config.getC()),
+                    String.valueOf(bareTxSize + tSize),
+                    String.valueOf(Config.getMaxTransactionsInBlock()),
+                    String.valueOf(sigPerSec));
             CSVUtils.writeLine(writer, row);
             writer.flush();
             writer.close();
@@ -365,7 +370,7 @@ public class cli {
                         if (txSize == -1) {
                             txSize = t.getSerializedSize();
                         }
-                        List<String> row = Arrays.asList(t.getTxID(), String.valueOf(t.getSerializedSize()),
+                        List<String> row = Arrays.asList(t.getId().getTxID(), String.valueOf(t.getSerializedSize()),
                                 String.valueOf(t.getClientID()), String.valueOf(b.getSt().getDecided()),
                                 String.valueOf(t.getData().size()), String.valueOf(i),
                                 String.valueOf(b.getHeader().getM().getSender()));
@@ -406,7 +411,8 @@ public class cli {
 //                CSVUtils.writeLine(writer, head);
                 statistics st = JToy.s.getStatistics();
 
-                double time = ((double) st.lastTxTs - (double) st.firstTxTs) / 1000;
+                double time = ((double) st.lastTxTs - st.firstTxTs) / 1000;
+//                double time = ((double) totalRT - st.firstTxTs) / 1000;
                 int thrp = ((int) (st.txCount / time)); // / 1000;
                 double opRate = ((double) st.optemisticDec) / ((double) st.totalDec);
                 long delaysAvgMs = 0; //st.delaysSum / st.txCount;
@@ -430,6 +436,70 @@ public class cli {
 
         }
 
+    void writeBlocksStatisticsSummery(String pathString)  {
+        Path path = Paths.get(pathString,   String.valueOf(JToy.s.getID()), "blocksStatSummery.csv");
+        try {
+            File f = new File(path.toString());
+            if (!f.exists()) {
+                f.getParentFile().mkdirs();
+                f.createNewFile();
+            }
+            FileWriter writer = null;
+            writer = new FileWriter(path.toString(), true);
+            int nob = JToy.s.getBCSize();
+//            DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy-HH:mm:ss");
+            statistics st = JToy.s.getStatistics();
+//            long total = 0;
+            long signaturePeriod = 0;
+//            long create2propose = 0;
+            long verificationPeriod = 0;
+            long propose2tentative = 0;
+            long tentative2permanent = 0;
+            long channelPermanent2decide = 0;
+            long propose2permanentchannel= 0;
+            long propose2decide = 0;
+            for (int i = 1 ; i < nob ; i++) {
+                Types.Block b = JToy.s.nonBlockingDeliver(i);
+                Types.blockStatistics bst = b.getSt();
+                signaturePeriod += bst.getSign();
+//                create2propose += bst.getProposed() - bst.getCreated();
+                verificationPeriod += bst.getVerified();
+                propose2tentative += bst.getChannelDecided() - bst.getProposed();
+                tentative2permanent += bst.getPd() - bst.getChannelDecided();
+                channelPermanent2decide += bst.getDecided() - bst.getPd();
+                propose2permanentchannel += bst.getPd() - bst.getProposed();
+                propose2decide += bst.getDecided() - bst.getProposed();
+//                total += b.getSt().getDecided() - b.getSt().getProposed();
+            }
+//            long avgTotal = total / nob;
+            signaturePeriod = signaturePeriod / nob;
+//            create2propose = create2propose / nob;
+            verificationPeriod = verificationPeriod / nob;
+            propose2tentative = propose2tentative / nob;
+            tentative2permanent = tentative2permanent / nob;
+            channelPermanent2decide = channelPermanent2decide / nob;
+            propose2permanentchannel = propose2permanentchannel / nob;
+            propose2decide = propose2decide / nob;
+            List<String> row = Arrays.asList(String.valueOf(JToy.s.getID()),
+                    JToy.type, String.valueOf(Config.getC()), String.valueOf(st.txSize),
+                    String.valueOf(Config.getMaxTransactionsInBlock()),
+                    String.valueOf(signaturePeriod),
+                    String.valueOf(verificationPeriod),
+//                    String.valueOf(create2propose),
+                    String.valueOf(propose2tentative),
+                    String.valueOf(tentative2permanent),
+                    String.valueOf(channelPermanent2decide),
+                    String.valueOf(propose2permanentchannel),
+                    String.valueOf(propose2decide));
+//                    String.valueOf(avgTotal));
+            CSVUtils.writeLine(writer, row);
+            writer.flush();
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
         void writeBlocksStatistics(String pathString)  {
             Path path = Paths.get(pathString,   String.valueOf(JToy.s.getID()), "blocksStat.csv");
             try {
@@ -441,18 +511,37 @@ public class cli {
                 FileWriter writer = null;
                 writer = new FileWriter(path.toString(), true);
                 int nob = JToy.s.getBCSize();
-                DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy-HH:mm:ss");
+//                DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy-HH:mm:ss");
                 statistics st = JToy.s.getStatistics();
-                for (int i = 0 ; i < nob ; i++) {
+                for (int i = 1 ; i < nob ; i++) {
                     Types.Block b = JToy.s.nonBlockingDeliver(i);
+//                    logger.info(format("[height=%d] [tentative=%d] [permanent=%d] [diff=%d]",
+//                            b.getHeader().getHeight(), b.getSt().getChannelDecided(),
+//                            b.getSt().getPd(), b.getSt().getPd() - b.getSt().getChannelDecided()));
+                    Types.blockStatistics bst = b.getSt();
+//                    long total = bst.getDecided() - bst.getChannelDecided();
+                    long signaturePeriod = bst.getSign();
+                    long verificationPeriod = bst.getVerified();
+//                    long create2propose = bst.getProposed() - bst.getCreated();
+                    long propose2tentative = bst.getChannelDecided() - bst.getProposed();
+                    long tentative2permanent = bst.getPd() - bst.getChannelDecided();
+                    long channelPermanent2decide = bst.getDecided() - bst.getPd();
+                    long propose2permanentchannel= bst.getPd() - bst.getProposed();
+                    long propose2decide = bst.getDecided() - bst.getProposed();
                     List<String> row = Arrays.asList(String.valueOf(JToy.s.getID()),
                             JToy.type, String.valueOf(Config.getC()), String.valueOf(st.txSize),
                             String.valueOf(Config.getMaxTransactionsInBlock()),
                             String.valueOf(b.getDataCount()),
                             String.valueOf(b.getHeader().getHeight()),
-                            String.valueOf(b.getSt().getSign()), String.valueOf(b.getSt().getProposed() - b.getSt().getCreated()),
-                            String.valueOf(b.getSt().getVerified()), String.valueOf(b.getSt().getDecided() - b.getSt().getProposed()),
-                            String.valueOf(b.getSt().getDecided() - b.getSt().getCreated()));
+                            String.valueOf(signaturePeriod),
+                            String.valueOf(verificationPeriod),
+//                            String.valueOf(create2propose),
+                            String.valueOf(propose2tentative),
+                            String.valueOf(tentative2permanent),
+                            String.valueOf(channelPermanent2decide),
+                            String.valueOf(propose2permanentchannel),
+                            String.valueOf(propose2decide));
+//                            String.valueOf(total));
                     CSVUtils.writeLine(writer, row);
                 }
                 writer.flush();
@@ -461,52 +550,53 @@ public class cli {
                 e.printStackTrace();
             }
         }
-        private void runBenchMark(int tSize, int tNumber, String csvPath) throws InterruptedException {
-
-            Thread.sleep(15 * 1000);
-            logger.info(format("[#%d] start serving...", JToy.s.getID()));
-            serve();
-//            Thread.sleep(10 * 1000);
-//            loadServer(tSize);
-            Thread.sleep(60 * 1 * 1000);
-            JToy.s.shutdown();
-//            writeToScv(csvPath);
-            writeSummery(csvPath);
-
-//            System.exit(0);
-        }
-        private void loadServer(int tSize) throws InterruptedException {
-            Random rand = new Random();
-            long tts = System.currentTimeMillis();
-            int bareTxSize = Types.Transaction.newBuilder()
-                    .setClientID(0)
-                    .setTxID(UUID.randomUUID().toString())
-                    .setClientTs(tts)
-                    .setServerTs(tts)
-                    .build().getSerializedSize();
-            int txSize = max(0, tSize - bareTxSize);
-            AtomicBoolean stopped = new AtomicBoolean(false);
-            int clients = 2;
-            ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(clients);
-            for (int i = 0 ; i < clients ;i++) {
-                int finalI = i;
-                executor.submit( () -> {
-                    while (!stopped.get()) {
-                        int cID = rand.nextInt(finalI);
-//                        byte[] ts = Longs.toByteArray(System.currentTimeMillis());
-                        SecureRandom random = new SecureRandom();
-                        byte[] tx = new byte[txSize];
-                        random.nextBytes(tx);
-                        JToy.s.addTransaction(tx, cID);
-                    }
-                });
-            }
-            Thread.sleep(60 * 1* 1000);
-            stopped.set(true);
-            Thread.sleep(2* 1000);
-            executor.shutdownNow();
-        }
+//        private void runBenchMark(int tSize, int tNumber, String csvPath) throws InterruptedException {
+//
+//            Thread.sleep(15 * 1000);
+//            logger.info(format("[#%d] start serving...", JToy.s.getID()));
+//            serve();
+////            Thread.sleep(10 * 1000);
+////            loadServer(tSize);
+//            Thread.sleep(60 * 1 * 1000);
+//            JToy.s.shutdown();
+////            writeToScv(csvPath);
+//            writeSummery(csvPath);
+//
+////            System.exit(0);
+//        }
+//        private void loadServer(int tSize) throws InterruptedException {
+//            Random rand = new Random();
+//            long tts = System.currentTimeMillis();
+//            int bareTxSize = Types.Transaction.newBuilder()
+//                    .setClientID(0)
+//                    .setId(Types.txID.newBuilder().setTxID(UUID.randomUUID().toString()).build())
+//                    .setClientTs(tts)
+//                    .setServerTs(tts)
+//                    .build().getSerializedSize();
+//            int txSize = max(0, tSize - bareTxSize);
+//            AtomicBoolean stopped = new AtomicBoolean(false);
+//            int clients = 2;
+//            ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(clients);
+//            for (int i = 0 ; i < clients ;i++) {
+//                int finalI = i;
+//                executor.submit( () -> {
+//                    while (!stopped.get()) {
+//                        int cID = rand.nextInt(finalI);
+////                        byte[] ts = Longs.toByteArray(System.currentTimeMillis());
+//                        SecureRandom random = new SecureRandom();
+//                        byte[] tx = new byte[txSize];
+//                        random.nextBytes(tx);
+//                        JToy.s.addTransaction(tx, cID);
+//                    }
+//                });
+//            }
+//            Thread.sleep(60 * 1* 1000);
+//            stopped.set(true);
+//            Thread.sleep(2* 1000);
+//            executor.shutdownNow();
+//        }
         private void setByzSetting(String[] args) {
+            logger.info("Setting byz");
             boolean fullByz = Integer.parseInt(args[1]) == 1;
             List<List<Integer>> groups = new ArrayList<>();
             int i = 2;
@@ -523,8 +613,12 @@ public class cli {
         }
 
         private void asyncPeriod(int sec, int duration) throws InterruptedException {
+            logger.debug(format("setting async params [%d, %d]", sec, duration));
             JToy.s.setAsyncParam(sec);
-            Thread.sleep(duration);
+            if (duration > 0) {
+                Thread.sleep(duration);
+            }
+            logger.debug(format("return to normal"));
             JToy.s.setAsyncParam(0);
         }
 

@@ -51,7 +51,7 @@ public class clientsAgent {
         int tSize = Integer.parseInt(argv[2]);
         int bareTxSize = Types.Transaction.newBuilder()
                 .setClientID(0)
-                .setTxID(UUID.randomUUID().toString())
+                .setId(Types.txID.newBuilder().setTxID(UUID.randomUUID().toString()).build())
                 .build().getSerializedSize() + 8;
         int txSize = max(0, tSize - bareTxSize);
         String pathString = argv[3];
@@ -64,6 +64,7 @@ public class clientsAgent {
 //        ExecutorService deliver_executor = Executors.newFixedThreadPool(1);
 //        CountDownLatch latch = new CountDownLatch(1);
 //        AtomicInteger sent = new AtomicInteger(0);
+        List<Types.approved> approved = new ArrayList<>();
         int clID = 0;
         for (int i = 0 ; i < clientsNum ; i++) {
             for (int j = 0 ; j < cln ; j++) {
@@ -74,7 +75,7 @@ public class clientsAgent {
                 clients_executor.submit(() -> {
                     logger.info(format("starting client: [%d, %d]", agentID, finalClID));
                     while (!stopped.get()) {
-                        long start = System.currentTimeMillis();
+//                        long start = System.currentTimeMillis();
                         Types.accepted ret = submitRandTxToServer(cl, txSize);
 //                        logger.info(format("sending message took [%d]", System.currentTimeMillis() - start));
                         if (ret == null) {
@@ -83,8 +84,9 @@ public class clientsAgent {
                         }
                         if (ret.getAccepted()) {
                             Types.approved app;
+
 //                            logger.info(format("read tx [%s]", ret.getTxID()));
-                            start = System.currentTimeMillis();
+//                            start = System.currentTimeMillis();
                             do {
                                 Types.read r = Types.read.newBuilder().setTxID(ret.getTxID()).build();
                                 app = cl.getTx(r);
@@ -92,7 +94,7 @@ public class clientsAgent {
 //                            logger.info(format("read message took [%d]", System.currentTimeMillis() - start));
                             if (stopped.get()) break;
                             synchronized (st) {
-                                collectSummery(st, app);
+                                approved.add(collectSummery(st, app));
                             }
 //                            sent.getAndIncrement();
 //                            submitted.put(cl.getID(), ret.getTxID());
@@ -128,15 +130,18 @@ public class clientsAgent {
 //
 //        st.sent = sent.get();
         writeSummery(pathString, agentID, st);
+        writeBlocks(pathString, agentID, approved, st);
 
     }
 
 
-    static void collectSummery(stat st, Types.approved app) {
+    static Types.approved collectSummery(stat st, Types.approved app) {
+        long ts = System.currentTimeMillis();
         st.txCount++;
-        st.diff += System.currentTimeMillis() - app.getTx().getClientTs();
-        st.diffServer = app.getSt().getDecided() - app.getTx().getServerTs();
+        st.diff += ts - app.getTx().getClientTs();
+        st.diffServer += app.getSt().getDecided() - app.getTx().getServerTs();
         st.txSize = app.getTx().getSerializedSize();
+        return app.toBuilder().setSt(app.getSt().toBuilder().setSign(ts)).build(); // We save here the client delivery time
     }
 
     static void writeSummery(String pathString, int agentID, stat st) throws IOException {
@@ -150,14 +155,37 @@ public class clientsAgent {
         DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy-HH:mm:ss");
         int clientDiffAvg = 0;
         int serverDiffAvg = 0;
+        int scDiffAvg = 0;
         if (st.txCount > 0) {
             clientDiffAvg = (int) (st.diff / st.txCount);
             serverDiffAvg = (int) (st.diffServer / st.txCount);
+            scDiffAvg = (int) ((st.diff - st.diffServer) / st.txCount);
         }
         List<String> row = Arrays.asList(dateFormat.format(new Date()), String.valueOf(agentID)
                 ,String.valueOf(st.txSize), String.valueOf(st.txCount), String.valueOf(clientDiffAvg),
-                String.valueOf(serverDiffAvg));
+                String.valueOf(serverDiffAvg), String.valueOf(scDiffAvg));
         CSVUtils.writeLine(writer, row);
+        writer.flush();
+        writer.close();
+    }
+
+    static void writeBlocks(String pathString, int agentID, List<Types.approved> approveds, stat st) throws IOException {
+        Path path = Paths.get(pathString,   String.valueOf(agentID), "blocksStat.csv");
+        File f = new File(path.toString());
+        if (!f.exists()) {
+            f.getParentFile().mkdirs();
+            f.createNewFile();
+        }
+        FileWriter writer = new FileWriter(path.toString(), true);
+        DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy-HH:mm:ss");
+        for (Types.approved app : approveds) {
+            Types.blockStatistics bst = app.getSt();
+            List<String> row = Arrays.asList(dateFormat.format(new Date()), String.valueOf(agentID)
+                    ,String.valueOf(st.txSize), String.valueOf(bst.getSign() - app.getTx().getClientTs()),
+                    String.valueOf(bst.getDecided() - app.getTx().getServerTs()),
+                    String.valueOf((bst.getSign() - app.getTx().getClientTs()) - (bst.getDecided() - app.getTx().getServerTs())));
+            CSVUtils.writeLine(writer, row);
+        }
         writer.flush();
         writer.close();
     }

@@ -69,9 +69,9 @@ public abstract class bcServer extends Node {
 //    int lastGc = 0;
     boolean testing = Config.getTesting();
     int txPoolMax = 100000;
-    int bareTxSize = Types.Transaction.newBuilder()
+    int bareTxSize = Transaction.newBuilder()
             .setClientID(0)
-            .setTxID(UUID.randomUUID().toString())
+            .setId(txID.newBuilder().setTxID(UUID.randomUUID().toString()).build())
             .build().getSerializedSize() + 8;
     int txSize = 0;
     int cID = new Random().nextInt(10000);
@@ -281,7 +281,7 @@ public abstract class bcServer extends Node {
                     for (Integer key : fp.keySet().stream().filter(k -> k < currHeight).collect(Collectors.toList())) {
                         fpEntry pe = fp.get(key);
                         if (!pe.done) {
-                            logger.debug(format("[#%d-C[%d]] have found panic message [height=%d] [fp=%d]",
+                            logger.info(format("[#%d-C[%d]] have found panic message [height=%d] [fp=%d]",
                                     getID(), channel, currHeight, key));
                             handleFork(pe.fp);
                             fp.get(key).done = true;
@@ -408,7 +408,17 @@ public abstract class bcServer extends Node {
 //                    synchronized (lastReceivedBlock) {
 
 //                    }
+                    recBlock = recBlock.toBuilder().setSt(recBlock.getSt().toBuilder().setChannelDecided(System.currentTimeMillis())).build();
                     bc.addBlock(recBlock);
+                    if (recBlock.getHeader().getHeight() - (f + 2) > 0) {
+                        Block permanent = bc.getBlock(recBlock.getHeader().getHeight() - (f + 2));
+                        permanent = permanent.toBuilder().setSt(permanent.getSt().toBuilder().setPd(System.currentTimeMillis())).build();
+                         bc.setBlock(recBlock.getHeader().getHeight() - (f + 2), permanent);
+//                        permanent = bc.getBlock(recBlock.getHeader().getHeight() - (f + 2));
+
+
+                    }
+
                     logger.debug(String.format("[#%d-C[%d]] adds new block with [height=%d] [cidSeries=%d ; cid=%d] [size=%d]",
                             getID(), channel, recBlock.getHeader().getHeight(), cidSeries, cid, recBlock.getDataCount()));
 //                    if (currHeight % 500 == 0) {
@@ -445,10 +455,10 @@ public abstract class bcServer extends Node {
         return transactionsPool.size();
     }
 
-    public String addTransaction(Transaction tx) {
-        if (transactionsPool.size() > txPoolMax) return "";
+    public Types.txID addTransaction(Transaction tx) {
+        if (transactionsPool.size() > txPoolMax) return null;
         transactionsPool.add(tx);
-        return tx.getTxID();
+        return tx.getId();
     }
 
     public String addTransaction(byte[] data, int clientID) {
@@ -457,7 +467,7 @@ public abstract class bcServer extends Node {
         String txID = UUID.randomUUID().toString();
         Transaction t = Transaction.newBuilder()
                 .setClientID(clientID)
-                .setTxID(txID)
+                .setId(Types.txID.newBuilder().setTxID(txID).build())
                 .setData(ByteString.copyFrom(data))
                 .build();
 //        synchronized (transactionsPool) {
@@ -509,8 +519,8 @@ public abstract class bcServer extends Node {
             SecureRandom random = new SecureRandom();
             byte[] tx = new byte[txSize];
             random.nextBytes(tx);
-            currBlock.addTransaction(Types.Transaction.newBuilder()
-                    .setTxID(UUID.randomUUID().toString())
+            currBlock.addTransaction(Transaction.newBuilder()
+                    .setId(txID.newBuilder().setTxID(UUID.randomUUID().toString()).build())
                     .setClientID(cID)
                     .setClientTs(ts)
                     .setServerTs(ts)
@@ -525,7 +535,7 @@ public abstract class bcServer extends Node {
         currBlock = bc.createNewBLock();
         currBlock.blockBuilder.setSt(blockStatistics
                 .newBuilder()
-                .setCreated(System.currentTimeMillis())
+//                .setCreated(System.currentTimeMillis())
                 .build());
 //        if (testing && bc.getHeight() < 20) return;
 
@@ -680,7 +690,7 @@ public abstract class bcServer extends Node {
         }
     }
     private void announceFork(Block b) {
-        logger.warn(format("[#%d-C[%d]] possible fork! [height=%d]",
+        logger.info(format("[#%d-C[%d]] possible fork! [height=%d]",
                 getID(), channel, currHeight));
 //        int prevCid = bc.getBlock(bc.getHeight()).getHeader().getCid();
 //        int prevCidSeries = bc.getBlock(bc.getHeight()).getHeader().getCidSeries();
@@ -707,7 +717,7 @@ public abstract class bcServer extends Node {
 
     public Block deliver(int index) throws InterruptedException {
         synchronized (newBlockNotifyer) {
-            while (index > bc.getHeight() - (f + 1)) {
+            while (index >= bc.getHeight() - (f + 1)) {
                 newBlockNotifyer.wait();
             }
         }
@@ -716,7 +726,7 @@ public abstract class bcServer extends Node {
 
     public Block nonBlockingdeliver(int index) {
         synchronized (newBlockNotifyer) {
-            if (index > bc.getHeight() - (f + 1)) {
+            if (index >= bc.getHeight() - (f + 1)) {
                 return null;
             }
         }
@@ -826,7 +836,7 @@ public abstract class bcServer extends Node {
     }
 
     private void sync(int forkPoint) throws InvalidProtocolBufferException {
-        logger.debug(format("[#%d-C[%d]] start sync method with [fp=%d]", getID(),channel, forkPoint));
+        logger.info(format("[#%d-C[%d]] start sync method with [fp=%d]", getID(),channel, forkPoint));
         disseminateChainVersion(forkPoint);
         while (!scVersions.containsKey(forkPoint) || scVersions.get(forkPoint).size() < 2*f + 1) {
             subChainVersion v;
@@ -865,7 +875,7 @@ public abstract class bcServer extends Node {
                 stream().
                 filter(v -> v.getV(v.getVCount() - 1).getHeader().getHeight() == max).
                 findFirst().get();
-        logger.debug(format("[#%d-C[%d]] adopts sub chain version [length=%d] from [#%d]", getID(),channel, choosen.getVList().size(), choosen.getSender()));
+        logger.info(format("[#%d-C[%d]] adopts sub chain version [length=%d] from [#%d]", getID(),channel, choosen.getVList().size(), choosen.getSender()));
         synchronized (newBlockNotifyer) {
             bc.setBlocks(choosen.getVList(), forkPoint - 1);
             if (!bc.validateBlockHash(bc.getBlock(bc.getHeight()))) { //||

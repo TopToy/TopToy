@@ -1,8 +1,6 @@
 package app;
 
 import config.Config;
-import servers.bftsmartBCserver;
-import servers.hlfBCserver;
 import servers.server;
 import servers.sg;
 //import utils.derbyUtils;
@@ -52,14 +50,14 @@ public class JToy {
             type = argv[1];
             logger.debug("type is " + type);
             switch (type) {
-                case "smr":
-                    s = new bftsmartBCserver(serverID, Config.getF(),
-                            Config.getMaxTransactionsInBlock(), Config.getSyncRBConfigHome());
-                    break;
-                case "hlf":
-                    s = new hlfBCserver(serverID, Config.getF(),
-                            Config.getMaxTransactionsInBlock(), Config.getSyncRBConfigHome());
-                    break;
+//                case "smr":
+//                    s = new bftsmartBCserver(serverID, Config.getF(),
+//                            Config.getMaxTransactionsInBlock(), Config.getSyncRBConfigHome());
+//                    break;
+//                case "hlf":
+//                    s = new hlfBCserver(serverID, Config.getF(),
+//                            Config.getMaxTransactionsInBlock(), Config.getSyncRBConfigHome());
+//                    break;
                 default:
                     s = new sg(Config.getAddress(serverID), Config.getPort(serverID), serverID, Config.getF(), Config.getC(),
                             Config.getTMO(), Config.getTMOInterval(), Config.getMaxTransactionsInBlock(), Config.getFastMode(),

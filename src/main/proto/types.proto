@@ -42,11 +42,13 @@ message BlockHeader {
 //}
 
 message blockStatistics {
-    int64 created = 1; // creation ts
+//    int64 created = 1; // creation ts
     int64 sign = 2; // the time that signature took
     int64 proposed = 3; // propose ts
     int64 verified = 4; // verification time
-    int64 decided = 5; // decision ts
+    int64 channelDecided = 5; // tentative decision
+    int64 pd = 6; // permanent decision
+    int64 decided = 7; // decision ts
 }
 
 message Block {
@@ -56,9 +58,12 @@ message Block {
 }
 
 //TODO: Adding: client signature, client public key etc.
+message txID {
+    string txID = 1;
+}
 message Transaction {
     int32 clientID = 1;
-    string txID = 2;
+    txID id = 2;
     bytes data = 3; // generic data type
     int64 clientTs = 4;
     int64 serverTs = 5;
@@ -66,7 +71,7 @@ message Transaction {
 
 message accepted {
     bool accepted = 1;
-    string txID = 2;
+    txID txID = 2;
 }
 
 message approved {
@@ -75,7 +80,7 @@ message approved {
 }
 
 message read {
-    string txID = 1;
+    txID txID = 1;
 }
 
 message ForkProof {

@@ -31,11 +31,12 @@ public class asyncBcServer extends bcServer {
     }
 
     Types.Block leaderImpl() throws InterruptedException {
-        Random rand = new Random();
         if (maxTime > 0) {
-//            int x = rand.nextInt(maxTime);
-            logger.info(format("[#%d] sleeps for %d ms", getID(), maxTime));
-            Thread.sleep(maxTime);
+            Random rand = new Random();
+            int x = rand.nextInt(maxTime);
+//            int x = maxTime;
+            logger.info(format("[#%d] sleeps for %d ms", getID(), x));
+            Thread.sleep(x);
         }
         if (!configuredFastMode) {
             return normalLeaderPhase();

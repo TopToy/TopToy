@@ -503,7 +503,8 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         long start = System.currentTimeMillis();
         if (!blockDigSig.verify(sender, request)) return;
         request = request.toBuilder()
-                .setSt(request.getSt().toBuilder().setVerified(System.currentTimeMillis() - start))
+                .setSt(request.getSt().toBuilder().setVerified(System.currentTimeMillis() - start)
+                .setProposed(System.currentTimeMillis()))
                 .build();
         int cid = request.getHeader().getM().getCid();
         int channel = request.getHeader().getM().getChannel();
@@ -805,6 +806,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             int dec = fullBbcConsensus(channel, v, cidSeries, cid);
             logger.debug(format("[#%d-C[%d]] bbc returned [%d] for [cidSeries=%d ; cid=%d]", id, channel, dec, cidSeries, cid));
             if (dec == 0) {
+                logger.debug(format("[#%d-C[%d]] timeout increased to [%d]", id, channel, currentTmo[channel]));
                 pendingMsg[channel].remove(key);
 //                mutex.unlock();
 //                synchronized (aliveLock[channel]) {
@@ -911,13 +913,13 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                             .copyFrom(DigestMethod
                                     .hash(curr.getHeader().toByteArray())))
                             .build());
-        long start = System.currentTimeMillis();
+//        long start = System.currentTimeMillis();
         String signature = blockDigSig.sign(next.getHeader());
         return nextBuilder.setHeader(nextBuilder.getHeader().toBuilder()
                 .setProof(signature))
-                .setSt(nextBuilder.getSt().toBuilder()
-                        .setSign(System.currentTimeMillis() - start)
-                        .setProposed(System.currentTimeMillis()))
+                .setSt(nextBuilder.getSt().toBuilder())
+//                        .setSign(System.currentTimeMillis() - start)
+//                        .setProposed(System.currentTimeMillis()))
                 .build();
     }
     

@@ -10,6 +10,7 @@ import consensus.RBroadcast.RBrodcastService;
 import crypto.DigestMethod;
 
 import org.apache.commons.lang.ArrayUtils;
+import proto.Types;
 import proto.Types.*;
 import rmf.ByzantineRmfNode;
 import rmf.RmfNode;
@@ -60,15 +61,11 @@ public class byzantineBcServer extends bcServer {
         SecureRandom random = new SecureRandom();
         byte[] byzTx = new byte[40];
         random.nextBytes(byzTx);
-        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        long magic = timestamp.getTime();
-        String txID = new BigInteger(DigestMethod.hash(ArrayUtils.addAll(byzTx, (String.valueOf(magic)).getBytes())))
-                .toString()
-                .replaceAll("-","N");
+        String txID = UUID.randomUUID().toString();
         Transaction t = Transaction.newBuilder()
-                .setClientID(getID())
+                .setClientID(-1)
+                .setId(Types.txID.newBuilder().setTxID(txID).build())
                 .setData(ByteString.copyFrom(byzTx))
-                .setTxID(txID)
                 .build();
         currBlock.addTransaction(t);
         if (currBlock.getTransactionCount() > 1) {
@@ -100,7 +97,7 @@ public class byzantineBcServer extends bcServer {
             ((ByzantineRmfNode)rmfServer).devidedBroadcast(msgs, groups);
 
         } else {
-            ((ByzantineRmfNode)rmfServer).selectiveBroadcast(sealedBlock1, groups.get(0));
+            ((ByzantineRmfNode)rmfServer).broadcast(sealedBlock1);
         }
     //        }
      return null;

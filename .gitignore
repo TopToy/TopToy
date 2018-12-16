@@ -22,9 +22,6 @@ target/
 
 Dockerfile
 
-Configurations*
-*.sh
-
 bin*
 scripts/python/.idea*
 scripts/python/venv*

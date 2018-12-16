@@ -1,141 +1,644 @@
 from __future__ import division
-import os
-import plotly
-import plotly.plotly as py
-import plotly.graph_objs as go
-import plotly.figure_factory as FF
-import argparse
-import plotly.io as pio
-
-import numpy as np
+import glob
 import pandas as pd
-from plotly import tools
+import matplotlib.pyplot as plt
+import numpy as np
+
+line_w=1
+marker_s=4
+face_c='none'
+markers=['s', 'x', '+', '^']
+def getTmoYrange(index):
+    if index == 1:
+        return np.arange(0.9, 1.01, 0.05)
+    if index == 2:
+        return np.arange(0.4, 1.01, 0.2)
+    if index == 3:
+        return np.arange(0.8, 1.01, 0.1)
+    if index == 4:
+        return np.arange(0.2, 1.01, 0.2)
+    if index == 5:
+        return np.arange(0.8, 1.01, 0.1)
+    if index == 6:
+        return np.arange(0, 1.01, 0.2)
+    # if index == 7:
+    #     return np.arange(0, 11, 2)
+    # if index == 8:
+    #     return np.arange(0, 81, 20)
+    # if index == 9:
+    #     return np.arange(0, 301, 100)
+
+def draw_tmo_charts(dirs, oPath):
+    rows=3
+    cols=2
+    index=1
+    series=[5,10,15,20]
+    names=["4 Servers 100 Txs/block", "4 Servers 1000 Txs/block", "7 Servers 100 Txs/block", "7 Servers 1000 Txs/block"
+           ,"10 Servers 100 Txs/block", "10 Servers 1000 Txs/block"]
+    n=0
+
+    allDirs = [dirs[0] + "/100.500", dirs[0] + "/1000.500", dirs[1] + "/100.500", dirs[1] + "/1000.500"
+               , dirs[2] + "/100.500", dirs[2] + "/1000.500"]
+    fig, ax = plt.subplots(nrows=rows, ncols=cols)
+    plt.subplots_adjust(wspace=0.3, hspace=0.5)
+    for d in allDirs:
+        sb = str(rows) + str(cols) + str(index)
+        sb = int(sb)
+        plt.subplot(sb)
+        m = 0
+        for s in series:
+            mark = markers[m]
+            m += 1
+            path=d + "/summery_" + str(s) + ".csv"
+            df = pd.read_csv(path, sep=",")
+            df = df[['tmo', 'opRate']].groupby(df.tmo).mean()
+            markers_on = [0, 3, 7, 9]
+            plt.plot(df['tmo'], df['opRate'],"-" + mark, markerfacecolor=face_c, markersize=marker_s, linewidth=line_w, markevery=markers_on)
+
+        plt.title(names[n], fontsize='small')
+        plt.grid(True)
+        plt.xticks(np.arange(0, 1001, step=200), fontsize='x-small')
+        plt.yticks(getTmoYrange(index), fontsize='x-small')
+        n += 1
+        index += 1
+    leg = fig.legend([],  # The line objects
+               labels=['5', '10', '15', '20'],  # The labels for each line
+               loc="upper right",  # Position of legend
+               borderaxespad=0.01,  # Small spacing around legend box
+               fontsize='xx-small',
+               # frameon=False,
+               bbox_to_anchor=(0.99, 0.932),
+               title="Channels"
+               # title_fontsize="x-small"
+               )
+    plt.setp(leg.get_title(), fontsize='xx-small')
+    fig.text(0.5, 0.015, "Time-Out (Ms)", ha="center", va="center", fontsize="small")
+    fig.text(0.02, 0.5, "Optimistic Rate", ha="center", va="center", fontsize="small", rotation=90)
+    fig.tight_layout(rect=[0, 0, 0.94, 1])
+    for d in oPath:
+        plt.savefig(d + '/tmo')
+
+def drawSigs(dirs, oPath):
+    subDirs = ['10', '100', '1000']
+    txSize = ['0', '512', '1024', '4096']
+    # names = ['10 Txs/block', '100 Txs/block', '1000 Txs/block']
+    names = ['50 Byte\nTransaction', '512 Byte\nTransaction', '1024 Byte\nTransaction', '4096 Byte\nTransaction']
+    rows = 2
+    cols = 2
+    index = 1
+    lines = []
+    fig, ax = plt.subplots(nrows=rows, ncols=cols)
+    plt.subplots_adjust(wspace=0.3, hspace=0.5)
+    for size in txSize:
+        for d in dirs:
+            m = 0
+            for sd in subDirs:
+                mark = markers[m]
+                m+=1
+                sb = str(rows) + str(cols) + str(index)
+                sb = int(sb)
+                plt.subplot(sb)
+                path = d + "/" + sd + "/sig_summery_" + size + ".csv"
+                df = pd.read_csv(path, sep=",")
+                df = df[['workers', 'sigPerSec']]
+                markers_on=[0, 1, 2, 3]
+                plt.plot(df['workers'], df['sigPerSec'] / 1000, "-" + mark, markerfacecolor=face_c,
+                         markersize=6, linewidth=line_w, markevery=markers_on)
 
 
-def drawSigCharts(dirs, oPath):
-    fig = tools.make_subplots(rows=1, cols=2, subplot_titles=('50B Tx 10 Txs/block', '4KB Tx 1000 Txs/block'))
-    df = pd.read_csv(dirs[0], sep=",")
-    df = df[['channels', 'sigAvg']]
-    trace = go.Scatter(x=df['channels'], y=df['sigAvg'] / 1000, name='50B')
-    fig.append_trace(trace, 1, 1)
-    df = pd.read_csv(dirs[1], sep=",")
-    df = df[['channels', 'sigAvg']]
-    trace = go.Scatter(x=df['channels'], y=df['sigAvg'] / 1000, name='4096B')
-    fig.append_trace(trace, 1, 2)
-    for i in fig['layout']['annotations']:
-        i['font'] = dict(size=12)
-    for i in range(1, 3):
-        fig['layout']['xaxis' + str(i)].update(rangemode='tozero', tickformat=',d', title='channels', titlefont=dict(size=12))
-        fig['layout']['yaxis' + str(i)].update(rangemode='tozero', tickformat=',d')
-        fig['layout']['yaxis' + str(i)].update(title='Ksignatures/sec', titlefont=dict(size=12))
-   # fig['layout'].update(height=800, width=800)
-    pio.write_image(fig, oPath + 'res2.jpeg')
+            plt.title(names[index - 1], fontsize='small')
+            # plt.xlabel('workers', fontsize='small')
+            # plt.ylabel('Throughput (Ksignatures/sec)', fontsize='small')
+            plt.xticks(np.arange(1, 5, step=1), fontsize='x-small')
+            plt.yticks(np.arange(0, 8, step=1), fontsize='x-small')
+            plt.grid(True)
+            index += 1
 
-def drawCharts(dirs, oPath):
-    fig = tools.make_subplots(rows=3, cols=3, subplot_titles=('4 servers 10 Txs/block','4 servers 100 Txs/block'
-                                                              , '4 servers 1000 Txs/block', '7 servers 10 Txs/block'
-                                                              , '7 servers 100 Txs/block', '7 servers 1000 Txs/block'
-                                                              ,'10 servers 10 Txs/block', '10 servers 100 Txs/block'
-                                                              , '10 servers 1000 Txs/block'))
-    plots=[(1, 1), (1, 2), (1, 3), (2, 1), (2, 2), (2, 3), (3, 1), (3, 2), (3, 3)]
-    evSize=['10', '100', '1000']
-    bSize=['50', '512', '1024', '4096']
-    markers=[1, 2, 3, 4]
-    colors=['blue', 'orange', 'red', 'green']
-    iter = 0
-    for i in range(0, 3):
-        dir = dirs[i]
-        for j in range(0, 3):
-            p = plots[iter]
-            es = evSize[j]
-            iter += 1
-            for k in range(0, 4):
-                s =bSize[k]
-                c = colors[k]
-                m = markers[k]
-                df = pd.read_csv(dir + '/' + es + '/' + s + '.csv', sep=",")
+
+    leg = fig.legend(lines,  # The line objects
+                     # labels=['50', '512', '1024', '4096'],  # The labels for each line
+                     labels=['10', '100', '1000'],  # The labels for each line
+                     loc="upper right",  # Position of legend
+                     borderaxespad=0.01,  # Small spacing around legend box
+                     fontsize='xx-small',
+                     # frameon=False,
+                     bbox_to_anchor=(0.992, 0.90),
+                     title="Txs/block"
+                     )
+    plt.setp(leg.get_title(), fontsize='xx-small')
+    fig.text(0.5, 0.02, "Workers", ha="center", va="center", fontsize='small')
+    fig.text(0.02, 0.5, "Throughput (Ksignatures/sec)", ha="center", va="center", fontsize='small', rotation=90)
+    fig.tight_layout(rect=[0.02, 0, 0.935, 1])
+    for d in oPath:
+        plt.savefig(d + '/sig_throughput')
+
+def calcCDFX(index):
+    if index == 1:
+        return np.arange(0, 2501, 500)
+    if index == 2:
+        return np.arange(0, 7001, 1000)
+    if index == 3:
+        return np.arange(0, 3001, 500)
+    if index == 4:
+        return np.arange(0, 9001, 1000)
+    if index == 5:
+        return np.arange(0, 6001, 1000)
+    if index == 6:
+        return np.arange(0, 11001, 1000)
+def drawCDF(dirs, oPath):
+    subDirs = ["clients/500.100", "clients/500.1000"]
+    names = ['4 Servers 100 Txs/Block', '4 Servers 1000 Txs/Block', '7 Servers 100 Txs/Block',
+             '7 Servers 1000 Txs/Block', '10 Servers 100 Txs/Block', '10 Servers 1000 Txs/Block']
+    rows = 3
+    cols = 2
+    index = 1
+    n=0
+    fig, ax = plt.subplots(nrows=rows, ncols=cols)
+    plt.subplots_adjust(wspace=0.3, hspace=0.5)
+    lines = []
+    for dir in dirs:
+        for d in subDirs:
+            files = ["blocksStat_1.csv", "blocksStat_5.csv", "blocksStat_10.csv"]
+            m=0
+            for f in files:
+                mark = markers[m]
+                m+=1
+                sb = str(rows) + str(cols) + str(index)
+                sb = int(sb)
+                plt.subplot(sb)
+                path = dir + "/" + d + "/" + f
+                df = pd.read_csv(path, sep=",")
+                df = df['clientLatency']
+                num_bins = 100
+                counts, bin_edges = np.histogram(df /1000, bins=num_bins, normed=True)
+                cdf = np.cumsum(counts)
+                markers_on=[0, 33, 66, 99]
+                plt.plot(bin_edges[1:], cdf / cdf[-1], "-" + mark, markerfacecolor=face_c,
+                         markersize=6, linewidth=line_w, markevery=markers_on)
+                # cdf = np.cumsum(df)
+                # x = np.arange(0, 5000, 500)
+                # l = plt.plot(df, cdf)
+
+            plt.title(names[n], fontsize='x-small')
+            plt.xticks(calcCDFX(index) / 1000, fontsize='xx-small')
+            plt.yticks(np.arange(0, 1.01, 0.2), fontsize='xx-small')
+            plt.grid(True)
+            n += 1
+            index += 1
+
+    leg = fig.legend(lines,  # The line objects
+                     labels=['1', '5', '10'],  # The labels for each line
+                     loc="upper right",  # Position of legend
+                     borderaxespad=0.01,  # Small spacing around legend box
+                     fontsize='xx-small',
+                     # frameon=False,
+                     bbox_to_anchor=(0.99, 0.935),
+                     title="Channels"
+                     )
+    plt.setp(leg.get_title(), fontsize='xx-small')
+    # fig.text(0.5, 0.04, "Latency (seconds)", ha="center", va="center")
+    # fig.text(0.05, 0.5, "percents of requests", ha="center", va="center", rotation=90)
+
+    fig.text(0.5, 0.02, "Time (seconds)", ha="center", fontsize='small', va="center")
+    fig.text(0.02, 0.5, "Probability", ha="center", va="center", fontsize='small', rotation=90)
+    fig.tight_layout(rect=[0.02, 0, 0.945, 1])
+    for d in oPath:
+        plt.savefig(d + '/cdf')
+
+# def drawGDCDF(dirs, oPath):
+#     subDirs = ["clients/500.100", "clients/500.1000"]
+#     names = ['4 Servers 100 Txs/Block', '4 Servers 1000 Txs/Block', '7 Servers 100 Txs/Block',
+#              '7 Servers 1000 Txs/Block', '10 Servers 100 Txs/Block', '10 Servers 1000 Txs/Block']
+#     rows = 3
+#     cols = 2
+#     index = 1
+#     n=0
+#     fig, ax = plt.subplots(nrows=rows, ncols=cols)
+#     plt.subplots_adjust(wspace=0.3, hspace=0.5)
+#     lines = []
+#     for dir in dirs:
+#         for d in subDirs:
+#             files = ["blocksStat_1.csv", "blocksStat_5.csv", "blocksStat_10.csv"]
+#             m=0
+#             for f in files:
+#                 mark = markers[m]
+#                 m+=1
+#                 sb = str(rows) + str(cols) + str(index)
+#                 sb = int(sb)
+#                 plt.subplot(sb)
+#                 path = dir + "/" + d + "/" + f
+#                 df = pd.read_csv(path, sep=",")
+#                 df = df['clientLatency']
+#                 num_bins = 100
+#                 counts, bin_edges = np.histogram(df /1000, bins=num_bins, normed=True)
+#                 cdf = np.cumsum(counts)
+#                 markers_on=[0, 33, 66, 99]
+#                 plt.plot(bin_edges[1:], cdf / cdf[-1], "-" + mark, markerfacecolor=face_c,
+#                          markersize=6, linewidth=line_w, markevery=markers_on)
+#                 # cdf = np.cumsum(df)
+#                 # x = np.arange(0, 5000, 500)
+#                 # l = plt.plot(df, cdf)
+#
+#             plt.title(names[n], fontsize='x-small')
+#             plt.xticks(calcCDFX(index) / 1000, fontsize='xx-small')
+#             plt.yticks(np.arange(0, 1.01, 0.2), fontsize='xx-small')
+#             plt.grid(True)
+#             n += 1
+#             index += 1
+#
+#     leg = fig.legend(lines,  # The line objects
+#                      labels=['1', '5', '10'],  # The labels for each line
+#                      loc="upper right",  # Position of legend
+#                      borderaxespad=0.01,  # Small spacing around legend box
+#                      fontsize='xx-small',
+#                      # frameon=False,
+#                      bbox_to_anchor=(0.99, 0.87),
+#                      title="Channels"
+#                      )
+#     plt.setp(leg.get_title(), fontsize='xx-small')
+#     # fig.text(0.5, 0.04, "Latency (seconds)", ha="center", va="center")
+#     # fig.text(0.05, 0.5, "percents of requests", ha="center", va="center", rotation=90)
+#
+#     fig.text(0.5, 0.04, "Time (seconds)", ha="center", va="center")
+#     fig.text(0.05, 0.5, "Probability", ha="center", va="center", rotation=90)
+#     for d in oPath:
+#         plt.savefig(d + '/gd_cdf', bbox_inches='tight')
+
+def drawGDCDF2(dirs, oPath):
+    n_groups = 3
+    bar_width = 0.35
+    opacity = 1
+    subDirs = ["clients/500.100", "clients/500.1000"]
+    names = ['4 Servers 100 Txs/Block', '4 Servers 1000 Txs/Block', '7 Servers 100 Txs/Block',
+             '7 Servers 1000 Txs/Block', '10 Servers 100 Txs/Block', '10 Servers 1000 Txs/Block']
+    rows = 1
+    cols = 2
+    index = 1
+    n=0
+    fig, ax = plt.subplots(nrows=rows, ncols=cols)
+    plt.subplots_adjust(wspace=0.3, hspace=0.5)
+    lines = []
+    for d in subDirs:
+        sb = str(rows) + str(cols) + str(index)
+        sb = int(sb)
+        ax2 = plt.subplot(sb)
+        index2 = np.arange(n_groups)
+        bars = [[], []]
+        bars2 = [[], []]
+        for dir in dirs:
+
+            files = ["blocksStat_1.csv", "blocksStat_5.csv"]
+            for i in range(0, 2):
+                f = files[i]
+                path = dir + "/" + d + "/" + f
+                df = pd.read_csv(path, sep=",")
+                df = df['clientLatency']
+                med = df.median()
+                bars[i] += [med / 1000]
+                eith = df.quantile(0.8) - med
+                bars2[i] += [eith / 1000]
+                # cdf = np.cumsum(df)
+                # x = np.arange(0, 5000, 500)
+                # l = plt.plot(df, cdf)
+
+        plt.bar(index2, bars[0], bar_width,
+                alpha=opacity, hatch='xxxx')
+        plt.bar(index2, bars2[0], bar_width,
+               bottom=bars[0], alpha=opacity, hatch='....')
+        plt.bar(index2 + bar_width, bars[1], bar_width,
+                alpha=opacity)
+        plt.bar(index2 + bar_width, bars2[1], bar_width,
+                bottom=bars[1], alpha=opacity, hatch='////')
+
+        ax2.set_xticks(np.arange(n_groups) + bar_width / 2)
+        ax2.set_xticklabels(('4', '7', '10'))
+
+        # plt.title(names[n], fontsize='x-small')
+        # plt.xticks(calcCDFX(index) / 1000, fontsize='xx-small')
+        # plt.yticks(np.arange(0, 1.01, 0.2), fontsize='xx-small')
+        plt.grid(True)
+        index += 1
+
+    # leg = fig.legend(lines,  # The line objects
+    #                  labels=['1', '5', '10'],  # The labels for each line
+    #                  loc="upper right",  # Position of legend
+    #                  borderaxespad=0.01,  # Small spacing around legend box
+    #                  fontsize='xx-small',
+    #                  # frameon=False,
+    #                  bbox_to_anchor=(0.99, 0.87),
+    #                  title="Channels"
+    #                  )
+    # plt.setp(leg.get_title(), fontsize='xx-small')
+    # fig.text(0.5, 0.04, "Latency (seconds)", ha="center", va="center")
+    # fig.text(0.05, 0.5, "percents of requests", ha="center", va="center", rotation=90)
+
+    fig.text(0.5, 0.04, "Time (seconds)", ha="center", va="center")
+    fig.text(0.05, 0.5, "Probability", ha="center", va="center", rotation=90)
+    for d in oPath:
+        plt.savefig(d + '/gd_cdf', bbox_inches='tight')
+def heatmaps(dirs, oPath):
+    subDirs = ["servers/500.1000"] #, "servers/500.100"]
+    # frames=[[], [], []]
+    frames = []
+    files = ["blocksStat_1.csv", "blocksStat_5.csv", "blocksStat_10.csv"]
+    for f in files:
+        for dir in dirs:
+            for d in subDirs:
+                path = dir + "/" + d + "/" + f
+                df = pd.read_csv(path, sep=",")
+                # frames[i].append(df)
+                frames += [df]
+    # df = []
+    # for frame in frames:
+    #     df += [pd.concat(frame, axis = 0)]
+
+    df = frames
+    chan = ['4 servers\n1 channel','7 servers\n1 channel','10 servers\n1 channel',
+            '4 servers\n5 channels','7 servers\n5 channels','10 servers\n5 channels',
+            '4 servers\n10 channels', '7 servers\n10 channels', '10 servers\n10 channels']
+    labels = ['signature', 'verification', 'propose\ntentative', 'tentative\npermanent', 'permanent\ndecide']
+    realLabels=['signaturePeriod','verificationPeriod','propose2tentative','tentative2permanent','channelPermanent2decide','propose2decide']
+    normData = []
+    # for i in range(0, 3):
+    #     data = df[i]
+    #     # data = data.mean()
+    #     d = data[realLabels[:5]].div(data.propose2decide, axis=0)
+    #     normData += [d.mean().values]
+
+    for data in df:
+        # data = data.mean()
+        d = data[realLabels[:5]].div(data.propose2decide, axis=0)
+        normData += [d.mean().values]
+
+    fig, ax = plt.subplots()
+    # im = ax.imshow(normData, cmap='autumn')
+    im = ax.imshow(zip(*normData), cmap='autumn')
+
+    # cbar = ax.figure.colorbar(im, ax=ax, cmap="autumn")
+    cbar = plt.colorbar(im, fraction=0.0257, pad=0.04)
+
+    cbar.ax.set_ylabel("Relative execution time", rotation=-90, va="bottom")
+    ax.set_xticks(np.arange(len(chan)))
+    ax.set_yticks(np.arange(len(labels)))
+
+    ax.set_xticklabels(chan, fontsize='x-small')
+    ax.set_yticklabels(labels, fontsize='small')
+
+    for edge, spine in ax.spines.items():
+        spine.set_visible(False)
+    ax.set_xticks(np.arange(len(chan) + 1) - .5, minor=True)
+    ax.set_yticks(np.arange(len(labels) + 1) - .5, minor=True)
+    ax.grid(which="minor", color="black", linestyle='-', linewidth=3)
+    ax.tick_params(which="minor", bottom=False, left=False)
+    plt.setp(ax.get_xticklabels(), rotation=45, ha="right",
+             rotation_mode="anchor")
+    # plt.setp(ax.get_yticklabels(), rotation=45, ha="right",
+    #          rotation_mode="anchor")
+
+    for i in range(len(chan)):
+        for j in range(len(labels)):
+            text = ax.text(i, j, str(round(normData[i][j], 3)),
+                           ha="center", va="center", color="black")
+
+    # fig.text(0.07, 0.8, "Channels", ha="center", va="center")
+    for d in oPath:
+        plt.savefig(d + '/heatmap', bbox_inches='tight')
+
+def getYrange(index):
+    if index == 1:
+        return np.arange(0, 21, 5)
+    if index == 2:
+        return np.arange(0, 200, 50)
+    if index == 3:
+        return np.arange(0, 500, 100)
+    if index == 4:
+        return np.arange(0, 16, 5)
+    if index == 5:
+        return np.arange(0, 101, 20)
+    if index == 6:
+        return np.arange(0, 301, 100)
+    if index == 7:
+        return np.arange(0, 11, 2)
+    if index == 8:
+        return np.arange(0, 81, 20)
+    if index == 9:
+        return np.arange(0, 301, 100)
+def drawThroghuputCharts(dirs, oPath):
+    rows = 3
+    cols = 3
+    index = 1
+    evSize = ['10', '100', '1000']
+    bSize = ['50', '512', '1024', '4096']
+    names = ['4 servers 10 Txs/block','4 servers 100 Txs/block'
+              , '4 servers 1000 Txs/block', '7 servers 10 Txs/block'
+              , '7 servers 100 Txs/block', '7 servers 1000 Txs/block'
+              ,'10 servers 10 Txs/block', '10 servers 100 Txs/block'
+              , '10 servers 1000 Txs/block']
+    n = 0
+    fig, ax = plt.subplots(nrows=rows, ncols=cols)
+    plt.subplots_adjust(wspace=0.3, hspace=0.5)
+    r, c = 0, 0
+    lines = []
+    for d in dirs:
+        c = 0
+        for size in evSize:
+            sb = str(rows) + str(cols) + str(index)
+            sb = int(sb)
+            plt.subplot(sb)
+            colors = ['b', 'm', 'r', 'g']
+            m = 0
+            for b in bSize:
+                mark = markers[m]
+                clr = colors[m]
+                m+= 1
+                path = d + "/" + size + "/" + b + ".csv"
+                df = pd.read_csv(path, sep=",")
                 df = df[['channels', 'txPsec']].groupby(df.channels).mean()
-                if (i == 0 and j == 0):
-                    trace = go.Scatter(x = df['channels'], y = df['txPsec']/1000, name=s + 'B',
-                                       legendgroup=s, line= {'color': c}, mode='lines')
-                                       #, marker = dict(size = 5, symbol = m))
-                else:
-                    trace = go.Scatter(x=df['channels'], y=df['txPsec'] / 1000, name=s + 'B',
-                                       showlegend=False, legendgroup=s, line= {'color': c}, mode='lines')
-                                      # , marker = dict(size = 5, symbol = m))
-                fig.append_trace(trace, p[0], p[1])
-    for i in fig['layout']['annotations']:
-        i['font'] = dict(size=12)
-    for i in range(1, 10):
-        fig['layout']['xaxis' + str(i)].update(rangemode='tozero', tickformat=',d')
-        fig['layout']['yaxis' + str(i)].update(rangemode='tozero', tickformat=',d')
-        if (i == 8):
-            fig['layout']['xaxis' + str(i)].update(title='channels', titlefont=dict(size=16))
-        if (i == 4):
-            fig['layout']['yaxis' + str(i)].update(title='KTxs/sec', titlefont=dict(size=16))
-    fig['layout'].update(height=800, width=800)
-    pio.write_image(fig, oPath + 'res1.jpeg')
+                mdf = df[df.channels % 1 == 0]
+                markers_on=[0, 5, 10, 19]
+                l = plt.plot(df['channels'], df['txPsec'] / 1000, "-" + mark, markerfacecolor=face_c, markersize=marker_s, linewidth=line_w, markevery=markers_on)
+                # if index == 1:
+                #     lines += [l]
+                # plt.plot(mdf['channels'], mdf['txPsec'] / 1000)
 
 
-# def loadCsv(path):
-#     return pd.read_csv(path)
 
-def drawThroughputDiagram(size, dfe, dfs, dfm, dfb, xKey, yKey, outputPath):
-#    dfs = pd.DataFrame([[0, 0]], columns=[xKey, yKey]).append(dfs)
-#    dfm = pd.DataFrame([[0, 0]], columns=[xKey, yKey]).append(dfm)
-#    dfb = pd.DataFrame([[0, 0]], columns=[xKey, yKey]).append(dfb)
-    tracee = go.Scatter(x = dfe[xKey], y = dfe[yKey]/1000, mode='lines+markers',  marker = dict(size = 7, symbol = 5), name='50B Tx')
-    traces = go.Scatter(x = dfs[xKey], y = dfs[yKey]/1000, mode='lines+markers',  marker = dict(size = 7, symbol = 1), name='512B Tx')
-    tracem = go.Scatter(x = dfm[xKey], y = dfm[yKey]/1000, mode='lines+markers',  marker = dict(size = 7, symbol = 2), name='1KB Tx')
-    traceb = go.Scatter(x = dfb[xKey], y = dfb[yKey]/1000, mode='lines+markers',  marker = dict(size = 7, symbol = 4), name='4KB Tx')
-    ys = range(0,500, 30)
-    # layout = go.Layout(title=' Throughput (over different channels)',
-    #                plot_bgcolor='rgb(230, 230, 230)')
-    layout = dict(
-                  xaxis=dict(rangemode='tozero'
-                      , title='Channels'
-                      , tickformat=',d'),
-                  yaxis=dict(title='KTxs/Sec'
-                  ,rangemode='tozero')
-#                  tickvals=ys,  showticklabels=True)
-                    )
-    fig = go.Figure(data=[tracee, traces, tracem, traceb], layout=layout)
-    # plotly.offline.plot(fig, filename='Toy_Throughput')
-   # if not os.path.exists(outputPath + '/images'):
-    #    os.mkdir(outputPath + '/images')
-    pio.write_image(fig, outputPath + size + '.jpeg')
+            plt.title(names[n], fontsize='x-small')
+            plt.xticks(np.arange(0, 21, step=5), fontsize='x-small')
+            plt.yticks(getYrange(index), fontsize='x-small')
+            c += 1
+            plt.grid(True)
+            n += 1
+            index += 1
+        r += 1
+    # plt.figlegend(lines, ('label1', 'label2', 'label3'), 'upper right')
+    leg = fig.legend(lines,  # The line objects
+               labels=['50', '512', '1024', '4096'],  # The labels for each line
+               loc="upper right",  # Position of legend
+               borderaxespad=0.01,  # Small spacing around legend box
+               fontsize='xx-small',
+               # frameon=False,
+               bbox_to_anchor=(0.993, 0.935),
+                title = "Tx size\n(Bytes)"
+               )
+    plt.setp(leg.get_title(), fontsize='xx-small')
+    fig.text(0.5, 0.015, "Channels", ha="center", va="center", fontsize="small")
+    fig.text(0.015, 0.5, "Throughput (KTxs/sec)", ha="center", va="center", fontsize="small", rotation=90)
+    fig.tight_layout(rect=[0, 0, 0.94, 1])
+    for d in oPath:
+        plt.savefig(d + '/throughput')
 
+def getGDYrange(index):
+    if index == 1:
+        return np.arange(0, 15, 3)
+    if index == 2:
+        return np.arange(0, 15, 3)
+
+def drawGDThroghuputCharts(dir, oPath):
+    rows = 1
+    cols = 2
+    index = 1
+    fig, ax = plt.subplots(nrows=rows, ncols=cols)
+    plt.subplots_adjust(wspace=0.2, hspace=0.5)
+    names = ['100 Txs/block', '1000 Txs/block']
+    subDirs = ['4Servers', '7Servers', '10Servers']
+    evSize = ['100', '1000']
+    for e in evSize:
+        sb = str(rows) + str(cols) + str(index)
+        sb = int(sb)
+        plt.subplot(sb, aspect='equal', adjustable='box-forced')
+        # summeries = glob.glob(dir + "*/*.100/servers/res/summery.csv")
+        m = 0
+        for sd in subDirs:
+            sem = glob.glob(dir + "/" + sd  + "*/*." + e + "/servers/res/summery.csv")[0]
+            # path = dir + "/" + sd + "/servers/res/summery.csv"
+            mark = markers[m]
+            m += 1
+            df = pd.read_csv(sem, sep=",")
+            df = df[['channels', 'txPsec']].groupby(df.channels).mean()
+            markers_on = [0, 5, 10, 19]
+            plt.plot(df['channels'], df['txPsec'] / 1000, "-" + mark,
+                     markerfacecolor=face_c, markersize=marker_s,
+                     linewidth=line_w, markevery=markers_on)
+
+        plt.title(names[index - 1], fontsize='x-small')
+        plt.xticks(np.arange(0, 21, step=5), fontsize='x-small')
+        plt.yticks(np.arange(0, 15, step=2), fontsize='x-small')
+        plt.grid(True)
+        index += 1
+    # plt.figlegend(lines, ('label1', 'label2', 'label3'), 'upper right')
+    leg = fig.legend([],  # The line objects
+               labels=['4', '7 ', '10'],  # The labels for each line
+               loc="upper right",  # Position of legend
+               borderaxespad=0.01,  # Small spacing around legend box
+               fontsize='xx-small',
+               # frameon=False,
+               bbox_to_anchor=(0.99, 0.433),
+                title = "#servers"
+               )
+    plt.setp(leg.get_title(), fontsize='xx-small')
+    fig.text(0.5, 0.27, "Channels", ha="center", va="center", fontsize='small')
+    fig.text(0.02, 0.5, "Throughput (KTxs/sec)", ha="center", va="center", rotation=90, fontsize='small')
+    fig.tight_layout(rect=[0.015, 0, 0.94, 1])
+    for d in oPath:
+        plt.savefig(d + '/GD_throughput', bbox_inches = 'tight', pad_inches = 0.08)
+
+def drawFailures(dir, sizes, oPath):
+    rows = 1
+    cols = 2
+    index = 1
+    n_groups = 3
+    bar_width = 0.35
+    opacity = 1
+    names = ['100 Txs/block', '1000 Txs/block']
+    fig, ax = plt.subplots(nrows=rows, ncols=cols)
+    plt.subplots_adjust(wspace=0.2, hspace=0.5)
+    for s in sizes:
+        sb = str(rows) + str(cols) + str(index)
+        sb = int(sb)
+        ax2 = plt.subplot(sb) #, aspect='equal', adjustable='box-forced')
+        benginFiles = glob.glob(dir + "/*." + s + ".bengin/servers/res/summery.csv")
+        list_ = []
+        for f in benginFiles:
+            df = pd.read_csv(f, index_col=None, header=0)
+            list_.append(df)
+        benginDf = pd.concat(list_, axis=0, ignore_index=True)
+
+        byzFiles = glob.glob(dir + "/*." + s + ".byz/servers/res/summery.csv")
+        list_ = []
+        for f in byzFiles:
+            df = pd.read_csv(f, index_col=None, header=0)
+            list_.append(df)
+        byzDf = pd.concat(list_, axis=0, ignore_index=True)
+
+        benginDf = benginDf[benginDf.id > 0]
+        byzDf = byzDf[byzDf.id > 0]
+
+        index2 = np.arange(n_groups)
+
+
+        benginDf = benginDf[['channels', 'txPsec']].groupby(benginDf.channels).mean()
+        byzDf = byzDf[['channels', 'txPsec']].groupby(byzDf.channels).mean()
+
+        rects1 = plt.bar(index2, benginDf['txPsec'] / 1000, bar_width,
+                         alpha=opacity, hatch='xxx',
+                        label='Benign fault')
+        rects2 = plt.bar(index2 + bar_width, byzDf['txPsec'] / 1000, bar_width,
+                         alpha=opacity,
+                         label='Byzantine fault')
+        ax2.set_xticks(index2 + bar_width / 2)
+        ax2.set_xticklabels(('1', '5', '10'))
+        # plt.yticks(getYrange(index), fontsize='x-small')
+        plt.title(names[index-1], fontsize='small')
+        index += 1
+
+    leg = fig.legend([],  # The line objects
+                     labels=['Omission', 'Byzantine'],  # The labels for each line
+                     loc="upper right",  # Position of legend
+                     borderaxespad=0.01,  # Small spacing around legend box
+                     fontsize='xx-small',
+                     handlelength=0.9,
+                     # frameon=False,
+                     bbox_to_anchor=(0.997, 0.88),
+                     title="Fault Type",
+                     # mode="expand"
+                     handletextpad=0.5
+                     )
+    plt.setp(leg.get_title(), fontsize='xx-small')
+    # plt.set_xlabel('channels')
+    # plt.set_ylabel('Throughput (KTxs / sec)')
+
+    # ax.legend()
+    #
+    # fig.tight_layout()
+
+    fig.text(0.5, 0.03, "Channels", ha="center", va="center")
+    fig.text(0.03, 0.5, "Throughput (KTxs/sec)", ha="center", va="center", rotation=90)
+    fig.tight_layout(rect=[0.02, 0, 0.93, 1])
+    for d in oPath:
+        plt.savefig(d + '/failures')
 
 if __name__ == '__main__':
-    base = '/home/yoni/toy/plots'
-    # dirs=[base + '/4servers', base + '/7servers', base + '/10servers']
-    # drawCharts(dirs, '/home/yoni/Dropbox/paper/draws/')
-    dirs = [base + '/sig/0-10.csv', base + '/sig/1000-4096.csv']
-    drawSigCharts(dirs, '/home/yoni/Dropbox/paper/draws/')
-#     parser = argparse.ArgumentParser(description='Create a Toy Diagrams')
-#     parser.add_argument('-t', metavar='path', required=True,
-#                             help='Tx in block ')
-#     parser.add_argument('-e', metavar='path', required=True,
-#                         help='the path to the directory of the 50 byte transactions ')
-#     parser.add_argument('-s', metavar='path', required=True,
-#                         help='the path to the directory of the 512 byte transactions ')
-#     parser.add_argument('-m', metavar='path', required=True,
-#                             help='the path to the directory of the 1K byte transactions ')
-#     parser.add_argument('-b', metavar='path', required=True,
-#                         help='the path to the directory of the 4K byte transactions ')
-#     parser.add_argument('-o', metavar='path', required=True,
-#                         help='the path to the output directory ')
-#     args = parser.parse_args()
-# #    dfs = pd.read_csv(args.s + '.10/res/summery.csv', sep=",")
-# #    dfm = pd.read_csv(args.m + '.10/res/summery.csv', sep=",")
-# #    dfb = pd.read_csv(args.b + '.10/res/summery.csv', sep=",")
-# #    drawThroughputDiagram('10', dfs[['channels', 'txPsec']].groupby(dfs.channels).mean(), dfm[['channels', 'txPsec']].groupby(dfm.channels).mean(), dfb[['channels', 'txPsec']].groupby(dfb.channels).mean(), 'channels', 'txPsec', args.o)
-# #    dfs = pd.read_csv(args.s + '.100/res/summery.csv', sep=",")
-# #    dfm = pd.read_csv(args.m + '.100/res/summery.csv', sep=",")
-# #    dfb = pd.read_csv(args.b + '.100/res/summery.csv', sep=",")
-# #    drawThroughputDiagram('100', dfs[['channels', 'txPsec']].groupby(dfs.channels).mean(), dfm[['channels', 'txPsec']].groupby(dfm.channels).mean(), dfb[['channels', 'txPsec']].groupby(dfb.channels).mean(), 'channels', 'txPsec', args.o)
-#     dfe = pd.read_csv(args.e + '/res/summery.csv', sep=",")
-#     dfs = pd.read_csv(args.s + '/res/summery.csv', sep=",")
-#     dfm = pd.read_csv(args.m + '/res/summery.csv', sep=",")
-#     dfb = pd.read_csv(args.b + '/res/summery.csv', sep=",")
-#     drawThroughputDiagram(args.t, dfe[['channels', 'txPsec']].groupby(dfe.channels).mean(), dfs[['channels', 'txPsec']].groupby(dfs.channels).mean(), dfm[['channels', 'txPsec']].groupby(dfm.channels).mean(), dfb[['channels', 'txPsec']].groupby(dfb.channels).mean(), 'channels', 'txPsec', args.o)
+    # draw_tmo_charts(["/home/yoni/toy/tmo/4Servers", "/home/yoni/toy/tmo/7Servers",
+    #                  "/home/yoni/toy/tmo/10Servers"], ["/home/yoni/toy/figures",
+    #                                                    "/home/yoni/Dropbox/paper/draws"])
+    # drawThroghuputCharts(["/home/yoni/toy/plots/4servers", "/home/yoni/toy/plots/7servers", "/home/yoni/toy/plots/10servers"],
+    #                      ["/home/yoni/toy/figures", "/home/yoni/Dropbox/paper/draws"])
+
+    # drawSigs(["/home/yoni/toy/sigData"], ["/home/yoni/toy/figures", "/home/yoni/Dropbox/paper/draws"])
+    # drawCDF(["/home/yoni/toy/latency/4Servers"
+    #         ,"/home/yoni/toy/latency/7Servers"
+    #         , "/home/yoni/toy/latency/10Servers"]
+    # , ["/home/yoni/toy/figures", "/home/yoni/Dropbox/paper/draws"])
+    #
+    # heatmaps(["/home/yoni/toy/latency/4Servers"
+    #             , "/home/yoni/toy/latency/7Servers"
+    #             , "/home/yoni/toy/latency/10Servers"]
+    #         , ["/home/yoni/toy/figures", "/home/yoni/Dropbox/paper/draws"])
+    # drawFailures("/home/yoni/toy/failures", ['100', '1000'],
+    #  ["/home/yoni/toy/figures", "/home/yoni/Dropbox/paper/draws"])
+    drawGDCDF2(["/home/yoni/toy/gd_latency/4Servers"
+                  , "/home/yoni/toy/gd_latency/7Servers"
+                  , "/home/yoni/toy/gd_latency/10Servers"]
+              , ["/home/yoni/toy/figures", "/home/yoni/Dropbox/paper/draws"])
+    # drawGDThroghuputCharts('/home/yoni/toy/gd', ["/home/yoni/toy/figures", "/home/yoni/Dropbox/paper/draws"])

@@ -35,6 +35,7 @@ public abstract class block {
     }
 
     public Block construct(int creatorID, int height, int cidSeries, int cid, int channel, BlockHeader header) {
+        long start = System.currentTimeMillis();
         byte[] tHash = new byte[0];
         for (Transaction t : blockBuilder.getDataList()) {
             tHash = DigestMethod.hash(ArrayUtils.addAll(tHash, t.toByteArray()));
@@ -73,7 +74,7 @@ public abstract class block {
 //                        .toBuilder()
 //                        .build())
 //                .build();
-        long start = System.currentTimeMillis();
+
         String signature = blockDigSig.sign(blockBuilder.getHeader());
         return blockBuilder
                 .setHeader(blockBuilder

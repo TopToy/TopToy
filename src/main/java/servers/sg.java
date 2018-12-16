@@ -39,7 +39,7 @@ public class sg implements server {
 
     private RmfNode rmf;
     boolean up = false;
-    HashMap<String, Integer> txMap = new HashMap<>();
+    final HashMap<Types.txID, Integer> txMap = new HashMap<>();
     private RBrodcastService deliverFork;
     private RBrodcastService sync;
     private int n;
@@ -57,6 +57,7 @@ public class sg implements server {
     private statistics sts = new statistics();
     private Thread deliverThread = new Thread(() -> {
         try {
+            Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
             deliverFromGroup();
         } catch (InterruptedException e) {
             logger.debug(format("G-%d interrupted while delivering from group", id));
@@ -67,8 +68,8 @@ public class sg implements server {
     Path cutterDirName = Paths.get(System.getProperty("user.dir"), "blocks");
     private Server txsServer;
 //    private ExecutorService chainCutterExecutor =  Executors.newSingleThreadExecutor();
-//    private ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(2);
-//    private EventLoopGroup gnio = new NioEventLoopGroup(2);
+    private ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
+    private EventLoopGroup gnio = new NioEventLoopGroup(2);
 
 
     public sg(String addr, int port, int id, int f, int c, int tmo, int tmoInterval,
@@ -118,20 +119,8 @@ public class sg implements server {
             }
         }
         bc = group[0].initBC(id, -1);
-//        try {
-//            txsServer = NettyServerBuilder
-//                    .forPort(9876)
-//                    .executor(executor)
-//                    .bossEventLoopGroup(gnio)
-//                    .workerEventLoopGroup(gnio)
-//                    .addService(new txServer(this))
-//                    .build()
-//                    .start();
-//            logger.info("starting tx server");
-//        } catch (IOException e) {
-//            logger.error("", e);
-//        }
-        new chainCutter(cutterDirName);
+
+//        new chainCutter(cutterDirName);
         logger.info(format("cutter batch is %d", cutterBatch));
     }
 
@@ -195,12 +184,9 @@ public class sg implements server {
         sts.lastTxTs = max(sts.lastTxTs, b.getSt().getDecided());
         sts.txCount += b.getDataCount();
 //        logger.info(format("data count is %d, bc size is: %d, total: %d", b.getDataCount(), bc.getHeight(), sts.txCount));
-        long bTs = b.getSt().getDecided();
+//        long bTs = b.getSt().getDecided();
         for (Types.Transaction t : b.getDataList()) {
-            txMap.put(t.getTxID(), b.getHeader().getHeight());
-//            long diff = bTs - Longs.fromByteArray(Arrays.copyOfRange(t.getData().toByteArray(), 0, 8));
-//            logger.info(format("diff is: [%d]", diff));
-//            sts.delaysSum += diff;
+            txMap.put(t.getId(), b.getHeader().getHeight());
         }
         synchronized (txMap) {
             txMap.notifyAll();
@@ -241,6 +227,19 @@ public class sg implements server {
 
     }
     public void start() {
+        try {
+            txsServer = NettyServerBuilder
+                    .forPort(9876)
+                    .executor(executor)
+                    .bossEventLoopGroup(gnio)
+                    .workerEventLoopGroup(gnio)
+                    .addService(new txServer(this))
+                    .build()
+                    .start();
+            logger.info("starting tx server");
+        } catch (IOException e) {
+            logger.error("", e);
+        }
         CountDownLatch latch = new CountDownLatch(3);
         new Thread(() -> {
             this.rmf.start();
@@ -319,7 +318,7 @@ public class sg implements server {
 //    }
 
 
-    public String addTransaction(Types.Transaction tx) {
+    public Types.txID addTransaction(Types.Transaction tx) {
 //        if (!up) return "";
         int ps = group[0].getTxPoolSize();
         int chan = 0;
@@ -332,7 +331,7 @@ public class sg implements server {
         }
         Types.Transaction ntx = tx.toBuilder()
                 .setServerTs(System.currentTimeMillis())
-                .setTxID(UUID.randomUUID().toString())
+                .setId(Types.txID.newBuilder().setTxID(UUID.randomUUID().toString()))
                 .build();
         return group[chan].addTransaction(ntx);
     }
@@ -359,7 +358,7 @@ public class sg implements server {
         return -1;
     }
 
-    Types.approved getTransaction(String txID) throws InterruptedException {
+    Types.approved getTransaction(Types.txID txID) throws InterruptedException {
         Types.Block b = null;
         synchronized (txMap) {
             while (!txMap.containsKey(txID)) {
@@ -371,7 +370,7 @@ public class sg implements server {
         }
         if (b == null) return Types.approved.getDefaultInstance();
         for (Types.Transaction t : b.getDataList()) {
-            if (t.getTxID().equals(txID)) {
+            if (t.getId().getTxID().equals(txID.getTxID())) {
                 return Types.approved.newBuilder().setSt(b.getSt()).setTx(t).build();
             }
         }
@@ -450,18 +449,18 @@ class txServer extends blockchainServiceImplBase {
     }
     @Override
     public void addTransaction(Types.Transaction request, StreamObserver<Types.accepted> responseObserver) {
-//        logger.info("add tx...");
-//        logger.info("receive write request");
+        logger.info("add tx...");
+        logger.info("receive write request");
         boolean ac = true;
-        String txID = server.addTransaction(request);
-        if (txID.equals("")) ac = false;
-        responseObserver.onNext(Types.accepted.newBuilder().setTxID(txID).setAccepted(ac).build());
+        Types.txID id = server.addTransaction(request);
+        if (id == null) ac = false;
+        responseObserver.onNext(Types.accepted.newBuilder().setTxID(id).setAccepted(ac).build());
         responseObserver.onCompleted();
     }
 
     @Override
     public void getTransaction(Types.read request, StreamObserver<Types.approved> responseObserver) {
-//        logger.info("receive read request");
+        logger.info("receive read request");
         try {
             responseObserver.onNext(server.getTransaction(request.getTxID()));
         } catch (InterruptedException e) {
