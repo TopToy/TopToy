@@ -123,7 +123,7 @@ load_servers_configuration() {
 
 configure_servers() {
     echo "init" > ${inst}
-#    echo "wait 15" >> ${inst}
+#    echo "wait 30" >> ${inst}
     echo "serve" >> ${inst}
     echo "wait ${1}" >> ${inst}
     echo "stop" >> ${inst}
@@ -230,6 +230,7 @@ run_servers_channels() {
         echo "id,type,channels,txSize,maxTxInBlock,actualTxInBlock,height,signaturePeriod,verificationPeriod,propose2tentative,tentative2permanent,channelPermanent2decide,propose2permanentchannel,propose2decide" >> $currOut/servers/res/blocksStat_${i}.csv
         echo "[${i} channels]"
         run_servers_instance_with_cahnnels ${i}
+        sleep 10
         collect_res_from_servers ${currOut} ${chan}
     done
 }
@@ -475,7 +476,7 @@ run_no_failures_test() {
         configure_tx_size ${1}
         configure_max_tx_in_block ${2}
         configure_tmo ${7}
-        configure_servers 90
+        configure_servers 60
         configure_server_files ${i}
         install_server ${i}
         cat ${tconfig_bbc} > ${config_bbc}
@@ -651,8 +652,55 @@ main_byz() {
    run_byz_test ${1} ${2} ${3} ${4} ${currOut} ${5}
 }
 
-main_no_failures 500 100 1 20 1 20000
-main_no_failures 500 1000 1 20 1 20000
+#for i in `seq 0 2`; do
+#    main_no_failures 0 10 1 1 1 2000
+#    main_no_failures 0 100 1 1 1 2000
+#    main_no_failures 0 1000 1 1 1 2000
+#done
+
+#for i in `seq 0 0`; do
+#    main_no_failures 0 10 2 20 2 2000
+#    main_no_failures 0 100 2 20 2 2000
+#    main_no_failures 0 1000 2 20 2 2000
+#done
+
+#for i in `seq 0 2`; do
+#    main_no_failures 500 10 1 1 1 2000
+#    main_no_failures 500 100 1 1 1 2000
+#    main_no_failures 500 1000 1 1 1 2000
+#done
+#
+for i in `seq 0 0`; do
+    main_no_failures 500 10 2 20 2 2000
+    main_no_failures 500 100 2 20 2 2000
+    main_no_failures 500 1000 2 20 2 2000
+done
+##
+#
+for i in `seq 0 2`; do
+    main_no_failures 1012 10 1 1 1 2000
+    main_no_failures 1012 100 1 1 1 2000
+    main_no_failures 1012 1000 1 1 1 2000
+done
+
+for i in `seq 0 2`; do
+    main_no_failures 1012 10 2 20 2 2000
+    main_no_failures 1012 100 2 20 2 2000
+    main_no_failures 1012 1000 2 20 2 2000
+done
+##
+#for i in `seq 0 2`; do
+#    main_no_failures 4084 10 1 1 1 2000
+#    main_no_failures 4084 100 1 1 1 2000
+#    main_no_failures 4084 1000 1 1 1 2000
+#done
+#
+#for i in `seq 0 2`; do
+#    main_no_failures 4084 10 2 20 2 2000
+#    main_no_failures 4084 100 2 20 2 2000
+#    main_no_failures 4084 1000 2 20 2 2000
+#done
+
 
 
 #main_bengin 500 100 200 1 1
@@ -696,24 +744,25 @@ main_no_failures 500 1000 1 20 1 20000
 #done
 
 
-#main_run_sig_test 0 10 1 4 1
-#main_run_sig_test 0 100 1 4 1
-#main_run_sig_test 0 1000 1 4 1
+#for i in `seq 0 2`; do
+#    main_run_sig_test 0 10 1 4 1
+#    main_run_sig_test 0 100 1 4 1
+#    main_run_sig_test 0 1000 1 4 1
 #
-#main_run_sig_test 512 10 1 4 1
-#main_run_sig_test 512 100 1 4 1
-#main_run_sig_test 512 1000 1 4 1
-#
-#
-#main_run_sig_test 1024 10 1 4 1
-#main_run_sig_test 1024 100 1 4 1
-#main_run_sig_test 1024 1000 1 4 1
+#    main_run_sig_test 512 10 1 4 1
+#    main_run_sig_test 512 100 1 4 1
+#    main_run_sig_test 512 1000 1 4 1
 #
 #
-#main_run_sig_test 4096 10 1 4 1
-#main_run_sig_test 4096 100 1 4 1
-#main_run_sig_test 4096 1000 1 4 1
-
+#    main_run_sig_test 1024 10 1 4 1
+#    main_run_sig_test 1024 100 1 4 1
+#    main_run_sig_test 1024 1000 1 4 1
+#
+#
+#    main_run_sig_test 4096 10 1 4 1
+#    main_run_sig_test 4096 100 1 4 1
+#    main_run_sig_test 4096 1000 1 4 1
+#done
 
 # ${1} - transaction size
 # ${2} - transactions in block

@@ -68,7 +68,7 @@ public class sg implements server {
     Path cutterDirName = Paths.get(System.getProperty("user.dir"), "blocks");
     private Server txsServer;
 //    private ExecutorService chainCutterExecutor =  Executors.newSingleThreadExecutor();
-    private ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
+    private ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(1);
     private EventLoopGroup gnio = new NioEventLoopGroup(2);
 
 
@@ -185,9 +185,9 @@ public class sg implements server {
         sts.txCount += b.getDataCount();
 //        logger.info(format("data count is %d, bc size is: %d, total: %d", b.getDataCount(), bc.getHeight(), sts.txCount));
 //        long bTs = b.getSt().getDecided();
-        for (Types.Transaction t : b.getDataList()) {
-            txMap.put(t.getId(), b.getHeader().getHeight());
-        }
+//        for (Types.Transaction t : b.getDataList()) {
+//            txMap.put(t.getId(), b.getHeader().getHeight());
+//        }
         synchronized (txMap) {
             txMap.notifyAll();
         }
@@ -227,19 +227,7 @@ public class sg implements server {
 
     }
     public void start() {
-        try {
-            txsServer = NettyServerBuilder
-                    .forPort(9876)
-                    .executor(executor)
-                    .bossEventLoopGroup(gnio)
-                    .workerEventLoopGroup(gnio)
-                    .addService(new txServer(this))
-                    .build()
-                    .start();
-            logger.info("starting tx server");
-        } catch (IOException e) {
-            logger.error("", e);
-        }
+
         CountDownLatch latch = new CountDownLatch(3);
         new Thread(() -> {
             this.rmf.start();
@@ -263,6 +251,8 @@ public class sg implements server {
         for (int i = 0 ; i < c ; i++) {
             group[i].start(true);
         }
+
+
     }
 
     public void shutdown() {
@@ -296,6 +286,19 @@ public class sg implements server {
             group[i].serve();
         }
         deliverThread.start();
+        try {
+            txsServer = NettyServerBuilder
+                    .forPort(9876)
+                    .executor(executor)
+                    .bossEventLoopGroup(gnio)
+                    .workerEventLoopGroup(gnio)
+                    .addService(new txServer(this))
+                    .build()
+                    .start();
+            logger.info("starting tx server");
+        } catch (IOException e) {
+            logger.error("", e);
+        }
         up = true;
     }
 

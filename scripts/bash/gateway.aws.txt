@@ -1,1 +1,2 @@
-toy@ec2-18-191-133-250.us-east-2.compute.amazonaws.com
+toy@52.14.26.110
+toy@52.14.221.234

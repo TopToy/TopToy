@@ -70,7 +70,8 @@ public class cli {
 
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 writeSummery(outPath);
-                writeBlocksStatistics(outPath);
+//                writeToScv(outPath);
+//                writeBlocksStatistics(outPath);
                 writeBlocksStatisticsSummery(outPath);
             }));
         }
@@ -311,7 +312,7 @@ public class cli {
                 });
             }
             logger.info(format("Await termination 1"));
-            Thread.sleep(40 * 1000);
+            Thread.sleep(60 * 1000);
             stop.set(true);
 //            executor.awaitTermination(120, TimeUnit.SECONDS);
             latch1.await();

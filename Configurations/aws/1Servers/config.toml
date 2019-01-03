@@ -35,7 +35,7 @@ title = "configuration"
 
     [cluster.s0]
         id = 0
-        ip = "172.31.1.68"
+        ip = "172.31.2.174"
         port = 30000
         publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
                        N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
