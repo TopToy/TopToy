@@ -32,25 +32,26 @@ title = "configuration"
 
     [cluster.s0]
         id = 0
-        ip = "172.31.9.44"
+        ip = "172.31.26.36"
         port = 30000
         publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
                        N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
     [cluster.s1]
         id = 1
-        ip = "172.31.12.25"
+        ip = "172.31.16.16"
         port = 30000
         publicKey = """MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
                         N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
     [cluster.s2]
         id = 2
-        ip = "172.31.12.250"
+        ip = "172.31.22.205"
         port = 30000
         publicKey = """MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
                         N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
     [cluster.s3]
         id = 3
-        ip = "172.31.4.26"
+        ip = "172.31.29.119"
         port = 30000
         publicKey="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
                       N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+
