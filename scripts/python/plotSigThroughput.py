@@ -66,4 +66,4 @@ def plotSigThroughput(dirs, oPath):
         plt.savefig(d + '/sig_throughput')
 
 if __name__ == "__main__":
-    plotSigThroughput(["/home/yoni/toy/res_sig"], ["/home/yoni/toy/figures", "/home/yoni/Dropbox/paper/draws"])
+    plotSigThroughput(["/home/yoni/toy/old/res_sig"], ["/home/yoni/toy/figures", "/home/yoni/Dropbox/paper/draws"])
