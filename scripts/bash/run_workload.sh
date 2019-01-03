@@ -230,7 +230,7 @@ run_servers_channels() {
         echo "id,type,channels,txSize,maxTxInBlock,actualTxInBlock,height,signaturePeriod,verificationPeriod,propose2tentative,tentative2permanent,channelPermanent2decide,propose2permanentchannel,propose2decide" >> $currOut/servers/res/blocksStat_${i}.csv
         echo "[${i} channels]"
         run_servers_instance_with_cahnnels ${i}
-        sleep 10
+#        sleep 10
         collect_res_from_servers ${currOut} ${chan}
     done
 }
@@ -671,8 +671,8 @@ main_byz() {
 #done
 #
 for i in `seq 0 0`; do
-    main_no_failures 500 10 2 20 2 2000
-    main_no_failures 500 100 2 20 2 2000
+#    main_no_failures 500 10 2 20 2 2000
+#    main_no_failures 500 100 2 20 2 2000
     main_no_failures 500 1000 2 20 2 2000
 done
 ##
@@ -688,18 +688,18 @@ for i in `seq 0 2`; do
     main_no_failures 1012 100 2 20 2 2000
     main_no_failures 1012 1000 2 20 2 2000
 done
-##
-#for i in `seq 0 2`; do
-#    main_no_failures 4084 10 1 1 1 2000
-#    main_no_failures 4084 100 1 1 1 2000
-#    main_no_failures 4084 1000 1 1 1 2000
-#done
 #
-#for i in `seq 0 2`; do
-#    main_no_failures 4084 10 2 20 2 2000
-#    main_no_failures 4084 100 2 20 2 2000
-#    main_no_failures 4084 1000 2 20 2 2000
-#done
+for i in `seq 0 2`; do
+    main_no_failures 4084 10 1 1 1 2000
+    main_no_failures 4084 100 1 1 1 2000
+    main_no_failures 4084 1000 1 1 1 2000
+done
+
+for i in `seq 0 2`; do
+    main_no_failures 4084 10 2 20 2 2000
+    main_no_failures 4084 100 2 20 2 2000
+    main_no_failures 4084 1000 2 20 2 2000
+done
 
 
 
