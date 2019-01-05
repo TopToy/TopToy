@@ -3,8 +3,8 @@
 echo "title = \"configuration\"
 
 [system]
-    n = 49
-    f = 16
+    n = ${2}
+    f = ${3}
     c = 20
     testing = true
     txSize = 0
