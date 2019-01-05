@@ -5,6 +5,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
+from utiles import csvs2df
+
 line_w=1
 marker_s=4
 face_c='none'
@@ -35,6 +37,7 @@ def plotTxthroughput(dirs, oPath):
     index = 1
     evSize = ['10', '100', '1000']
     bSize = ['50', '512', '1024', '4096']
+    fSize = ['0', '500', '1012', '4084']
     names = ['4 servers 10 Txs/block','4 servers 100 Txs/block'
               , '4 servers 1000 Txs/block', '7 servers 10 Txs/block'
               , '7 servers 100 Txs/block', '7 servers 1000 Txs/block'
@@ -52,11 +55,11 @@ def plotTxthroughput(dirs, oPath):
             sb = int(sb)
             plt.subplot(sb)
             m = 0
-            for b in bSize:
+            for f in fSize:
                 mark = markers[m]
                 m+= 1
-                path = d + "/" + size + "/" + b + ".csv"
-                df = pd.read_csv(path, sep=",")
+                files = glob.glob(d + "/*." + f + "." + size + "/servers/res/summery.csv")
+                df = csvs2df(files)
                 df = df[['channels', 'txPsec']][(df.channels == 1) | (df.channels % 2 == 0)].groupby(df.channels).mean()
                 markers_on=[0, 3, 6, 10]
                 l = plt.plot(df['channels'], df['txPsec'] / 1000, "-" + mark, markerfacecolor=face_c, markersize=marker_s, linewidth=line_w, markevery=markers_on)
@@ -86,5 +89,6 @@ def plotTxthroughput(dirs, oPath):
         plt.savefig(d + '/throughput2')
 
 if __name__ == "__main__":
-    plotTxthroughput(["/home/yoni/toy/plots/4servers", "/home/yoni/toy/plots/7servers", "/home/yoni/toy/plots/10servers"],
+    plotTxthroughput(["/home/yoni/toy/singleDCThroughput/4Servers", "/home/yoni/toy/singleDCThroughput/7Servers",
+                      "/home/yoni/toy/singleDCThroughput/10Servers"],
                          ["/home/yoni/toy/figures", "/home/yoni/Dropbox/paper/draws"])

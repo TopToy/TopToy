@@ -41,29 +41,20 @@ def plotGdLatencyChart(dirs, oPath):
                 f = files[i]
                 path = dir + "/" + d + "/" + f
                 df = pd.read_csv(path, sep=",")
+                len = df.size
+
                 df = df['clientLatency'] / 1000
                 data += [df]
                 print("path: " + path)
                 print("max: " + str(df.max()))
                 print("min: " + str(df.min()))
+                print("size:" + str(len))
         plt.boxplot(data, 0, '', whis=[0, 90])
-        # plt.boxplot(data, 0, '') # whis='range')
         ax2.set_xticklabels(('4(1)', '4(5)', '7(1)', '7(5)', '10(1)', '10(5)'))
         plt.title(names[index - 1], fontsize='medium')
         plt.grid(True)
         index += 1
 
-    # leg = fig.legend([],  # The line objects
-    #                  labels=['1', '5'],  # The labels for each line
-    #                  loc="upper right",  # Position of legend
-    #                  borderaxespad=0.01,  # Small spacing around legend box
-    #                  fontsize='x-small',
-    #                  # frameon=False,
-    #                  handlelength=0.9,
-    #                  bbox_to_anchor=(0.985, 0.925),
-    #                  title="Channels",
-    #                  )
-    # plt.setp(leg.get_title(), fontsize='xx-small')
     fig.text(0.48, 0.03, "Servers(workers)", ha="center", va="center")
     fig.text(0.03, 0.5, "Time (seconds)", ha="center", va="center", rotation=90)
     fig.tight_layout(rect=[0.01, 0.03, 0.93, 1])
@@ -72,7 +63,7 @@ def plotGdLatencyChart(dirs, oPath):
         plt.savefig(d + '/gd_cdf3', bbox_inches='tight')
 
 if __name__ == "__main__":
-    plotGdLatencyChart(["/home/yoni/toy/gd_latency/4Servers"
-                       , "/home/yoni/toy/gd_latency/7Servers"
-                       , "/home/yoni/toy/gd_latency/10Servers"]
+    plotGdLatencyChart(["/home/yoni/toy/old/gd_latency/4Servers"
+                       , "/home/yoni/toy/old/gd_latency/7Servers"
+                       , "/home/yoni/toy/old/gd_latency/10Servers"]
                    , ["/home/yoni/toy/figures", "/home/yoni/Dropbox/paper/draws"])
