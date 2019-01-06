@@ -46,6 +46,7 @@ def drawBSThroghuputCharts(dir, oPath):
     fig.text(0.02, 0.5, "Throughput (KTxs/sec)", ha="center", va="center", rotation=90, fontsize='small')
     fig.tight_layout(rect=[0.015, 0, 0.93, 1])
     for d in oPath:
+        plt.savefig(d + '/BS_throughput2.pdf', bbox_inches='tight', pad_inches=0.08)
         plt.savefig(d + '/BS_throughput2', bbox_inches = 'tight', pad_inches = 0.08)
 
 if __name__ == "__main__":

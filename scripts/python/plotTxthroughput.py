@@ -86,6 +86,7 @@ def plotTxthroughput(dirs, oPath):
     fig.text(0.015, 0.5, "Throughput (KTxs/sec)", ha="center", va="center", fontsize="small", rotation=90)
     fig.tight_layout(rect=[0, 0, 0.94, 1])
     for d in oPath:
+        plt.savefig(d + '/throughput2.pdf')
         plt.savefig(d + '/throughput2')
 
 if __name__ == "__main__":
