@@ -123,7 +123,7 @@ load_servers_configuration() {
 
 configure_servers() {
     echo "init" > ${inst}
-    echo "wait 30" >> ${inst}
+#    echo "wait 30" >> ${inst}
     echo "serve" >> ${inst}
     echo "wait ${1}" >> ${inst}
     echo "stop" >> ${inst}
@@ -705,12 +705,17 @@ main_byz() {
 #    main_no_failures 4084 1000 12 12 1 2000
 
 for i in `seq 0 2`; do
-    main_no_failures 500 1000 2 20 2 20000
+    main_byz 500 100 200 1 1
+    main_byz 500 100 400 5 1
+    main_byz 500 100 600 10 1
 done
 
 for i in `seq 0 2`; do
-    main_no_failures 500 1000 2 20 2 20000
+    main_byz 500 1000 200 1 1
+    main_byz 500 1000 500 5 1
+    main_byz 500 1000 900 10 1
 done
+
 
 
 #main_bengin 500 100 200 1 1
@@ -725,9 +730,7 @@ done
 ##main_bengin 500 1000 500 5 1
 ##main_bengin 500 1000 900 10 1
 #
-#main_byz 500 1000 200 1 1
-#main_byz 500 1000 500 5 1
-#main_byz 500 1000 900 10 1
+
 
 #main_bengin 500 100 400 10 1
 #main_bengin 500 1000 500 10 1

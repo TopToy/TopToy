@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #readarray -t gate < ./gateway.txt
-out_path_f=/home/yoni/toy/res_4latency
+out_path_f=/home/yoni/toy/res_4tmo
 gate_f=toy@52.14.26.110
 #rsync -au ${gate}:./toy/out/* ${out_path}
 while sleep 5; do

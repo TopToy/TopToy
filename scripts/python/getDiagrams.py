@@ -283,73 +283,7 @@ def drawGDCDF2(dirs, oPath):
     # fig.tight_layout(rect=[0.04, 0, 0.9, 1])
     for d in oPath:
         plt.savefig(d + '/gd_cdf', bbox_inches='tight')
-def heatmaps(dirs, oPath):
-    subDirs = ["servers/500.1000"] #, "servers/500.100"]
-    # frames=[[], [], []]
-    frames = []
-    files = ["blocksStat_1.csv", "blocksStat_5.csv", "blocksStat_10.csv"]
-    for f in files:
-        for dir in dirs:
-            for d in subDirs:
-                path = dir + "/" + d + "/" + f
-                df = pd.read_csv(path, sep=",")
-                # frames[i].append(df)
-                frames += [df]
-    # df = []
-    # for frame in frames:
-    #     df += [pd.concat(frame, axis = 0)]
 
-    df = frames
-    chan = ['4 servers\n1 channel','7 servers\n1 channel','10 servers\n1 channel',
-            '4 servers\n5 channels','7 servers\n5 channels','10 servers\n5 channels',
-            '4 servers\n10 channels', '7 servers\n10 channels', '10 servers\n10 channels']
-    labels = ['signature', 'verification', 'propose\ntentative', 'tentative\npermanent', 'permanent\ndecide']
-    realLabels=['signaturePeriod','verificationPeriod','propose2tentative','tentative2permanent','channelPermanent2decide','propose2decide']
-    normData = []
-    # for i in range(0, 3):
-    #     data = df[i]
-    #     # data = data.mean()
-    #     d = data[realLabels[:5]].div(data.propose2decide, axis=0)
-    #     normData += [d.mean().values]
-
-    for data in df:
-        # data = data.mean()
-        d = data[realLabels[:5]].div(data.propose2decide, axis=0)
-        normData += [d.mean().values]
-
-    fig, ax = plt.subplots()
-    # im = ax.imshow(normData, cmap='autumn')
-    im = ax.imshow(zip(*normData), cmap='autumn')
-
-    # cbar = ax.figure.colorbar(im, ax=ax, cmap="autumn")
-    cbar = plt.colorbar(im, fraction=0.0257, pad=0.04)
-
-    cbar.ax.set_ylabel("Relative execution time", rotation=-90, va="bottom")
-    ax.set_xticks(np.arange(len(chan)))
-    ax.set_yticks(np.arange(len(labels)))
-
-    ax.set_xticklabels(chan, fontsize='x-small')
-    ax.set_yticklabels(labels, fontsize='small')
-
-    for edge, spine in ax.spines.items():
-        spine.set_visible(False)
-    ax.set_xticks(np.arange(len(chan) + 1) - .5, minor=True)
-    ax.set_yticks(np.arange(len(labels) + 1) - .5, minor=True)
-    ax.grid(which="minor", color="black", linestyle='-', linewidth=3)
-    ax.tick_params(which="minor", bottom=False, left=False)
-    plt.setp(ax.get_xticklabels(), rotation=45, ha="right",
-             rotation_mode="anchor")
-    # plt.setp(ax.get_yticklabels(), rotation=45, ha="right",
-    #          rotation_mode="anchor")
-
-    for i in range(len(chan)):
-        for j in range(len(labels)):
-            text = ax.text(i, j, str(round(normData[i][j], 3)),
-                           ha="center", va="center", color="black")
-
-    # fig.text(0.07, 0.8, "Channels", ha="center", va="center")
-    for d in oPath:
-        plt.savefig(d + '/heatmap', bbox_inches='tight')
 
 
 def heatmaps2(dirs, oPath):
@@ -559,80 +493,7 @@ def drawBSThroghuputCharts(dir, oPath):
     for d in oPath:
         plt.savefig(d + '/BS_throughput', bbox_inches = 'tight', pad_inches = 0.08)
 
-def drawFailures(dir, sizes, oPath):
-    rows = 1
-    cols = 2
-    index = 1
-    n_groups = 3
-    bar_width = 0.35
-    opacity = 1
-    names = ['100 Txs/block', '1000 Txs/block']
-    fig, ax = plt.subplots(nrows=rows, ncols=cols)
-    plt.subplots_adjust(wspace=0.2, hspace=0.5)
-    for s in sizes:
-        sb = str(rows) + str(cols) + str(index)
-        sb = int(sb)
-        ax2 = plt.subplot(sb) #, aspect='equal', adjustable='box-forced')
-        benginFiles = glob.glob(dir + "/*." + s + ".bengin/servers/res/summery.csv")
-        list_ = []
-        for f in benginFiles:
-            df = pd.read_csv(f, index_col=None, header=0)
-            list_.append(df)
-        benginDf = pd.concat(list_, axis=0, ignore_index=True)
 
-        byzFiles = glob.glob(dir + "/*." + s + ".byz/servers/res/summery.csv")
-        list_ = []
-        for f in byzFiles:
-            df = pd.read_csv(f, index_col=None, header=0)
-            list_.append(df)
-        byzDf = pd.concat(list_, axis=0, ignore_index=True)
-
-        benginDf = benginDf[benginDf.id > 0]
-        byzDf = byzDf[byzDf.id > 0]
-
-        index2 = np.arange(n_groups)
-
-
-        benginDf = benginDf[['channels', 'txPsec']].groupby(benginDf.channels).mean()
-        byzDf = byzDf[['channels', 'txPsec']].groupby(byzDf.channels).mean()
-
-        rects1 = plt.bar(index2, benginDf['txPsec'] / 1000, bar_width,
-                         alpha=opacity, hatch='xxx',
-                        label='Benign fault')
-        rects2 = plt.bar(index2 + bar_width, byzDf['txPsec'] / 1000, bar_width,
-                         alpha=opacity,
-                         label='Byzantine fault')
-        ax2.set_xticks(index2 + bar_width / 2)
-        ax2.set_xticklabels(('1', '5', '10'))
-        # plt.yticks(getYrange(index), fontsize='x-small')
-        plt.title(names[index-1], fontsize='small')
-        index += 1
-
-    leg = fig.legend([],  # The line objects
-                     labels=['Omission', 'Byzantine'],  # The labels for each line
-                     loc="upper right",  # Position of legend
-                     borderaxespad=0.01,  # Small spacing around legend box
-                     fontsize='xx-small',
-                     handlelength=0.9,
-                     # frameon=False,
-                     bbox_to_anchor=(0.995, 0.93),
-                     title="Fault Type",
-                     # mode="expand"
-                     handletextpad=0.5
-                     )
-    plt.setp(leg.get_title(), fontsize='xx-small')
-    # plt.set_xlabel('channels')
-    # plt.set_ylabel('Throughput (KTxs / sec)')
-
-    # ax.legend()
-    #
-    # fig.tight_layout()
-
-    fig.text(0.5, 0.03, "Channels", ha="center", va="center")
-    fig.text(0.03, 0.5, "Throughput (KTxs/sec)", ha="center", va="center", rotation=90)
-    fig.tight_layout(rect=[0.02, 0, 0.925, 1])
-    for d in oPath:
-        plt.savefig(d + '/failures')
 
 
 if __name__ == '__main__':
@@ -641,12 +502,9 @@ if __name__ == '__main__':
     #                                                    "/home/yoni/Dropbox/paper/draws"])
 
     #
-    # heatmaps(["/home/yoni/toy/latency/4Servers"
-    #             , "/home/yoni/toy/latency/7Servers"
-    #             , "/home/yoni/toy/latency/10Servers"]
-    #         , ["/home/yoni/toy/figures", "/home/yoni/Dropbox/paper/draws"])
-    # drawFailures("/home/yoni/toy/failures", ['100', '1000'],
-    #  ["/home/yoni/toy/figures", "/home/yoni/Dropbox/paper/draws"])
+
+    drawFailures("/home/yoni/toy/failures", ['100', '1000'],
+     ["/home/yoni/toy/figures", "/home/yoni/Dropbox/paper/draws"])
     # drawGDCDF2(["/home/yoni/toy/gd_latency/4Servers"
     #               , "/home/yoni/toy/gd_latency/7Servers"
     #               , "/home/yoni/toy/gd_latency/10Servers"]

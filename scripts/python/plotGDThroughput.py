@@ -33,7 +33,7 @@ def plotGDTrhoughput(dir, oPath):
             m += 1
             df = csvs2df(files)
             df = df[['channels', 'txPsec']].groupby(df.channels).mean()
-            markers_on = [0, 5, 10, 19]
+            markers_on = [0, 3, 6, 9]
             plt.plot(df['channels'], df['txPsec'] / 1000, "-" + mark,
                      markerfacecolor=face_c, markersize=marker_s,
                      linewidth=line_w, markevery=markers_on)
@@ -62,4 +62,4 @@ def plotGDTrhoughput(dir, oPath):
         plt.savefig(d + '/GD_throughput', bbox_inches = 'tight', pad_inches = 0.08)
 
 if __name__ == "__main__":
-    plotGDTrhoughput('/home/yoni/toy/gd', ["/home/yoni/toy/figures", "/home/yoni/Dropbox/paper/draws"])
+    plotGDTrhoughput('/home/yoni/toy/gdThroughput', ["/home/yoni/toy/figures", "/home/yoni/Dropbox/paper/draws"])
