@@ -6,8 +6,9 @@ import numpy as np
 
 from utiles import csvs2df
 
+fs=12
 line_w=1
-marker_s=4
+marker_s=6
 face_c='none'
 markers=['s', 'x', '+', '^']
 
@@ -15,15 +16,15 @@ def plotGDTrhoughput(dir, oPath):
     rows = 1
     cols = 2
     index = 1
-    fig, ax = plt.subplots(nrows=rows, ncols=cols)
+    fig, ax = plt.subplots(nrows=rows, ncols=cols, figsize=(7, 3))
     plt.subplots_adjust(wspace=0.2, hspace=0.5)
-    names = ['100 Txs/block', '1000 Txs/block']
+    names = ['$\\beta=100$', '$\\beta=1000$']
     subDirs = ['4Servers', '7Servers', '10Servers']
     evSize = ['100', '1000']
     for e in evSize:
         sb = str(rows) + str(cols) + str(index)
         sb = int(sb)
-        plt.subplot(sb, aspect='equal', adjustable='box-forced')
+        plt.subplot(sb)
         # summeries = glob.glob(dir + "*/*.100/servers/res/summery.csv")
         m = 0
         for sd in subDirs:
@@ -38,25 +39,25 @@ def plotGDTrhoughput(dir, oPath):
                      markerfacecolor=face_c, markersize=marker_s,
                      linewidth=line_w, markevery=markers_on)
 
-        plt.title(names[index - 1], fontsize='x-small')
-        plt.xticks(np.arange(0, 21, step=5), fontsize='x-small')
-        plt.yticks(np.arange(0, 15, step=2), fontsize='x-small')
+        plt.title(names[index - 1], fontsize=16)
+        plt.xticks(np.arange(0, 21, step=5), fontsize=16)
+        plt.yticks(np.arange(0, 15, step=2), fontsize=16)
         plt.grid(True)
         index += 1
     # plt.figlegend(lines, ('label1', 'label2', 'label3'), 'upper right')
     leg = fig.legend([],  # The line objects
-               labels=['4', '7 ', '10'],  # The labels for each line
-               loc="upper right",  # Position of legend
-               borderaxespad=0.01,  # Small spacing around legend box
-               fontsize='xx-small',
-               # frameon=False,
-               bbox_to_anchor=(0.99, 0.433),
-                title = "#servers"
+               labels=['$n=4$', '$n=7$', '$n=10$'],  # The labels for each line
+                     loc="lower center",  # Position of legend
+                     # borderaxespad=0.01,  # Small spacing around legend box
+                     fontsize=16,
+                     ncol=4,
+                     frameon=False,
+                     bbox_to_anchor=(0.5, -0.04),
                )
-    plt.setp(leg.get_title(), fontsize='xx-small')
-    fig.text(0.49, 0.27, "Channels", ha="center", va="center", fontsize='small')
-    fig.text(0.02, 0.5, "Throughput (KTxs/sec)", ha="center", va="center", rotation=90, fontsize='small')
-    fig.tight_layout(rect=[0.015, 0, 0.94, 1])
+    plt.setp(leg.get_title(), fontsize=fs)
+    fig.text(0.502, 0.1, "$\\omega$", ha="center", va="center", fontsize=16)
+    fig.text(0.02, 0.5, "Throughput ($\\frac{KTx}{sec}$)", ha="center", va="center", rotation=90, fontsize=16)
+    fig.tight_layout(rect=[0.02, 0.08, 1, 1])
     for d in oPath:
         plt.savefig(d + '/GD_throughput.pdf', bbox_inches='tight', pad_inches=0.08)
         plt.savefig(d + '/GD_throughput', bbox_inches = 'tight', pad_inches = 0.08)

@@ -6,9 +6,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from utiles import csvs2df
+fs=12
 
 line_w=1
-marker_s=4
+marker_s=5
 face_c='none'
 markers=['s', 'x', '+', '^']
 
@@ -38,14 +39,16 @@ def plotTxthroughput(dirs, oPath):
     evSize = ['10', '100', '1000']
     bSize = ['50', '512', '1024', '4096']
     fSize = ['0', '500', '1012', '4084']
-    names = ['4 servers 10 Txs/block','4 servers 100 Txs/block'
-              , '4 servers 1000 Txs/block', '7 servers 10 Txs/block'
-              , '7 servers 100 Txs/block', '7 servers 1000 Txs/block'
-              ,'10 servers 10 Txs/block', '10 servers 100 Txs/block'
-              , '10 servers 1000 Txs/block']
+    nu="$n=$"
+    beta="$\\beta=$"
+    names = [nu+'4, ' + beta + '10',nu+'4, ' + beta + '100'
+              , nu+'4, ' + beta + '1000', nu+'7, ' + beta + '10'
+              , nu+'7, ' + beta + '100', nu+'7, ' + beta + '1000'
+              , nu+'10, ' + beta + '10', nu+'10, ' + beta + '100'
+              , nu+'10, ' + beta + '1000']
     n = 0
     fig, ax = plt.subplots(nrows=rows, ncols=cols)
-    plt.subplots_adjust(wspace=0.3, hspace=0.5)
+    plt.subplots_adjust(wspace=0.3, hspace=0.6)
     r, c = 0, 0
     lines = []
     for d in dirs:
@@ -64,27 +67,28 @@ def plotTxthroughput(dirs, oPath):
                 markers_on=[0, 3, 6, 10]
                 l = plt.plot(df['channels'], df['txPsec'] / 1000, "-" + mark, markerfacecolor=face_c, markersize=marker_s, linewidth=line_w, markevery=markers_on)
 
-            plt.title(names[n], fontsize='x-small')
-            plt.xticks(np.arange(0, 21, step=5), fontsize='x-small')
-            plt.yticks(getYrange(index), fontsize='x-small')
+            plt.title(names[n], fontsize='large')
+            plt.xticks(np.arange(0, 21, step=5), fontsize=fs)
+            plt.yticks(getYrange(index), fontsize=fs)
             c += 1
             plt.grid(True)
             n += 1
             index += 1
         r += 1
     leg = fig.legend(lines,  # The line objects
-               labels=['50', '512', '1024', '4096'],  # The labels for each line
-               loc="upper right",  # Position of legend
-               borderaxespad=0.01,  # Small spacing around legend box
-               fontsize='xx-small',
-               # frameon=False,
-               bbox_to_anchor=(0.993, 0.935),
-                title = "Tx size\n(Bytes)"
+               labels=['$\\sigma=50B$', '$\\sigma=512B$', '$\\sigma=1KB$', '$\\sigma=4KB$'],  # The labels for each line
+               loc="lower center",  # Position of legend
+               # borderaxespad=0.01,  # Small spacing around legend box
+               fontsize=fs,
+                ncol=4,
+               frameon=False,
+               bbox_to_anchor=(0.5, -0.03),
+               #  title = "Tx size\n(Bytes)"
                )
-    plt.setp(leg.get_title(), fontsize='xx-small')
-    fig.text(0.48, 0.015, "Channels", ha="center", va="center", fontsize="small")
-    fig.text(0.015, 0.5, "Throughput (KTxs/sec)", ha="center", va="center", fontsize="small", rotation=90)
-    fig.tight_layout(rect=[0, 0, 0.94, 1])
+    # plt.setp(leg.get_title(), fontsize='xx-small')
+    fig.text(0.51, 0.06, "$\\omega$", ha="center", va="center", fontsize=fs)
+    fig.text(0.025, 0.5, "Throughput ($\\frac{KTx}{sec}$)", ha="center", va="center", fontsize=fs, rotation=90)
+    fig.tight_layout(rect=[0.02, 0.06, 1, 1.03])
     for d in oPath:
         plt.savefig(d + '/throughput2.pdf')
         plt.savefig(d + '/throughput2')

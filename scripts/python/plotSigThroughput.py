@@ -5,9 +5,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from utiles import csvs2df
-
+fs=14
 line_w=1
-marker_s=4
+marker_s=5
 face_c='none'
 markers=['s', 'x', '+', '^']
 
@@ -15,7 +15,7 @@ def plotSigThroughput(dirs, oPath):
     subDirs = ['10', '100', '1000']
     txSize = ['0', '512', '1024', '4096']
     # names = ['10 Txs/block', '100 Txs/block', '1000 Txs/block']
-    names = ['50 Byte\nTransaction', '512 Byte\nTransaction', '1024 Byte\nTransaction', '4096 Byte\nTransaction']
+    names = ['$\\sigma=50B$', '$\\sigma=512B$', '$\\sigma=1KB$', '$\\sigma=4KB$']
     rows = 2
     cols = 2
     index = 1
@@ -39,28 +39,31 @@ def plotSigThroughput(dirs, oPath):
                          markersize=6, linewidth=line_w, markevery=markers_on)
 
 
-            plt.title(names[index - 1], fontsize='small')
-            plt.xticks(np.arange(1, 5, step=1), fontsize='x-small')
-            plt.yticks(np.arange(0, 8, step=1), fontsize='x-small')
+            plt.title(names[index - 1], fontsize=fs)
+            plt.xticks(np.arange(1, 5, step=1), fontsize=fs)
+            plt.yticks(np.arange(0, 8, step=1), fontsize=fs)
             plt.grid(True)
             index += 1
-
-
+    legt="$\\beta=$"
     leg = fig.legend(lines,  # The line objects
                      # labels=['50', '512', '1024', '4096'],  # The labels for each line
-                     labels=['10', '100', '1000'],  # The labels for each line
-                     loc="upper right",  # Position of legend
+                     labels=[legt+'10', legt+'100', legt+'1000'],  # The labels for each line
+                     loc="lower center",  # Position of legend
                      borderaxespad=0.01,  # Small spacing around legend box
-                     fontsize='x-small',
-                     # frameon=False,
-                     bbox_to_anchor=(0.91, 0.08),
-                     title="Txs/block",
-                     ncol=3
+                     fontsize=fs,
+                     frameon=False,
+                     # bbox_to_anchor=(0.91, 0.08),
+                     # title="$\\frac{Txs}{block}$",
+                     ncol=3,
+                     # fancybox=True,
+                     # shadow=True
+
                      )
-    plt.setp(leg.get_title(), fontsize='x-small')
-    fig.text(0.49, 0.05, "Workers", ha="center", va="center", fontsize='small')
-    fig.text(0.02, 0.5, "Throughput (Ksignatures/sec)", ha="center", va="center", fontsize='small', rotation=90)
-    fig.tight_layout(rect=[0.02, 0.05, 0.935, 1])
+    # plt.setp(leg.get_title(), position=(-160, -25), fontsize='medium')
+    fig.text(0.51, 0.09, "$\\omega$", ha="center", va="center", fontsize=fs)
+    fig.text(0.03, 0.5, "Throughput ($\\frac{Ksignatures}{sec}$)",
+             ha="center", va="center", fontsize=fs, rotation=90)
+    fig.tight_layout(rect=[0.04, 0.09, 1, 1])
     for d in oPath:
         plt.savefig(d + '/sig_throughput.pdf')
         plt.savefig(d + '/sig_throughput')
