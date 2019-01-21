@@ -5,6 +5,7 @@ import servers.server;
 import servers.sg;
 //import utils.derbyUtils;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
@@ -36,7 +37,7 @@ public class JToy {
     }
 
     static void mainImpl(String argv[]) {
-        try {
+//        try {
 //            Config.setConfig(null, 0);
 //        sg.createTxTable();
             Path config = null;
@@ -74,11 +75,17 @@ public class JToy {
                 if (!scan.hasNext()) {
                     break;
                 }
-                parser.parse(getArgs(scan.next()));
+                try {
+                    parser.parse(getArgs(scan.next()));
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
-        } catch (Exception ex) {
-            logger.error("", ex);
-            System.exit(0);
-        }
+//        } catch (Exception ex) {
+//            logger.error("", ex);
+//            System.exit(0);
+//        }
     }
 }

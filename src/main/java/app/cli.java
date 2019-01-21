@@ -110,6 +110,7 @@ public class cli {
                 }
                 if (args[0].equals("quit")) {
 //                    writeSummery("/tmp/JToy/res");
+                    System.out.println("Goodbye :)");
                     System.exit(0);
                     return;
                 }
@@ -119,7 +120,7 @@ public class cli {
                         int sec = Integer.parseInt(args[1]);
                         if (sec > 0) {
 
-                            logger.info(format("waits for %d seconds ", sec));
+                            System.out.println(format("waits for %d seconds ", sec));
                             Thread.sleep(sec * 1000);
                             totalRT = System.currentTimeMillis();
                         }
