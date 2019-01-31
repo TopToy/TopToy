@@ -1,47 +1,43 @@
-package rmf;
+package wrb;
 
-import com.google.protobuf.ByteString;
 import config.Node;
-import consensus.bbc.bbcService;
 //import crypto.rmfDigSig;
 
 import proto.Types.*;
 import java.util.ArrayList;
-import java.util.Base64;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.lang.String.format;
 
-public class RmfNode extends Node{
-    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(RmfNode.class);
+public class WrbNode extends Node{
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(WrbNode.class);
 
 //    protected AtomicBoolean stopped = new AtomicBoolean(false);
-    RmfService rmfService;
+    WrbService wrbService;
 
-    public RmfNode(int channels, int id, String addr, int rmfPort, int f , int tmo, int tmoInterval, ArrayList<Node> nodes, String bbcConfig,
+    public WrbNode(int channels, int id, String addr, int rmfPort, int f , int tmo, int tmoInterval, ArrayList<Node> nodes, String bbcConfig,
                    String serverCrt, String serverPrivKey, String caRoot) {
         super(addr, rmfPort,  id);
-        rmfService = new RmfService(channels, id, f, tmo, tmoInterval, nodes, bbcConfig, serverCrt, serverPrivKey, caRoot);
+        wrbService = new WrbService(channels, id, f, tmo, tmoInterval, nodes, bbcConfig, serverCrt, serverPrivKey, caRoot);
     }
 
-//    public RmfNode(int channel, int id, String addr, int rmfPort, int f , ArrayList<Node> nodes, bbcService bbc) {
+//    public WrbNode(int channel, int id, String addr, int rmfPort, int f , ArrayList<Node> nodes, bbcService bbc) {
 //        super(addr, rmfPort,  id);
-//        rmfService = new RmfService(channel, id, f, nodes, bbc);
+//        wrbService = new WrbService(channel, id, f, nodes, bbc);
 //    }
 
     public void stop() {
 //        stopped = true;
-        if (rmfService != null)
-            rmfService.shutdown();
+        if (wrbService != null)
+            wrbService.shutdown();
     }
 
 //    public void blockUntilShutdown() throws InterruptedException {
-//        rmfService.shutdown();
+//        wrbService.shutdown();
 //    }
 
     // This should be called only after all servers are running (as this object contains also the client logic)
     public void start() {
-        rmfService.start();
+        wrbService.start();
     }
 
 //    Data buildData(byte[] msg, int channel, int cidSeries, int cid, int height, boolean fm) {
@@ -65,7 +61,7 @@ public class RmfNode extends Node{
     public void broadcast(Block data) {
         logger.debug(format("[#%d] broadcasts data message with [height=%d]", getID(), data.getHeader().getHeight()));
 
-        rmfService.rmfBroadcast(data);
+        wrbService.rmfBroadcast(data);
     }
 
     public Block deliver(int channel, int cidSeries, int cid, int height, int sender, Block msg)
@@ -75,8 +71,8 @@ public class RmfNode extends Node{
 //            dMsg = buildData(msg, channel, cidSeries, cid + 1, height + 1, true);
 //        }
         long start = System.currentTimeMillis();
-        Block m = rmfService.deliver(channel, cidSeries, cid, sender, height, msg);
-        logger.debug(format("[#%d-C[%d]] Deliver on rmf node took about %d [cidSeries=%d ; cid=%d]", getID(), channel,
+        Block m = wrbService.deliver(channel, cidSeries, cid, sender, height, msg);
+        logger.debug(format("[#%d-C[%d]] Deliver on wrb node took about %d [cidSeries=%d ; cid=%d]", getID(), channel,
                 System.currentTimeMillis() - start, cidSeries, cid));
         return m;
 //        Data data = (td == null ? null : td.d);
@@ -91,17 +87,17 @@ public class RmfNode extends Node{
     }
 
 //    public String getRmfDataSig(int channel, int cidSeries, int cid) {
-//        return rmfService.getMessageSig(channel, cidSeries, cid);
+//        return wrbService.getMessageSig(channel, cidSeries, cid);
 //    }
     public void clearBuffers(Meta key) {
-        rmfService.clearBuffers(key);
+        wrbService.clearBuffers(key);
     }
 
     public long getTotolDec() {
-        return rmfService.getTotalDeliveredTries();
+        return wrbService.getTotalDeliveredTries();
     }
 
     public long getOptemisticDec() {
-        return rmfService.getOptimialDec();
+        return wrbService.getOptimialDec();
     }
 }

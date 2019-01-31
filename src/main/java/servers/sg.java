@@ -1,21 +1,19 @@
 package servers;
 
 import blockchain.blockchain;
-import com.google.common.primitives.Longs;
 import com.google.protobuf.ByteString;
 import config.Config;
 import config.Node;
 import consensus.RBroadcast.RBrodcastService;
 import crypto.DigestMethod;
 import io.grpc.Server;
-import io.grpc.ServerBuilder;
 import io.grpc.netty.NettyServerBuilder;
 import io.grpc.stub.StreamObserver;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import proto.Types;
-import rmf.ByzantineRmfNode;
-import rmf.RmfNode;
+import wrb.ByzantineWrbNode;
+import wrb.WrbNode;
 import proto.blockchainServiceGrpc.blockchainServiceImplBase;
 import utils.chainCutter;
 
@@ -24,12 +22,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static java.lang.Math.log;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.String.format;
@@ -37,7 +33,7 @@ import static java.lang.String.format;
 public class sg implements server {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(sg.class);
 
-    private RmfNode rmf;
+    private WrbNode rmf;
     boolean up = false;
     final HashMap<Types.txID, Integer> txMap = new HashMap<>();
     private RBrodcastService deliverFork;
@@ -91,10 +87,10 @@ public class sg implements server {
         this.group = new bcServer[c];
         this.id = id;
         if (type.equals("r") || type.equals("a")) {
-            rmf = new RmfNode(c, id, addr, port, f, tmo, tmoInterval, cluster, bbcConfig, serverCrt, serverPrivKey, caRoot);
+            rmf = new WrbNode(c, id, addr, port, f, tmo, tmoInterval, cluster, bbcConfig, serverCrt, serverPrivKey, caRoot);
         }
         if (type.equals("b")) {
-            rmf = new ByzantineRmfNode(c, id, addr, port, f, tmo, tmoInterval, cluster, bbcConfig, serverCrt, serverPrivKey, caRoot);
+            rmf = new ByzantineWrbNode(c, id, addr, port, f, tmo, tmoInterval, cluster, bbcConfig, serverCrt, serverPrivKey, caRoot);
         }
         deliverFork = new RBrodcastService(c, id, panicConfig);
         sync = new RBrodcastService(c, id, syncConfig);
@@ -269,9 +265,9 @@ public class sg implements server {
         }
         logger.debug(format("G-%d shutdown deliverThread", id));
         rmf.stop();
-//        sts.totalDec = rmf.getTotolDec();
-//        sts.optemisticDec = rmf.getOptemisticDec();
-        logger.debug(format("G-%d shutdown rmf Service", id));
+//        sts.totalDec = wrb.getTotolDec();
+//        sts.optemisticDec = wrb.getOptemisticDec();
+        logger.debug(format("G-%d shutdown wrb Service", id));
         deliverFork.shutdown();
         logger.debug(format("G-%d shutdown panic service", id));
         sync.shutdown();

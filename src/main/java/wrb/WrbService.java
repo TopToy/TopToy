@@ -1,4 +1,4 @@
-package rmf;
+package wrb;
 
 import com.google.protobuf.ByteString;
 import config.Config;
@@ -22,15 +22,12 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.stream.Collectors;
 
-import static java.lang.Math.log;
 import static java.lang.Math.max;
 import static java.lang.String.format;
 
-public class RmfService extends RmfGrpc.RmfImplBase {
-    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(RmfService.class);
+public class WrbService extends RmfGrpc.RmfImplBase {
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(WrbService.class);
     class authInterceptor implements ServerInterceptor {
         @Override
         public <ReqT, RespT> ServerCall.Listener<ReqT> interceptCall(ServerCall<ReqT, RespT> serverCall,
@@ -146,7 +143,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
     AtomicInteger optimialDec = new AtomicInteger(0);;
 //    ReentrantLock mutex = new ReentrantLock(true);
 
-//    public RmfService(int channels, int id, int f, ArrayList<Node> nodes, bbcService bbc) {
+//    public WrbService(int channels, int id, int f, ArrayList<Node> nodes, bbcService bbc) {
 //        this.channels = channels;
 //        this.globalLock = new Object[channels];
 //        this.fVotes = new HashBasedTable[channels];
@@ -171,7 +168,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
 //        startGrpcServer();
 //    }
 
-    public RmfService(int channels, int id, int f, int tmo, int tmoInterval, ArrayList<Node> nodes, String bbcConfig,
+    public WrbService(int channels, int id, int f, int tmo, int tmoInterval, ArrayList<Node> nodes, String bbcConfig,
                       String serverCrt, String serverPrivKey, String caRoot) {
         this.channels = channels;
         this.tmo = tmo;
@@ -283,12 +280,12 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             peers.put(n.getID(), new peer(n));
         }
         logger.debug(format("[#%d] initiates grpc clients", id));
-        logger.debug(format("[#%d] starting rmf service", id));
+        logger.debug(format("[#%d] starting wrb service", id));
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             if (stopped.get()) return;
             // Use stderr here since the logger may have been reset by its JVM shutdown hook.
-            logger.warn(format("[#%d] *** shutting down rmf service since JVM is shutting down", id));
+            logger.warn(format("[#%d] *** shutting down wrb service since JVM is shutting down", id));
             shutdown();
         }));
     }
@@ -360,7 +357,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             p.shutdown();
         }
 
-        logger.debug(format("[#%d] shutting down rmf clients", id));
+        logger.debug(format("[#%d] shutting down wrb clients", id));
 //        if (!group) {
             if (bbcService != null) bbcService.shutdown();
 //        }
@@ -387,7 +384,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
 //            weg.shutdownNow();
             rmfServer.shutdown();
         }
-        logger.info(format("[#%d] shutting down rmf service", id));
+        logger.info(format("[#%d] shutting down wrb service", id));
     }
 
     void sendDataMessage(RmfGrpc.RmfStub stub, Block msg) {
@@ -661,57 +658,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
         }
     }
 
-    public Block deliver(int channel, int cidSeries, int cid, int sender, int height, Block next)
-            throws InterruptedException
-    {
-//        mutex.lock();
-        totalDeliveredTries.getAndIncrement();
-
-        long estimatedTime;
-        Meta key = Meta.newBuilder()
-                .setChannel(channel)
-                .setCidSeries(cidSeries)
-                .setCid(cid)
-                .build();
-//        int realTmo = currentTmo[channel];
-//        long startTime = System.currentTimeMillis();
-//        synchronized (msgNotifyer[channel]) {
-//            while (realTmo > 0 && !pendingMsg[channel].containsKey(key)) {
-////                mutex.unlock();
-//                msgNotifyer[channel].wait(realTmo);
-////                mutex.lock();
-//                realTmo -= System.currentTimeMillis() - startTime;
-//            }
-//        }
-
-//        long startTime = System.currentTimeMillis();
-//        synchronized (msgNotifyer[channel]) {
-//            if (!pendingMsg[channel].containsKey(key)) {
-////                mutex.unlock();
-//                msgNotifyer[channel].wait(currentTmo[channel]);
-////                mutex.lock();
-//            }
-//        }
-        Meta key2 = Meta.newBuilder()
-                .setChannel(channel)
-                .setCidSeries(cidSeries)
-                .setCid(cid + 2)
-                .build();
-        int realTmo = currentTmo[channel];
-        long startTime = System.currentTimeMillis();
-        synchronized (msgNotifyer[channel]) {
-            while (realTmo > 0 && !pendingMsg[channel].containsKey(key)) {
-                if (pendingMsg[channel].containsKey(key2)) break;
-//                mutex.unlock();
-                msgNotifyer[channel].wait(realTmo);
-//                mutex.lock();
-                realTmo -= System.currentTimeMillis() - startTime;
-            }
-        }
-
-        estimatedTime = System.currentTimeMillis() - startTime;
-        logger.debug(format("[#%d-C[%d]] have waited [%d] ms for data msg [cidSeries=%d ; cid=%d]",
-                id, channel, estimatedTime, cidSeries, cid));
+    private void fastBbcVote(Meta key, int channel, int sender, int cidSeries, int cid, Block next) {
         pendingMsg[channel].computeIfPresent(key, (k, val) -> {
             long start = System.currentTimeMillis();
             if (val.getHeader().getM().getSender() != sender ||
@@ -742,16 +689,10 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             return val;
         });
 
-//        startTime = System.currentTimeMillis();
-//        long waitStartTime = System.currentTimeMillis();
-//        fvote fv = fVotes.get(key);
-//        while (fv == null || fv.voters.size() < n) {
-//            if (System.currentTimeMillis() - startTime >= tmo) break;
-//            fv = fVotes.get(key);
-//        }
-//        logger.debug(format("[#%d-C[%d]] have waited for more [%d] ms for fast bbc [cidSeries=%d ; cid=%d]", id, channel,
-//                    System.currentTimeMillis() - waitStartTime, cidSeries, cid));
-        startTime = System.currentTimeMillis();
+    }
+
+    private void wait4FastVoteV1(Meta key, int channel, long estimatedTime) throws InterruptedException {
+        long startTime = System.currentTimeMillis();
         synchronized (fastVoteNotifyer[channel]) {
             fvote fv = fVotes[channel].get(key);
             if (currentTmo[channel] - estimatedTime > 0 && (fv == null || fv.voters.size() < n)) {
@@ -764,9 +705,9 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             logger.debug(format("[#%d-C[%d]] have waited for more [%d] ms for fast bbc", id, channel,
                     System.currentTimeMillis() - startTime));
         }
+    }
 
-        currentTmo[channel] += tmoInterval;
-
+    private void doOnFastVoteV1(Meta key, int channel) {
         fVotes[channel].computeIfPresent(key, (k, val) -> {
             int vote = 0;
 //            regBbcCons[channel].remove(k);
@@ -780,9 +721,51 @@ public class RmfService extends RmfGrpc.RmfImplBase {
                 regBbcCons[channel].put(k, BbcDecision.newBuilder().setDecosion(vote).buildPartial());
                 return val;
             }
-            logger.debug(format("[#%d-C[%d]] deliver by fast vote [cidSeries=%d ; cid=%d]", id, channel, cidSeries, cid));
+            logger.debug(format("[#%d-C[%d]] deliver by fast vote [cidSeries=%d ; cid=%d]", id, channel,
+                    key.getCidSeries(), key.getCid()));
             return val;
         });
+    }
+
+
+    public Block deliver(int channel, int cidSeries, int cid, int sender, int height, Block next)
+            throws InterruptedException
+    {
+//        mutex.lock();
+        totalDeliveredTries.getAndIncrement();
+
+        long estimatedTime;
+        Meta key = Meta.newBuilder()
+                .setChannel(channel)
+                .setCidSeries(cidSeries)
+                .setCid(cid)
+                .build();
+//        Meta key2 = Meta.newBuilder()
+//                .setChannel(channel)
+//                .setCidSeries(cidSeries)
+//                .setCid(cid + 2)
+//                .build();
+        int realTmo = currentTmo[channel];
+        long startTime = System.currentTimeMillis();
+        synchronized (msgNotifyer[channel]) {
+            while (realTmo > 0 && !pendingMsg[channel].containsKey(key)) {
+//                if (pendingMsg[channel].containsKey(key2)) break;
+                msgNotifyer[channel].wait(realTmo);
+                realTmo -= System.currentTimeMillis() - startTime;
+            }
+        }
+
+        estimatedTime = System.currentTimeMillis() - startTime;
+        logger.debug(format("[#%d-C[%d]] have waited [%d] ms for data msg [cidSeries=%d ; cid=%d]",
+                id, channel, estimatedTime, cidSeries, cid));
+
+        fastBbcVote(key, channel, sender, cidSeries, cid, next);
+
+        wait4FastVoteV1(key, channel, estimatedTime);
+
+        currentTmo[channel] += tmoInterval;
+
+        doOnFastVoteV1(key, channel);
 
         fVotes[channel].computeIfAbsent(key, k -> {
             fvote vi = new fvote();
@@ -798,9 +781,7 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             return vi;
         });
 
-//        if (currentTmo[channel] != tmo) {
-//            logger.debug(format("[#%d-C[%d]] unable to receive message, timeout increased to [%d] ms", id, channel, currentTmo[channel]));
-//        }
+
         if (regBbcCons[channel].containsKey(key)) {
             int v = regBbcCons[channel].get(key).getDecosion();
             int dec = fullBbcConsensus(channel, v, cidSeries, cid);
@@ -808,19 +789,11 @@ public class RmfService extends RmfGrpc.RmfImplBase {
             if (dec == 0) {
                 logger.debug(format("[#%d-C[%d]] timeout increased to [%d]", id, channel, currentTmo[channel]));
                 pendingMsg[channel].remove(key);
-//                mutex.unlock();
-//                synchronized (aliveLock[channel]) {
-//                    alive[channel] = currentTmo[channel];
-//                }
                 return null;
             }
         }  else {
             optimialDec.getAndIncrement();
         }
-
-//        synchronized (aliveLock[channel]) {
-//            alive[channel] = currentTmo[channel];
-//        }
 
         requestData(channel, cidSeries, cid, sender, height);
         Block msg = pendingMsg[channel].get(key);

@@ -187,7 +187,7 @@ public class sgTest {
         }
 //        for (int i = 0 ; i < 4 ; i++) {
 //            assertEquals(msg, ret[i]);
-//            ((RmfNode) allNodes[i]).stop();
+//            ((WrbNode) allNodes[i]).stop();
 //        }
 
     }

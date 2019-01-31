@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source /home/yoni/Desktop/Research/github.com/JToy/make_scripts/tests/utiles.sh
+source /home/yoni/github.com/JToy/make_scripts/tests/utiles.sh
 
 # ${1} - start worker
 # ${2} - end worker

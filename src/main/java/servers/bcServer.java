@@ -1,30 +1,24 @@
 package servers;
 
-import app.JToy;
 import blockchain.blockchain;
 import blockchain.block;
-import com.google.common.collect.Lists;
-import com.google.common.primitives.Longs;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import config.Config;
 import config.Node;
 import consensus.RBroadcast.RBrodcastService;
 import crypto.blockDigSig;
-import org.apache.commons.lang.ArrayUtils;
 import proto.*;
-import rmf.RmfNode;
+import wrb.WrbNode;
 import proto.Types.*;
 
 import java.security.SecureRandom;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import static java.lang.Math.incrementExact;
-import static java.lang.Math.log;
 import static java.lang.Math.max;
 import static java.lang.String.format;
 import static java.util.Collections.min;
@@ -35,7 +29,7 @@ public abstract class bcServer extends Node {
         boolean done;
     }
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(bcServer.class);
-    RmfNode rmfServer;
+    WrbNode rmfServer;
     private RBrodcastService panicRB;
     private RBrodcastService syncRB;
     final blockchain bc;
@@ -80,7 +74,7 @@ public abstract class bcServer extends Node {
 
     public bcServer(String addr, int rmfPort, int id, int channel, int f, int tmo, int tmoInterval,
                     int maxTx, boolean fastMode, ArrayList<Node> cluster,
-                    RmfNode rmf, RBrodcastService panic, RBrodcastService sync) {
+                    WrbNode rmf, RBrodcastService panic, RBrodcastService sync) {
         super(addr, rmfPort, id);
         this.f = f;
         this.n = 3*f + 1;
@@ -133,7 +127,7 @@ public abstract class bcServer extends Node {
         super(addr, rmfPort, id);
         this.f = f;
         this.n = 3*f + 1;
-        rmfServer = new RmfNode(1, id, addr, rmfPort, f, tmo, tmoInterval,
+        rmfServer = new WrbNode(1, id, addr, rmfPort, f, tmo, tmoInterval,
                cluster, bbcConfig, serverCrt, serverPrivKey, caRoot);
         panicRB = new RBrodcastService(1, id, panicConfig);
         syncRB = new RBrodcastService(1, id, syncConfig);
@@ -170,7 +164,7 @@ public abstract class bcServer extends Node {
     public void start(boolean group) {
         if (!group) {
             rmfServer.start();
-            logger.debug(format("[#%d-C[%d]] rmf server is up", getID(), channel));
+            logger.debug(format("[#%d-C[%d]] wrb server is up", getID(), channel));
             syncRB.start();
             logger.debug(format("[#%d-C[%d]] sync server is up", getID(), channel));
             panicRB.start();
@@ -311,7 +305,7 @@ public abstract class bcServer extends Node {
                     logger.debug(format("[#%d-C[%d]] deliver took about [%d] ms [cidSeries=%d ; cid=%d]",
                             getID(), channel, System.currentTimeMillis() - startTime, cidSeries, cid));
                 } catch (InterruptedException e) {
-                    logger.debug(format("[#%d-C[%d]] main thread has been interrupted on rmf deliver",
+                    logger.debug(format("[#%d-C[%d]] main thread has been interrupted on wrb deliver",
                             getID(), channel));
 //                    if (stopped) return;
                     continue;

@@ -6,7 +6,7 @@ import config.Node;
 import consensus.RBroadcast.RBrodcastService;
 
 import proto.Types.*;
-import rmf.RmfNode;
+import wrb.WrbNode;
 
 import java.util.ArrayList;
 
@@ -16,7 +16,7 @@ public class cbcServer extends bcServer {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(cbcServer.class);
 
     public cbcServer(String addr, int rmfPort, int id, int channel, int f, int tmo, int tmoInterval,
-                     int maxTx, boolean fastMode, ArrayList<Node> cluster, RmfNode rmf, RBrodcastService panic, RBrodcastService sync) {
+                     int maxTx, boolean fastMode, ArrayList<Node> cluster, WrbNode rmf, RBrodcastService panic, RBrodcastService sync) {
         super(addr, rmfPort, id, channel, f, tmo, tmoInterval, maxTx, fastMode, cluster, rmf, panic, sync);
     }
 

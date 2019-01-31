@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 conf=/home/yoni/Desktop/dtoy/configurations/benign
-dc=/home/yoni/Desktop/Research/github.com/JToy/docker-compose.yml
+dc=/home/yoni/github.com/JToy/docker-compose.yml
 configure_inst(){
 echo \
 "init

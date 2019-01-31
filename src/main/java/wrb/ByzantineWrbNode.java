@@ -1,16 +1,15 @@
-package rmf;
+package wrb;
 
-import com.google.protobuf.ByteString;
 import config.Node;
 
 import proto.Types.*;
 import java.util.*;
 
-public class ByzantineRmfNode extends RmfNode {
+public class ByzantineWrbNode extends WrbNode {
 //    private boolean stopped = false;
-    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ByzantineRmfNode.class);
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ByzantineWrbNode.class);
 
-    public ByzantineRmfNode(int channels, int id, String addr, int rmfPort, int f, int tmo, int tmoInterval, ArrayList<Node> nodes,
+    public ByzantineWrbNode(int channels, int id, String addr, int rmfPort, int f, int tmo, int tmoInterval, ArrayList<Node> nodes,
                             String bbcConfig, String serverCrt, String serverPrivKey, String caRoot) {
         super(channels, id, addr, rmfPort, f, tmo, tmoInterval, nodes, bbcConfig, serverCrt, serverPrivKey, caRoot);
     }
@@ -29,16 +28,16 @@ public class ByzantineRmfNode extends RmfNode {
 //                setData(ByteString.copyFrom(msg)).
 //                setMeta(metaMsg);
 //        Data dmsg = dataMsg.setSig(rmfDigSig.sign(dataMsg)).build();
-        for (Map.Entry<Integer, RmfService.peer>  p: rmfService.peers.entrySet()) {
+        for (Map.Entry<Integer, WrbService.peer>  p: wrbService.peers.entrySet()) {
             if (ids.contains(p.getKey())) {
 //                logger.debug("sending message " + Arrays.toString(msg) + " to " + p.getKey() + " with height of " + height);
-                rmfService.sendDataMessage(p.getValue().stub, msg);
+                wrbService.sendDataMessage(p.getValue().stub, msg);
             }
 
         }
     }
     /*
-        This should used outside the rmf protocol (Note that the rmf protocol does not handle such failures)
+        This should used outside the wrb protocol (Note that the wrb protocol does not handle such failures)
      */
     public void devidedBroadcast(List<Block> msgs, List<List<Integer>> ids) {
         for (int i = 0 ; i < msgs.size() ; i++) {

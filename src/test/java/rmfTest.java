@@ -2,16 +2,13 @@ import config.Config;
 import config.Node;
 import org.apache.commons.lang.ArrayUtils;
 import org.junit.jupiter.api.Test;
-import rmf.ByzantineRmfNode;
-import rmf.RmfNode;
+import wrb.ByzantineWrbNode;
+import wrb.WrbNode;
 
 import java.io.File;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
 
-import static config.Config.setConfig;
 import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -49,11 +46,11 @@ public class rmfTest {
         for (int id = 0 ; id < nnodes ; id++) {
             logger.info("init server #" + id);
             if (ArrayUtils.contains(byzIds, id)) {
-                ret[id] = new ByzantineRmfNode(1, id, localHost, rmfPorts[id], f, 1000, 100, currentNodes, configHome,
+                ret[id] = new ByzantineWrbNode(1, id, localHost, rmfPorts[id], f, 1000, 100, currentNodes, configHome,
                         Config.getServerCrtPath(), Config.getServerTlsPrivKeyPath(), Config.getCaRootPath());
                 continue;
             }
-            ret[id] =  new RmfNode(1, id, localHost, rmfPorts[id], f, 1000, 100, currentNodes, configHome,
+            ret[id] =  new WrbNode(1, id, localHost, rmfPorts[id], f, 1000, 100, currentNodes, configHome,
                     Config.getServerCrtPath(), Config.getServerTlsPrivKeyPath(), Config.getCaRootPath());
         }
         return ret;
@@ -65,8 +62,8 @@ public class rmfTest {
         logger.info("start TestSingleServer");
         String SingleServerconfigHome = Paths.get("config", "Configurations/single server/bbcConfig", "bbcSingleServer").toString();
         Node[] rn1 = initLocalRmfNodes(1, 0, SingleServerconfigHome, null);
-        ((RmfNode) rn1[0]).start();
-        ((RmfNode) rn1[0]).stop();
+        ((WrbNode) rn1[0]).start();
+        ((WrbNode) rn1[0]).stop();
     }
 
 //    @Test
@@ -76,11 +73,11 @@ public class rmfTest {
 //        logger.info("start TestSingleServerDisseminateMessage");
 //        String SingleServerconfigHome = Paths.get("config", "Configurations/single server/bbcConfig", "bbcSingleServer").toString();
 //        Node[] rn = initLocalRmfNodes( 1, 0, SingleServerconfigHome, null);
-//        ((RmfNode) rn[0]).start();
+//        ((WrbNode) rn[0]).start();
 //        String msg = "hello world";
-//        ((RmfNode) rn[0]).broadcast(0, cidSeires, cid, msg.getBytes(), 0);
-//        assertEquals(msg, new String(((RmfNode) rn[0]).deliver(0, cidSeires, cid, 0, 0, 10 * 60 * 1000, null)[0]));
-//        ((RmfNode) rn[0]).stop();
+//        ((WrbNode) rn[0]).broadcast(0, cidSeires, cid, msg.getBytes(), 0);
+//        assertEquals(msg, new String(((WrbNode) rn[0]).deliver(0, cidSeires, cid, 0, 0, 10 * 60 * 1000, null)[0]));
+//        ((WrbNode) rn[0]).stop();
 //
 //    }
 //
@@ -96,7 +93,7 @@ public class rmfTest {
 //        Node[] allNodes = initLocalRmfNodes(nnodes,1,fourServersConfig, null);
 //        for (int i = 0 ; i < nnodes ; i++) {
 //            int finalI = i;
-//            servers[i]  = new Thread(() ->((RmfNode) allNodes[finalI]).start());
+//            servers[i]  = new Thread(() ->((WrbNode) allNodes[finalI]).start());
 //            servers[i].start();
 //        }
 //        for (int i = 0 ; i < nnodes ; i++) {
@@ -104,14 +101,14 @@ public class rmfTest {
 //        }
 //        int height = 0;
 //        String msg = "Hello";
-//        ((RmfNode) allNodes[0]).broadcast(0, 0, 0, msg.getBytes(), 0);
+//        ((WrbNode) allNodes[0]).broadcast(0, 0, 0, msg.getBytes(), 0);
 //        String[] ret = new String[4];
 //        Thread[] tasks = new Thread[4];
 //        for (int i = 0 ; i < nnodes ; i++) {
 //            int finalI = i;
 //            tasks[i] = new Thread(()-> {
 //                try {
-//                    ret[finalI] = new String(((RmfNode) allNodes[finalI]).deliver(0, 0, 0, height, 0, 1000, null)[0]);
+//                    ret[finalI] = new String(((WrbNode) allNodes[finalI]).deliver(0, 0, 0, height, 0, 1000, null)[0]);
 //                } catch (InterruptedException e) {
 //                    e.printStackTrace();
 //                }
@@ -127,7 +124,7 @@ public class rmfTest {
 //            assertEquals(msg, ret[i]);
 //        }
 //        for (int i = 0 ; i < 4 ; i++) {
-//            ((RmfNode) allNodes[i]).stop();
+//            ((WrbNode) allNodes[i]).stop();
 //        }
 //    }
 //
@@ -143,7 +140,7 @@ public class rmfTest {
 //        Node[] allNodes = initLocalRmfNodes(nnodes,1,fourServersConfig, null);
 //        for (int i = 0 ; i < nnodes ; i++) {
 //            int finalI = i;
-//            servers[i]  = new Thread(() ->((RmfNode) allNodes[finalI]).start());
+//            servers[i]  = new Thread(() ->((WrbNode) allNodes[finalI]).start());
 //            servers[i].start();
 //        }
 //        for (int i = 0 ; i < nnodes ; i++) {
@@ -151,7 +148,7 @@ public class rmfTest {
 //        }
 //        for (int k = 0 ; k < 100 ; k++) {
 //            String msg = "Hello" + k;
-//            ((RmfNode) allNodes[k % 4]).broadcast(0, cidSeires, k, msg.getBytes(), k);
+//            ((WrbNode) allNodes[k % 4]).broadcast(0, cidSeires, k, msg.getBytes(), k);
 //            String[] ret = new String[4];
 //            Thread[] tasks = new Thread[4];
 //            for (int i = 0 ; i < nnodes ; i++) {
@@ -159,7 +156,7 @@ public class rmfTest {
 //                int finalK = k;
 //                tasks[i] = new Thread(()-> {
 //                    try {
-//                        ret[finalI] = new String(((RmfNode) allNodes[finalI]).deliver(0, cidSeires, finalK, finalK,
+//                        ret[finalI] = new String(((WrbNode) allNodes[finalI]).deliver(0, cidSeires, finalK, finalK,
 //                                finalK % 4, 1* 1000, null)[0]);
 //                    } catch (InterruptedException e) {
 //                        e.printStackTrace();
@@ -177,7 +174,7 @@ public class rmfTest {
 //            }
 //        }
 //        for (int i = 0 ; i < 4 ; i++) {
-//            ((RmfNode) allNodes[i]).stop();
+//            ((WrbNode) allNodes[i]).stop();
 //        }
 //    }
 //
@@ -193,7 +190,7 @@ public class rmfTest {
 //        Node[] allNodes = initLocalRmfNodes(nnodes,1,fourServersConfig, null);
 //        for (int i = 0 ; i < nnodes ; i++) {
 //            int finalI = i;
-//            servers[i]  = new Thread(() ->((RmfNode) allNodes[finalI]).start());
+//            servers[i]  = new Thread(() ->((WrbNode) allNodes[finalI]).start());
 //            servers[i].start();
 //        }
 //        for (int i = 0 ; i < nnodes ; i++) {
@@ -207,7 +204,7 @@ public class rmfTest {
 //            tasks[i] = new Thread(()-> {
 //                byte[] res = new byte[0];
 //                try {
-//                    res = ((RmfNode) allNodes[finalI]).deliver(0, 0, 0, height, 0, 1000,
+//                    res = ((WrbNode) allNodes[finalI]).deliver(0, 0, 0, height, 0, 1000,
 //                            null)[0];
 //                } catch (InterruptedException e) {
 //                    e.printStackTrace();
@@ -225,7 +222,7 @@ public class rmfTest {
 //            assertNull(ret[i]);
 //        }
 //        for (int i = 0 ; i < 4 ; i++) {
-//            ((RmfNode) allNodes[i]).stop();
+//            ((WrbNode) allNodes[i]).stop();
 //        }
 //    }
 //    @Test
@@ -241,9 +238,9 @@ public class rmfTest {
 //        for (int i = 0 ; i < nnodes ; i++) {
 //            int finalI = i;
 //            if (i == 0) {
-//                servers[i] =  new Thread(() ->((ByzantineRmfNode) allNodes[finalI]).start());
+//                servers[i] =  new Thread(() ->((ByzantineWrbNode) allNodes[finalI]).start());
 //            } else {
-//                servers[i]  = new Thread(() ->((RmfNode) allNodes[finalI]).start());
+//                servers[i]  = new Thread(() ->((WrbNode) allNodes[finalI]).start());
 //            }
 //            servers[i].start();
 //        }
@@ -255,7 +252,7 @@ public class rmfTest {
 //        List<Integer> ids = new ArrayList<Integer>();
 //        ids.add(1);
 //        ids.add(2);
-//        ((ByzantineRmfNode) allNodes[0]).selectiveBroadcast(0, 0, 0, msg.getBytes(), 0, ids);
+//        ((ByzantineWrbNode) allNodes[0]).selectiveBroadcast(0, 0, 0, msg.getBytes(), 0, ids);
 //        String[] ret = new String[4];
 //        Thread[] tasks = new Thread[4];
 //        for (int i = 0 ; i < nnodes ; i++) {
@@ -264,7 +261,7 @@ public class rmfTest {
 //                tasks[i] = new Thread(()-> {
 //                    byte[] res = new byte[0];
 //                    try {
-//                        res = ((ByzantineRmfNode) allNodes[finalI]).deliver(0, 0, 0, height, 0, 1000,
+//                        res = ((ByzantineWrbNode) allNodes[finalI]).deliver(0, 0, 0, height, 0, 1000,
 //                                null)[0];
 //                    } catch (InterruptedException e) {
 //                        e.printStackTrace();
@@ -276,7 +273,7 @@ public class rmfTest {
 //                tasks[i] = new Thread(()-> {
 //                    byte[] res = new byte[0];
 //                    try {
-//                        res = ((RmfNode) allNodes[finalI]).deliver(0, 0, 0, height, 0, 1000,
+//                        res = ((WrbNode) allNodes[finalI]).deliver(0, 0, 0, height, 0, 1000,
 //                                null)[0];
 //                    } catch (InterruptedException e) {
 //                        e.printStackTrace();
@@ -297,10 +294,10 @@ public class rmfTest {
 //        }
 //        for (int i = 0 ; i < 4 ; i++) {
 //            if (i == 0)  {
-//                ((ByzantineRmfNode) allNodes[i]).stop();
+//                ((ByzantineWrbNode) allNodes[i]).stop();
 //                continue;
 //            }
-//            ((RmfNode) allNodes[i]).stop();
+//            ((WrbNode) allNodes[i]).stop();
 //        }
 //
 //    }
@@ -318,9 +315,9 @@ public class rmfTest {
 //        for (int i = 0 ; i < nnodes ; i++) {
 //            int finalI = i;
 //            if (i == 0) {
-//                servers[i] =  new Thread(() ->((ByzantineRmfNode) allNodes[finalI]).start());
+//                servers[i] =  new Thread(() ->((ByzantineWrbNode) allNodes[finalI]).start());
 //            } else {
-//                servers[i]  = new Thread(() ->((RmfNode) allNodes[finalI]).start());
+//                servers[i]  = new Thread(() ->((WrbNode) allNodes[finalI]).start());
 //            }
 //            servers[i].start();
 //        }
@@ -332,8 +329,8 @@ public class rmfTest {
 //        ids.add(2);
 //        for (int k = 0 ; k < 100 ; k++) {
 //            String msg = "Hello" + k;
-//            ((ByzantineRmfNode) allNodes[0]).selectiveBroadcast(0, 0, k, msg.getBytes(), k, ids);
-////        sender.act((RmfNode) allNodes[0]);
+//            ((ByzantineWrbNode) allNodes[0]).selectiveBroadcast(0, 0, k, msg.getBytes(), k, ids);
+////        sender.act((WrbNode) allNodes[0]);
 //            String[] ret = new String[4];
 //            Thread[] tasks = new Thread[4];
 //            for (int i = 0 ; i < nnodes ; i++) {
@@ -343,7 +340,7 @@ public class rmfTest {
 //                    tasks[i] = new Thread(()-> {
 //                        byte[] res = new byte[0];
 //                        try {
-//                            res = ((ByzantineRmfNode) allNodes[finalI]).deliver(0, 0, finalK, finalK, 0, 1000,
+//                            res = ((ByzantineWrbNode) allNodes[finalI]).deliver(0, 0, finalK, finalK, 0, 1000,
 //                                    null)[0];
 //                        } catch (InterruptedException e) {
 //                            e.printStackTrace();
@@ -356,7 +353,7 @@ public class rmfTest {
 //                    tasks[i] = new Thread(()-> {
 //                        byte[] res = new byte[0];
 //                        try {
-//                            res = ((RmfNode) allNodes[finalI]).deliver(0, 0, finalK1, finalK1, 0, 1000,
+//                            res = ((WrbNode) allNodes[finalI]).deliver(0, 0, finalK1, finalK1, 0, 1000,
 //                                    null)[0];
 //                        } catch (InterruptedException e) {
 //                            e.printStackTrace();
@@ -379,15 +376,15 @@ public class rmfTest {
 //
 //        for (int i = 0 ; i < 4 ; i++) {
 //            if (i == 0)  {
-//                ((ByzantineRmfNode) allNodes[i]).stop();
+//                ((ByzantineWrbNode) allNodes[i]).stop();
 //                continue;
 //            }
-//            ((RmfNode) allNodes[i]).stop();
+//            ((WrbNode) allNodes[i]).stop();
 //        }
 //
 //    }
 //
-//    void asyncServerAction(RmfNode node, String[] res) throws InterruptedException {
+//    void asyncServerAction(WrbNode node, String[] res) throws InterruptedException {
 //        for (int i = 0 ; i < 100 ; i++) {
 //            Random rand = new Random();
 //            int  n = rand.nextInt(800);
@@ -420,7 +417,7 @@ public class rmfTest {
 //        Node[] allNodes = initLocalRmfNodes(nnodes,1,fourServersConfig, null);
 //        for (int i = 0 ; i < nnodes ; i++) {
 //            int finalI = i;
-//            servers[i]  = new Thread(() ->((RmfNode) allNodes[finalI]).start());
+//            servers[i]  = new Thread(() ->((WrbNode) allNodes[finalI]).start());
 //            servers[i].start();
 //        }
 //        for (int i = 0 ; i < nnodes ; i++) {
@@ -433,7 +430,7 @@ public class rmfTest {
 //            int finalI = i;
 //            tasks[i] = new Thread(() -> {
 //                try {
-//                    asyncServerAction((RmfNode) allNodes[finalI], allRes[finalI]);
+//                    asyncServerAction((WrbNode) allNodes[finalI], allRes[finalI]);
 //                } catch (InterruptedException e) {
 //                    logger.warn("",e);
 //                }
@@ -455,7 +452,7 @@ public class rmfTest {
 //        }
 //
 //        for (int i = 0 ; i < 4 ; i++) {
-//            ((RmfNode) allNodes[i]).stop();
+//            ((WrbNode) allNodes[i]).stop();
 //            logger.info(format("[#%d] stopped", i));
 //        }
 //    }

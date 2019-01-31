@@ -4,20 +4,15 @@ import blockchain.blockchain;
 
 import blockchain.basicBlockchain;
 import com.google.protobuf.ByteString;
-import config.Config;
 import config.Node;
 import consensus.RBroadcast.RBrodcastService;
-import crypto.DigestMethod;
 
-import org.apache.commons.lang.ArrayUtils;
 import proto.Types;
 import proto.Types.*;
-import rmf.ByzantineRmfNode;
-import rmf.RmfNode;
+import wrb.ByzantineWrbNode;
+import wrb.WrbNode;
 
-import java.math.BigInteger;
 import java.security.SecureRandom;
-import java.sql.Timestamp;
 import java.util.*;
 
 import static java.lang.String.format;
@@ -29,7 +24,7 @@ public class byzantineBcServer extends bcServer {
     List<List<Integer>> groups = new ArrayList<>();
 
     public byzantineBcServer(String addr, int rmfPort, int id, int channel, int f, int tmo, int tmoInterval,
-                     int maxTx, boolean fastMode, ArrayList<Node> cluster, RmfNode rmf, RBrodcastService panic, RBrodcastService sync) {
+                             int maxTx, boolean fastMode, ArrayList<Node> cluster, WrbNode rmf, RBrodcastService panic, RBrodcastService sync) {
         super(addr, rmfPort, id, channel, f, tmo, tmoInterval, maxTx, fastMode, cluster, rmf, panic, sync);
     }
 
@@ -40,7 +35,7 @@ public class byzantineBcServer extends bcServer {
         super(addr, rmfPort, id, channel, f, tmo, tmoInterval, maxTx, fastMode, cluster,
                 bbcConfig, panicConfig, syncConfig, serverCrt, serverPrivKey, caRoot);
         rmfServer.stop();
-        rmfServer = new ByzantineRmfNode(1, id, addr, rmfPort, f, tmo, tmoInterval,
+        rmfServer = new ByzantineWrbNode(1, id, addr, rmfPort, f, tmo, tmoInterval,
                 cluster, bbcConfig, serverCrt, serverPrivKey, caRoot);
         groups.add(new ArrayList<>());
         for (int i = 0 ; i < n ; i++) {
@@ -94,10 +89,10 @@ public class byzantineBcServer extends bcServer {
         }
 
         if (fullByz) {
-            ((ByzantineRmfNode)rmfServer).devidedBroadcast(msgs, groups);
+            ((ByzantineWrbNode)rmfServer).devidedBroadcast(msgs, groups);
 
         } else {
-            ((ByzantineRmfNode)rmfServer).broadcast(sealedBlock1);
+            ((ByzantineWrbNode)rmfServer).broadcast(sealedBlock1);
         }
     //        }
      return null;

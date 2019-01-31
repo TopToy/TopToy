@@ -5,7 +5,7 @@ import blockchain.blockchain;
 import config.Node;
 import consensus.RBroadcast.RBrodcastService;
 import proto.Types;
-import rmf.RmfNode;
+import wrb.WrbNode;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -18,7 +18,7 @@ public class asyncBcServer extends bcServer {
     int maxTime = 0;
 
     public asyncBcServer(String addr, int rmfPort, int id, int channel, int f, int tmo, int tmoInterval,
-                             int maxTx, boolean fastMode, ArrayList<Node> cluster, RmfNode rmf,
+                             int maxTx, boolean fastMode, ArrayList<Node> cluster, WrbNode rmf,
                          RBrodcastService panic, RBrodcastService sync) {
         super(addr, rmfPort, id, channel, f, tmo, tmoInterval, maxTx, fastMode, cluster, rmf, panic, sync);
     }
