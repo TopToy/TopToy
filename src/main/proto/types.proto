@@ -117,6 +117,10 @@ message Req {
     Meta _meta = 1;
 }
 
+message PreConsReq {
+    Meta _meta = 1;
+}
+
 message Res {
     Meta m = 1;
     Block data = 2;

@@ -9,4 +9,5 @@ service Rmf {
     rpc DisseminateMessage(Block) returns (Empty) {};
     rpc FastVote(BbcMsg) returns (Empty) {};
     rpc reqMessage(Req) returns (Res) {};
+    rpc PreConsReqMessage(PreConsReq) returns (Res) {};
 }

@@ -11078,6 +11078,588 @@ public final class Types {
 
   }
 
+  public interface PreConsReqOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:proto.PreConsReq)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>.proto.Meta _meta = 1;</code>
+     */
+    boolean hasMeta();
+    /**
+     * <code>.proto.Meta _meta = 1;</code>
+     */
+    proto.Types.Meta getMeta();
+    /**
+     * <code>.proto.Meta _meta = 1;</code>
+     */
+    proto.Types.MetaOrBuilder getMetaOrBuilder();
+  }
+  /**
+   * Protobuf type {@code proto.PreConsReq}
+   */
+  public  static final class PreConsReq extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:proto.PreConsReq)
+      PreConsReqOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use PreConsReq.newBuilder() to construct.
+    private PreConsReq(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private PreConsReq() {
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private PreConsReq(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownFieldProto3(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 10: {
+              proto.Types.Meta.Builder subBuilder = null;
+              if (Meta_ != null) {
+                subBuilder = Meta_.toBuilder();
+              }
+              Meta_ = input.readMessage(proto.Types.Meta.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(Meta_);
+                Meta_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return proto.Types.internal_static_proto_PreConsReq_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return proto.Types.internal_static_proto_PreConsReq_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              proto.Types.PreConsReq.class, proto.Types.PreConsReq.Builder.class);
+    }
+
+    public static final int _META_FIELD_NUMBER = 1;
+    private proto.Types.Meta Meta_;
+    /**
+     * <code>.proto.Meta _meta = 1;</code>
+     */
+    public boolean hasMeta() {
+      return Meta_ != null;
+    }
+    /**
+     * <code>.proto.Meta _meta = 1;</code>
+     */
+    public proto.Types.Meta getMeta() {
+      return Meta_ == null ? proto.Types.Meta.getDefaultInstance() : Meta_;
+    }
+    /**
+     * <code>.proto.Meta _meta = 1;</code>
+     */
+    public proto.Types.MetaOrBuilder getMetaOrBuilder() {
+      return getMeta();
+    }
+
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (Meta_ != null) {
+        output.writeMessage(1, getMeta());
+      }
+      unknownFields.writeTo(output);
+    }
+
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (Meta_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(1, getMeta());
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof proto.Types.PreConsReq)) {
+        return super.equals(obj);
+      }
+      proto.Types.PreConsReq other = (proto.Types.PreConsReq) obj;
+
+      boolean result = true;
+      result = result && (hasMeta() == other.hasMeta());
+      if (hasMeta()) {
+        result = result && getMeta()
+            .equals(other.getMeta());
+      }
+      result = result && unknownFields.equals(other.unknownFields);
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasMeta()) {
+        hash = (37 * hash) + _META_FIELD_NUMBER;
+        hash = (53 * hash) + getMeta().hashCode();
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static proto.Types.PreConsReq parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static proto.Types.PreConsReq parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static proto.Types.PreConsReq parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static proto.Types.PreConsReq parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static proto.Types.PreConsReq parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static proto.Types.PreConsReq parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static proto.Types.PreConsReq parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static proto.Types.PreConsReq parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static proto.Types.PreConsReq parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static proto.Types.PreConsReq parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static proto.Types.PreConsReq parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static proto.Types.PreConsReq parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(proto.Types.PreConsReq prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code proto.PreConsReq}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:proto.PreConsReq)
+        proto.Types.PreConsReqOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return proto.Types.internal_static_proto_PreConsReq_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return proto.Types.internal_static_proto_PreConsReq_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                proto.Types.PreConsReq.class, proto.Types.PreConsReq.Builder.class);
+      }
+
+      // Construct using proto.Types.PreConsReq.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      public Builder clear() {
+        super.clear();
+        if (MetaBuilder_ == null) {
+          Meta_ = null;
+        } else {
+          Meta_ = null;
+          MetaBuilder_ = null;
+        }
+        return this;
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return proto.Types.internal_static_proto_PreConsReq_descriptor;
+      }
+
+      public proto.Types.PreConsReq getDefaultInstanceForType() {
+        return proto.Types.PreConsReq.getDefaultInstance();
+      }
+
+      public proto.Types.PreConsReq build() {
+        proto.Types.PreConsReq result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public proto.Types.PreConsReq buildPartial() {
+        proto.Types.PreConsReq result = new proto.Types.PreConsReq(this);
+        if (MetaBuilder_ == null) {
+          result.Meta_ = Meta_;
+        } else {
+          result.Meta_ = MetaBuilder_.build();
+        }
+        onBuilt();
+        return result;
+      }
+
+      public Builder clone() {
+        return (Builder) super.clone();
+      }
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return (Builder) super.setField(field, value);
+      }
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return (Builder) super.clearField(field);
+      }
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return (Builder) super.clearOneof(oneof);
+      }
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return (Builder) super.setRepeatedField(field, index, value);
+      }
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return (Builder) super.addRepeatedField(field, value);
+      }
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof proto.Types.PreConsReq) {
+          return mergeFrom((proto.Types.PreConsReq)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(proto.Types.PreConsReq other) {
+        if (other == proto.Types.PreConsReq.getDefaultInstance()) return this;
+        if (other.hasMeta()) {
+          mergeMeta(other.getMeta());
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        proto.Types.PreConsReq parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (proto.Types.PreConsReq) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      private proto.Types.Meta Meta_ = null;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          proto.Types.Meta, proto.Types.Meta.Builder, proto.Types.MetaOrBuilder> MetaBuilder_;
+      /**
+       * <code>.proto.Meta _meta = 1;</code>
+       */
+      public boolean hasMeta() {
+        return MetaBuilder_ != null || Meta_ != null;
+      }
+      /**
+       * <code>.proto.Meta _meta = 1;</code>
+       */
+      public proto.Types.Meta getMeta() {
+        if (MetaBuilder_ == null) {
+          return Meta_ == null ? proto.Types.Meta.getDefaultInstance() : Meta_;
+        } else {
+          return MetaBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>.proto.Meta _meta = 1;</code>
+       */
+      public Builder setMeta(proto.Types.Meta value) {
+        if (MetaBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          Meta_ = value;
+          onChanged();
+        } else {
+          MetaBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <code>.proto.Meta _meta = 1;</code>
+       */
+      public Builder setMeta(
+          proto.Types.Meta.Builder builderForValue) {
+        if (MetaBuilder_ == null) {
+          Meta_ = builderForValue.build();
+          onChanged();
+        } else {
+          MetaBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <code>.proto.Meta _meta = 1;</code>
+       */
+      public Builder mergeMeta(proto.Types.Meta value) {
+        if (MetaBuilder_ == null) {
+          if (Meta_ != null) {
+            Meta_ =
+              proto.Types.Meta.newBuilder(Meta_).mergeFrom(value).buildPartial();
+          } else {
+            Meta_ = value;
+          }
+          onChanged();
+        } else {
+          MetaBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <code>.proto.Meta _meta = 1;</code>
+       */
+      public Builder clearMeta() {
+        if (MetaBuilder_ == null) {
+          Meta_ = null;
+          onChanged();
+        } else {
+          Meta_ = null;
+          MetaBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <code>.proto.Meta _meta = 1;</code>
+       */
+      public proto.Types.Meta.Builder getMetaBuilder() {
+        
+        onChanged();
+        return getMetaFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.proto.Meta _meta = 1;</code>
+       */
+      public proto.Types.MetaOrBuilder getMetaOrBuilder() {
+        if (MetaBuilder_ != null) {
+          return MetaBuilder_.getMessageOrBuilder();
+        } else {
+          return Meta_ == null ?
+              proto.Types.Meta.getDefaultInstance() : Meta_;
+        }
+      }
+      /**
+       * <code>.proto.Meta _meta = 1;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          proto.Types.Meta, proto.Types.Meta.Builder, proto.Types.MetaOrBuilder> 
+          getMetaFieldBuilder() {
+        if (MetaBuilder_ == null) {
+          MetaBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              proto.Types.Meta, proto.Types.Meta.Builder, proto.Types.MetaOrBuilder>(
+                  getMeta(),
+                  getParentForChildren(),
+                  isClean());
+          Meta_ = null;
+        }
+        return MetaBuilder_;
+      }
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFieldsProto3(unknownFields);
+      }
+
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:proto.PreConsReq)
+    }
+
+    // @@protoc_insertion_point(class_scope:proto.PreConsReq)
+    private static final proto.Types.PreConsReq DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new proto.Types.PreConsReq();
+    }
+
+    public static proto.Types.PreConsReq getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<PreConsReq>
+        PARSER = new com.google.protobuf.AbstractParser<PreConsReq>() {
+      public PreConsReq parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new PreConsReq(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<PreConsReq> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<PreConsReq> getParserForType() {
+      return PARSER;
+    }
+
+    public proto.Types.PreConsReq getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   public interface ResOrBuilder extends
       // @@protoc_insertion_point(interface_extends:proto.Res)
       com.google.protobuf.MessageOrBuilder {
@@ -12991,6 +13573,11 @@ public final class Types {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_proto_Req_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_proto_PreConsReq_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_proto_PreConsReq_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_proto_Res_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -13035,11 +13622,12 @@ public final class Types {
       "proto.Block\022\032\n\004prev\030\004 \001(\0132\014.proto.Block\"" +
       "-\n\005RBMsg\022\026\n\001m\030\001 \001(\0132\013.proto.Meta\022\014\n\004data" +
       "\030\003 \001(\014\"\007\n\005Empty\"!\n\003Req\022\032\n\005_meta\030\001 \001(\0132\013." +
-      "proto.Meta\"9\n\003Res\022\026\n\001m\030\001 \001(\0132\013.proto.Met" +
-      "a\022\032\n\004data\030\002 \001(\0132\014.proto.Block\"`\n\017subChai" +
-      "nVersion\022\021\n\tforkPoint\030\001 \001(\005\022\021\n\tsuggested" +
-      "\030\002 \001(\005\022\027\n\001v\030\003 \003(\0132\014.proto.Block\022\016\n\006sende" +
-      "r\030\004 \001(\005B\007\n\005protob\006proto3"
+      "proto.Meta\"(\n\nPreConsReq\022\032\n\005_meta\030\001 \001(\0132" +
+      "\013.proto.Meta\"9\n\003Res\022\026\n\001m\030\001 \001(\0132\013.proto.M" +
+      "eta\022\032\n\004data\030\002 \001(\0132\014.proto.Block\"`\n\017subCh" +
+      "ainVersion\022\021\n\tforkPoint\030\001 \001(\005\022\021\n\tsuggest" +
+      "ed\030\002 \001(\005\022\027\n\001v\030\003 \003(\0132\014.proto.Block\022\016\n\006sen" +
+      "der\030\004 \001(\005B\007\n\005protob\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -13143,14 +13731,20 @@ public final class Types {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_Req_descriptor,
         new java.lang.String[] { "Meta", });
-    internal_static_proto_Res_descriptor =
+    internal_static_proto_PreConsReq_descriptor =
       getDescriptor().getMessageTypes().get(15);
+    internal_static_proto_PreConsReq_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_proto_PreConsReq_descriptor,
+        new java.lang.String[] { "Meta", });
+    internal_static_proto_Res_descriptor =
+      getDescriptor().getMessageTypes().get(16);
     internal_static_proto_Res_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_Res_descriptor,
         new java.lang.String[] { "M", "Data", });
     internal_static_proto_subChainVersion_descriptor =
-      getDescriptor().getMessageTypes().get(16);
+      getDescriptor().getMessageTypes().get(17);
     internal_static_proto_subChainVersion_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_subChainVersion_descriptor,

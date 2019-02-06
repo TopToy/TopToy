@@ -108,6 +108,33 @@ public final class RmfGrpc {
      return getReqMessageMethod;
   }
 
+  private static volatile io.grpc.MethodDescriptor<proto.Types.PreConsReq,
+      proto.Types.Res> getPreConsReqMessageMethod;
+
+  public static io.grpc.MethodDescriptor<proto.Types.PreConsReq,
+      proto.Types.Res> getPreConsReqMessageMethod() {
+    io.grpc.MethodDescriptor<proto.Types.PreConsReq, proto.Types.Res> getPreConsReqMessageMethod;
+    if ((getPreConsReqMessageMethod = RmfGrpc.getPreConsReqMessageMethod) == null) {
+      synchronized (RmfGrpc.class) {
+        if ((getPreConsReqMessageMethod = RmfGrpc.getPreConsReqMessageMethod) == null) {
+          RmfGrpc.getPreConsReqMessageMethod = getPreConsReqMessageMethod = 
+              io.grpc.MethodDescriptor.<proto.Types.PreConsReq, proto.Types.Res>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+              .setFullMethodName(generateFullMethodName(
+                  "proto.Rmf", "PreConsReqMessage"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  proto.Types.PreConsReq.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  proto.Types.Res.getDefaultInstance()))
+                  .setSchemaDescriptor(new RmfMethodDescriptorSupplier("PreConsReqMessage"))
+                  .build();
+          }
+        }
+     }
+     return getPreConsReqMessageMethod;
+  }
+
   /**
    * Creates a new async stub that supports all call types for the service
    */
@@ -156,6 +183,13 @@ public final class RmfGrpc {
       asyncUnimplementedUnaryCall(getReqMessageMethod(), responseObserver);
     }
 
+    /**
+     */
+    public void preConsReqMessage(proto.Types.PreConsReq request,
+        io.grpc.stub.StreamObserver<proto.Types.Res> responseObserver) {
+      asyncUnimplementedUnaryCall(getPreConsReqMessageMethod(), responseObserver);
+    }
+
     @java.lang.Override public final io.grpc.ServerServiceDefinition bindService() {
       return io.grpc.ServerServiceDefinition.builder(getServiceDescriptor())
           .addMethod(
@@ -179,6 +213,13 @@ public final class RmfGrpc {
                 proto.Types.Req,
                 proto.Types.Res>(
                   this, METHODID_REQ_MESSAGE)))
+          .addMethod(
+            getPreConsReqMessageMethod(),
+            asyncUnaryCall(
+              new MethodHandlers<
+                proto.Types.PreConsReq,
+                proto.Types.Res>(
+                  this, METHODID_PRE_CONS_REQ_MESSAGE)))
           .build();
     }
   }
@@ -224,6 +265,14 @@ public final class RmfGrpc {
       asyncUnaryCall(
           getChannel().newCall(getReqMessageMethod(), getCallOptions()), request, responseObserver);
     }
+
+    /**
+     */
+    public void preConsReqMessage(proto.Types.PreConsReq request,
+        io.grpc.stub.StreamObserver<proto.Types.Res> responseObserver) {
+      asyncUnaryCall(
+          getChannel().newCall(getPreConsReqMessageMethod(), getCallOptions()), request, responseObserver);
+    }
   }
 
   /**
@@ -263,6 +312,13 @@ public final class RmfGrpc {
     public proto.Types.Res reqMessage(proto.Types.Req request) {
       return blockingUnaryCall(
           getChannel(), getReqMessageMethod(), getCallOptions(), request);
+    }
+
+    /**
+     */
+    public proto.Types.Res preConsReqMessage(proto.Types.PreConsReq request) {
+      return blockingUnaryCall(
+          getChannel(), getPreConsReqMessageMethod(), getCallOptions(), request);
     }
   }
 
@@ -307,11 +363,20 @@ public final class RmfGrpc {
       return futureUnaryCall(
           getChannel().newCall(getReqMessageMethod(), getCallOptions()), request);
     }
+
+    /**
+     */
+    public com.google.common.util.concurrent.ListenableFuture<proto.Types.Res> preConsReqMessage(
+        proto.Types.PreConsReq request) {
+      return futureUnaryCall(
+          getChannel().newCall(getPreConsReqMessageMethod(), getCallOptions()), request);
+    }
   }
 
   private static final int METHODID_DISSEMINATE_MESSAGE = 0;
   private static final int METHODID_FAST_VOTE = 1;
   private static final int METHODID_REQ_MESSAGE = 2;
+  private static final int METHODID_PRE_CONS_REQ_MESSAGE = 3;
 
   private static final class MethodHandlers<Req, Resp> implements
       io.grpc.stub.ServerCalls.UnaryMethod<Req, Resp>,
@@ -340,6 +405,10 @@ public final class RmfGrpc {
           break;
         case METHODID_REQ_MESSAGE:
           serviceImpl.reqMessage((proto.Types.Req) request,
+              (io.grpc.stub.StreamObserver<proto.Types.Res>) responseObserver);
+          break;
+        case METHODID_PRE_CONS_REQ_MESSAGE:
+          serviceImpl.preConsReqMessage((proto.Types.PreConsReq) request,
               (io.grpc.stub.StreamObserver<proto.Types.Res>) responseObserver);
           break;
         default:
@@ -406,6 +475,7 @@ public final class RmfGrpc {
               .addMethod(getDisseminateMessageMethod())
               .addMethod(getFastVoteMethod())
               .addMethod(getReqMessageMethod())
+              .addMethod(getPreConsReqMessageMethod())
               .build();
         }
       }
