@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
-base=..
-dest=/home/yoni/Desktop/dtoy/configurations/benign
+
+source /home/yoni/github.com/JToy/definitions.sh
 
 generate_config_toml() {
     echo \
 "title = \"configuration\"
 [system]
-    n = ${1}
-    f = ${2}
+    n = ${C}
+    f = ${F}
     c = 20
     testing = true
     txSize = 0
@@ -35,8 +35,8 @@ generate_config_toml() {
     TlsCertPath = \"src/main/resources/sslConfig/server.crt\"
 
 [[cluster]]" \
-> ${dest}/config.toml
-n=$((${1} - 1))
+> ${1}/config.toml
+n=$((${C} - 1))
 for i in `seq 0 ${n}`; do
     echo "      [cluster.s${i}]
             id = ${i}
@@ -44,7 +44,7 @@ for i in `seq 0 ${n}`; do
             port = 30000
             publicKey =\"\"\"MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
                            N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg==\"\"\"
-    " >> ${dest}/config.toml
+    " >> ${1}/config.toml
 done
 }
 
@@ -78,10 +78,10 @@ generate_hosts(){
 # The same holds for replicas 1, 2, 3 ... N.
 
 #server id, address and port (the ids from 0 to n-1 are the service replicas)" \
-    > ${dest}/${conf}/hosts.config
-    n=$((${2} - 1))
+    > ${conf}/hosts.config
+    n=$((${C} - 1))
     for i in `seq 0 ${n}`; do
-        echo "${i} 172.18.0.$((${i} + 3)) ${3}" >> ${dest}/${conf}/hosts.config
+        echo "${i} 172.18.0.$((${i} + 3)) ${2}" >> ${conf}/hosts.config
     done
 }
 
@@ -122,10 +122,10 @@ system.communication.defaultkeys = false
 ############################################
 
 #Number of servers in the group
-system.servers.num = ${2}
+system.servers.num = ${C}
 
 #Maximum number of faulty replicas
-system.servers.f = ${3}
+system.servers.f = ${F}
 
 #Timeout to asking for a client request
 system.totalordermulticast.timeout = 2000
@@ -199,70 +199,59 @@ system.totalordermulticast.sync_ckp = false
 
 #Replicas ID for the initial view, separated by a comma.
 # The number of replicas in this parameter should be equal to that specified in 'system.servers.num'
-system.initial.view = 0" > ${dest}/${conf}/system.config
-for i in `seq 1 $((${2} - 1))`; do
-    echo -n ",${i}" >> ${dest}/${conf}/system.config
+system.initial.view = 0" > ${conf}/system.config
+for i in `seq 1 $((${C} - 1))`; do
+    echo -n ",${i}" >> ${conf}/system.config
 done
 echo "
-" >> ${dest}/${conf}/system.config
+" >> ${conf}/system.config
 echo \
 "#The ID of the trust third party (TTP)
 system.ttp.id = 7002
 
 #This sets if the system will function in Byzantine or crash-only mode. Set to "true" to support Byzantine faults
 system.bft = true" \
-    >> ${dest}/${conf}/system.config
+    >> ${conf}/system.config
 }
 
 generate_keys() {
     conf=${1}
-    mkdir -p ${dest}/${conf}/keys
-    for i in `seq 0 $((${2} - 1))`; do
-        cat ${base}/make_scripts/keys/publickey0 > ${dest}/${conf}/keys/publickey${i}
-        cat ${base}/make_scripts/keys/privatekey0 > ${dest}/${conf}/keys/privatekey${i}
+    mkdir -p ${conf}/keys
+    for i in `seq 0 $((${C} - 1))`; do
+        cat ${make_script_dir}/keys/publickey > ${conf}/keys/publickey${i}
+        cat ${make_script_dir}/keys/privatekey > ${conf}/keys/privatekey${i}
     done
 }
 
 generate_log4j() {
-    cat ${base}/make_scripts/log4j.properties >  ${dest}/log4j.properties
-}
-
-generate_benign_inst() {
-echo \
-"init
-serve
-wait ${1}
-stop
-quit" > ${dest}/inst/input.inst
+    cat ${make_script_dir}/log4j.properties >  ${1}/log4j.properties
 }
 
 main(){
-    base=${1}
-    mkdir -p ${dest}/bbcConfig
-    mkdir -p ${dest}/panicRBConfig
-    mkdir -p ${dest}/syncRBConfig
-    mkdir -p ${dest}/inst
+    mkdir -p ${1}/bbcConfig
+    mkdir -p ${1}/panicRBConfig
+    mkdir -p ${1}/syncRBConfig
+    mkdir -p ${1}/inst
 
-    generate_config_toml ${2} ${3}
+    generate_config_toml ${1}
 
-    generate_hosts bbcConfig ${2} 12000
-    generate_hosts panicRBConfig ${2} 11000
-    generate_hosts syncRBConfig ${2} 13000
+    generate_hosts ${1}/bbcConfig 12000
+    generate_hosts ${1}/panicRBConfig 11000
+    generate_hosts ${1}/syncRBConfig 13000
 
-    generate_system bbcConfig ${2} ${3}
-    generate_system panicRBConfig ${2} ${3}
-    generate_system syncRBConfig ${2} ${3}
+    generate_system ${1}/bbcConfig
+    generate_system ${1}/panicRBConfig
+    generate_system ${1}/syncRBConfig
 
-    generate_keys bbcConfig ${2}
-    generate_keys panicRBConfig ${2}
-    generate_keys syncRBConfig ${2}
+    generate_keys ${1}/bbcConfig
+    generate_keys ${1}/panicRBConfig
+    generate_keys ${1}/syncRBConfig
 
-    generate_benign_inst 10
+    generate_log4j ${1}
 
-    generate_log4j
-
-    cp -r ${base}/make_scripts/sslConfig ${dest}
+    cp -r ${make_script_dir}/sslConfig ${1}
 
 }
 
-main ${1} ${2} ${3}
+main ${cdest}
+main ${fbdest}

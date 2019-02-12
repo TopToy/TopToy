@@ -242,6 +242,15 @@ public class bbcService extends DefaultSingleRecoverable {
         return new byte[1];
     }
 
+    public boolean hasDecision(int channel, int cidSeries, int cid) {
+        Meta key = Meta.newBuilder()
+                .setCidSeries(cidSeries)
+                .setCid(cid)
+                .setChannel(channel)
+                .build();
+        consVote v = rec.get(key);
+        return v != null && v.neg + v.pos >= quorumSize;
+    }
     public BbcDecision decide(int channel, int cidSeries, int cid) throws  InterruptedException {
 //        synchronized (globalLock) {
             Meta key = Meta.newBuilder()

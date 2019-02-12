@@ -1,17 +1,18 @@
 #!/usr/bin/env bash
-curr=/home/yoni/Desktop/dtoy/curr
-output=/home/yoni/Desktop/dtoy/out
-test_dir=$(dirname "$0")/tests
 
-run(){
+source /home/yoni/github.com/JToy/definitions.sh
+
+run() {
     for t in ${test_dir}/active/*.sh; do
+        echo "running ${t}..."
         sudo chmod 777 $t
         local outputDir=${output}/$(date '+%F-%H:%M:%S')
         mkdir -p ${outputDir}/servers
         print_headers ${outputDir}
         ${t}
         collect_res_from_servers ${outputDir}
-        sudo rm -r -f ${curr}/*
+        sudo rm -r -f ${docker_out}/*
+        echo "done..."
     done
 }
 
@@ -20,12 +21,12 @@ collect_res_from_servers() {
     mkdir -p ${currOut}/servers/logs
     shopt -s globstar
 
-    cp -r ${curr}/logs/* ${currOut}/servers/logs/
-    for summery in ${curr}/**/summery.csv ; do
+    cp -r ${docker_out}/logs/* ${currOut}/servers/logs/
+    for summery in ${docker_out}/**/summery.csv ; do
         cat ${summery} >> ${currOut}/servers/summery.csv
     done
 
-    for sigsummery in ${curr}/**/sig_summery.csv ; do
+    for sigsummery in ${docker_out}/**/sig_summery.csv ; do
         cat ${sigsummery} >> ${currOut}/servers/sig_summery.csv
     done
     shopt -u globstar

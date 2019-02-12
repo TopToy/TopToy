@@ -1,22 +1,15 @@
-BASE_DIR=.
-BIN_DIR=$(BASE_DIR)/bin
-RESOURCES_DIR=$(BIN_DIR)/src/main/resources
-C=1
-F=0
+
 bin-build:
-	mvn install && \
-	rm -r $(RESOURCES_DIR)/* && \
-	sudo chmod 777 $(BIN_DIR)/run_docker.sh && \
-	sudo chmod 777 $(BIN_DIR)/run_single.sh
+	./make_scripts/bin-build.sh
 
 docker_build:
 	docker build -t toy:0.1 .
 
 docker-composer:
-	./make_scripts/docker-composer.sh $(BASE_DIR) $(C)
+	./make_scripts/docker-composer.sh
 
 docker-generate_configuration:
-	./make_scripts/generate_configuration.sh $(BASE_DIR) $(C) $(F)
+	./make_scripts/generate_configuration.sh
 
 docker-full-build:
 	make docker-generate_configuration
