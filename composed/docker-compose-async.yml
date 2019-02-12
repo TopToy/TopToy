@@ -5,10 +5,10 @@ services:
         container_name: TS_0
         environment:
         - ID=0
-        - Type=r
+        - Type=a
         volumes:
         - /home/yoni/Desktop/dtoy/curr/:/tmp/JToy
-        - /home/yoni/Desktop/dtoy/configurations/fbenign:/JToy/bin/src/main/resources
+        - /home/yoni/Desktop/dtoy/configurations/async:/JToy/bin/src/main/resources
         networks:
             toy_net:
                 ipv4_address: 172.18.0.3
@@ -17,10 +17,10 @@ services:
         container_name: TS_1
         environment:
         - ID=1
-        - Type=r
+        - Type=a
         volumes:
         - /home/yoni/Desktop/dtoy/curr/:/tmp/JToy
-        - /home/yoni/Desktop/dtoy/configurations/correct:/JToy/bin/src/main/resources
+        - /home/yoni/Desktop/dtoy/configurations/async:/JToy/bin/src/main/resources
         networks:
             toy_net:
                 ipv4_address: 172.18.0.4
@@ -29,10 +29,10 @@ services:
         container_name: TS_2
         environment:
         - ID=2
-        - Type=r
+        - Type=a
         volumes:
         - /home/yoni/Desktop/dtoy/curr/:/tmp/JToy
-        - /home/yoni/Desktop/dtoy/configurations/correct:/JToy/bin/src/main/resources
+        - /home/yoni/Desktop/dtoy/configurations/async:/JToy/bin/src/main/resources
         networks:
             toy_net:
                 ipv4_address: 172.18.0.5
@@ -41,10 +41,10 @@ services:
         container_name: TS_3
         environment:
         - ID=3
-        - Type=r
+        - Type=a
         volumes:
         - /home/yoni/Desktop/dtoy/curr/:/tmp/JToy
-        - /home/yoni/Desktop/dtoy/configurations/correct:/JToy/bin/src/main/resources
+        - /home/yoni/Desktop/dtoy/configurations/async:/JToy/bin/src/main/resources
         networks:
             toy_net:
                 ipv4_address: 172.18.0.6

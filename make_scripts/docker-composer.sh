@@ -41,6 +41,27 @@ echo \
         container_name: TS_${id}
         environment:
         - ID=${id}
+        - Type=r
+        volumes:
+        - ${out}:/tmp/JToy
+        - ${conf}:/JToy/bin/src/main/resources
+        networks:
+            toy_net:
+                ipv4_address: 172.18.0.$((${id} + 3))" \
+            >> ${5}
+}
+
+compose_async_server() {
+local id=${1}
+local image=${2}
+local conf=${3}
+local out=${4}
+echo \
+"   TS${id}:
+        image: ${image}
+        container_name: TS_${id}
+        environment:
+        - ID=${id}
         - Type=a
         volumes:
         - ${out}:/tmp/JToy
@@ -82,6 +103,14 @@ compose_benign_network() {
     done
 
 }
+
+compose_async_dockers() {
+    containers_n=$((${C} - 1))
+    for i in `seq 0 ${containers_n}`; do
+        compose_async_server $i ${docker_image} ${asdest} ${docker_out} ${compose_file_async}
+    done
+}
+
 main_correct(){
     compose_header ${compose_file_correct}
 #    compose_benign_network ${C} ${F}
@@ -95,5 +124,12 @@ main_benign_failures(){
     compose_footer ${compose_file_benign_failures}
 }
 
+main_async(){
+    compose_header ${compose_file_async}
+    compose_async_dockers
+    compose_footer ${compose_file_async}
+}
+
 main_correct
 main_benign_failures
+main_async
