@@ -10,6 +10,15 @@ stop
 quit" > ${2}/inst/input.inst
 }
 
+configure_async_inst(){
+echo \
+"init
+serve
+async ${1} ${2}
+stop
+quit" > ${3}/inst/input.inst
+}
+
 configure_channels(){
     sed -i 's/c =.*/c = '${1}'/g' ${2}/config.toml
 

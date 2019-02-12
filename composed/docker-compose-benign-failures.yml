@@ -5,7 +5,7 @@ services:
         container_name: TS_0
         environment:
         - ID=0
-        - Type=r
+        - Type=a
         volumes:
         - /home/yoni/Desktop/dtoy/curr/:/tmp/JToy
         - /home/yoni/Desktop/dtoy/configurations/fbenign:/JToy/bin/src/main/resources

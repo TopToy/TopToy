@@ -41,7 +41,7 @@ echo \
         container_name: TS_${id}
         environment:
         - ID=${id}
-        - Type=r
+        - Type=a
         volumes:
         - ${out}:/tmp/JToy
         - ${conf}:/JToy/bin/src/main/resources

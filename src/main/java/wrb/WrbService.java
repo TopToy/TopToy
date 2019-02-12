@@ -652,7 +652,7 @@ public class WrbService extends RmfGrpc.RmfImplBase {
         });
 
 //        fastVoteV1(request, key, channel, cidSeries, cid);
-        fastVoteV1(request, key, channel, cidSeries, cid);
+        fastVoteV2(request, key, channel, cidSeries, cid);
 
 
     }
@@ -972,12 +972,12 @@ public class WrbService extends RmfGrpc.RmfImplBase {
         long start = System.currentTimeMillis();
         preDeliverLogic(key, channel, cidSeries, cid);
         long est = System.currentTimeMillis() - start;
-        if (!deliverV1(key, channel, cidSeries, cid, sender, height, next, est)) {
-            return null;
-        }
-//        if (!deliverV2(key, channel, cidSeries, cid, sender, height, next)) {
+//        if (!deliverV1(key, channel, cidSeries, cid, sender, height, next, est)) {
 //            return null;
 //        }
+        if (!deliverV2(key, channel, cidSeries, cid, sender, height, next)) {
+            return null;
+        }
         return postDeliverLogic(key, channel, cidSeries, cid, sender, height);
     }
 
