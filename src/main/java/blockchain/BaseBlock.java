@@ -9,7 +9,7 @@ import proto.Types.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class block {
+public abstract class BaseBlock {
     public Block.Builder blockBuilder = Block.newBuilder();
 
     abstract public boolean validateTransaction(Transaction t);

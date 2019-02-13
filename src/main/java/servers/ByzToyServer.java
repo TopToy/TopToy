@@ -1,37 +1,37 @@
 package servers;
 
-import blockchain.blockchain;
+import blockchain.BaseBlockchain;
 
-import blockchain.basicBlockchain;
+import blockchain.SBlockchain;
 import com.google.protobuf.ByteString;
 import config.Node;
-import consensus.RBroadcast.RBrodcastService;
+import das.RBroadcast.RBrodcastService;
 
 import proto.Types;
 import proto.Types.*;
-import wrb.ByzantineWrbNode;
-import wrb.WrbNode;
+import das.wrb.ByzantineWrbNode;
+import das.wrb.WrbNode;
 
 import java.security.SecureRandom;
 import java.util.*;
 
 import static java.lang.String.format;
 
-public class byzantineBcServer extends bcServer {
+public class ByzToyServer extends ToyBaseServer {
 
-    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(byzantineBcServer.class);
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ByzToyServer.class);
     private boolean fullByz = false;
     List<List<Integer>> groups = new ArrayList<>();
 
-    public byzantineBcServer(String addr, int rmfPort, int id, int channel, int f, int tmo, int tmoInterval,
-                             int maxTx, boolean fastMode, ArrayList<Node> cluster, WrbNode rmf, RBrodcastService panic, RBrodcastService sync) {
+    public ByzToyServer(String addr, int rmfPort, int id, int channel, int f, int tmo, int tmoInterval,
+                        int maxTx, boolean fastMode, ArrayList<Node> cluster, WrbNode rmf, RBrodcastService panic, RBrodcastService sync) {
         super(addr, rmfPort, id, channel, f, tmo, tmoInterval, maxTx, fastMode, cluster, rmf, panic, sync);
     }
 
-    public byzantineBcServer(String addr, int rmfPort, int id, int channel, int f, int tmo, int tmoInterval,
-                             int maxTx, boolean fastMode, ArrayList<Node> cluster,
-                             String bbcConfig, String panicConfig, String syncConfig,
-                             String serverCrt, String serverPrivKey, String caRoot) {
+    public ByzToyServer(String addr, int rmfPort, int id, int channel, int f, int tmo, int tmoInterval,
+                        int maxTx, boolean fastMode, ArrayList<Node> cluster,
+                        String bbcConfig, String panicConfig, String syncConfig,
+                        String serverCrt, String serverPrivKey, String caRoot) {
         super(addr, rmfPort, id, channel, f, tmo, tmoInterval, maxTx, fastMode, cluster,
                 bbcConfig, panicConfig, syncConfig, serverCrt, serverPrivKey, caRoot);
         rmfServer.stop();
@@ -71,7 +71,7 @@ public class byzantineBcServer extends bcServer {
         if (currLeader != getID()) {
             return null;
         }
-    logger.debug(format("[#%d] prepare to disseminate a new block of [height=%d]", getID(), currHeight));
+    logger.debug(format("[#%d] prepare to disseminate a new BaseBlock of [height=%d]", getID(), currHeight));
 
     //        synchronized (blockLock) {
         addTransactionsToCurrBlock();
@@ -99,13 +99,13 @@ public class byzantineBcServer extends bcServer {
     }
 
     @Override
-    public blockchain initBC(int id, int channel) {
-        return new basicBlockchain(id, channel);
+    public BaseBlockchain initBC(int id, int channel) {
+        return new SBlockchain(id, channel);
     }
 
     @Override
-    public blockchain getBC(int start, int end) {
-        return new basicBlockchain(this.bc, start, end);
+    public BaseBlockchain getBC(int start, int end) {
+        return new SBlockchain(this.bc, start, end);
     }
 
 //    public void setFullByz() {

@@ -59,15 +59,15 @@ public interface Recoverable {
     
     /**
      * This method is invoked by ServiceReplica to pass information that was
-     * decided in a particular consensus instance. This method is always invoked before
-     * the executor. However, multiple invocations for the same consensus ID may
+     * decided in a particular das instance. This method is always invoked before
+     * the executor. However, multiple invocations for the same das ID may
      * occur, so developers must take this behavior into consideration when developing
      * their own logging and checkpointing. If there is no information to be passed to
      * the application, noOp(...) is invoked instead.
      * 
-     * @param CID the consensus instance ID associated with the request
+     * @param CID the das instance ID associated with the request
      * @param requests A request decided in CID
-     * @param msgCtx Message context associated with the client request and the consensus instance
+     * @param msgCtx Message context associated with the client request and the das instance
      * where it was ordered. msgCtx.getConsensusId() will be equal to CID.
      * 
      * 
@@ -75,7 +75,7 @@ public interface Recoverable {
     public void Op(int CID, byte[] requests, MessageContext msgCtx);
     
     /**
-     * This method is invoked by ServiceReplica to indicate that a consensus instance
+     * This method is invoked by ServiceReplica to indicate that a das instance
      * finished without delivering anything to the application (e.g., an instance
      * only decided a single reconfiguration operation. or an instance where the client
      * operation was not delivered because its view was outdated). To allow the underlying state
@@ -83,9 +83,9 @@ public interface Recoverable {
      * In the current protocols included, it suffices to register a NOOP operation in the
      * logs used within the state transfer, but never deliver it to the application
      * 
-     * @param CID the consensus instance where the aforementioned condition occurred
+     * @param CID the das instance where the aforementioned condition occurred
      * @param operations Operations decided in CID
-     * @param msgCtx Message context associated with the consensus instance. furthermore
+     * @param msgCtx Message context associated with the das instance. furthermore
      * msgCtx.getConsensusId() will be equal to CID.
      */
     public void noOp(int CID, byte[][] operations, MessageContext msgCtx[]);

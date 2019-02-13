@@ -29,7 +29,7 @@ import bftsmart.tom.core.messages.TOMMessage;
 
 
 /**
- * This class stands for a consensus epoch, as described in
+ * This class stands for a das epoch, as described in
  * Cachin's 'Yet Another Visit to Paxos' (April 2011)
  */
 public class Epoch implements Serializable {
@@ -44,7 +44,7 @@ public class Epoch implements Serializable {
     private byte[][] write; // WRITE values from other processes
     private byte[][] accept; // accepted values from other processes
     
-    private boolean alreadyRemoved = false; // indicates if this epoch was removed from its consensus
+    private boolean alreadyRemoved = false; // indicates if this epoch was removed from its das
 
     public byte[] propValue = null; // proposed value
     public TOMMessage[] deserializedPropValue = null; //utility var
@@ -66,7 +66,7 @@ public class Epoch implements Serializable {
         this.timestamp = timestamp;
         this.controller = controller;
         this.proof = new HashSet<>();
-        //ExecutionManager manager = consensus.getManager();
+        //ExecutionManager manager = das.getManager();
 
         this.lastView = controller.getCurrentView();
         this.me = controller.getStaticConf().getProcessId();
@@ -94,7 +94,7 @@ public class Epoch implements Serializable {
         }
     }
 
-    // If a view change takes place and concurrentely this consensus is still
+    // If a view change takes place and concurrentely this das is still
     // receiving messages, the write and accept arrays must be updated
     private void updateArrays() {
         
@@ -139,14 +139,14 @@ public class Epoch implements Serializable {
     }
             
     /**
-     * Set this epoch as removed from its consensus instance
+     * Set this epoch as removed from its das instance
      */
     public void setRemoved() {
         this.alreadyRemoved = true;
     }
 
     /**
-     * Informs if this epoch was removed from its consensus instance
+     * Informs if this epoch was removed from its das instance
      * @return True if it is removed, false otherwise
      */
     public boolean isRemoved() {
@@ -178,8 +178,8 @@ public class Epoch implements Serializable {
     }
 
     /**
-     * Retrieves this epoch's consensus
-     * @return This epoch's consensus
+     * Retrieves this epoch's das
+     * @return This epoch's das
      */
     public Consensus getConsensus() {
         return consensus;

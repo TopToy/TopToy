@@ -1,15 +1,15 @@
 package servers;
 
-import blockchain.blockchain;
-import blockchain.block;
+import blockchain.BaseBlock;
+import blockchain.BaseBlockchain;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import config.Config;
 import config.Node;
-import consensus.RBroadcast.RBrodcastService;
+import das.RBroadcast.RBrodcastService;
 import crypto.blockDigSig;
 import proto.*;
-import wrb.WrbNode;
+import das.wrb.WrbNode;
 import proto.Types.*;
 
 import java.security.SecureRandom;
@@ -18,28 +18,25 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
-import static java.lang.Math.incrementExact;
 import static java.lang.Math.max;
 import static java.lang.String.format;
-import static java.util.Collections.min;
-
-public abstract class bcServer extends Node {
+public abstract class ToyBaseServer extends Node {
     class fpEntry {
         ForkProof fp;
         boolean done;
     }
-    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(bcServer.class);
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ToyBaseServer.class);
     WrbNode rmfServer;
     private RBrodcastService panicRB;
     private RBrodcastService syncRB;
-    final blockchain bc;
+    final BaseBlockchain bc;
     int currHeight;
     protected int f;
     protected int n;
     int currLeader;
     protected AtomicBoolean stopped = new AtomicBoolean(false);
 //    final Object blockLock = new Object();
-    block currBlock;
+    BaseBlock currBlock;
     private final Object newBlockNotifyer = new Object();
     private int maxTransactionInBlock;
 //    private int tmo;
@@ -72,9 +69,9 @@ public abstract class bcServer extends Node {
 //    Semaphore txSem = new Semaphore(txPoolMax);
 
 
-    public bcServer(String addr, int rmfPort, int id, int channel, int f, int tmo, int tmoInterval,
-                    int maxTx, boolean fastMode, ArrayList<Node> cluster,
-                    WrbNode rmf, RBrodcastService panic, RBrodcastService sync) {
+    public ToyBaseServer(String addr, int rmfPort, int id, int channel, int f, int tmo, int tmoInterval,
+                         int maxTx, boolean fastMode, ArrayList<Node> cluster,
+                         WrbNode rmf, RBrodcastService panic, RBrodcastService sync) {
         super(addr, rmfPort, id);
         this.f = f;
         this.n = 3*f + 1;
@@ -82,7 +79,7 @@ public abstract class bcServer extends Node {
         this.syncRB = sync;
         bc = initBC(id, channel);
         currBlock = null;
-        currHeight = 1; // starts from 1 due to the genesis block
+        currHeight = 1; // starts from 1 due to the genesis BaseBlock
         currLeader = 0;
 //        this.tmo = tmo;
 //        this.tmoInterval = tmoInterval;
@@ -119,10 +116,10 @@ public abstract class bcServer extends Node {
         }
     }
 
-    public bcServer(String addr, int rmfPort, int id, int channel, int f, int tmo, int tmoInterval,
-                    int maxTx, boolean fastMode, ArrayList<Node> cluster,
-                    String bbcConfig, String panicConfig, String syncConfig,
-                    String serverCrt, String serverPrivKey, String caRoot) {
+    public ToyBaseServer(String addr, int rmfPort, int id, int channel, int f, int tmo, int tmoInterval,
+                         int maxTx, boolean fastMode, ArrayList<Node> cluster,
+                         String bbcConfig, String panicConfig, String syncConfig,
+                         String serverCrt, String serverPrivKey, String caRoot) {
 
         super(addr, rmfPort, id);
         this.f = f;
@@ -133,7 +130,7 @@ public abstract class bcServer extends Node {
         syncRB = new RBrodcastService(1, id, syncConfig);
         bc = initBC(id, channel);
         currBlock = null;
-        currHeight = 1; // starts from 1 due to the genesis block
+        currHeight = 1; // starts from 1 due to the genesis BaseBlock
         currLeader = 0;
 //        this.tmo =  tmo;
 //        this.tmoInterval = tmoInterval;
@@ -318,7 +315,7 @@ public abstract class bcServer extends Node {
 //            int mcidSeries = msg.getCidSeries();
                 if (recBlock == null) {
 //                    tmo += tmoInterval;
-//                    logger.debug(format("[#%d-C[%d]] Unable to receive block [cidSeries=%d ; cid=%d], timeout increased to [%d] ms"
+//                    logger.debug(format("[#%d-C[%d]] Unable to receive BaseBlock [cidSeries=%d ; cid=%d], timeout increased to [%d] ms"
 //                            , getID(), channel, cidSeries, cid, tmo));
 //                    updateLeaderAndHeight();
                     currLeader = (currLeader + 1) % n;
@@ -332,7 +329,7 @@ public abstract class bcServer extends Node {
 //                try {
 //                    recBlock = Block.parseFrom(msg);
 //                } catch (InvalidProtocolBufferException e) {
-//                    logger.warn("Unable to parse received block", e);
+//                    logger.warn("Unable to parse received BaseBlock", e);
 ////                updateLeaderAndHeight();
 ////                continue;
 //                    recBlock = Block.newBuilder()
@@ -349,9 +346,9 @@ public abstract class bcServer extends Node {
 //                                    .build())
 //                            .build();
                 /*
-                    We should create an empty block to the case in which a byzantine leader sends valid block to
+                    We should create an empty BaseBlock to the case in which a byzantine leader sends valid BaseBlock to
                     part of the network and invalid one to the other part.
-                    But, creating an empty block requires to change the fork proof mechanism (as the signature is not the
+                    But, creating an empty BaseBlock requires to change the fork proof mechanism (as the signature is not the
                     original one). Hence currently we leave it to a later development.
                  */
 //                }
@@ -413,10 +410,10 @@ public abstract class bcServer extends Node {
 
                     }
 
-                    logger.debug(String.format("[#%d-C[%d]] adds new block with [height=%d] [cidSeries=%d ; cid=%d] [size=%d]",
+                    logger.debug(String.format("[#%d-C[%d]] adds new BaseBlock with [height=%d] [cidSeries=%d ; cid=%d] [size=%d]",
                             getID(), channel, recBlock.getHeader().getHeight(), cidSeries, cid, recBlock.getDataCount()));
 //                    if (currHeight % 500 == 0) {
-//                        logger.info(String.format("[#%d-C[%d]] adds new block with [height=%d] [cidSeries=%d ; cid=%d]",
+//                        logger.info(String.format("[#%d-C[%d]] adds new BaseBlock with [height=%d] [cidSeries=%d ; cid=%d]",
 //                                getID(), channel, recBlock.getHeader().getHeight(), cidSeries, cid));
 //                    }
                     newBlockNotifyer.notify();
@@ -441,9 +438,9 @@ public abstract class bcServer extends Node {
 
     abstract Block leaderImpl() throws InterruptedException;
 
-    abstract public blockchain initBC(int id, int channel);
+    abstract public BaseBlockchain initBC(int id, int channel);
 
-    abstract public blockchain getBC(int start, int end);
+    abstract public BaseBlockchain getBC(int start, int end);
 
     public int getTxPoolSize() {
         return transactionsPool.size();
@@ -775,16 +772,16 @@ public abstract class bcServer extends Node {
         }
 
         if (v.getVList().size() < f && forkPoint >= f) {
-            logger.debug(format("[#%d-C[%d]] invalid sub chain version, block list size is smaller then f [size=%d] [fp=%d]",
+            logger.debug(format("[#%d-C[%d]] invalid sub chain version, BaseBlock list size is smaller then f [size=%d] [fp=%d]",
                     getID(), channel,v.getVList().size(), forkPoint));
             return false;
         }
 
-        blockchain lastSyncBC = getBC(0, lowIndex);
+        BaseBlockchain lastSyncBC = getBC(0, lowIndex);
         for (Block pb : v.getVList()) {
 //            Block b = pb;
 //            if (b.hasOrig()) {
-//                b = b.getOrig(); // To handle self created empty block
+//                b = b.getOrig(); // To handle self created empty BaseBlock
 //            }
             Block.Builder dataAsInRmf = Block.newBuilder()
                     .setHeader(pb.getHeader());
@@ -805,22 +802,22 @@ public abstract class bcServer extends Node {
 //                    .setSig(pb.getFooter().getRmfProof())
 //                    .build();
             if (!blockDigSig.verify(pb.getHeader().getM().getSender(), pb)) {
-                logger.debug(format("[#%d-C[%d]] invalid sub chain version, block [height=%d] digital signature is invalid " +
+                logger.debug(format("[#%d-C[%d]] invalid sub chain version, BaseBlock [height=%d] digital signature is invalid " +
                         "[fp=%d ; sender=%d]", getID(),channel, pb.getHeader().getHeight(), forkPoint, v.getSender()));
                 return false;
             }
             //            if (!lastSyncBC.validateBlockData(curr)) {
-//                logger.debug(format("[#%d-C[%d]] invalid sub chain version, block data is invalid [height=%d] [fp=%d]",
+//                logger.debug(format("[#%d-C[%d]] invalid sub chain version, BaseBlock data is invalid [height=%d] [fp=%d]",
 //                        getID(), curr.getHeader().getHeight(), forkPoint));
 //                return false;
 //            }
             if (!lastSyncBC.validateBlockHash(pb)) {
-                logger.debug(format("[#%d-C[%d]] invalid sub chain version, block hash is invalid [height=%d] [fp=%d]",
+                logger.debug(format("[#%d-C[%d]] invalid sub chain version, BaseBlock hash is invalid [height=%d] [fp=%d]",
                         getID(),channel, pb.getHeader().getHeight(), forkPoint));
                 return false;
             }
             if (!lastSyncBC.validateBlockCreator(pb, f)) {
-                logger.debug(format("[#%d-C[%d]] invalid invalid sub chain version, block creator is invalid [height=%d] [fp=%d]",
+                logger.debug(format("[#%d-C[%d]] invalid invalid sub chain version, BaseBlock creator is invalid [height=%d] [fp=%d]",
                         getID(),channel, pb.getHeader().getHeight(), forkPoint));
                 return false;
             }
@@ -874,7 +871,7 @@ public abstract class bcServer extends Node {
             bc.setBlocks(choosen.getVList(), forkPoint - 1);
             if (!bc.validateBlockHash(bc.getBlock(bc.getHeight()))) { //||
 //                    !bc.validateBlockData(bc.getBlock(bc.getHeight()))) {
-                logger.debug(format("[#%d-C[%d]] deletes a block [height=%d]", getID(),channel, bc.getHeight()));
+                logger.debug(format("[#%d-C[%d]] deletes a BaseBlock [height=%d]", getID(),channel, bc.getHeight()));
                 bc.removeBlock(bc.getHeight()); // meant to handle the case in which the front is split between the to leading blocks
             }
             newBlockNotifyer.notify();

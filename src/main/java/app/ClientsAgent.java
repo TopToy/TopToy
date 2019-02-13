@@ -1,8 +1,6 @@
 package app;
 
-import clients.txClient;
-import com.google.common.primitives.Longs;
-import org.apache.commons.lang.ArrayUtils;
+import clients.TxClient;
 import proto.Types;
 import utils.CSVUtils;
 import java.io.File;
@@ -16,13 +14,12 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.lang.StrictMath.max;
 import static java.lang.String.format;
-public class clientsAgent {
+public class ClientsAgent {
     private static org.apache.log4j.Logger logger;
-    private static List<txClient> clients = new ArrayList<>();
+    private static List<TxClient> clients = new ArrayList<>();
 //    private static ThreadPoolExecutor executor; // = (ThreadPoolExecutor) Executors.newFixedThreadPool(clients);
     private static AtomicBoolean stopped = new AtomicBoolean(false);
     static int cln = 1;
@@ -34,7 +31,7 @@ public class clientsAgent {
         System.setProperty("current.date.time", dateFormat.format(new Date()));
         int s_id = agentID;
         System.setProperty("s_id", Integer.toString(s_id));
-        logger = org.apache.log4j.Logger.getLogger(clientsAgent.class);
+        logger = org.apache.log4j.Logger.getLogger(ClientsAgent.class);
         try {
             mainImpl2(argv);
         } catch (Exception e) {
@@ -57,7 +54,7 @@ public class clientsAgent {
         String pathString = argv[3];
         int clientsNum = argv.length - 4;
         logger.info(format("params: [id:%d, time:%d, size:%d, path:%s]", agentID, time, tSize, pathString));
-        stat st = new stat();
+        Stat st = new Stat();
 
         ExecutorService clients_executor = Executors.newFixedThreadPool(clientsNum * cln);
 //        ConcurrentHashMap<Integer, String> submitted = new ConcurrentHashMap<>();
@@ -68,7 +65,7 @@ public class clientsAgent {
         int clID = 0;
         for (int i = 0 ; i < clientsNum ; i++) {
             for (int j = 0 ; j < cln ; j++) {
-                txClient cl = new txClient(clID, argv[i + 4], 9876);
+                TxClient cl = new TxClient(clID, argv[i + 4], 9876);
                 clID++;
                 clients.add(cl);
                 int finalClID = clID;
@@ -135,7 +132,7 @@ public class clientsAgent {
     }
 
 
-    static Types.approved collectSummery(stat st, Types.approved app) {
+    static Types.approved collectSummery(Stat st, Types.approved app) {
         long ts = System.currentTimeMillis();
         st.txCount++;
         st.diff += ts - app.getTx().getClientTs();
@@ -144,7 +141,7 @@ public class clientsAgent {
         return app.toBuilder().setSt(app.getSt().toBuilder().setSign(ts)).build(); // We save here the client delivery time
     }
 
-    static void writeSummery(String pathString, int agentID, stat st) throws IOException {
+    static void writeSummery(String pathString, int agentID, Stat st) throws IOException {
         Path path = Paths.get(pathString,   String.valueOf(agentID), "summery.csv");
         File f = new File(path.toString());
         if (!f.exists()) {
@@ -169,7 +166,7 @@ public class clientsAgent {
         writer.close();
     }
 
-    static void writeBlocks(String pathString, int agentID, List<Types.approved> approveds, stat st) throws IOException {
+    static void writeBlocks(String pathString, int agentID, List<Types.approved> approveds, Stat st) throws IOException {
         Path path = Paths.get(pathString,   String.valueOf(agentID), "blocksStat.csv");
         File f = new File(path.toString());
         if (!f.exists()) {
@@ -190,7 +187,7 @@ public class clientsAgent {
         writer.close();
     }
 
-    static Types.accepted submitRandTxToServer(txClient c, int txSize) {
+    static Types.accepted submitRandTxToServer(TxClient c, int txSize) {
 //        byte[] ts = Longs.toByteArray(System.currentTimeMillis());
         SecureRandom random = new SecureRandom();
         byte[] tx = new byte[txSize];
@@ -206,7 +203,7 @@ public class clientsAgent {
 //            for (int j = 0 ; j < cln ; j++) {
 ////                System.out.println("Establishing client for " +  argv[i + 2]);
 //                int cID = rand.nextInt(10000);
-//                txClient cl = new txClient(cID, argv[i + 2], 9876);
+//                TxClient cl = new TxClient(cID, argv[i + 2], 9876);
 //                clients.add(cl);
 //                executor.submit(() -> {
 //                    while (!stopped.get()) {
@@ -229,7 +226,7 @@ public class clientsAgent {
 //            e.printStackTrace();
 //        }
 //        int total2 = 0;
-//        for (txClient c : clients) {
+//        for (TxClient c : clients) {
 //            total += c.shutdown();
 //            logger.info(format("Client %d send %d tx in total with throughput of %s", c.getID(),
 //                    c.getTxCount(), String.valueOf(c.getAvgTx())));
@@ -240,7 +237,7 @@ public class clientsAgent {
 //        System.exit(0);
 //    }
 }
-class stat {
+class Stat {
     int txCount = 0;
     long diff = 0;
     long diffServer = 0;

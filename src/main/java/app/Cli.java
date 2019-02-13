@@ -5,12 +5,10 @@ import config.Config;
 //import crypto.rmfDigSig;
 import crypto.DigestMethod;
 import crypto.blockDigSig;
-import io.opencensus.stats.Aggregation;
 import org.apache.commons.cli.*;
 import org.apache.commons.lang.ArrayUtils;
-import org.bouncycastle.math.ec.custom.sec.SecT113R1Curve;
 import proto.Types;
-import servers.statistics;
+import servers.Statistics;
 import utils.CSVUtils;
 
 import java.io.FileWriter;
@@ -19,7 +17,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.SecureRandom;
-import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -32,12 +29,12 @@ import static java.lang.StrictMath.max;
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
 
-public class cli {
-    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(cli.class);
+public class Cli {
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Cli.class);
         private Options options = new Options();
         private long totalRT = 0;
         static String outPath = "/tmp/JToy/res/";
-        public cli() {
+        public Cli() {
             options.addOption("help", "print this message");
             options.addOption("init", "init the server");
             options.addOption("serve", "start the server\n" +
@@ -411,7 +408,7 @@ public class cli {
 //                        ,"duration","txPsec","blocksNum","avgTxInBlock","eRate","dRate");
 //
 //                CSVUtils.writeLine(writer, head);
-                statistics st = JToy.s.getStatistics();
+                Statistics st = JToy.s.getStatistics();
 
                 double time = ((double) st.lastTxTs - st.firstTxTs) / 1000;
 //                double time = ((double) totalRT - st.firstTxTs) / 1000;
@@ -450,7 +447,7 @@ public class cli {
             writer = new FileWriter(path.toString(), true);
             int nob = JToy.s.getBCSize();
 //            DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy-HH:mm:ss");
-            statistics st = JToy.s.getStatistics();
+            Statistics st = JToy.s.getStatistics();
 //            long total = 0;
             long signaturePeriod = 0;
 //            long create2propose = 0;
@@ -514,7 +511,7 @@ public class cli {
                 writer = new FileWriter(path.toString(), true);
                 int nob = JToy.s.getBCSize();
 //                DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy-HH:mm:ss");
-                statistics st = JToy.s.getStatistics();
+                Statistics st = JToy.s.getStatistics();
                 for (int i = 1 ; i < nob ; i++) {
                     Types.Block b = JToy.s.nonBlockingDeliver(i);
 //                    logger.info(format("[height=%d] [tentative=%d] [permanent=%d] [diff=%d]",

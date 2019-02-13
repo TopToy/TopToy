@@ -38,8 +38,8 @@ import org.apache.log4j.Logger;
 
 
 /**
- * This class manages consensus instances. It can have several epochs if
- * there were problems during consensus.
+ * This class manages das instances. It can have several epochs if
+ * there were problems during das.
  *
  * @author Alysson
  */
@@ -55,7 +55,7 @@ public final class ExecutionManager {
     //******* EDUARDO END **************//
     private Map<Integer, Consensus> consensuses = new TreeMap<Integer, Consensus>(); // Consensuses
     private ReentrantLock consensusesLock = new ReentrantLock(); //lock for consensuses table
-    // Paxos messages that were out of context (that didn't belong to the consensus that was/is is progress
+    // Paxos messages that were out of context (that didn't belong to the das that was/is is progress
     private Map<Integer, List<ConsensusMessage>> outOfContext = new HashMap<Integer, List<ConsensusMessage>>();
     // Proposes that were out of context (that belonged to future consensuses, and not the one running at the time)
     private Map<Integer, ConsensusMessage> outOfContextProposes = new HashMap<Integer, ConsensusMessage>();
@@ -63,14 +63,14 @@ public final class ExecutionManager {
     private boolean stopped = false; // Is the execution manager stopped?
     // When the execution manager is stopped, incoming paxos messages are stored here
     private Queue<ConsensusMessage> stoppedMsgs = new LinkedList<ConsensusMessage>();
-    private Epoch stoppedEpoch = null; // epoch at which the current consensus was stopped
+    private Epoch stoppedEpoch = null; // epoch at which the current das was stopped
     private ReentrantLock stoppedMsgsLock = new ReentrantLock(); //lock for stopped messages
     private TOMLayer tomLayer; // TOM layer associated with this execution manager
-    private int paxosHighMark; // Paxos high mark for consensus instances
+    private int paxosHighMark; // Paxos high mark for das instances
     
     /** THIS IS JOAO'S CODE, TO HANDLE THE STATE TRANSFER */
     
-    private int revivalHighMark; // Paxos high mark for consensus instances when this replica CID equals 0
+    private int revivalHighMark; // Paxos high mark for das instances when this replica CID equals 0
     private int timeoutHighMark; // Paxos high mark for a timed-out replica
     
     private int lastRemovedCID = 0; // Addition to fix memory leak
@@ -78,7 +78,7 @@ public final class ExecutionManager {
     /******************************************************************/
     
     // This is the new way of storing info about the leader,
-    // uncoupled from any consensus instance
+    // uncoupled from any das instance
     private int currentLeader;
     
     /**
@@ -181,7 +181,7 @@ public final class ExecutionManager {
         if (tomLayer.getInExec() != -1) {
             stoppedEpoch = getConsensus(tomLayer.getInExec()).getLastEpoch();
             //stoppedEpoch.getTimeoutTask().cancel();
-            if (stoppedEpoch != null) logger.info("(ExecutionManager.stop) Stoping epoch " + stoppedEpoch.getTimestamp() + " of consensus " + tomLayer.getInExec());
+            if (stoppedEpoch != null) logger.info("(ExecutionManager.stop) Stoping epoch " + stoppedEpoch.getTimestamp() + " of das " + tomLayer.getInExec());
         }
         stoppedMsgsLock.unlock();
     }
@@ -220,8 +220,8 @@ public final class ExecutionManager {
         int inExec = tomLayer.getInExec();
         
         logger.info("(ExecutionManager.checkLimits) Received message  " + msg);
-        logger.info("(ExecutionManager.checkLimits) I'm at consensus " +
-                inExec + " and my last consensus is " + lastConsId);
+        logger.info("(ExecutionManager.checkLimits) I'm at das " +
+                inExec + " and my last das is " + lastConsId);
         
         boolean isRetrievingState = tomLayer.isRetrievingState();
 
@@ -242,9 +242,9 @@ public final class ExecutionManager {
             if (stopped) {//just an optimization to avoid calling the lock in normal case
                 stoppedMsgsLock.lock();
                 if (stopped) {
-                    logger.info("(ExecutionManager.checkLimits) adding message for consensus " + msg.getNumber() + " to stoopped");
+                    logger.info("(ExecutionManager.checkLimits) adding message for das " + msg.getNumber() + " to stoopped");
                     //the execution manager was stopped, the messages should be stored
-                    //for later processing (when the consensus is restarted)
+                    //for later processing (when the das is restarted)
                     stoppedMsgs.add(msg);
                 }
                 stoppedMsgsLock.unlock();
@@ -252,18 +252,18 @@ public final class ExecutionManager {
                 if (isRetrievingState || 
                         msg.getNumber() > (lastConsId + 1) || 
                         (inExec != -1 && inExec < msg.getNumber()) || 
-                        (inExec == -1 && msg.getType() != MessageFactory.PROPOSE)) { //not propose message for the next consensus
-                    logger.info("(ExecutionManager.checkLimits) Message for consensus " +
+                        (inExec == -1 && msg.getType() != MessageFactory.PROPOSE)) { //not propose message for the next das
+                    logger.info("(ExecutionManager.checkLimits) Message for das " +
                             msg.getNumber() + " is out of context, adding it to out of context set");
                     
 
-                    //logger.info("(ExecutionManager.checkLimits) Message for consensus " +
+                    //logger.info("(ExecutionManager.checkLimits) Message for das " +
                      //       msg.getNumber() + " is out of context, adding it to out of context set; isRetrievingState="+isRetrievingState);
                     
                     
                     addOutOfContextMessage(msg);
                 } else { //can process!
-                    logger.info("(ExecutionManager.checkLimits) message for consensus " +
+                    logger.info("(ExecutionManager.checkLimits) message for das " +
                             msg.getNumber() + " can be processed");
             
                     //Logger.debug = false;
@@ -276,7 +276,7 @@ public final class ExecutionManager {
 
             //Start state transfer
             /** THIS IS JOAO'S CODE, FOR HANLDING THE STATE TRANSFER */
-            logger.info("(ExecutionManager.checkLimits) Message for consensus "
+            logger.info("(ExecutionManager.checkLimits) Message for das "
                     + msg.getNumber() + " is beyond the paxos highmark, adding it to out of context set");
             addOutOfContextMessage(msg);
 
@@ -287,9 +287,9 @@ public final class ExecutionManager {
             else {
                 logger.info("##################################################################################");
                 logger.info("- Ahead-of-time message discarded");
-                logger.info("- If many messages of the same consensus are discarded, the replica can halt!");
+                logger.info("- If many messages of the same das are discarded, the replica can halt!");
                 logger.info("- Try to increase the 'system.paxos.highMarc' configuration parameter.");
-                logger.info("- Last consensus executed: " + lastConsId);
+                logger.info("- Last das executed: " + lastConsId);
                 logger.info("##################################################################################");
             }
             /******************************************************************/
@@ -301,8 +301,8 @@ public final class ExecutionManager {
     }
 
     /**
-     * Informs if there are messages till to be processed associated the specified consensus
-     * @param cid The ID for the consensus in question
+     * Informs if there are messages till to be processed associated the specified das
+     * @param cid The ID for the das in question
      * @return True if there are still messages to be processed, false otherwise
      */
     public boolean receivedOutOfContextPropose(int cid) {
@@ -316,9 +316,9 @@ public final class ExecutionManager {
     }
 
     /**
-     * Removes a consensus from this manager
-     * @param id ID of the consensus to be removed
-     * @return The consensus that was removed
+     * Removes a das from this manager
+     * @param id ID of the das to be removed
+     * @return The das that was removed
      */
     public Consensus removeConsensus(int id) {
         consensusesLock.lock();
@@ -370,10 +370,10 @@ public final class ExecutionManager {
 
     /********************************************************/
     /**
-     * Returns the specified consensus
+     * Returns the specified das
      *
-     * @param cid ID of the consensus to be returned
-     * @return The consensus specified
+     * @param cid ID of the das to be returned
+     * @return The das specified
      */
     public Consensus getConsensus(int cid) {
         consensusesLock.lock();
@@ -381,7 +381,7 @@ public final class ExecutionManager {
         
         Consensus consensus = consensuses.get(cid);
 
-        if (consensus == null) {//there is no consensus created with the given cid
+        if (consensus == null) {//there is no das created with the given cid
             //let's create one...
             Decision dec = new Decision(cid);
 
@@ -456,7 +456,7 @@ public final class ExecutionManager {
             for (Iterator<ConsensusMessage> i = messages.iterator(); i.hasNext();) {
                 acceptor.processMessage(i.next());
                 if (consensus.isDecided()) {
-                    logger.info("(ExecutionManager.processOutOfContext) consensus "
+                    logger.info("(ExecutionManager.processOutOfContext) das "
                             + consensus.getId() + " decided.");
                     break;
                 }
@@ -471,7 +471,7 @@ public final class ExecutionManager {
 
     /**
      * Stores a message established as being out of context (a message that
-     * doesn't belong to current executing consensus).
+     * doesn't belong to current executing das).
      *
      * @param m Out of context message to be stored
      */

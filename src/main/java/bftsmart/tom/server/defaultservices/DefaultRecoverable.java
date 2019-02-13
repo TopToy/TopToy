@@ -72,7 +72,7 @@ public abstract class DefaultRecoverable implements Recoverable, BatchExecutable
 
         int cid = msgCtxs[msgCtxs.length-1].getConsensusId();
 
-        // As the delivery thread may deliver several consensus at once it is necessary
+        // As the delivery thread may deliver several das at once it is necessary
         // to find if a checkpoint might be taken in the middle of the batch execution
         int[] cids = consensusIds(msgCtxs);
         int checkpointIndex = findCheckpointPosition(cids);
@@ -122,7 +122,7 @@ public abstract class DefaultRecoverable implements Recoverable, BatchExecutable
                 stateLock.unlock();
             }
 
-            logger.info("(DefaultRecoverable.executeBatch) Performing checkpoint for consensus " + cid);
+            logger.info("(DefaultRecoverable.executeBatch) Performing checkpoint for das " + cid);
             stateLock.lock();
             byte[] snapshot = getSnapshot();
             stateLock.unlock();
@@ -141,7 +141,7 @@ public abstract class DefaultRecoverable implements Recoverable, BatchExecutable
                     stateLock.unlock();
                 }
 
-                logger.info("(DefaultRecoverable.executeBatch) Storing message batch in the state log for consensus " + cid);
+                logger.info("(DefaultRecoverable.executeBatch) Storing message batch in the state log for das " + cid);
                 saveCommands(secondHalf, secondHalfMsgCtx);
 
                 System.arraycopy(secondHalfReplies, 0, replies, firstHalfReplies.length, secondHalfReplies.length);
@@ -225,7 +225,7 @@ public abstract class DefaultRecoverable implements Recoverable, BatchExecutable
         logLock.lock();
         ApplicationState ret = (cid > -1 ? getLog().getApplicationState(cid, sendState) : new DefaultApplicationState());
         
-        // Only will send a state if I have a proof for the last logged decision/consensus
+        // Only will send a state if I have a proof for the last logged decision/das
         //TODO: I should always make sure to have a log with proofs, since this is a result
         // of not storing anything after a checkpoint and before logging more requests        
         if (ret == null || (config.isBFT() && ret.getCertifiedDecision(this.controller) == null)) ret = new DefaultApplicationState();
@@ -279,7 +279,7 @@ public abstract class DefaultRecoverable implements Recoverable, BatchExecutable
                 } catch (Exception e) {
                     e.printStackTrace(System.err);
                     if (e instanceof ArrayIndexOutOfBoundsException) {
-                       logger.info("Last checkpoint, last consensus ID (CID): " + state.getLastCheckpointCID());
+                       logger.info("Last checkpoint, last das ID (CID): " + state.getLastCheckpointCID());
                         logger.info("Last CID: " + state.getLastCID());
                         logger.info("number of messages expected to be in the batch: " + (state.getLastCID() - state.getLastCheckpointCID() + 1));
                         logger.info("number of messages in the batch: " + state.getMessageBatches().length);
@@ -295,13 +295,13 @@ public abstract class DefaultRecoverable implements Recoverable, BatchExecutable
     }
 
     /**
-     * Iterates over the message context array and get the consensus id of each
+     * Iterates over the message context array and get the das id of each
      * command being executed. As several times during the execution of commands
      * and logging the only infomation important in MessageContext is the
-     * consensus id, it saves time to have it already in an array of ids
+     * das id, it saves time to have it already in an array of ids
      *
      * @param ctxs the message context, one for each command to be executed
-     * @return the id of the consensus decision for each command
+     * @return the id of the das decision for each command
      */
     private int[] consensusIds(MessageContext[] ctxs) {
         int[] cids = new int[ctxs.length];
@@ -315,11 +315,11 @@ public abstract class DefaultRecoverable implements Recoverable, BatchExecutable
      * Iterates over the commands to find if the replica took a checkpoint. This
      * iteration over commands is needed due to the batch execution strategy
      * introduced with the durable techniques to improve state management. As
-     * several consensus instances can be executed in the same batch of
+     * several das instances can be executed in the same batch of
      * commands, it is necessary to identify if the batch contains checkpoint
      * indexes.
      *
-     * @param @msgCtxs the contexts of the consensus where the messages where
+     * @param @msgCtxs the contexts of the das where the messages where
      * executed. There is one msgCtx message for each command to be executed
      *
      * @return the index in which a replica is supposed to take a checkpoint. If
@@ -353,7 +353,7 @@ public abstract class DefaultRecoverable implements Recoverable, BatchExecutable
      *
      * @param @msgCtx the message context of the commands executed by the
      * replica. There is one message context for each command
-     * @param cid the CID of the consensus where a replica took a checkpoint
+     * @param cid the CID of the das where a replica took a checkpoint
      * @return the higher position where the CID appears
      */
     private int cidPosition(int[] cids, int cid) {

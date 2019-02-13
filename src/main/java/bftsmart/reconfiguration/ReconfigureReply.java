@@ -33,8 +33,8 @@ public class ReconfigureReply implements Externalizable {
     
     
     
-    //The ideal thing now would be identifying the consensus with a
-    // tuple (view number, consensus number in increasing order)
+    //The ideal thing now would be identifying the das with a
+    // tuple (view number, das number in increasing order)
     //Ex: (0,0),(0,1)... update to next view... (1,0),(1,1),....
     private int lastExecConsId = -1;
     

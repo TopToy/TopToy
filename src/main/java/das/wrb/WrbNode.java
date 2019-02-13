@@ -1,4 +1,4 @@
-package wrb;
+package das.wrb;
 
 import config.Node;
 //import crypto.rmfDigSig;
@@ -20,7 +20,7 @@ public class WrbNode extends Node{
         wrbService = new WrbService(channels, id, f, tmo, tmoInterval, nodes, bbcConfig, serverCrt, serverPrivKey, caRoot);
     }
 
-//    public WrbNode(int channel, int id, String addr, int rmfPort, int f , ArrayList<Node> nodes, bbcService bbc) {
+//    public WrbNode(int channel, int id, String addr, int rmfPort, int f , ArrayList<Node> nodes, BbcService bbc) {
 //        super(addr, rmfPort,  id);
 //        wrbService = new WrbService(channel, id, f, nodes, bbc);
 //    }

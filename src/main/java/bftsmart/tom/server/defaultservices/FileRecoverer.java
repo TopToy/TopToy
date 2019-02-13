@@ -45,7 +45,7 @@ public class FileRecoverer {
 	
 	/**
 	 * Reads all log messages from the last log file created
-	 * @return an array with batches of messages executed for each consensus
+	 * @return an array with batches of messages executed for each das
 	 */
 //	public CommandsInfo[] getLogState() {
 //		String lastLogFilename = getLatestFile(".log");

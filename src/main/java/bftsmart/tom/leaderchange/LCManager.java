@@ -745,7 +745,7 @@ public class LCManager {
 
         HashSet<CollectData> result = new HashSet<CollectData>();
 
-        // if there are collects refering to other consensus instances, lets assume that they are still at timestamp zero of the consensus we want
+        // if there are collects refering to other das instances, lets assume that they are still at timestamp zero of the das we want
         for (CollectData c : collects) {
 
             if (c.getCid() == cid) {
@@ -802,7 +802,7 @@ public class LCManager {
     public boolean hasValidProof(CertifiedDecision cDec) {
         
         if (cDec.getCID() == -1) return true; // If the last CID is -1 it means the replica
-                                             // did not complete any consensus and cannot have
+                                             // did not complete any das and cannot have
                                              // any proof
         
         byte[] hashedValue = md.digest(cDec.getDecision());
@@ -914,9 +914,9 @@ public class LCManager {
     
     /**
      * Gets the highest ETS associated with a
-     * consensus ID from the given collects
+     * das ID from the given collects
      * 
-     * @param cid The consensus ID
+     * @param cid The das ID
      * @param collects The collects from the other replicas
      * @return  The highest ETS
      */

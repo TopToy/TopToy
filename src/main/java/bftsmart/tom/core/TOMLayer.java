@@ -60,7 +60,7 @@ public final class TOMLayer extends Thread implements RequestReceiver {
     public ExecutionManager execManager; // Execution manager
     public Acceptor acceptor; // Acceptor role of the PaW algorithm
     private ServerCommunicationSystem communication; // Communication system between replicas
-    //private OutOfContextMessageThread ot; // Thread which manages messages that do not belong to the current consensus
+    //private OutOfContextMessageThread ot; // Thread which manages messages that do not belong to the current das
     private DeliveryThread dt; // Thread which delivers total ordered messages to the appication
     public StateManager stateManager = null; // object which deals with the state transfer protocol
 
@@ -73,7 +73,7 @@ public final class TOMLayer extends Thread implements RequestReceiver {
      */
     public ClientsManager clientsManager;
     /**
-     * The id of the consensus being executed (or -1 if there is none)
+     * The id of the das being executed (or -1 if there is none)
      */
     private int inExecution = -1;
     private int lastExecuted = -1;
@@ -216,27 +216,27 @@ public final class TOMLayer extends Thread implements RequestReceiver {
     }
 
     /**
-     * Sets which consensus was the last to be executed
+     * Sets which das was the last to be executed
      *
-     * @param last ID of the consensus which was last to be executed
+     * @param last ID of the das which was last to be executed
      */
     public void setLastExec(int last) {
         this.lastExecuted = last;
     }
 
     /**
-     * Gets the ID of the consensus which was established as the last executed
+     * Gets the ID of the das which was established as the last executed
      *
-     * @return ID of the consensus which was established as the last executed
+     * @return ID of the das which was established as the last executed
      */
     public int getLastExec() {
         return this.lastExecuted;
     }
 
     /**
-     * Sets which consensus is being executed at the moment
+     * Sets which das is being executed at the moment
      *
-     * @param inEx ID of the consensus being executed at the moment
+     * @param inEx ID of the das being executed at the moment
      */
     public void setInExec(int inEx) {
         proposeLock.lock();
@@ -258,9 +258,9 @@ public final class TOMLayer extends Thread implements RequestReceiver {
     }
 
     /**
-     * Gets the ID of the consensus currently beign executed
+     * Gets the ID of the das currently beign executed
      *
-     * @return ID of the consensus currently beign executed (if no consensus ir
+     * @return ID of the das currently beign executed (if no das ir
      * executing, -1 is returned)
      */
     public int getInExec() {
@@ -333,7 +333,7 @@ public final class TOMLayer extends Thread implements RequestReceiver {
         logger.info("Running."); // TODO: can't this be outside of the loop?
         while (doWork) {
 
-            // blocks until this replica learns to be the leader for the current epoch of the current consensus
+            // blocks until this replica learns to be the leader for the current epoch of the current das
             leaderLock.lock();
             logger.info("Next leader for CID=" + (getLastExec() + 1) + ": " + execManager.getCurrentLeader());
 
@@ -347,11 +347,11 @@ public final class TOMLayer extends Thread implements RequestReceiver {
             
             if (!doWork) break;
 
-            // blocks until the current consensus finishes
+            // blocks until the current das finishes
             proposeLock.lock();
 
-            if (getInExec() != -1) { //there is some consensus running
-                logger.info("(TOMLayer.run) Waiting for consensus " + getInExec() + " termination.");
+            if (getInExec() != -1) { //there is some das running
+                logger.info("(TOMLayer.run) Waiting for das " + getInExec() + " termination.");
                 canPropose.awaitUninterruptibly();
             }
             proposeLock.unlock();
@@ -375,9 +375,9 @@ public final class TOMLayer extends Thread implements RequestReceiver {
 
             if ((execManager.getCurrentLeader() == this.controller.getStaticConf().getProcessId()) && //I'm the leader
                     (clientsManager.havePendingRequests()) && //there are messages to be ordered
-                    (getInExec() == -1)) { //there is no consensus in execution
+                    (getInExec() == -1)) { //there is no das in execution
 
-                // Sets the current consensus
+                // Sets the current das
                 int execId = getLastExec() + 1;
                 setInExec(execId);
 
@@ -386,7 +386,7 @@ public final class TOMLayer extends Thread implements RequestReceiver {
                 // Bypass protocol if service is not replicated
                 if (controller.getCurrentViewN() == 1) {
 
-                    logger.info("(TOMLayer.run) Only one replica, bypassing consensus.");
+                    logger.info("(TOMLayer.run) Only one replica, bypassing das.");
 
                     byte[] value = createPropose(dec);
 
@@ -412,10 +412,10 @@ public final class TOMLayer extends Thread implements RequestReceiver {
     }
 
     /**
-     * Called by the current consensus instance, to notify the TOM layer that
+     * Called by the current das instance, to notify the TOM layer that
      * a value was decided
      *
-     * @param dec The decision of the consensus
+     * @param dec The decision of the das
      */
     public void decided(Decision dec) {
         

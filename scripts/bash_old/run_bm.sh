@@ -12,12 +12,12 @@ for j in "${txInBlock[@]}"; do
     sed -i 's/maxTransactionInBlock = .*/maxTransactionInBlock = '${j}'/g' ${config}
     echo "ts,id,type,channels,fm,txSize,txInBlock,txTotal,duration,txPsec,latency,rounds,opRounds,opRate,blocksNum" >> ${currOut}/res/summery.csv
     for i in `seq 1 9`; do
-        echo "******* running test with ${i} channels ${j} tx in block*********"
+        echo "******* running test with ${i} channels ${j} tx in BaseBlock*********"
         sed -i 's/c =.*/c = '${i}'/g' ${config}
         run_remote_cluster.sh ${config} ${txSize} ${currOut}
     done
     for i in `seq 10 2 30`; do
-        echo "******* running test with ${i} channels ${j} tx in block*********"
+        echo "******* running test with ${i} channels ${j} tx in BaseBlock*********"
         sed -i 's/c =.*/c = '${i}'/g' ${config}
         run_remote_cluster.sh ${config} ${txSize} ${currOut}
     done

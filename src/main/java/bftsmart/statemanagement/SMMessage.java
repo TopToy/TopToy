@@ -90,8 +90,8 @@ public abstract class SMMessage extends SystemMessage {
     }
 
     /**
-     * Retrieves the consensus ID up to which the sender needs to be updated
-     * @return The consensus ID up to which the sender needs to be updated
+     * Retrieves the das ID up to which the sender needs to be updated
+     * @return The das ID up to which the sender needs to be updated
      */
     public int getCID() {
         return cid;

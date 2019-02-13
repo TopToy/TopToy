@@ -48,7 +48,7 @@ public class StateSenderServer implements Runnable {
 		try {
 			server = new ServerSocket(port);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			// TODO Auto-generated catch BaseBlock
 			logger.error("", e);
 		}
 	}

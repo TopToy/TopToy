@@ -2,24 +2,22 @@ package app;
 
 import config.Config;
 import servers.server;
-import servers.sg;
+import servers.Top;
 //import utils.derbyUtils;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class JToy {
     private static org.apache.log4j.Logger logger;
 //    static Config c = new Config();
-    static server s; // = new cbcServer(Config.getAddress(), Config.getPort(), Config.getID());
+    static server s; // = new ToyServer(Config.getAddress(), Config.getPort(), Config.getID());
     static String type;
     public static void main(String argv[]) {
         mainImpl(argv);
@@ -39,7 +37,7 @@ public class JToy {
     static void mainImpl(String argv[]) {
 //        try {
 //            Config.setConfig(null, 0);
-//        sg.createTxTable();
+//        Top.createTxTable();
             Path config = null;
             if (argv.length == 3) {
                 config = Paths.get(argv[2]);
@@ -47,7 +45,7 @@ public class JToy {
 
             int serverID = Integer.parseInt(argv[0]);
             Config.setConfig(config, serverID);
-            logger = org.apache.log4j.Logger.getLogger(cli.class);
+            logger = org.apache.log4j.Logger.getLogger(Cli.class);
             type = argv[1];
             logger.debug("type is " + type);
             switch (type) {
@@ -60,7 +58,7 @@ public class JToy {
 //                            Config.getMaxTransactionsInBlock(), Config.getSyncRBConfigHome());
 //                    break;
                 default:
-                    s = new sg(Config.getAddress(serverID), Config.getPort(serverID), serverID, Config.getF(), Config.getC(),
+                    s = new Top(Config.getAddress(serverID), Config.getPort(serverID), serverID, Config.getF(), Config.getC(),
                             Config.getTMO(), Config.getTMOInterval(), Config.getMaxTransactionsInBlock(), Config.getFastMode(),
                             Config.getCluster(), Config.getRMFbbcConfigHome(), Config.getPanicRBConfigHome(),
                             Config.getSyncRBConfigHome(), type,
@@ -68,7 +66,7 @@ public class JToy {
                     break;
             }
 
-            cli parser = new cli();
+            Cli parser = new Cli();
             Scanner scan = new Scanner(System.in).useDelimiter("\\n");
             while (true) {
                 System.out.print("Toy>> ");

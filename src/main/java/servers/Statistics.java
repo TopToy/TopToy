@@ -1,6 +1,6 @@
 package servers;
 
-public class statistics {
+public class Statistics {
     public int txCount;
     public long firstTxTs;
     public long lastTxTs;
@@ -12,7 +12,7 @@ public class statistics {
     public int all = 0;
     public int deliveredTime = 0;
 
-    public statistics() {
+    public Statistics() {
         txCount = 0;
         firstTxTs = 0;
         lastTxTs = 0;

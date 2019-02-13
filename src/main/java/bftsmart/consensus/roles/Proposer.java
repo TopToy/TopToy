@@ -20,7 +20,7 @@ import bftsmart.consensus.messages.MessageFactory;
 import bftsmart.reconfiguration.ServerViewController;
 
 /**
- * This class represents the proposer role in the consensus protocol.
+ * This class represents the proposer role in the das protocol.
  **/
 public class Proposer {
 
@@ -45,9 +45,9 @@ public class Proposer {
 
     /**
      * This method is called by the TOMLayer (or any other)
-     * to start the consensus instance.
+     * to start the das instance.
      *
-     * @param cid ID for the consensus instance to be started
+     * @param cid ID for the das instance to be started
      * @param value Value to be proposed
      */
     public void startConsensus(int cid, byte[] value) {

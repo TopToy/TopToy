@@ -132,7 +132,7 @@ public class Synchronizer {
             // store information about messages that I'm going to send
             lcManager.addStop(regency, this.controller.getStaticConf().getProcessId());
 
-            //execManager.stop(); // stop consensus execution
+            //execManager.stop(); // stop das execution
 
             //Get requests that timed out and the requests received in STOP messages
             //and add those STOPed requests to the client manager
@@ -221,7 +221,7 @@ public class Synchronizer {
     // ahead of the replica's expected regency
     private void processSTOPDATA(LCMessage msg, int regency) {
 
-        //TODO: It is necessary to verify the proof of the last decided consensus and the signature of the state of the current consensus!
+        //TODO: It is necessary to verify the proof of the last decided das and the signature of the state of the current das!
         CertifiedDecision lastData = null;
         SignedObject signedCollect = null;
 
@@ -466,7 +466,7 @@ public class Synchronizer {
             // store information about message I am going to send
             lcManager.addStop(regency, this.controller.getStaticConf().getProcessId());
 
-            //execManager.stop(); // stop execution of consensus
+            //execManager.stop(); // stop execution of das
 
             //Get requests that timed out and the requests received in STOP messages
             //and add those STOPed requests to the client manager
@@ -528,7 +528,7 @@ public class Synchronizer {
         //if (lcManager.getStopsSize(nextReg) > this.reconfManager.getQuorum2F() && lcManager.getNextReg() > lcManager.getLastReg()) {
         if (condition && lcManager.getNextReg() > lcManager.getLastReg()) {
             
-            if (!execManager.stopped()) execManager.stop(); // stop consensus execution if more than f replicas sent a STOP message
+            if (!execManager.stopped()) execManager.stop(); // stop das execution if more than f replicas sent a STOP message
 
             logger.info("(Synchronizer.startSynchronization) installing regency " + lcManager.getNextReg());
             lcManager.setLastReg(lcManager.getNextReg()); // define last timestamp
@@ -564,7 +564,7 @@ public class Synchronizer {
                     // content of the last decided CID
                     if (last > -1) cons = execManager.getConsensus(last);
 
-                    //Do I have info on my last executed consensus?
+                    //Do I have info on my last executed das?
                     if (cons != null && cons.getDecisionEpoch() != null && cons.getDecisionEpoch().propValue != null) {
                         
                     out.writeBoolean(true);
@@ -586,7 +586,7 @@ public class Synchronizer {
                         logger.info("[DEBUG INFO FOR LAST CID #1]");
 
                         if (cons == null) {
-                            if (last > -1) logger.info("No consensus instance for cid " + last);
+                            if (last > -1) logger.info("No das instance for cid " + last);
 
                         }
                         else if (cons.getDecisionEpoch() == null) {
@@ -608,14 +608,14 @@ public class Synchronizer {
 
                         cons = execManager.getConsensus(in);
 
-                        //cons.incEts(); // make the consensus advance to the next epoch
-                        cons.setETS(regency); // make the consensus advance to the next epoch
+                        //cons.incEts(); // make the das advance to the next epoch
+                        cons.setETS(regency); // make the das advance to the next epoch
 
                         //int ets = cons.getEts();
                         //cons.createEpoch(ets, controller);
                         cons.createEpoch(regency, controller);
-                        //logger.info("(Synchronizer.startSynchronization) incrementing ets of consensus " + cons.getId() + " to " + ets);
-                        logger.info("(Synchronizer.startSynchronization) incrementing ets of consensus " + cons.getId() + " to " + regency);
+                        //logger.info("(Synchronizer.startSynchronization) incrementing ets of das " + cons.getId() + " to " + ets);
+                        logger.info("(Synchronizer.startSynchronization) incrementing ets of das " + cons.getId() + " to " + regency);
 
                         TimestampValuePair quorumWrites;
                         if (cons.getQuorumWrites() != null) {
@@ -640,14 +640,14 @@ public class Synchronizer {
 
                         cons = execManager.getConsensus(last + 1);
 
-                        //cons.incEts(); // make the consensus advance to the next epoch
-                        cons.setETS(regency); // make the consensus advance to the next epoch
+                        //cons.incEts(); // make the das advance to the next epoch
+                        cons.setETS(regency); // make the das advance to the next epoch
                         
                         //int ets = cons.getEts();
                         //cons.createEpoch(ets, controller);
                         cons.createEpoch(regency, controller);
-                        //logger.info("(Synchronizer.startSynchronization) incrementing ets of consensus " + cons.getId() + " to " + ets);
-                        logger.info("(Synchronizer.startSynchronization) incrementing ets of consensus " + cons.getId() + " to " + regency);
+                        //logger.info("(Synchronizer.startSynchronization) incrementing ets of das " + cons.getId() + " to " + ets);
+                        logger.info("(Synchronizer.startSynchronization) incrementing ets of das " + cons.getId() + " to " + regency);
 
                         //CollectData collect = new CollectData(this.controller.getStaticConf().getProcessId(), last + 1, ets, new TimestampValuePair(0, new byte[0]), new HashSet<TimestampValuePair>());
                         CollectData collect = new CollectData(this.controller.getStaticConf().getProcessId(), last + 1, regency, new TimestampValuePair(0, new byte[0]), new HashSet<TimestampValuePair>());
@@ -716,7 +716,7 @@ public class Synchronizer {
                 //Content of the last decided CID
                 if (last > -1) cons = execManager.getConsensus(last);
                         
-                //Do I have info on my last executed consensus?
+                //Do I have info on my last executed das?
                 if (cons != null && cons.getDecisionEpoch() != null && cons.getDecisionEpoch().propValue != null) { 
                     //byte[] decision = exec.getLearner().getDecision();
 
@@ -735,7 +735,7 @@ public class Synchronizer {
                         logger.info("[DEBUG INFO FOR LAST CID #2]");
 
                         if (cons == null) {
-                            if (last > -1) logger.info("No consensus instance for cid " + last);
+                            if (last > -1) logger.info("No das instance for cid " + last);
 
                         }
                         else if (cons.getDecisionEpoch() == null) {
@@ -756,14 +756,14 @@ public class Synchronizer {
                 if (in > -1) { // content of cid being executed
                     cons = execManager.getConsensus(in);
 
-                    //cons.incEts(); // make the consensus advance to the next epoch
-                    cons.setETS(regency); // make the consensus advance to the next epoch
+                    //cons.incEts(); // make the das advance to the next epoch
+                    cons.setETS(regency); // make the das advance to the next epoch
 
                     //int ets = cons.getEts();
                     //cons.createEpoch(ets, controller);
                     cons.createEpoch(regency, controller);
-                    //logger.info("(Synchronizer.startSynchronization) incrementing ets of consensus " + cons.getId() + " to " + ets);
-                    logger.info("(Synchronizer.startSynchronization) incrementing ets of consensus " + cons.getId() + " to " + regency);
+                    //logger.info("(Synchronizer.startSynchronization) incrementing ets of das " + cons.getId() + " to " + ets);
+                    logger.info("(Synchronizer.startSynchronization) incrementing ets of das " + cons.getId() + " to " + regency);
 
                     TimestampValuePair quorumWrites;
 
@@ -783,14 +783,14 @@ public class Synchronizer {
 
                     cons = execManager.getConsensus(last + 1);
 
-                    //cons.incEts(); // make the consensus advance to the next epoch
-                    cons.setETS(regency); // make the consensus advance to the next epoch
+                    //cons.incEts(); // make the das advance to the next epoch
+                    cons.setETS(regency); // make the das advance to the next epoch
 
                     //int ets = cons.getEts();
                     //cons.createEpoch(ets, controller);
                     cons.createEpoch(regency, controller);
-                    //logger.info("(Synchronizer.startSynchronization) incrementing ets of consensus " + cons.getId() + " to " + ets);
-                    logger.info("(Synchronizer.startSynchronization) incrementing ets of consensus " + cons.getId() + " to " + regency);
+                    //logger.info("(Synchronizer.startSynchronization) incrementing ets of das " + cons.getId() + " to " + ets);
+                    logger.info("(Synchronizer.startSynchronization) incrementing ets of das " + cons.getId() + " to " + regency);
 
                     //collect = new CollectData(this.controller.getStaticConf().getProcessId(), last + 1, ets, new TimestampValuePair(0, new byte[0]), new HashSet<TimestampValuePair>());
                     collect = new CollectData(this.controller.getStaticConf().getProcessId(), last + 1, regency, new TimestampValuePair(0, new byte[0]), new HashSet<TimestampValuePair>());
@@ -1047,7 +1047,7 @@ public class Synchronizer {
 
             return;
 
-        } /*else if (tom.getLastExec() + 1 == lastHighestCID.getCID()) { // Is this replica still executing the last decided consensus?
+        } /*else if (tom.getLastExec() + 1 == lastHighestCID.getCID()) { // Is this replica still executing the last decided das?
 
             logger.info("(Synchronizer.finalise) I'm still at the CID before the most recent one!!! (" + lastHighestCID.getCID() + ")");
 
@@ -1070,7 +1070,7 @@ public class Synchronizer {
             cons.decided(e, true); // pass the decision to the delivery thread
         }*/
         
-        // install proof of the last decided consensus
+        // install proof of the last decided das
         cons = execManager.getConsensus(lastHighestCID.getCID());
         e = null;
                 
@@ -1081,7 +1081,7 @@ public class Synchronizer {
             
             if (e == null) e = cons.getEpoch(cm.getEpoch(), true, controller);
             if (e.getTimestamp() != cm.getEpoch()) {
-                logger.info("(Synchronizer.finalise) Strange... proof of last decided consensus contains messages from more than just one epoch");
+                logger.info("(Synchronizer.finalise) Strange... proof of last decided das contains messages from more than just one epoch");
                 e = cons.getEpoch(cm.getEpoch(), true, controller);
             }
             e.addToProof(cm);
@@ -1098,14 +1098,14 @@ public class Synchronizer {
         }
         if (e != null) {
 
-            logger.info("(Synchronizer.finalise) Installed proof of last decided consensus " + lastHighestCID.getCID());
+            logger.info("(Synchronizer.finalise) Installed proof of last decided das " + lastHighestCID.getCID());
             
             byte[] hash = tom.computeHash(lastHighestCID.getDecision());
             e.propValueHash = hash;
             e.propValue = lastHighestCID.getDecision();
             e.deserializedPropValue = tom.checkProposedValue(lastHighestCID.getDecision(), false);
 
-            // Is this replica still executing the last decided consensus?
+            // Is this replica still executing the last decided das?
             if (tom.getLastExec() + 1 == lastHighestCID.getCID()) {
                 
                 logger.info("(Synchronizer.finalise) I'm still at the CID before the most recent one!!! (" + lastHighestCID.getCID() + ")");
@@ -1116,7 +1116,7 @@ public class Synchronizer {
             }
 
         } else {
-            logger.info("(Synchronizer.finalise) I did not install any proof of last decided consensus " + lastHighestCID.getCID());
+            logger.info("(Synchronizer.finalise) I did not install any proof of last decided das " + lastHighestCID.getCID());
         }
         
         cons = null;
@@ -1151,15 +1151,15 @@ public class Synchronizer {
 
             int ets = cons.getEts();
 
-            //Update current consensus with latest ETS. This may be necessary
-            //if I 'jumped' to a consensus instance ahead of the one I was executing
+            //Update current das with latest ETS. This may be necessary
+            //if I 'jumped' to a das instance ahead of the one I was executing
                    
             //int currentETS = lcManager.getETS(currentCID, selectedColls);
             //if (currentETS > ets) {
             if (regency > ets) {
                 
-                //logger.info("(Synchronizer.finalise) Updating consensus' ETS after SYNC (from " + ets + " to " + currentETS +")");
-                logger.info("(Synchronizer.finalise) Updating consensus' ETS after SYNC (from " + ets + " to " + regency +")");
+                //logger.info("(Synchronizer.finalise) Updating das' ETS after SYNC (from " + ets + " to " + currentETS +")");
+                logger.info("(Synchronizer.finalise) Updating das' ETS after SYNC (from " + ets + " to " + regency +")");
 
                 /*do {
                     cons.incEts();
@@ -1210,7 +1210,7 @@ public class Synchronizer {
                 e.setAccept(me, hash);
 
                 /********* LEADER CHANGE CODE ********/
-                logger.info("(Synchronizer.finalise) [CFT Mode] Setting consensus " + currentCID + " QuorumWrite tiemstamp to " + e.getConsensus().getEts() + " and value " + Arrays.toString(hash));
+                logger.info("(Synchronizer.finalise) [CFT Mode] Setting das " + currentCID + " QuorumWrite tiemstamp to " + e.getConsensus().getEts() + " and value " + Arrays.toString(hash));
  	        e.getConsensus().setQuorumWrites(hash);
                 /*************************************/
 

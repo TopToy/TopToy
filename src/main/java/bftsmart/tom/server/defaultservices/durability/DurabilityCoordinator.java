@@ -86,7 +86,7 @@ public abstract class DurabilityCoordinator implements Recoverable, BatchExecuta
 		int checkpointIndex = findCheckpointPosition(cids);
 		byte[][] replies = new byte[commands.length][];
 
-		// During the consensus IDs contained in this batch of commands none of the
+		// During the das IDs contained in this batch of commands none of the
 		// replicas is supposed to take a checkpoint, so the replica will only execute
 		// the command and return the replies
 		if(checkpointIndex == -1) {
@@ -96,7 +96,7 @@ public abstract class DurabilityCoordinator implements Recoverable, BatchExecuta
 			replies = appExecuteBatch(commands, msgCtx);
 			stateLock.unlock();
                     }
-                    logger.info("(DurabilityCoordinator.executeBatch) Storing message batch in the state log for consensus " + cid);
+                    logger.info("(DurabilityCoordinator.executeBatch) Storing message batch in the state log for das " + cid);
                     saveCommands(commands, msgCtx);
 		} else {
 			// there is a replica supposed to take the checkpoint. In this case, the commands
@@ -130,14 +130,14 @@ public abstract class DurabilityCoordinator implements Recoverable, BatchExecuta
                         }
                         
 			if (cid % globalCheckpointPeriod == replicaCkpIndex && lastCkpCID < cid ) {
-				logger.info("(DurabilityCoordinator.executeBatch) Performing checkpoint for consensus " + cid);
+				logger.info("(DurabilityCoordinator.executeBatch) Performing checkpoint for das " + cid);
 				stateLock.lock();
 				byte[] snapshot = getSnapshot();
 				stateLock.unlock();
 				saveState(snapshot, cid);
 				lastCkpCID = cid;
 			} else {
-				logger.info("(DurabilityCoordinator.executeBatch) Storing message batch in the state log for consensus " + cid);
+				logger.info("(DurabilityCoordinator.executeBatch) Storing message batch in the state log for das " + cid);
 				saveCommands(firstHalf, firstHalfMsgCtx);
 			}
 
@@ -154,7 +154,7 @@ public abstract class DurabilityCoordinator implements Recoverable, BatchExecuta
                                     stateLock.unlock();
                                     
                                 }
-				logger.info("(DurabilityCoordinator.executeBatch) Storing message batch in the state log for consensus " + cid);
+				logger.info("(DurabilityCoordinator.executeBatch) Storing message batch in the state log for das " + cid);
 				saveCommands(secondHalf, secondHalfMsgCtx);
 
 				System.arraycopy(secondHalfReplies, 0, replies, firstHalfReplies.length, secondHalfReplies.length);
@@ -175,10 +175,10 @@ public abstract class DurabilityCoordinator implements Recoverable, BatchExecuta
 	 * restored in the recovering replica.
 	 * This iteration over commands is needed due to the batch execution strategy
 	 * introduced with the durable techniques to improve state management. As several
-	 * consensus instances can be executed in the same batch of commands, it is necessary
+	 * das instances can be executed in the same batch of commands, it is necessary
 	 * to identify if the batch contains checkpoint indexes.
 
-	 * @param msgCtxs the contexts of the consensus where the messages where executed.
+	 * @param msgCtxs the contexts of the das where the messages where executed.
 	 * There is one msgCtx message for each command to be executed
 
 	 * @return the index in which a replica is supposed to take a checkpoint. If there is
@@ -210,7 +210,7 @@ public abstract class DurabilityCoordinator implements Recoverable, BatchExecuta
 	 * 
 	 * @param msgCtx the message context of the commands executed by the replica.
 	 * There is one message context for each command
-	 * @param cid the CID of the consensus where a replica took a checkpoint
+	 * @param cid the CID of the das where a replica took a checkpoint
 	 * @return the higher position where the CID appears
 	 */
 	private int cidPosition(int[] cids, int cid) {
@@ -385,12 +385,12 @@ public abstract class DurabilityCoordinator implements Recoverable, BatchExecuta
 	}
 
 	/**
-	 * Iterates over the message context array and get the consensus id of each command
+	 * Iterates over the message context array and get the das id of each command
 	 * being executed. As several times during the execution of commands and logging the
-	 * only information important in MessageContext is the consensus id, it saves time to
+	 * only information important in MessageContext is the das id, it saves time to
 	 * have it already in an array of ids
 	 * @param ctxs the message context, one for each command to be executed
-	 * @return the id of the consensus decision for each command
+	 * @return the id of the das decision for each command
 	 */
 	private int[] consensusIds(MessageContext[] ctxs) {
 		int[] cids = new int[ctxs.length];

@@ -3,7 +3,7 @@ package blockchain;
 
 import proto.Types;
 
-public class basicBlock extends block {
+public class SBlock extends BaseBlock {
 
     @Override
     public boolean validateTransaction(Types.Transaction t) {

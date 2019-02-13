@@ -1,9 +1,9 @@
-package wrb;
+package das.wrb;
 
 import com.google.protobuf.ByteString;
 import config.Config;
 import config.Node;
-import consensus.bbc.bbcService;
+import das.bbc.BbcService;
 import crypto.DigestMethod;
 import crypto.blockDigSig;
 import crypto.sslUtils;
@@ -113,7 +113,7 @@ public class WrbService extends RmfGrpc.RmfImplBase {
     protected int id;
     private int n;
     protected int f;
-    private bbcService bbcService;
+    private BbcService bbcService;
 //    private final Object globalLock = new Object();
 
     private final ConcurrentHashMap<Meta, Block>[] recMsg;
@@ -146,13 +146,13 @@ public class WrbService extends RmfGrpc.RmfImplBase {
     AtomicInteger optimialDec = new AtomicInteger(0);;
 //    ReentrantLock mutex = new ReentrantLock(true);
 
-//    public WrbService(int channels, int id, int f, ArrayList<Node> nodes, bbcService bbc) {
+//    public WrbService(int channels, int id, int f, ArrayList<Node> nodes, BbcService bbc) {
 //        this.channels = channels;
 //        this.globalLock = new Object[channels];
 //        this.fVotes = new HashBasedTable[channels];
 //        this.pendingMsg =  new HashBasedTable[channels];
 //        this.recMsg =  new HashBasedTable[channels];
-//        this.bbcService = bbc;
+//        this.BbcService = bbc;
 //        this.peers = new HashMap<>();
 //        this.f = f;
 //        this.n = 3*f +1;
@@ -251,7 +251,7 @@ public class WrbService extends RmfGrpc.RmfImplBase {
     public void start() {
         CountDownLatch latch = new CountDownLatch(1);
 //        if (!group)  {
-            this.bbcService = new bbcService(channels, id, 2*f + 1, bbcConfig);
+            this.bbcService = new BbcService(channels, id, 2*f + 1, bbcConfig);
             bbcServiceThread = new Thread(() -> {
                 /*
                     Note that in case that there is more than one bbc server this call blocks until all servers are up.
@@ -342,11 +342,11 @@ public class WrbService extends RmfGrpc.RmfImplBase {
 //                        .setCidSeries(fcidSeries)
 //                        .setCid(fcid)
 //                        .build();
-//                logger.debug(format("[#%d-C[%d]] starting missed consensus for [cidSeries=%d ; cid=%d]",
+//                logger.debug(format("[#%d-C[%d]] starting missed das for [cidSeries=%d ; cid=%d]",
 //                        id, channel, fcidSeries, fcid));
 //
 ////                logger.debug(format("[#%d-C[%d]] Trying re-participate [cidSeries=%d ; cid=%d]", id, channel, fcidSeries, fcid));
-//                bbcService.periodicallyVoteMissingConsensus(fastBbcCons[channel].get(key));
+//                BbcService.periodicallyVoteMissingConsensus(fastBbcCons[channel].get(key));
 //            } catch (Exception e) {
 //                logger.error("", e);
 //            }
@@ -508,12 +508,12 @@ public class WrbService extends RmfGrpc.RmfImplBase {
                         return;
                     }
                     if (!pendingMsg[channel].containsKey(key) && !recMsg[channel].containsKey(key)) {
-                        logger.debug(format("[#%d-C[%d]] has pre consensus received message from [#%d] for [cidSeries=%d ; cid=%d]",
+                        logger.debug(format("[#%d-C[%d]] has pre das received message from [#%d] for [cidSeries=%d ; cid=%d]",
                                 id, channel, res.getM().getSender(), cidSeries, cid));
                         pendingMsg[channel].put(key, res.getData());
                     }
                 } else if (res.getData().equals(Block.getDefaultInstance())) {
-                    logger.debug(format("[#%d-C[%d]] has pre consensus received NULL message from [#%d] for [cidSeries=%d ; cid=%d]",
+                    logger.debug(format("[#%d-C[%d]] has pre das received NULL message from [#%d] for [cidSeries=%d ; cid=%d]",
                             id, channel, res.getM().getSender(), cidSeries,  cid));
                 }
                 synchronized (preConsNotifyer[channel]) {
@@ -793,12 +793,12 @@ public class WrbService extends RmfGrpc.RmfImplBase {
         }
         if (msg == null) {
             msg = Block.getDefaultInstance();
-            logger.debug(format("[#%d-C[%d]] has received pre consensus request message" +
+            logger.debug(format("[#%d-C[%d]] has received pre das request message" +
                             " from [#%d] of [cidSeries=%d ; cid=%d] response with NULL",
                     id, channel, request.getMeta().getSender(), cidSeries, cid));
 
         } else {
-            logger.debug(format("[#%d-C[%d]] has received pre consensus request message from [#%d] of [cidSeries=%d ; cid=%d]" +
+            logger.debug(format("[#%d-C[%d]] has received pre das request message from [#%d] of [cidSeries=%d ; cid=%d]" +
                             "responses with a value",
                     id, channel, request.getMeta().getSender(), cidSeries, cid));
         }
@@ -837,7 +837,7 @@ public class WrbService extends RmfGrpc.RmfImplBase {
                         id, channel, next.getHeader().getM().getCidSeries(), next.getHeader().getM().getCid()));
                 long st = System.currentTimeMillis();
                 bv.setNext(setFastModeData(val, next));
-                logger.debug(format("[#%d-C[%d]] creating new block of [cidSeries=%d ; cid=%d] took about [%d] ms",
+                logger.debug(format("[#%d-C[%d]] creating new BaseBlock of [cidSeries=%d ; cid=%d] took about [%d] ms",
                         id, channel, next.getHeader().getM().getCidSeries(), next.getHeader().getM().getCid(),
                         System.currentTimeMillis() - st));
             }
@@ -871,7 +871,7 @@ public class WrbService extends RmfGrpc.RmfImplBase {
                         id, channel, next.getHeader().getM().getCidSeries(), next.getHeader().getM().getCid()));
 //                long st = System.currentTimeMillis();
                 bv.setNext(setFastModeData(val, next));
-//                logger.debug(format("[#%d-C[%d]] creating new block of [cidSeries=%d ; cid=%d] took about [%d] ms",
+//                logger.debug(format("[#%d-C[%d]] creating new BaseBlock of [cidSeries=%d ; cid=%d] took about [%d] ms",
 //                        id, channel, next.getHeader().getM().getCidSeries(), next.getHeader().getM().getCid(),
 //                        System.currentTimeMillis() - st));
             }

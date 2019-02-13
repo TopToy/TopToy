@@ -53,7 +53,7 @@ import org.apache.log4j.Logger;
  * This class receives messages from DeliveryThread and manages the execution
  * from the application and reply to the clients. For applications where the
  * ordered messages are executed one by one, ServiceReplica receives the batch
- * decided in a consensus, deliver one by one and reply with the batch of
+ * decided in a das, deliver one by one and reply with the batch of
  * replies. In cases where the application executes the messages in batches, the
  * batch of messages is delivered to the application and ServiceReplica doesn't
  * need to organize the replies in batches.
@@ -208,7 +208,7 @@ public class ServiceReplica {
 
         // This is used to deliver the requests to the application and obtain a reply to deliver
         //to the clients. The raw decision does not need to be delivered to the recoverable since
-        // it is not associated with any consensus instance, and therefore there is no need for
+        // it is not associated with any das instance, and therefore there is no need for
         //applications to log it or keep any proof.
         if (executor instanceof FIFOExecutable) {
             response = ((FIFOExecutable) executor).executeUnorderedFIFO(message.getContent(), msgCtx, message.getSender(), message.getOperationId());
@@ -296,7 +296,7 @@ public class ServiceReplica {
             noop = true;
             for (TOMMessage request : requestsFromConsensus) {
                 
-                logger.info("(ServiceReplica.receiveMessages) Processing TOMMessage from client " + request.getSender() + " with sequence number " + request.getSequence() + " for session " + request.getSession() + " decided in consensus " + consId[consensusCount]);
+                logger.info("(ServiceReplica.receiveMessages) Processing TOMMessage from client " + request.getSender() + " with sequence number " + request.getSequence() + " for session " + request.getSession() + " decided in das " + consId[consensusCount]);
 
                 if (request.getViewID() == SVController.getCurrentViewId()) {
 
@@ -319,7 +319,7 @@ public class ServiceReplica {
                                 
                                 logger.info("(ServiceReplica.receiveMessages) Batching request from " + request.getSender());
                                 
-                                // This is used to deliver the content decided by a consensus instance directly to
+                                // This is used to deliver the content decided by a das instance directly to
                                 // a Recoverable object. It is useful to allow the application to create a log and
                                 // store the proof associated with decisions (which are needed by replicas
                                 // that are asking for a state transfer).
@@ -332,7 +332,7 @@ public class ServiceReplica {
                                 
                                 logger.info("(ServiceReplica.receiveMessages) Delivering request from " + request.getSender() + " via FifoExecutable");
                                 
-                                // This is used to deliver the content decided by a consensus instance directly to
+                                // This is used to deliver the content decided by a das instance directly to
                                 // a Recoverable object. It is useful to allow the application to create a log and
                                 // store the proof associated with decisions (which are needed by replicas
                                 // that are asking for a state transfer).
@@ -351,7 +351,7 @@ public class ServiceReplica {
                                 
                                 logger.info("(ServiceReplica.receiveMessages) Delivering request from " + request.getSender() + " via SingleExecutable");
                                 
-                                // This is used to deliver the content decided by a consensus instance directly to
+                                // This is used to deliver the content decided by a das instance directly to
                                 // a Recoverable object. It is useful to allow the application to create a log and
                                 // store the proof associated with decisions (which are needed by replicas
                                 // that are asking for a state transfer).
@@ -377,7 +377,7 @@ public class ServiceReplica {
                     }
                 } else if (request.getViewID() < SVController.getCurrentViewId()) { 
                     // message sender had an old view, resend the message to
-                    // him (but only if it came from consensus an not state transfer)
+                    // him (but only if it came from das an not state transfer)
                     
                     tomLayer.getCommunication().send(new int[]{request.getSender()}, new TOMMessage(SVController.getStaticConf().getProcessId(),
                             request.getSession(), request.getSequence(), request.getOperationId(), TOMUtil.getBytes(SVController.getCurrentView()), SVController.getCurrentViewId(), request.getReqType()));
@@ -385,7 +385,7 @@ public class ServiceReplica {
                 requestCount++;
             }
 
-            // This happens when a consensus finishes but there are no requests to deliver
+            // This happens when a das finishes but there are no requests to deliver
             // to the application. This can happen if a reconfiguration is issued and is the only
             // operation contained in the batch. The recoverer must be notified about this,
             // hence the invocation of "noop"
@@ -393,8 +393,8 @@ public class ServiceReplica {
                 
                 logger.info("(ServiceReplica.receiveMessages) Delivering a no-op to the recoverer");
 
-                logger.info(" --- A consensus instance finished, but there were no commands to deliver to the application.");
-                logger.info(" --- Notifying recoverable about a blank consensus.");
+                logger.info(" --- A das instance finished, but there were no commands to deliver to the application.");
+                logger.info(" --- Notifying recoverable about a blank das.");
 
                 byte[][] batch = null;
                 MessageContext[] msgCtx = null;
@@ -422,7 +422,7 @@ public class ServiceReplica {
                 this.recoverer.noOp(consId[consensusCount], batch, msgCtx);
                 
                 //MessageContext msgCtx = new MessageContext(-1, -1, null, -1, -1, -1, -1, null, // Since it is a noop, there is no need to pass info about the client...
-                //        -1, 0, 0, regencies[consensusCount], leaders[consensusCount], consId[consensusCount], cDecs[consensusCount].getConsMessages(), //... but there is still need to pass info about the consensus
+                //        -1, 0, 0, regencies[consensusCount], leaders[consensusCount], consId[consensusCount], cDecs[consensusCount].getConsMessages(), //... but there is still need to pass info about the das
                 //        null, true); // there is no command that is the first of the batch, since it is a noop
                 //msgCtx.setLastInBatch();
                 

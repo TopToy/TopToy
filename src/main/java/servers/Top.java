@@ -1,10 +1,10 @@
 package servers;
 
-import blockchain.blockchain;
+import blockchain.BaseBlockchain;
 import com.google.protobuf.ByteString;
 import config.Config;
 import config.Node;
-import consensus.RBroadcast.RBrodcastService;
+import das.RBroadcast.RBrodcastService;
 import crypto.DigestMethod;
 import io.grpc.Server;
 import io.grpc.netty.NettyServerBuilder;
@@ -12,10 +12,10 @@ import io.grpc.stub.StreamObserver;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import proto.Types;
-import wrb.ByzantineWrbNode;
-import wrb.WrbNode;
+import das.wrb.ByzantineWrbNode;
+import das.wrb.WrbNode;
 import proto.blockchainServiceGrpc.blockchainServiceImplBase;
-import utils.chainCutter;
+import utils.DiskUtils;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -30,8 +30,8 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.String.format;
 
-public class sg implements server {
-    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(sg.class);
+public class Top implements server {
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Top.class);
 
     private WrbNode rmf;
     boolean up = false;
@@ -41,16 +41,16 @@ public class sg implements server {
     private int n;
     private int gcCount = 0;
     private int gcLimit = 1;
-    private bcServer[] group;
+    private ToyBaseServer[] group;
     private int[][] lastDelivered;
     private int[] lastGCpoint;
-    private final blockchain bc;
+    private final BaseBlockchain bc;
     private int id;
     private int c;
     private String type;
     int lastChannel = 0;
     private AtomicBoolean stopped = new AtomicBoolean(false);
-    private statistics sts = new statistics();
+    private Statistics sts = new Statistics();
     private Thread deliverThread = new Thread(() -> {
         try {
             Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
@@ -68,9 +68,9 @@ public class sg implements server {
     private EventLoopGroup gnio = new NioEventLoopGroup(2);
 
 
-    public sg(String addr, int port, int id, int f, int c, int tmo, int tmoInterval,
-              int maxTx, boolean fastMode, ArrayList<Node> cluster, String bbcConfig, String panicConfig,
-              String syncConfig, String type,  String serverCrt, String serverPrivKey, String caRoot) {
+    public Top(String addr, int port, int id, int f, int c, int tmo, int tmoInterval,
+               int maxTx, boolean fastMode, ArrayList<Node> cluster, String bbcConfig, String panicConfig,
+               String syncConfig, String type, String serverCrt, String serverPrivKey, String caRoot) {
         n = 3 *f +1;
         this.maxTx = maxTx;
         lastDelivered = new int[c][];
@@ -84,7 +84,7 @@ public class sg implements server {
             }
         }
         this.c = c;
-        this.group = new bcServer[c];
+        this.group = new ToyBaseServer[c];
         this.id = id;
         if (type.equals("r") || type.equals("a")) {
             rmf = new WrbNode(c, id, addr, port, f, tmo, tmoInterval, cluster, bbcConfig, serverCrt, serverPrivKey, caRoot);
@@ -98,25 +98,25 @@ public class sg implements server {
         // TODO: Apply to more types
         if (type.equals("r")) {
             for (int i = 0 ; i < c ; i++) {
-                group[i] = new cbcServer(addr, port, id, i, f, tmo, tmoInterval, maxTx,
+                group[i] = new ToyServer(addr, port, id, i, f, tmo, tmoInterval, maxTx,
                         fastMode, cluster, rmf, deliverFork, sync);
             }
         }
         if (type.equals("b")) {
             for (int i = 0 ; i < c ; i++) {
-                group[i] = new byzantineBcServer(addr, port, id, i, f, tmo, tmoInterval, maxTx,
+                group[i] = new ByzToyServer(addr, port, id, i, f, tmo, tmoInterval, maxTx,
                         fastMode, cluster, rmf, deliverFork, sync);
             }
         }
         if (type.equals("a")) {
             for (int i = 0 ; i < c ; i++) {
-                group[i] = new asyncBcServer(addr, port, id, i, f, tmo, tmoInterval, maxTx,
+                group[i] = new AsyncToyServer(addr, port, id, i, f, tmo, tmoInterval, maxTx,
                         fastMode, cluster, rmf, deliverFork, sync);
             }
         }
         bc = group[0].initBC(id, -1);
 
-//        new chainCutter(cutterDirName);
+//        new DiskUtils(cutterDirName);
         logger.info(format("cutter batch is %d", cutterBatch));
     }
 
@@ -157,7 +157,7 @@ public class sg implements server {
 //                    chainCutterExecutor.execute(() -> {
 //                        try {
 ////                            logger.info("Writing blocks...");
-//                            chainCutter.cut(bc, bc.getHeight() - cutterBatch, bc.getHeight());
+//                            DiskUtils.cut(bc, bc.getHeight() - cutterBatch, bc.getHeight());
 //                        } catch (IOException e) {
 //                            logger.error("", e);
 //                        }
@@ -189,7 +189,7 @@ public class sg implements server {
         }
     }
 
-    public statistics getStatistics() {
+    public Statistics getStatistics() {
         sts.totalDec = rmf.getTotolDec();
         sts.optemisticDec = rmf.getOptemisticDec();
         return sts;
@@ -288,7 +288,7 @@ public class sg implements server {
                     .executor(executor)
                     .bossEventLoopGroup(gnio)
                     .workerEventLoopGroup(gnio)
-                    .addService(new txServer(this))
+                    .addService(new TxServer(this))
                     .build()
                     .start();
             logger.info("starting tx server");
@@ -386,7 +386,7 @@ public class sg implements server {
                 return b;
             }
             try {
-                return chainCutter.getBlockFromFile(b.getHeader().getHeight());
+                return DiskUtils.getBlockFromFile(b.getHeader().getHeight());
             } catch (IOException e) {
                 logger.error("", e);
                 return null;
@@ -402,7 +402,7 @@ public class sg implements server {
         }
 
         try {
-            return chainCutter.getBlockFromFile(b.getHeader().getHeight());
+            return DiskUtils.getBlockFromFile(b.getHeader().getHeight());
         } catch (IOException e) {
             logger.error("", e);
             return null;
@@ -419,7 +419,7 @@ public class sg implements server {
             return;
         }
         for (int i = 0 ; i < c ; i++) {
-            ((byzantineBcServer) group[i]).setByzSetting(fullByz, groups);
+            ((ByzToyServer) group[i]).setByzSetting(fullByz, groups);
         }
     }
 
@@ -429,7 +429,7 @@ public class sg implements server {
             return;
         }
         for (int i = 0 ; i < c ; i++) {
-            ((asyncBcServer) group[i]).setAsyncParam(maxTime);
+            ((AsyncToyServer) group[i]).setAsyncParam(maxTime);
         }
     }
 
@@ -438,11 +438,11 @@ public class sg implements server {
     }
 
 }
-class txServer extends blockchainServiceImplBase {
-    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(txServer.class);
-    sg server;
+class TxServer extends blockchainServiceImplBase {
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(TxServer.class);
+    Top server;
 
-    public txServer(sg server) {
+    public TxServer(Top server) {
         super();
         this.server = server;
     }

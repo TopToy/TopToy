@@ -41,7 +41,7 @@ public class Decision {
 
     /**
      * Creates a new instance of Decision
-     * @param cid The ID for the respective consensus
+     * @param cid The ID for the respective das
      */
     public Decision(int cid) {
         this.cid = cid;
@@ -118,8 +118,8 @@ public class Decision {
     }
 
     /**
-     * The ID for the associated consensus
-     * @return ID for the associated consensus
+     * The ID for the associated das
+     * @return ID for the associated das
      */
     public int getConsensusId() {
         return cid;
@@ -129,7 +129,7 @@ public class Decision {
         while (decisionEpoch == null &&
                 decisionEpoch.deserializedPropValue == null) {
             try {
-                logger.info("waiting for propose for consensus" + cid);
+                logger.info("waiting for propose for das" + cid);
                 Thread.sleep(1);
             } catch (InterruptedException ie) {
             }

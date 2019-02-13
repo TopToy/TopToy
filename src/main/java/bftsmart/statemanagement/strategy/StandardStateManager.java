@@ -230,7 +230,7 @@ public class StandardStateManager extends BaseStateManager {
                         
                         if (currentProof != null && !appStateOnly) {
                             
-                            logger.info("Installing proof for consensus " + waitingCID);
+                            logger.info("Installing proof for das " + waitingCID);
 
                             Consensus cons = execManager.getConsensus(waitingCID);
                             Epoch e = null;
@@ -264,10 +264,10 @@ public class StandardStateManager extends BaseStateManager {
                                 e.deserializedPropValue = tomLayer.checkProposedValue(currentProof.getDecision(), false);
                                  cons.decided(e, false);
                                  
-                                logger.info("Successfully installed proof for consensus " + waitingCID);
+                                logger.info("Successfully installed proof for das " + waitingCID);
 
                             } else {
-                                logger.info("Failed to install proof for consensus " + waitingCID);
+                                logger.info("Failed to install proof for das " + waitingCID);
 
                             }
 

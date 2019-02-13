@@ -38,7 +38,7 @@ message BlockHeader {
 //message BlockFooter {
 ////    string rmfProof = 1;
 //    int64 ts = 2;
-////    bytes orig = 3; // Enable to cerate an empty block
+////    bytes orig = 3; // Enable to cerate an empty BaseBlock
 //}
 
 message blockStatistics {

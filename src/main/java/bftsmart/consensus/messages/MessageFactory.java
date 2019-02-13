@@ -56,7 +56,7 @@ public class MessageFactory{
      * @param id Consensus's execution ID
      * @param epoch Epoch number
      * @param value Write value
-     * @return A consensus message of the WRITE type, with the specified id, epoch, and value
+     * @return A das message of the WRITE type, with the specified id, epoch, and value
      */
     public ConsensusMessage createWrite(int id, int epoch, byte[] value) {
 
@@ -69,7 +69,7 @@ public class MessageFactory{
      * @param id Consensus's execution ID
      * @param epoch Epoch number
      * @param value Accepted value
-     * @return A consensus message of the ACCEPT type, with the specified id, epoch, and value
+     * @return A das message of the ACCEPT type, with the specified id, epoch, and value
      */
     public ConsensusMessage createAccept(int id, int epoch, byte[] value) {
 

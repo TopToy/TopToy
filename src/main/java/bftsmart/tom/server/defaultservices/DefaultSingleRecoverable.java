@@ -91,7 +91,7 @@ public abstract class DefaultSingleRecoverable implements Recoverable, SingleExe
         
         if(msgCtx.isLastInBatch()) {
 	        if ((cid > 0) && ((cid % checkpointPeriod) == 0)) {
-	            logger.info("(DefaultSingleRecoverable.executeOrdered) Performing checkpoint for consensus " + cid);
+	            logger.info("(DefaultSingleRecoverable.executeOrdered) Performing checkpoint for das " + cid);
 	            stateLock.lock();
 	            byte[] snapshot = getSnapshot();
 	            stateLock.unlock();
@@ -172,7 +172,7 @@ public abstract class DefaultSingleRecoverable implements Recoverable, SingleExe
         logLock.lock();
         ApplicationState ret = (cid > -1 ? getLog().getApplicationState(cid, sendState) : new DefaultApplicationState());
 
-        // Only will send a state if I have a proof for the last logged decision/consensus
+        // Only will send a state if I have a proof for the last logged decision/das
         //TODO: I should always make sure to have a log with proofs, since this is a result
         // of not storing anything after a checkpoint and before logging more requests        
         if (ret == null || (config.isBFT() && ret.getCertifiedDecision(this.controller) == null)) ret = new DefaultApplicationState();
@@ -224,7 +224,7 @@ public abstract class DefaultSingleRecoverable implements Recoverable, SingleExe
                 } catch (Exception e) {
                     e.printStackTrace(System.err);
                     if (e instanceof ArrayIndexOutOfBoundsException) {
-                        logger.info("Last checkpoint, last consensus ID (CID): " + state.getLastCheckpointCID());
+                        logger.info("Last checkpoint, last das ID (CID): " + state.getLastCheckpointCID());
                         logger.info("Last CID: " + state.getLastCID());
                         logger.info("number of messages expected to be in the batch: " + (state.getLastCID() - state.getLastCheckpointCID() + 1));
                         logger.info("number of messages in the batch: " + state.getMessageBatches().length);

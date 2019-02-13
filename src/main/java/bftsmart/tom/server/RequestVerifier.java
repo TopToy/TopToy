@@ -10,7 +10,7 @@ import bftsmart.tom.core.messages.TOMMessage;
 /**
  *
  * Classes that implement this interface are invoked within
- * consensus instances upon reception of a PROPOSE message
+ * das instances upon reception of a PROPOSE message
  * in order to enforce the "external validity". More precisely,
  * objects extending this class must verify if the requests
  * are valid in accordance to the application semantics (and not

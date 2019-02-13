@@ -336,7 +336,7 @@ public class ClientsManager {
      * Cleans all state for this request (e.g., removes it from the pending
      * requests queue and stop any timer for it).
      *
-     * @param request the request ordered by the consensus
+     * @param request the request ordered by the das
      */
     private void requestOrdered(TOMMessage request) {
         //stops the timer associated with this message

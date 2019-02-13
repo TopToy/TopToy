@@ -3,7 +3,7 @@ import config.Node;
 import org.apache.commons.lang.ArrayUtils;
 import org.junit.jupiter.api.Test;
 import proto.Types;
-import servers.sg;
+import servers.Top;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -17,11 +17,11 @@ import static config.Config.setConfig;
 import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class sgTest {
+public class topTest {
     private int timeToWaitBetweenTests = 1; //1000 * 60;
     //    static Config conf = new Config();
 //    Config.setConfig(null, 0);
-    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(sgTest.class);
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(topTest.class);
     private String localHost = "127.0.0.1";
     private int[] ports = {20000, 20010, 20020, 20030};
     //    private int[] syncPort = {30000, 30010, 30020, 30030};
@@ -65,23 +65,23 @@ public class sgTest {
     }
 
 
-    private sg[] initLocalSgNodes(int nnodes, int f, int g, String bbcConfig, String panicConfig, String syncConfig, int[] byzIds) {
+    private Top[] initLocalSgNodes(int nnodes, int f, int g, String bbcConfig, String panicConfig, String syncConfig, int[] byzIds) {
         deleteViewIfExist(bbcConfig);
         deleteViewIfExist(panicConfig);
         deleteViewIfExist(syncConfig);
 //        ArrayList<ArrayList<Node>> clusters =  new ArrayList<>();
 //        clusters.add(new ArrayList<>(c0.subList(0, nnodes)));
 //        clusters.add(new ArrayList<>(c1.subList(0, nnodes)));
-        sg[] ret = new sg[nnodes];
+        Top[] ret = new Top[nnodes];
         for (int id = 0 ; id < nnodes ; id++) {
             logger.info("init server #" + id);
             if (ArrayUtils.contains(byzIds, id)) {
-                ret[id] = new sg(localHost, ports[id], id, f, g, 1000,
+                ret[id] = new Top(localHost, ports[id], id, f, g, 1000,
                         100, 1, true, cluster, bbcConfig, panicConfig, syncConfig, "b",
                         Config.getServerCrtPath(), Config.getServerTlsPrivKeyPath(), Config.getCaRootPath());
                 continue;
             }
-            ret[id] = new sg(localHost, ports[id], id,f, g, 1000,
+            ret[id] = new Top(localHost, ports[id], id,f, g, 1000,
                     100, 1, true, cluster, bbcConfig, panicConfig, syncConfig, "r",
                     Config.getServerCrtPath(), Config.getServerTlsPrivKeyPath(), Config.getCaRootPath());
         }
@@ -90,23 +90,23 @@ public class sgTest {
 
     }
 
-    private sg[] initLocalAsyncBCNodes(int nnodes, int f, int g, String bbcConfig, String panicConfig, String syncConfig, int[] byzIds) {
+    private Top[] initLocalAsyncBCNodes(int nnodes, int f, int g, String bbcConfig, String panicConfig, String syncConfig, int[] byzIds) {
         deleteViewIfExist(bbcConfig);
         deleteViewIfExist(panicConfig);
         deleteViewIfExist(syncConfig);
 //        ArrayList<ArrayList<Node>> clusters =  new ArrayList<>();
 //        clusters.add((ArrayList<Node>) c0.subList(0, nnodes));
 //        clusters.add((ArrayList<Node>) c1.subList(0, nnodes));
-        sg[] ret = new sg[nnodes];
+        Top[] ret = new Top[nnodes];
         for (int id = 0 ; id < nnodes ; id++) {
             logger.info("init server #" + id);
             if (ArrayUtils.contains(byzIds, id)) {
-                ret[id] = new sg(localHost, ports[id], id,f, g, 1000,
+                ret[id] = new Top(localHost, ports[id], id,f, g, 1000,
                         100, 1, true, cluster, bbcConfig, panicConfig, syncConfig, "b",
                         Config.getServerCrtPath(), Config.getServerTlsPrivKeyPath(), Config.getCaRootPath());
                 continue;
             }
-            ret[id] = new sg(localHost, ports[id], id,f, g, 1000,
+            ret[id] = new Top(localHost, ports[id], id,f, g, 1000,
                     100, 1, true, cluster, bbcConfig, panicConfig, syncConfig, "a",
                     Config.getServerCrtPath(), Config.getServerTlsPrivKeyPath(), Config.getCaRootPath());
         }
@@ -118,7 +118,7 @@ public class sgTest {
         setConfig(singleConfig, 0);
         Thread.sleep(timeToWaitBetweenTests);
         logger.info("start TestSingleServer");
-        sg[] rn1 = initLocalSgNodes(1, 0, 2, singleBbc.toString(),
+        Top[] rn1 = initLocalSgNodes(1, 0, 2, singleBbc.toString(),
                 singlepanic.toString(), singlesync.toString(), null);
         rn1[0].start();
         rn1[0].shutdown();
@@ -129,7 +129,7 @@ public class sgTest {
         setConfig(singleConfig, 0);
         Thread.sleep(timeToWaitBetweenTests);
         logger.info("start TestSingleServer");
-        sg[] rn1 = initLocalSgNodes(1, 0, 2, singleBbc.toString(),
+        Top[] rn1 = initLocalSgNodes(1, 0, 2, singleBbc.toString(),
                 singlepanic.toString(), singlesync.toString(), null);
         rn1[0].start();
         rn1[0].serve();
@@ -148,7 +148,7 @@ public class sgTest {
         int nnodes = 4;
         logger.info("start TestFourServersNoFailures");
         Thread[] servers = new Thread[4];
-        sg[] allNodes = initLocalSgNodes(nnodes,1, 2, fourBbc.toString(),
+        Top[] allNodes = initLocalSgNodes(nnodes,1, 2, fourBbc.toString(),
                 fourpanic.toString(), foursync.toString(), null);
         for (int i = 0 ; i < nnodes ; i++) {
             int finalI = i;
@@ -192,7 +192,7 @@ public class sgTest {
 
     }
 
-    void serverDoing(List<Types.Block> res, sg s) throws InterruptedException {
+    void serverDoing(List<Types.Block> res, Top s) throws InterruptedException {
         logger.info("--->" + s.getID() + " STARTS");
         for(int i = 0; i < 100 ; i++) {
             String msg = "Hello" + i;
@@ -210,7 +210,7 @@ public class sgTest {
         int nnodes = 4;
         logger.info("start TestFourServersNoFailures");
         Thread[] servers = new Thread[4];
-        sg[] allNodes = initLocalSgNodes(nnodes,1, 2, fourBbc.toString(),
+        Top[] allNodes = initLocalSgNodes(nnodes,1, 2, fourBbc.toString(),
                 fourpanic.toString(), foursync.toString(), null);
         for (int i = 0 ; i < nnodes ; i++) {
             int finalI = i;
@@ -266,7 +266,7 @@ public class sgTest {
         int nnodes = 4;
         logger.info("start TestFourServersNoFailures");
         Thread[] servers = new Thread[4];
-        sg[] allNodes = initLocalSgNodes(nnodes,1, 2, fourBbc.toString(),
+        Top[] allNodes = initLocalSgNodes(nnodes,1, 2, fourBbc.toString(),
                 fourpanic.toString(), foursync.toString(), null);
         for (int i = 0 ; i < nnodes ; i++) {
             int finalI = i;
@@ -316,7 +316,7 @@ public class sgTest {
 
     }
 
-    void bServerDoing(List<Types.Block> res, sg s) throws InterruptedException {
+    void bServerDoing(List<Types.Block> res, Top s) throws InterruptedException {
         for(int i = 0; i < 100 ; i++) {
             String msg = "Hello" + i;
             if (i % 4 == s.getID()) {
@@ -333,7 +333,7 @@ public class sgTest {
         int nnodes = 4;
         logger.info("start TestFourServersNoFailures");
         Thread[] servers = new Thread[4];
-        sg[] allNodes = initLocalSgNodes(nnodes,1, 2, fourBbc.toString(),
+        Top[] allNodes = initLocalSgNodes(nnodes,1, 2, fourBbc.toString(),
                 fourpanic.toString(), foursync.toString(), new int[]{0});
         for (int i = 0 ; i < nnodes ; i++) {
             int finalI = i;
@@ -414,7 +414,7 @@ public class sgTest {
 
     }
 
-    void asyncServerDoing(List<Types.Block> res, sg s) throws InterruptedException {
+    void asyncServerDoing(List<Types.Block> res, Top s) throws InterruptedException {
         if (s.getID() == 1) {
             Thread.sleep(20 * 1000);
         }
@@ -436,7 +436,7 @@ public class sgTest {
         int nnodes = 4;
         logger.info("start TestFourServersNoFailures");
         Thread[] servers = new Thread[4];
-        sg[] allNodes = initLocalAsyncBCNodes(nnodes,1, 2, fourBbc.toString(),
+        Top[] allNodes = initLocalAsyncBCNodes(nnodes,1, 2, fourBbc.toString(),
                 fourpanic.toString(), foursync.toString(), null);
 
         for (int i = 0 ; i < nnodes ; i++) {
@@ -495,7 +495,7 @@ public class sgTest {
         int nnodes = 4;
         logger.info("start TestFourServersNoFailures");
         Thread[] servers = new Thread[4];
-        sg[] allNodes = initLocalSgNodes(nnodes,1, 2, fourBbc.toString(),
+        Top[] allNodes = initLocalSgNodes(nnodes,1, 2, fourBbc.toString(),
                 fourpanic.toString(), foursync.toString(), new int[]{0});
         for (int i = 0 ; i < nnodes ; i++) {
             int finalI = i;
@@ -589,7 +589,7 @@ public class sgTest {
         int nnodes = 4;
         logger.info("start TestFourServersNoFailures");
         Thread[] servers = new Thread[4];
-        sg[] allNodes = initLocalAsyncBCNodes(nnodes,1, 2, fourBbc.toString(),
+        Top[] allNodes = initLocalAsyncBCNodes(nnodes,1, 2, fourBbc.toString(),
                 fourpanic.toString(), foursync.toString(), new int[]{0});
         for (int i = 0 ; i < nnodes ; i++) {
             int finalI = i;

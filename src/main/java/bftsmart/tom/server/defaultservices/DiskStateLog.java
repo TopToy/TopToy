@@ -112,7 +112,7 @@ public class DiskStateLog extends StateLog {
 			log.seek(log.length() - 2 * INT_BYTE_SIZE);// Next write will overwrite
 													// the EOF mark
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			// TODO Auto-generated catch BaseBlock
 			logger.error("", e);
 	    }
 	}
@@ -148,10 +148,10 @@ public class DiskStateLog extends StateLog {
 				createLogFile();
 			
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
+			// TODO Auto-generated catch BaseBlock
 			logger.error("", e);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			// TODO Auto-generated catch BaseBlock
 			logger.error("", e);
 		} finally {
 			checkpointLock.unlock();
@@ -279,7 +279,7 @@ public class DiskStateLog extends StateLog {
 			log = fr.getLogState(0, logPath);
 		int ckpLastConsensusId = fr.getCkpLastConsensusId();
 		int logLastConsensusId = fr.getLogLastConsensusId();
-		logger.info("log last consensus di: " + logLastConsensusId);
+		logger.info("log last das di: " + logLastConsensusId);
 		ApplicationState state = new DefaultApplicationState(log, ckpLastConsensusId,
 				logLastConsensusId, checkpoint, fr.getCkpStateHash(), this.id);
 		if(logLastConsensusId > ckpLastConsensusId) {

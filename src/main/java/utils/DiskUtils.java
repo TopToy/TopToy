@@ -1,17 +1,16 @@
 package utils;
-import blockchain.blockchain;
+import blockchain.BaseBlockchain;
 import org.apache.commons.io.FileUtils;
 import proto.Types;
 import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.List;
 
-public class chainCutter {
-    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(chainCutter.class);
+public class DiskUtils {
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(DiskUtils.class);
     static Path path;
-    public chainCutter(Path pathToDir) {
+    public DiskUtils(Path pathToDir) {
         path = pathToDir;
         File dir = new File(pathToDir.toString());
         try {
@@ -24,7 +23,7 @@ public class chainCutter {
         }
 
     }
-    public static void cut(blockchain bc, int start, int end) throws IOException {
+    public static void cut(BaseBlockchain bc, int start, int end) throws IOException {
         for (Types.Block b : new ArrayList<>(bc.getBlocksCopy(start, end))) {
             cutBlock(b);
             bc.setBlock(b.getHeader().getHeight(), Types.Block.newBuilder()
@@ -35,7 +34,7 @@ public class chainCutter {
     }
 
     static void cutBlock(Types.Block b) throws IOException {
-//        logger.info("Write block " + String.valueOf(b.getHeader().getHeight()));
+//        logger.info("Write BaseBlock " + String.valueOf(b.getHeader().getHeight()));
         Path blockFile = Paths.get(path.toString(), String.valueOf(b.getHeader().getHeight()));
         File f = new File(blockFile.toString());
         f.createNewFile();

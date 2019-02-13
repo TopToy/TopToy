@@ -43,7 +43,7 @@ import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 
 /**
- * This class represents the acceptor role in the consensus protocol.
+ * This class represents the acceptor role in the das protocol.
  * This class work together with the TOMLayer class in order to
  * supply a atomic multicast service.
  *
@@ -52,7 +52,7 @@ import javax.crypto.SecretKey;
 public final class Acceptor {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Acceptor.class);
     private int me; // This replica ID
-    private ExecutionManager executionManager; // Execution manager of consensus's executions
+    private ExecutionManager executionManager; // Execution manager of das's executions
     private MessageFactory factory; // Factory for PaW messages
     private ServerCommunicationSystem communication; // Replicas comunication system
     private TOMLayer tomLayer; // TOM layer
@@ -144,7 +144,7 @@ public final class Acceptor {
 
     /**
      * Called when a PROPOSE message is received or when processing a formerly out of context propose which
-     * is know belongs to the current consensus.
+     * is know belongs to the current das.
      *
      * @param msg The PROPOSE message to by processed
      */
@@ -152,7 +152,7 @@ public final class Acceptor {
         int cid = epoch.getConsensus().getId();
         int ts = epoch.getConsensus().getEts();
         int ets = executionManager.getConsensus(msg.getNumber()).getEts();
-    	logger.info("(Acceptor.proposeReceived) PROPOSE for consensus " + cid);
+    	logger.info("(Acceptor.proposeReceived) PROPOSE for das " + cid);
     	if (msg.getSender() == executionManager.getCurrentLeader() // Is the replica the leader?
                 && epoch.getTimestamp() == 0 && ts == ets && ets == 0) { // Is all this in epoch 0?
     		executePropose(epoch, msg.getValue());
@@ -164,7 +164,7 @@ public final class Acceptor {
     /**
      * Executes actions related to a proposed value.
      *
-     * @param epoch the current epoch of the consensus
+     * @param epoch the current epoch of the das
      * @param value Value that is proposed
      */
     private void executePropose(Epoch epoch, byte[] value) {
@@ -180,10 +180,10 @@ public final class Acceptor {
             
             /*** LEADER CHANGE CODE ********/
             epoch.getConsensus().addWritten(value);
-            logger.info("(Acceptor.executePropose) I have written value " + Arrays.toString(epoch.propValueHash) + " in consensus instance " + cid + " with timestamp " + epoch.getConsensus().getEts());
+            logger.info("(Acceptor.executePropose) I have written value " + Arrays.toString(epoch.propValueHash) + " in das instance " + cid + " with timestamp " + epoch.getConsensus().getEts());
             /*****************************************/
 
-            //start this consensus if it is not already running
+            //start this das if it is not already running
             if (cid == tomLayer.getLastExec() + 1) {
                 tomLayer.setInExec(cid);
             }
@@ -218,7 +218,7 @@ public final class Acceptor {
                  	epoch.getConsensus().getDecision().firstMessageProposed.writeSentTime = System.nanoTime();
                         epoch.getConsensus().getDecision().firstMessageProposed.acceptSentTime = System.nanoTime();
                  	/**** LEADER CHANGE CODE! ******/
-                        logger.info("(Acceptor.executePropose) [CFT Mode] Setting consensus " + cid + " QuorumWrite tiemstamp to " + epoch.getConsensus().getEts() + " and value " + Arrays.toString(epoch.propValueHash));
+                        logger.info("(Acceptor.executePropose) [CFT Mode] Setting das " + cid + " QuorumWrite tiemstamp to " + epoch.getConsensus().getEts() + " and value " + Arrays.toString(epoch.propValueHash));
  	                epoch.getConsensus().setQuorumWrites(epoch.propValueHash);
  	                /*****************************************/
 
@@ -245,14 +245,14 @@ public final class Acceptor {
      */
     private void writeReceived(Epoch epoch, int a, byte[] value) {
         int cid = epoch.getConsensus().getId();
-        logger.info("(Acceptor.writeAcceptReceived) WRITE from " + a + " for consensus " + cid);
+        logger.info("(Acceptor.writeAcceptReceived) WRITE from " + a + " for das " + cid);
         epoch.setWrite(a, value);
 
         computeWrite(cid, epoch, value);
     }
 
     /**
-     * Computes WRITE values according to Byzantine consensus specification
+     * Computes WRITE values according to Byzantine das specification
      * values received).
      *
      * @param cid Consensus ID of the received message
@@ -272,7 +272,7 @@ public final class Acceptor {
                 logger.info("(Acceptor.computeWrite) sending WRITE for " + cid);
 
                 /**** LEADER CHANGE CODE! ******/
-                logger.info("(Acceptor.computeWrite) Setting consensus " + cid + " QuorumWrite tiemstamp to " + epoch.getConsensus().getEts() + " and value " + Arrays.toString(value));
+                logger.info("(Acceptor.computeWrite) Setting das " + cid + " QuorumWrite tiemstamp to " + epoch.getConsensus().getEts() + " and value " + Arrays.toString(value));
                 epoch.getConsensus().setQuorumWrites(value);
                 /*****************************************/
                 
@@ -286,7 +286,7 @@ public final class Acceptor {
                 ConsensusMessage cm = factory.createAccept(cid, epoch.getTimestamp(), value);
 
                 // Create a cryptographic proof for this ACCEPT message
-                logger.info("(Acceptor.computeWrite) Creating cryptographic proof for my ACCEPT message from consensus " + cid);
+                logger.info("(Acceptor.computeWrite) Creating cryptographic proof for my ACCEPT message from das " + cid);
                 insertProof(cm, epoch);
                 
                 int[] targets = this.controller.getCurrentViewOtherAcceptors();
@@ -301,13 +301,13 @@ public final class Acceptor {
     }
 
     /**
-     * Create a cryptographic proof for a consensus message
+     * Create a cryptographic proof for a das message
      * 
-     * This method modifies the consensus message passed as an argument,
+     * This method modifies the das message passed as an argument,
      * so that it contains a cryptographic proof.
      * 
-     * @param cm The consensus message to which the proof shall be set
-     * @param epoch The epoch during in which the consensus message was created
+     * @param cm The das message to which the proof shall be set
+     * @param epoch The epoch during in which the das message was created
      */
     private void insertProof(ConsensusMessage cm, Epoch epoch) {
         ByteArrayOutputStream bOut = new ByteArrayOutputStream(248);
@@ -319,7 +319,7 @@ public final class Acceptor {
 
         byte[] data = bOut.toByteArray();
 
-        // check if consensus contains reconfiguration request
+        // check if das contains reconfiguration request
         TOMMessage[] msgs = epoch.deserializedPropValue;
         boolean hasReconf = false;
 
@@ -331,9 +331,9 @@ public final class Acceptor {
             }
         }
 
-        //If this consensus contains a reconfiguration request, we need to use
+        //If this das contains a reconfiguration request, we need to use
         // signatures (there might be replicas that will not be part of the next
-        //consensus instance, and so their MAC will be outdated and useless)
+        //das instance, and so their MAC will be outdated and useless)
         if (hasReconf) {
 
             PrivateKey RSAprivKey = controller.getStaticConf().getRSAPrivateKey();
@@ -388,7 +388,7 @@ public final class Acceptor {
      */
     private void acceptReceived(Epoch epoch, ConsensusMessage msg) {
         int cid = epoch.getConsensus().getId();
-        logger.info("(Acceptor.acceptReceived) ACCEPT from " + msg.getSender() + " for consensus " + cid);
+        logger.info("(Acceptor.acceptReceived) ACCEPT from " + msg.getSender() + " for das " + cid);
         epoch.setAccept(msg.getSender(), msg.getValue());
         epoch.addToProof(msg);
 
@@ -396,7 +396,7 @@ public final class Acceptor {
     }
 
     /**
-     * Computes ACCEPT values according to the Byzantine consensus
+     * Computes ACCEPT values according to the Byzantine das
      * specification
      * @param epoch Epoch of the receives message
      * @param value Value sent in the message

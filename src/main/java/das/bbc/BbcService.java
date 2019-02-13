@@ -1,4 +1,4 @@
-package consensus.bbc;
+package das.bbc;
 
 import bftsmart.communication.client.ReplyListener;
 import bftsmart.tom.AsynchServiceProxy;
@@ -8,20 +8,17 @@ import bftsmart.tom.ServiceReplica;
 import bftsmart.tom.core.messages.TOMMessage;
 import bftsmart.tom.core.messages.TOMMessageType;
 import bftsmart.tom.server.defaultservices.DefaultSingleRecoverable;
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Table;
 
 import proto.Types.*;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
 
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
 
-public class bbcService extends DefaultSingleRecoverable {
+public class BbcService extends DefaultSingleRecoverable {
     class consVote {
         int pos = 0;
         int neg = 0;
@@ -33,7 +30,7 @@ public class bbcService extends DefaultSingleRecoverable {
         BbcDecision d;
         boolean done;
     }
-    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(bbcService.class);
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(BbcService.class);
 
     private int id;
 //    final Object globalLock = new Object();
@@ -50,7 +47,7 @@ public class bbcService extends DefaultSingleRecoverable {
     private boolean stopped = false;
     private ConcurrentHashMap<Meta, fastVotePart> fastVote = new ConcurrentHashMap<>();
 
-    public bbcService(int channels, int id, int quorumSize, String configHome) {
+    public BbcService(int channels, int id, int quorumSize, String configHome) {
         this.id = id;
         rec = new ConcurrentHashMap<>();
         sr = null;
@@ -197,7 +194,7 @@ public class bbcService extends DefaultSingleRecoverable {
             });
             fastVote.computeIfPresent(key, (k, v) -> {
                 if (!v.done && msg.getM().getSender() != id) {
-                    logger.debug(format("[#%d] #1 re-participating in a consensus " +
+                    logger.debug(format("[#%d] #1 re-participating in a das " +
                             "[channel=%d ; cidSeries=%d ; cid=%d]", id, channel, cidSeries, cid));
                     propose(v.d.getDecosion(), channel, cidSeries, cid);
                     v.done = true;
@@ -207,7 +204,7 @@ public class bbcService extends DefaultSingleRecoverable {
 //                if (fastVote.containsKey(key)) return new byte[0];
 //                if (fastVote.containsKey(key) && !fastVote.get(key).done) {
 //                    if (msg.getM().getSender() != id) {
-//                        logger.debug(format("[#%d] re-participating in a consensus " +
+//                        logger.debug(format("[#%d] re-participating in a das " +
 //                                "[channel=%d ; cidSeries=%d ; cid=%d]", id, channel, cidSeries, cid));
 //                        propose(fastVote.get(key).d.getDecosion(), channel, cidSeries, cid);
 //                        fastVote.get(key).done = true;
@@ -327,7 +324,7 @@ public class bbcService extends DefaultSingleRecoverable {
                 fv.done = false;
                 rec.computeIfPresent(key, (k1, v1) -> {
 //                    fastVote.computeIfPresent(key, (k, v) ->{
-                        logger.debug(format("[#%d] #2 re-participating in a consensus " +
+                        logger.debug(format("[#%d] #2 re-participating in a das " +
                                 "[channel=%d ; cidSeries=%d ; cid=%d]", id, b.getM().getChannel(), b.getM().getCidSeries(), b.getM().getCid()));
                         propose(b.getDecosion(), b.getM().getChannel(), b.getM().getCidSeries(), b.getM().getCid());
                         fv.done = true;
@@ -339,7 +336,7 @@ public class bbcService extends DefaultSingleRecoverable {
             });
 //            rec.computeIfPresent(key, (k1, v1) -> {
 //                fastVote.computeIfPresent(key, (k, v) ->{
-//                    logger.debug(format("[#%d] #2 re-participating in a consensus " +
+//                    logger.debug(format("[#%d] #2 re-participating in a das " +
 //                            "[channel=%d ; cidSeries=%d ; cid=%d]", id, b.getM().getChannel(), b.getM().getCidSeries(), b.getM().getCid()));
 //                    propose(b.getDecosion(), b.getM().getChannel(), b.getM().getCidSeries(), b.getM().getCid());
 //                    v.done = true;
@@ -376,7 +373,7 @@ public class bbcService extends DefaultSingleRecoverable {
 //                }
                 fastVote.computeIfPresent(key, (k, v) -> {
                     if (!v.done) {
-                        logger.debug(format("[#%d] re-participating in a consensus (periodicallyVoteMissingConsensus) " +
+                        logger.debug(format("[#%d] re-participating in a das (periodicallyVoteMissingConsensus) " +
                                         "[channel=%d ; cidSeries=%d ; cid=%d]", id, key.getChannel(), key.getCidSeries()
                                 , key.getCid()));
                         propose(b.getDecosion(), key.getChannel(), key.getCidSeries(), key.getCid());

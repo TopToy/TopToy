@@ -23,7 +23,7 @@ import java.io.ObjectOutput;
 import java.util.Set;
 
 /**
- * Data about the last consensus decision
+ * Data about the last das decision
  *
  * @author Joao Sousa
  */
@@ -61,8 +61,8 @@ public class CertifiedDecision implements Externalizable {
     }
 
     /**
-     * Get consensus ID
-     * @return consensus ID
+     * Get das ID
+     * @return das ID
      */
     public int getCID() {
         return cid;

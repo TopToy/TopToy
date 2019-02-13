@@ -26,7 +26,7 @@ import java.util.Set;
 /**
  * This class represents the whole context of a request ordered in the system.
  * It stores all informations regarding the message sent by the client, as well as
- * the consensus instance in which it was ordered.
+ * the das instance in which it was ordered.
  * 
  * @author alysson
  */
@@ -53,7 +53,7 @@ public class MessageContext implements Serializable {
     private final long seed;
     private final Set<ConsensusMessage> proof;
                 
-    private final TOMMessage firstInBatch; //to be replaced by a statistics class
+    private final TOMMessage firstInBatch; //to be replaced by a Statistics class
     private boolean lastInBatch; // indicates that the command is the last in the batch. Used for logging
     private final boolean noOp;
     
@@ -195,9 +195,9 @@ public class MessageContext implements Serializable {
     }
     
     /**
-     * Returns the id of the consensus in which this message was ordered (-1
+     * Returns the id of the das in which this message was ordered (-1
      * if readonly).
-     * @return the consensus Id
+     * @return the das Id
      */
     public int getConsensusId() {
         return consensusId;
@@ -212,8 +212,8 @@ public class MessageContext implements Serializable {
         return leader;
     }
     /**
-     * Returns the proof for the consensus.
-     * @return the proof for the consensus
+     * Returns the proof for the das.
+     * @return the proof for the das
      */
     public Set<ConsensusMessage> getProof() {
         return proof;

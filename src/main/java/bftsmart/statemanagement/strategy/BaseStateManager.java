@@ -96,8 +96,8 @@ public abstract class BaseStateManager implements StateManager {
         return result;
     }
     
-    // check if the consensus messages are consistent without checking the mac/signatures
-    // if it is consistent, it returns the respective consensus ID; otherwise, returns -1
+    // check if the das messages are consistent without checking the mac/signatures
+    // if it is consistent, it returns the respective das ID; otherwise, returns -1
     private int proofIsConsistent(Set<ConsensusMessage> proof) {
         
         int id = -1;

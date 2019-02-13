@@ -76,12 +76,12 @@ public final class DeliveryThread extends Thread {
    
     /**
      * Invoked by the TOM layer, to deliver a decision
-     * @param dec Decision established from the consensus
+     * @param dec Decision established from the das
      */
     public void delivery(Decision dec) {
         if (!containsGoodReconfig(dec)) {
 
-            logger.info("(DeliveryThread.delivery) Decision from consensus " + dec.getConsensusId() + " does not contain good reconfiguration");
+            logger.info("(DeliveryThread.delivery) Decision from das " + dec.getConsensusId() + " does not contain good reconfiguration");
             //set this decision as the last one from this replica
             tomLayer.setLastExec(dec.getConsensusId());
             //define that end of this execution
@@ -145,7 +145,7 @@ public final class DeliveryThread extends Thread {
         logger.info("Setting last CID to " + lastCID);
         tomLayer.setLastExec(lastCID);
 
-        //define the last stable consensus... the stable consensus can
+        //define the last stable das... the stable das can
         //be removed from the leaderManager and the executionManager
         if (lastCID > 2) {
             int stableConsensus = lastCID - 3;
@@ -230,7 +230,7 @@ public final class DeliveryThread extends Thread {
                         if (controller.hasUpdates()) {
                             processReconfigMessages(lastDecision.getConsensusId());
 
-                            // set the consensus associated to the last decision as the last executed
+                            // set the das associated to the last decision as the last executed
                             tomLayer.setLastExec(lastDecision.getConsensusId());
                             // define that end of this execution
                             tomLayer.setInExec(-1);
@@ -238,7 +238,7 @@ public final class DeliveryThread extends Thread {
                         }
                     }
 
-                    // define the last stable consensus... the stable consensus can
+                    // define the last stable das... the stable das can
                     // be removed from the leaderManager and the executionManager
                     // TODO: Is this part necessary? If it is, can we put it
                     // inside setLastExec
@@ -286,7 +286,7 @@ public final class DeliveryThread extends Thread {
         MessageContext msgCtx = new MessageContext(request.getSender(), request.getViewID(), request.getReqType(),
                 request.getSession(), request.getSequence(), request.getOperationId(), request.getReplyServer(), request.serializedMessageSignature,
                 System.currentTimeMillis(), 0, 0, regency, -1, -1, null, null, false); // Since the request is unordered,
-                                                                                       // there is no consensus info to pass
+                                                                                       // there is no das info to pass
         
         msgCtx.readOnly = true;
         receiver.receiveReadonlyMessage(request, msgCtx);

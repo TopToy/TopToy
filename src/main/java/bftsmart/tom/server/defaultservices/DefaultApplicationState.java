@@ -106,7 +106,7 @@ public class DefaultApplicationState implements ApplicationState {
 
 
     /**
-     * Retrieves the consensus ID for the last messages batch delivered to the application
+     * Retrieves the das ID for the last messages batch delivered to the application
      * @return Consensus ID for the last messages batch delivered to the application
      */
     @Override
@@ -115,19 +115,19 @@ public class DefaultApplicationState implements ApplicationState {
     }
     
     /**
-     * Retrieves the certified decision for the last consensus present in this object
+     * Retrieves the certified decision for the last das present in this object
      * @param controller
-     * @return The certified decision for the last consensus present in this object
+     * @return The certified decision for the last das present in this object
      */
     @Override
     public CertifiedDecision getCertifiedDecision(ServerViewController controller) {
         CommandsInfo ci = getMessageBatch(getLastCID());
-        if (ci != null && ci.msgCtx[0].getProof() != null) { // do I have a proof for the consensus?
+        if (ci != null && ci.msgCtx[0].getProof() != null) { // do I have a proof for the das?
             
             Set<ConsensusMessage> proof = ci.msgCtx[0].getProof();
             LinkedList<TOMMessage> requests = new LinkedList<>();
             
-            //Recreate all TOMMessages ordered in the consensus
+            //Recreate all TOMMessages ordered in the das
             for (int i = 0; i < ci.commands.length; i++) {
                 
                 requests.add(ci.msgCtx[i].recreateTOMMessage(ci.commands[i]));
@@ -142,7 +142,7 @@ public class DefaultApplicationState implements ApplicationState {
             //Assemble and return the certified decision
             return new CertifiedDecision(pid, getLastCID(), value, proof);
         }
-        else return null; // there was no proof for the consensus
+        else return null; // there was no proof for the das
     }
 
     /**
@@ -185,7 +185,7 @@ public class DefaultApplicationState implements ApplicationState {
     /**
      * Retrieves the specified batch of messages
      * @param cid Consensus ID associated with the batch to be fetched
-     * @return The batch of messages associated with the batch correspondent consensus ID
+     * @return The batch of messages associated with the batch correspondent das ID
      */
     public CommandsInfo getMessageBatch(int cid) {
         if (messageBatches != null && cid >= lastCheckpointCID && cid <= lastCID) {
@@ -195,7 +195,7 @@ public class DefaultApplicationState implements ApplicationState {
     }
 
     /**
-     * Retrieves the consensus ID for the last checkpoint
+     * Retrieves the das ID for the last checkpoint
      * @return Consensus ID for the last checkpoint, or -1 if no checkpoint was yet executed
      */
     public int getLastCheckpointCID() {

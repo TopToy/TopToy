@@ -54,7 +54,7 @@ public class ShutdownHookThread extends Thread {
         buffer.append("\nCurrent leader: " + tomLayer.execManager.getCurrentLeader());
         buffer.append("\nCurrent regency: " + tomLayer.getSynchronizer().getLCManager().getLastReg());
 
-        buffer.append("\n\nLast finished consensus: " + (lastCons == -1 ? "None" : lastCons));
+        buffer.append("\n\nLast finished das: " + (lastCons == -1 ? "None" : lastCons));
         if(lastCons > -1) {
             
             c = tomLayer.execManager.getConsensus(lastCons);

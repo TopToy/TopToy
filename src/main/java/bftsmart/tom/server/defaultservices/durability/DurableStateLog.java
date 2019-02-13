@@ -83,7 +83,7 @@ public class DurableStateLog extends StateLog {
 	 * kept
          * @param commands The batch of messages to be kept.
          * @param msgCtx
-         * @param consensusId the consensus id added to the batch
+         * @param consensusId the das id added to the batch
 	 */
         @Override
 	public void addMessageBatch(byte[][] commands, MessageContext[] msgCtx, int consensusId) {
@@ -116,7 +116,7 @@ public class DurableStateLog extends StateLog {
 			log.seek(log.length() - 2 * INT_BYTE_SIZE);// Next write will overwrite
 													// the EOF mark
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			// TODO Auto-generated catch BaseBlock
 			logger.error("", e);
 	    }
 	}
@@ -152,10 +152,10 @@ public class DurableStateLog extends StateLog {
 				createLogFile();
 			
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
+			// TODO Auto-generated catch BaseBlock
 			logger.error("", e);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			// TODO Auto-generated catch BaseBlock
 			logger.error("", e);
 		} finally {
 			checkpointLock.unlock();

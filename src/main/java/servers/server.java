@@ -15,6 +15,6 @@ public interface server {
     Types.Block nonBlockingDeliver(int index);
     void setByzSetting(boolean fullByz, List<List<Integer>> groups);
     void setAsyncParam(int tiem);
-    statistics getStatistics();
+    Statistics getStatistics();
 
 }

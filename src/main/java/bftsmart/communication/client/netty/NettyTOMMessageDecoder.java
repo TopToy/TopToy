@@ -45,7 +45,7 @@ import bftsmart.tom.core.messages.TOMMessage;
 public class NettyTOMMessageDecoder extends ByteToMessageDecoder {
     private final static Logger logger = Logger.getLogger(NettyTOMMessageDecoder.class);
     /**
-     * number of measures used to calculate statistics
+     * number of measures used to calculate Statistics
      */
     //private final int BENCHMARK_PERIOD = 10000;
     private boolean isClient;

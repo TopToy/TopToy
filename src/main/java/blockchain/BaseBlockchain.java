@@ -5,29 +5,28 @@ import crypto.DigestMethod;
 import proto.Types.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
-public abstract class blockchain {
-    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(blockchain.class);
+public abstract class BaseBlockchain {
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(BaseBlockchain.class);
     private final List<Block> blocks = new ArrayList<>();
     private final int creatorID;
 
-    public blockchain(int creatorID, int channel) {
+    public BaseBlockchain(int creatorID, int channel) {
         this.creatorID = creatorID;
         createGenesis(channel);
     }
 
-    public blockchain(blockchain orig, int start, int end) {
+    public BaseBlockchain(BaseBlockchain orig, int start, int end) {
         this.creatorID = orig.creatorID;
         this.blocks.addAll(orig.getBlocks(start, end));
     }
 
-    public abstract block createNewBLock();
+    public abstract BaseBlock createNewBLock();
 
     abstract void createGenesis(int channel);
 
@@ -48,7 +47,7 @@ public abstract class blockchain {
         map(bl -> bl.getHeader().getM().getSender()).
         collect(Collectors.toList()).
         contains(b.getHeader().getM().getSender())) {
-            logger.debug(format("[#%d] invalid block", creatorID));
+            logger.debug(format("[#%d] invalid BaseBlock", creatorID));
             return false;
         }
         return true;

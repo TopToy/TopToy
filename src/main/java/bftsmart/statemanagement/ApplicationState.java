@@ -33,15 +33,15 @@ import java.io.Serializable;
 public interface ApplicationState extends Serializable {
 
     /**
-     * The consensus of the last batch of commands which the application was given
-     * @return consensus of the last batch of commands which the application was given
+     * The das of the last batch of commands which the application was given
+     * @return das of the last batch of commands which the application was given
      */
     public int getLastCID();
     
     /**
-     * Retrieves the certified decision for the last consensus present in this object
+     * Retrieves the certified decision for the last das present in this object
      * @param controller
-     * @return The certified decision for the last consensus present in this object
+     * @return The certified decision for the last das present in this object
      */
     public CertifiedDecision getCertifiedDecision(ServerViewController controller);
 

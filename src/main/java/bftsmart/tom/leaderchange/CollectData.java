@@ -24,15 +24,15 @@ import java.util.HashSet;
 import bftsmart.consensus.TimestampValuePair;
 
 /**
- * This class represents a COLLECT object with the information about the running consensus
+ * This class represents a COLLECT object with the information about the running das
  *
  * @author Joao Sousa
  */
 public class CollectData implements Externalizable {
 
     private int pid; // process id
-    private int cid; // consensus id
-    private int ets; // consensus ETS
+    private int cid; // das id
+    private int ets; // das ETS
     private TimestampValuePair quorumWrites; // last value recevied from a Byzantine quorum of WRITEs
     private HashSet<TimestampValuePair> writeSet; // values written by the replica
     
@@ -66,16 +66,16 @@ public class CollectData implements Externalizable {
     }
 
     /**
-     * Get consensus id
-     * @return consensus id
+     * Get das id
+     * @return das id
      */
     public int getCid() {
         return cid;
     }
 
     /**
-     * Get consensus ETS
-     * @return consensus ETS
+     * Get das ETS
+     * @return das ETS
      */
     public int getEts() {
         return ets;

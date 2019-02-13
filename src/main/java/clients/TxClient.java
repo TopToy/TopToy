@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 import static java.lang.String.format;
 
-public class txClient {
+public class TxClient {
     blockchainServiceGrpc.blockchainServiceBlockingStub stub;
     ManagedChannel channel;
     int clientID;
@@ -20,7 +20,7 @@ public class txClient {
     long startTime;
     double txPs;
 
-    public txClient(int clientID, String addr, int port) {
+    public TxClient(int clientID, String addr, int port) {
         this.clientID = clientID;
         channel = ManagedChannelBuilder.forAddress(addr, port).usePlaintext().build();
         stub = blockchainServiceGrpc.newBlockingStub(channel);

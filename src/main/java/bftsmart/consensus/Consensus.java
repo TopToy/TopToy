@@ -28,19 +28,19 @@ import bftsmart.tom.util.Logger;
 
 
 /**
- * This class stands for a consensus instance that implements the algorithm
+ * This class stands for a das instance that implements the algorithm
  * for the Byzantine fault model described in Cachin's 'Yet Another Visit to Paxos' (April 2011)
  */
 public class Consensus {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Consensus.class);
-    private ExecutionManager manager; // Execution manager for this replica's consensus instances
+    private ExecutionManager manager; // Execution manager for this replica's das instances
 
-    private Decision decision; // Decision instance to which this consensus works for
+    private Decision decision; // Decision instance to which this das works for
     private HashMap<Integer,Epoch> epochs = new HashMap<Integer,Epoch>(2);
     private ReentrantLock epochsLock = new ReentrantLock(); // Lock for concurrency control
-    private ReentrantLock writeSetLock = new ReentrantLock(); //lock for this consensus write set
+    private ReentrantLock writeSetLock = new ReentrantLock(); //lock for this das write set
 
-    private boolean decided; // Is this consensus decided?
+    private boolean decided; // Is this das decided?
     private int decisionEpoch = -1; // epoch at which a decision was made
 
     //NEW ATTRIBUTES FOR THE LEADER CHANGE
@@ -48,7 +48,7 @@ public class Consensus {
     private TimestampValuePair quorumWrites = null;
     private HashSet<TimestampValuePair> writeSet = new HashSet<TimestampValuePair>();
 
-    public ReentrantLock lock = new ReentrantLock(); //this consensus lock (called by other classes)
+    public ReentrantLock lock = new ReentrantLock(); //this das lock (called by other classes)
     
     /**
      * Creates a new instance of Consensus
@@ -56,10 +56,10 @@ public class Consensus {
      * Important: At this point, the 'decision' parameter is only a placeholder
      * for the future decision, and should not be delivered to the delivery thread.
      * 
-     * Use 'isDecided()' to check if the consensus already decided a value.
+     * Use 'isDecided()' to check if the das already decided a value.
      * 
-     * @param manager Execution manager for this replica's consensus instances
-     * @param decision Decision instance to which this consensus works for.
+     * @param manager Execution manager for this replica's das instances
+     * @param decision Decision instance to which this das works for.
      */
     public Consensus(ExecutionManager manager, Decision decision) {
         this.manager = manager;
@@ -67,7 +67,7 @@ public class Consensus {
     }
 
     /**
-     * This is the consensus ID
+     * This is the das ID
      * @return Consensus ID
      */
     public int getId() {
@@ -75,7 +75,7 @@ public class Consensus {
     }
 
     /**
-     * This is the execution manager for this replica's consensus instances
+     * This is the execution manager for this replica's das instances
      * @return Execution manager for this replica
      */
     public ExecutionManager getManager() {
@@ -83,20 +83,20 @@ public class Consensus {
     }
 
     /**
-     * This is the decision instance to which this consensus works for
+     * This is the decision instance to which this das works for
      * 
      * Important: The returned object should only be sent to the delivery thread
-     * after this consensus instance decides a value. Use 'isDecided()' to check if
-     * the consensus already decided a value.
+     * after this das instance decides a value. Use 'isDecided()' to check if
+     * the das already decided a value.
      * 
-     * @return Decision instance to which this consensus works for
+     * @return Decision instance to which this das works for
      */
     public Decision getDecision() {
         return decision;
     }
 
     /**
-     * Gets a epoch associated with this consensus
+     * Gets a epoch associated with this das
      * @param timestamp The timestamp of the epoch
      * @param controller The view controller for the replicas
      * @return The epoch
@@ -106,7 +106,7 @@ public class Consensus {
     }
 
     /**
-     * Gets a epoch associated with this consensus
+     * Gets a epoch associated with this das
      * @param timestamp The number of the epoch
      * @param create if the epoch is to be created if not existent
      * @param controller The view controller for the replicas
@@ -127,7 +127,7 @@ public class Consensus {
     }
     
     /**
-     * Increments the ETS of this consensus, thus advancing 
+     * Increments the ETS of this das, thus advancing
      * to the next epoch
      */
     public void incEts() {
@@ -135,10 +135,10 @@ public class Consensus {
     }
     
     /**
-     * Increments the ETS of this consensus, thus advancing 
+     * Increments the ETS of this das, thus advancing
      * to the next epoch
      * 
-     * @param ets New ETS for this consensus, to advance
+     * @param ets New ETS for this das, to advance
      * to the next epoch. It must be greater than the current ETS
      */
     public void setETS(int ets) {
@@ -205,7 +205,7 @@ public class Consensus {
         return (HashSet<TimestampValuePair>) writeSet.clone(); 
     }
     /**
-     * Creates an epoch associated with this consensus, with the specified timestamp
+     * Creates an epoch associated with this das, with the specified timestamp
      * @param timestamp The timestamp to associated to this epoch
      * @param recManager The replica's ServerViewController
      * @return The epoch
@@ -221,7 +221,7 @@ public class Consensus {
         return epoch;
     }
     /**
-     * Creates a epoch associated with this consensus, supposedly the next
+     * Creates a epoch associated with this das, supposedly the next
      * @param recManager The replica's ServerViewController
      * @return The epoch
      */
@@ -245,7 +245,7 @@ public class Consensus {
     }
 
     /**
-     * Removes epochs greater than 'limit' from this consensus instance
+     * Removes epochs greater than 'limit' from this das instance
      *
      * @param limit Epochs that should be kept (from 0 to 'limit')
      */
@@ -275,9 +275,9 @@ public class Consensus {
     }
 
     /**
-     * The last epoch of this consensus instance
+     * The last epoch of this das instance
      *
-     * @return Last epoch of this consensus instance
+     * @return Last epoch of this das instance
      */
     public Epoch getLastEpoch() {
         epochsLock.lock();
@@ -292,7 +292,7 @@ public class Consensus {
     }
 
     /**
-     * Informs whether or not the consensus instance has decided a value
+     * Informs whether or not the das instance has decided a value
      *
      * @return True if it is decided, false otherwise
      */
@@ -312,7 +312,7 @@ public class Consensus {
             decisionEpoch = epoch.getTimestamp();
             decision.setDecisionEpoch(epoch);
             if (deliver) {
-                logger.info("(Consensus.decided) Delivering decision from consensus " + getId() + " to the TOMLayer/DeliveryThread");
+                logger.info("(Consensus.decided) Delivering decision from das " + getId() + " to the TOMLayer/DeliveryThread");
                 manager.getTOMLayer().decided(decision);
             }
         }

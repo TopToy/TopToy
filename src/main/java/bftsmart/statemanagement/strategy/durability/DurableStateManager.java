@@ -221,13 +221,13 @@ public class DurableStateManager extends BaseStateManager {
 							clientSocket.getInputStream());
 					stateReceived = (ApplicationState) in.readObject();
 				} catch (UnknownHostException e) {
-					// TODO Auto-generated catch block
+					// TODO Auto-generated catch BaseBlock
 					logger.error("", e);
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
+					// TODO Auto-generated catch BaseBlock
 					logger.error("", e);
 				} catch (ClassNotFoundException e) {
-					// TODO Auto-generated catch block
+					// TODO Auto-generated catch BaseBlock
 					logger.error("", e);
 				}
 
@@ -308,7 +308,7 @@ public class DurableStateManager extends BaseStateManager {
 
 //						if (currentProof != null && !appStateOnly) {
 //
-//							logger.info("Installing proof for consensus " + waitingCID);
+//							logger.info("Installing proof for das " + waitingCID);
 //
 //							Consensus cons = execManager.getConsensus(waitingCID);
 //							Epoch e = null;
@@ -342,10 +342,10 @@ public class DurableStateManager extends BaseStateManager {
 //								e.deserializedPropValue = tomLayer.checkProposedValue(currentProof.getDecision(), false);
 //								cons.decided(e, false);
 //
-//								logger.info("Successfully installed proof for consensus " + waitingCID);
+//								logger.info("Successfully installed proof for das " + waitingCID);
 //
 //							} else {
-//								logger.info("Failed to install proof for consensus " + waitingCID);
+//								logger.info("Failed to install proof for das " + waitingCID);
 //
 //							}
 //

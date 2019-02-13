@@ -2,8 +2,8 @@ import config.Config;
 import config.Node;
 import org.apache.commons.lang.ArrayUtils;
 import org.junit.jupiter.api.Test;
-import wrb.ByzantineWrbNode;
-import wrb.WrbNode;
+import das.wrb.ByzantineWrbNode;
+import das.wrb.WrbNode;
 
 import java.io.File;
 import java.nio.file.Paths;

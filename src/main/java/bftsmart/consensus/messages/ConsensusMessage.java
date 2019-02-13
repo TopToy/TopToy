@@ -24,11 +24,11 @@ import bftsmart.communication.SystemMessage;
 
 
 /**
- * This class represents a message used in a epoch of a consensus instance.
+ * This class represents a message used in a epoch of a das instance.
  */
 public class ConsensusMessage extends SystemMessage {
 
-    private int number; //consensus ID for this message
+    private int number; //das ID for this message
     private int epoch; // Epoch to which this message belongs to
     private int paxosType; // Message type
     private byte[] value = null; // Value used when message type is PROPOSE
@@ -36,12 +36,12 @@ public class ConsensusMessage extends SystemMessage {
                               // Can be either a MAC vector or a RSA signature
 
     /**
-     * Creates a consensus message. Not used. TODO: How about making it private?
+     * Creates a das message. Not used. TODO: How about making it private?
      */
     public ConsensusMessage(){}
 
     /**
-     * Creates a consensus message. Used by the message factory to create a COLLECT or PROPOSE message
+     * Creates a das message. Used by the message factory to create a COLLECT or PROPOSE message
      * TODO: How about removing the modifier, to make it visible just within the package?
      * @param paxosType This should be MessageFactory.COLLECT or MessageFactory.PROPOSE
      * @param id Consensus's ID
@@ -63,10 +63,10 @@ public class ConsensusMessage extends SystemMessage {
 
 
     /**
-     * Creates a consensus message. Used by the message factory to create a FREEZE message
+     * Creates a das message. Used by the message factory to create a FREEZE message
      * TODO: How about removing the modifier, to make it visible just within the package?
      * @param type This should be MessageFactory.FREEZE
-     * @param id Consensus's consensus ID
+     * @param id Consensus's das ID
      * @param epoch Epoch timestamp
      * @param from This should be this process ID
      */
@@ -178,7 +178,7 @@ public class ConsensusMessage extends SystemMessage {
     }
 
     /**
-     * Returns the consensus ID of this message
+     * Returns the das ID of this message
      * @return Consensus ID of this message
      */
     public int getNumber() {

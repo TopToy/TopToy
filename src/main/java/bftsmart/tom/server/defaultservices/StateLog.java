@@ -79,7 +79,7 @@ public class StateLog {
     }
     
     /**
-     * Sets the state associated with the last checkpoint, and updates the consensus ID associated with it
+     * Sets the state associated with the last checkpoint, and updates the das ID associated with it
      * @param state State associated with the last checkpoint
      * @param stateHash
      * @param lastConsensusId
@@ -98,7 +98,7 @@ public class StateLog {
     }
 
     /**
-     * Sets the consensus ID for the last checkpoint
+     * Sets the das ID for the last checkpoint
      * @param lastCheckpointCID Consensus ID for the last checkpoint
      */
     public void setLastCheckpointCID(int lastCheckpointCID) {
@@ -106,7 +106,7 @@ public class StateLog {
     }
 
     /**
-     * Retrieves the consensus ID for the last checkpoint
+     * Retrieves the das ID for the last checkpoint
      * @return Consensus ID for the last checkpoint, or -1 if none was obtained
      */
     public int getLastCheckpointCID() {
@@ -115,8 +115,8 @@ public class StateLog {
     }
 
     /**
-     * Sets the consensus ID for the last messages batch delivered to the application
-     * @param lastCID the consensus ID for the last messages batch delivered to the application
+     * Sets the das ID for the last messages batch delivered to the application
+     * @param lastCID the das ID for the last messages batch delivered to the application
      */
     public void setLastCID(int lastCID) {
 
@@ -124,7 +124,7 @@ public class StateLog {
     }
 
     /**
-     * Retrieves the consensus ID for the last messages batch delivered to the application
+     * Retrieves the das ID for the last messages batch delivered to the application
      * @return Consensus ID for the last messages batch delivered to the application
      */
     public int getLastCID() {
@@ -164,9 +164,9 @@ public class StateLog {
     }
 
     /**
-     * Returns a batch of messages, given its correspondent consensus ID
+     * Returns a batch of messages, given its correspondent das ID
      * @param cid Consensus ID associated with the batch to be fetched
-     * @return The batch of messages associated with the batch correspondent consensus ID
+     * @return The batch of messages associated with the batch correspondent das ID
      */
     public CommandsInfo getMessageBatch(int cid) {
         if (cid > lastCheckpointCID && cid <= lastCID) {
