@@ -51,6 +51,27 @@ echo \
             >> ${5}
 }
 
+compose_byz_server() {
+local id=${1}
+local image=${2}
+local conf=${3}
+local out=${4}
+echo \
+"   TS${id}:
+        image: ${image}
+        container_name: TS_${id}
+        environment:
+        - ID=${id}
+        - Type=b
+        volumes:
+        - ${out}:/tmp/JToy
+        - ${conf}:/JToy/bin/src/main/resources
+        networks:
+            toy_net:
+                ipv4_address: 172.18.0.$((${id} + 3))" \
+            >> ${5}
+}
+
 compose_async_server() {
 local id=${1}
 local image=${2}
@@ -104,6 +125,19 @@ compose_benign_network() {
 
 }
 
+compose_byz_network() {
+    containers_n=$((${C} - 1))
+    for i in `seq 0 ${containers_n}`; do
+        if ((i < ${F})); then
+            compose_byz_server $i ${docker_image} ${byzdest} ${docker_out} ${compose_file_byz}
+        else
+            compose_correct_server $i ${docker_image} ${cdest} ${docker_out} ${compose_file_byz}
+        fi
+    done
+
+}
+
+
 compose_async_dockers() {
     containers_n=$((${C} - 1))
     for i in `seq 0 ${containers_n}`; do
@@ -130,6 +164,13 @@ main_async(){
     compose_footer ${compose_file_async}
 }
 
+main_byz(){
+    compose_header ${compose_file_byz}
+    compose_byz_network
+    compose_footer ${compose_file_byz}
+}
+
 main_correct
 main_benign_failures
 main_async
+main_byz

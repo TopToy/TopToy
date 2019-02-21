@@ -11,6 +11,7 @@ public class Statistics {
     public int eb;
     public int all = 0;
     public int deliveredTime = 0;
+    public int syncEvents = 0;
 
     public Statistics() {
         txCount = 0;

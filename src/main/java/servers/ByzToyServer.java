@@ -12,6 +12,7 @@ import proto.Types.*;
 import das.wrb.ByzantineWrbNode;
 import das.wrb.WrbNode;
 
+import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.*;
 
@@ -71,7 +72,7 @@ public class ByzToyServer extends ToyBaseServer {
         if (currLeader != getID()) {
             return null;
         }
-    logger.debug(format("[#%d] prepare to disseminate a new BaseBlock of [height=%d]", getID(), currHeight));
+    logger.debug(format("[#%d] prepare to disseminate a new block of [height=%d]", getID(), currHeight));
 
     //        synchronized (blockLock) {
         addTransactionsToCurrBlock();
@@ -105,7 +106,16 @@ public class ByzToyServer extends ToyBaseServer {
 
     @Override
     public BaseBlockchain getBC(int start, int end) {
-        return new SBlockchain(this.bc, start, end);
+        try {
+            return new SBlockchain(this.bc, start, end);
+        } catch (IOException e) {
+            logger.error("Unable to return the blockchain", e);
+            return null;
+        }
+    }
+    @Override
+    public BaseBlockchain getEmptyBC() {
+        return new SBlockchain(getID());
     }
 
 //    public void setFullByz() {

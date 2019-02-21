@@ -256,3 +256,4 @@ main(){
 main ${cdest}
 main ${fbdest}
 main ${asdest}
+main ${byzdest}

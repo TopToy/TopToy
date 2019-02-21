@@ -8,6 +8,7 @@ import das.RBroadcast.RBrodcastService;
 import proto.Types.*;
 import das.wrb.WrbNode;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import static java.lang.String.format;
@@ -41,7 +42,7 @@ public class ToyServer extends ToyBaseServer {
         if (currLeader != getID()) {
             return null;
         }
-        logger.debug(format("[#%d -C[%d]] prepare to disseminate a new BaseBlock of [height=%d] [cidSeries=%d ; cid=%d]",
+        logger.debug(format("[#%d -C[%d]] prepare to disseminate a new block of [height=%d] [cidSeries=%d ; cid=%d]",
                 getID(), channel, currHeight, cidSeries, cid));
         addTransactionsToCurrBlock();
         Block sealedBlock = currBlock.construct(getID(), currHeight, cidSeries, cid, channel, bc.getBlock(currHeight - 1).getHeader());
@@ -66,6 +67,16 @@ public class ToyServer extends ToyBaseServer {
 
     @Override
     public BaseBlockchain getBC(int start, int end) {
-        return new SBlockchain(this.bc, start, end);
+        try {
+            return new SBlockchain(this.bc, start, end);
+        } catch (IOException e) {
+            logger.error("Unable to return the blockchain", e);
+            return null;
+        }
+    }
+
+    @Override
+    public BaseBlockchain getEmptyBC() {
+        return new SBlockchain(this.getID());
     }
 }

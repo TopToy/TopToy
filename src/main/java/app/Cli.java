@@ -1,4 +1,5 @@
 package app;
+import blockchain.BaseBlockchain;
 import com.google.common.primitives.Longs;
 import com.google.protobuf.ByteString;
 import config.Config;
@@ -144,6 +145,7 @@ public class Cli {
 //                        return;
 //                    }
                     setByzSetting(args);
+                    return;
                 }
 
                 if (args[0].equals("res")) {
@@ -384,6 +386,16 @@ public class Cli {
             }
         }
 
+        boolean validateBC() {
+            for (int i = 1 ; i < JToy.s.getBCSize() ; i++) {
+                if (!BaseBlockchain.validateBlockHash(JToy.s.nonBlockingDeliver(i - 1),
+                        JToy.s.nonBlockingDeliver(i))) {
+                    System.out.println(String.format("Invalid Blockchain!! [%d -> %d]", i-1, i));
+                    return false;
+                }
+            }
+            return true;
+        }
         void writeSummery(String pathString) {
             long avgWt = 0;
             int newTxCount = 0;
@@ -419,13 +431,13 @@ public class Cli {
                 double eRate = ((double)st.eb) / ((double) st.all);
                 double dRate = ((double)st.deliveredTime) / ((double) st.all);
                 DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy-HH:mm:ss");
-                List<String> row = Arrays.asList(dateFormat.format(new Date()), String.valueOf(JToy.s.getID()),
+                List<String> row = Arrays.asList(String.valueOf(validateBC()), dateFormat.format(new Date()), String.valueOf(JToy.s.getID()),
                         JToy.type, String.valueOf(Config.getC()), String.valueOf(Config.getTMO()), String.valueOf(Config.getFastMode()),
                         String.valueOf(st.txSize), String.valueOf(Config.getMaxTransactionsInBlock()),
                         String.valueOf(st.txCount), String.valueOf(time), String.valueOf(thrp),
 //                        String.valueOf(st.totalDec), String.valueOf(st.optemisticDec), String.valueOf(opRate),
                         String.valueOf(nob), String.valueOf(avgTxInBlock),String.valueOf(delaysAvgMs), String.valueOf(opRate),
-                        String.valueOf(eRate), String.valueOf(dRate));
+                        String.valueOf(eRate), String.valueOf(dRate), String.valueOf(st.syncEvents));
                 CSVUtils.writeLine(writer, row);
                 writer.flush();
                 writer.close();

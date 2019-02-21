@@ -256,7 +256,7 @@ run_servers_tmo() {
 # ${4} - channel interval
 # ${5} - test time
 # ${6} - output directory
-# ${7} - transactions in BaseBlock
+# ${7} - transactions in block
 run_clients_instance() {
     local currOut=${6}
     for i in `seq ${2} ${4} ${3}`; do
@@ -333,7 +333,7 @@ collect_res_from_servers() {
 
 # ${1} - output directory
 # ${2} - channels
-# ${3} - transaction in BaseBlock
+# ${3} - transaction in block
 collect_res_from_clients() {
     local currOut=${1}
     local channels=${2}
@@ -356,7 +356,7 @@ collect_res_from_clients() {
 }
 
 # ${1} - transaction size
-# ${2} - max transactions in BaseBlock
+# ${2} - max transactions in block
 # ${3} - tmo
 # ${4} - channels
 # ${5} - output directory
@@ -385,7 +385,7 @@ run_async_test() {
 }
 
 # ${1} - transaction size
-# ${2} - transactions in BaseBlock
+# ${2} - transactions in block
 # ${3} - channel to start with
 # ${4} - max channel
 # ${5} - channel interval
@@ -413,7 +413,7 @@ run_latency_test() {
 }
 
 # ${1} - transaction size
-# ${2} - max transactions in BaseBlock
+# ${2} - max transactions in block
 # ${3} - tmo
 # ${4} - channels
 # ${5} - output directory
@@ -438,7 +438,7 @@ run_bengin_test() {
 
 
 # ${1} - transaction size
-# ${2} - max transactions in BaseBlock
+# ${2} - max transactions in block
 # ${3} - tmo
 # ${4} - channels
 # ${5} - output directory
@@ -462,7 +462,7 @@ run_byz_test() {
 }
 
 # ${1} - transaction size
-# ${2} - transactions in BaseBlock
+# ${2} - transactions in block
 # ${3} - channel to start with
 # ${4} - max channel
 # ${5} - channel interval
@@ -487,7 +487,7 @@ run_no_failures_test() {
 }
 
 # ${1} - transaction size
-# ${2} - transactions in BaseBlock
+# ${2} - transactions in block
 # ${3} - channels
 # ${4} - tmo to start with
 # ${5} - max tmo
@@ -501,11 +501,11 @@ run_tmo_test() {
         configure_servers 60
         install_server ${i}
     done
-    echo "setting [[txSize:${1}] [tx/BaseBlock:${2}] [channels:${3}]]"
+    echo "setting [[txSize:${1}] [tx/block:${2}] [channels:${3}]]"
     run_servers_tmo  ${4} ${5} ${6} ${7}
 }
 # ${1} - transaction size
-# ${2} - transactions in BaseBlock
+# ${2} - transactions in block
 # ${3} - workers to start with
 # ${4} - max worker
 # ${5} - worker interval
@@ -554,7 +554,7 @@ create_output_dir_server() {
 
 
 # ${1} - transaction size
-# ${2} - transactions in BaseBlock
+# ${2} - transactions in block
 # ${3} - channel to start with
 # ${4} - max channel
 # ${5} - channel interval
@@ -565,7 +565,7 @@ main_latency() {
 }
 
 # ${1} - transaction size
-# ${2} - transactions in BaseBlock
+# ${2} - transactions in block
 # ${3} - channel to start with
 # ${4} - max channel
 # ${5} - channel interval
@@ -576,7 +576,7 @@ main_no_failures() {
 }
 
 # ${1} - transaction size
-# ${2} - transactions in BaseBlock
+# ${2} - transactions in block
 # ${3} - channels
 # ${4} - tmo to start with
 # ${5} - max tmo
@@ -587,7 +587,7 @@ main_run_tmo_tunning() {
 }
 
 # ${1} - transaction size
-# ${2} - transactions in BaseBlock
+# ${2} - transactions in block
 # ${3} - workers to start with
 # ${4} - max worker
 # ${5} - worker interval
@@ -599,7 +599,7 @@ main_run_sig_test() {
 
 
 # ${1} - transaction size
-# ${2} - max transactions in BaseBlock
+# ${2} - max transactions in block
 # ${3} - tmo
 # ${4} - channels
 # ${5} - f
@@ -616,7 +616,7 @@ main_bengin() {
 }
 
 # ${1} - transaction size
-# ${2} - transactions in BaseBlock
+# ${2} - transactions in block
 # ${3} - tmo
 # ${4} - channels
 # ${5} - before
@@ -636,7 +636,7 @@ main_async() {
 }
 
 # ${1} - transaction size
-# ${2} - max transactions in BaseBlock
+# ${2} - max transactions in block
 # ${3} - tmo
 # ${4} - channels
 # ${5} - f
@@ -778,7 +778,7 @@ done
 #done
 
 # ${1} - transaction size
-# ${2} - transactions in BaseBlock
+# ${2} - transactions in block
 # ${3} - channel to start with
 # ${4} - max channel
 # ${5} - channel interval

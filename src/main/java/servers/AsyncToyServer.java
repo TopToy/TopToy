@@ -7,6 +7,7 @@ import das.RBroadcast.RBrodcastService;
 import proto.Types;
 import das.wrb.WrbNode;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -51,7 +52,7 @@ public class AsyncToyServer extends ToyBaseServer {
         if (currLeader != getID()) {
             return null;
         }
-        logger.debug(format("[#%d] prepare to disseminate a new BaseBlock of [height=%d] [cidSeries=%d ; cid=%d]",
+        logger.debug(format("[#%d] prepare to disseminate a new block of [height=%d] [cidSeries=%d ; cid=%d]",
                 getID(), currHeight, cidSeries, cid));
         addTransactionsToCurrBlock();
         Types.Block sealedBlock = currBlock.construct(getID(), currHeight, cidSeries, cid, channel, bc.getBlock(currHeight - 1).getHeader());
@@ -80,6 +81,16 @@ public class AsyncToyServer extends ToyBaseServer {
 
     @Override
     public BaseBlockchain getBC(int start, int end) {
-        return new SBlockchain(this.bc, start, end);
+        try {
+            return new SBlockchain(this.bc, start, end);
+        } catch (IOException e) {
+            logger.error("Unable to return the blockchain", e);
+            return null;
+        }
+    }
+
+    @Override
+    public BaseBlockchain getEmptyBC() {
+        return new SBlockchain(getID());
     }
 }

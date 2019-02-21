@@ -11,10 +11,12 @@ docker_image=toy:0.1
 cdest=/home/yoni/Desktop/dtoy/configurations/correct
 fbdest=/home/yoni/Desktop/dtoy/configurations/fbenign
 asdest=/home/yoni/Desktop/dtoy/configurations/async
+byzdest=/home/yoni/Desktop/dtoy/configurations/byz
 
 compose_file_correct=${BASE_DIR}/composed/docker-compose-correct.yml
 compose_file_benign_failures=${BASE_DIR}/composed/docker-compose-benign-failures.yml
 compose_file_async=${BASE_DIR}/composed/docker-compose-async.yml
+compose_file_byz=${BASE_DIR}/composed/docker-compose-byz.yml
 
 docker_out=/home/yoni/Desktop/dtoy/curr/
 output=/home/yoni/Desktop/dtoy/out

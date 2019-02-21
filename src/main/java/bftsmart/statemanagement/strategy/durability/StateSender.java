@@ -46,7 +46,7 @@ public class StateSender implements Runnable {
 			oos.close();
 			socket.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch BaseBlock
+			// TODO Auto-generated catch block
 			logger.error("", e);
 		}
 	}

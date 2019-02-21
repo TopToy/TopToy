@@ -57,6 +57,9 @@ public class Top implements server {
             deliverFromGroup();
         } catch (InterruptedException e) {
             logger.debug(format("G-%d interrupted while delivering from group", id));
+        } catch (IOException e) {
+            logger.error(format("G-%d IO error occurred, exiting", id), e);
+            shutdown();
         }
     });
     private int maxTx;
@@ -120,7 +123,7 @@ public class Top implements server {
         logger.info(format("cutter batch is %d", cutterBatch));
     }
 
-    private void deliverFromGroup() throws InterruptedException {
+    private void deliverFromGroup() throws InterruptedException, IOException {
         int currChannel = 0;
         int currBlock = 0;
         while (!stopped.get()) {
@@ -192,10 +195,13 @@ public class Top implements server {
     public Statistics getStatistics() {
         sts.totalDec = rmf.getTotolDec();
         sts.optemisticDec = rmf.getOptemisticDec();
+        for (int i = 0 ; i < c ; i++) {
+            sts.syncEvents += group[i].getSyncEvents();
+        }
         return sts;
     }
 
-    void gc(int origHeight, int sender, int channel) {
+    void gc(int origHeight, int sender, int channel) throws IOException {
         if (sender < 0 || sender > n - 1 || channel < 0 || channel > c -1 || origHeight < 0) {
             logger.debug(format("G-%d GC invalid argument [OrigHeight=%d ; sender=%d ; channel=%d]"
                     ,id, origHeight, sender, channel));
@@ -209,7 +215,7 @@ public class Top implements server {
             gcForChannel(i);
         }
     }
-    void gcForChannel(int channel) {
+    void gcForChannel(int channel) throws IOException {
         int minHeight = lastDelivered[channel][0];
         for (int i = 0 ; i < n ; i++) {
             minHeight = min(minHeight, lastDelivered[channel][i]);
@@ -381,32 +387,13 @@ public class Top implements server {
             while (bc.getHeight() < index) {
                 bc.wait();
             }
-            Types.Block b = bc.getBlock(index);
-            if (b.getDataCount() > 0 || b.getHeader().getHeight() == 0) {
-                return b;
-            }
-            try {
-                return DiskUtils.getBlockFromFile(b.getHeader().getHeight());
-            } catch (IOException e) {
-                logger.error("", e);
-                return null;
-            }
+            return bc.getBlock(index);
         }
     }
 
     public Types.Block nonBlockingDeliver(int index) {
         if (bc.getHeight() < index) return null;
-        Types.Block b = bc.getBlock(index);
-        if (b.getDataCount() > 0 || b.getHeader().getHeight() == 0) {
-            return b;
-        }
-
-        try {
-            return DiskUtils.getBlockFromFile(b.getHeader().getHeight());
-        } catch (IOException e) {
-            logger.error("", e);
-            return null;
-        }
+        return bc.getBlock(index);
     }
 
     public int getID() {

@@ -112,7 +112,7 @@ public class DiskStateLog extends StateLog {
 			log.seek(log.length() - 2 * INT_BYTE_SIZE);// Next write will overwrite
 													// the EOF mark
 		} catch (IOException e) {
-			// TODO Auto-generated catch BaseBlock
+			// TODO Auto-generated catch block
 			logger.error("", e);
 	    }
 	}
@@ -148,10 +148,10 @@ public class DiskStateLog extends StateLog {
 				createLogFile();
 			
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch BaseBlock
+			// TODO Auto-generated catch block
 			logger.error("", e);
 		} catch (IOException e) {
-			// TODO Auto-generated catch BaseBlock
+			// TODO Auto-generated catch block
 			logger.error("", e);
 		} finally {
 			checkpointLock.unlock();

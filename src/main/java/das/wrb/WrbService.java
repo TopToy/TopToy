@@ -837,7 +837,7 @@ public class WrbService extends RmfGrpc.RmfImplBase {
                         id, channel, next.getHeader().getM().getCidSeries(), next.getHeader().getM().getCid()));
                 long st = System.currentTimeMillis();
                 bv.setNext(setFastModeData(val, next));
-                logger.debug(format("[#%d-C[%d]] creating new BaseBlock of [cidSeries=%d ; cid=%d] took about [%d] ms",
+                logger.debug(format("[#%d-C[%d]] creating new block of [cidSeries=%d ; cid=%d] took about [%d] ms",
                         id, channel, next.getHeader().getM().getCidSeries(), next.getHeader().getM().getCid(),
                         System.currentTimeMillis() - st));
             }
@@ -871,9 +871,6 @@ public class WrbService extends RmfGrpc.RmfImplBase {
                         id, channel, next.getHeader().getM().getCidSeries(), next.getHeader().getM().getCid()));
 //                long st = System.currentTimeMillis();
                 bv.setNext(setFastModeData(val, next));
-//                logger.debug(format("[#%d-C[%d]] creating new BaseBlock of [cidSeries=%d ; cid=%d] took about [%d] ms",
-//                        id, channel, next.getHeader().getM().getCidSeries(), next.getHeader().getM().getCid(),
-//                        System.currentTimeMillis() - st));
             }
                        return val;
         });
@@ -1240,7 +1237,7 @@ public class WrbService extends RmfGrpc.RmfImplBase {
         pendingMsg[channel].remove(key);
         fastBbcCons[channel].remove(key);
         regBbcCons[channel].remove(key);
-
+        preConsVote[channel].remove(key);
         bbcService.clearBuffers(key);
     }
 
