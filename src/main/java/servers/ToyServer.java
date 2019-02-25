@@ -79,4 +79,10 @@ public class ToyServer extends ToyBaseServer {
     public BaseBlockchain getEmptyBC() {
         return new SBlockchain(this.getID());
     }
+
+    @Override
+    void potentialBehaviourForSync() throws InterruptedException {
+
+    }
+
 }

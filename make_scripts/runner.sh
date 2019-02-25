@@ -16,6 +16,27 @@ run() {
     done
 }
 
+run2() {
+    while read -r line; do
+        local name=`echo $line | cut -f 1 -d " "`
+        local t=`echo $line | cut -f 2 -d " "`
+
+        if [[ $line == '#'* ]] ; then
+            echo $"skipping ${name}..."
+        else
+            echo "running ${name}..."
+            sudo chmod 777 ${test_dir}/$t.sh
+            local outputDir=${output}/$(date '+%F-%H:%M:%S').${name}
+            mkdir -p ${outputDir}/servers
+            print_headers ${outputDir}
+            ${test_dir}/${t}.sh
+            collect_res_from_servers ${outputDir}
+            sudo rm -r -f ${docker_out}/*
+            echo "done..."
+        fi
+    done < "${tests_conf}"
+
+}
 collect_res_from_servers() {
     local currOut=${1}
     mkdir -p ${currOut}/servers/logs
@@ -39,4 +60,4 @@ print_headers() {
 #    echo "channels,txInBlock,ts,id,txSize,txCount,clientLatency,serverLatency,clientOnly" >> ${currOut}/clients/summery.csv
 }
 
-run
+run2

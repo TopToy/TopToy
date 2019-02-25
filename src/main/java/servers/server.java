@@ -14,7 +14,7 @@ public interface server {
     int getBCSize();
     Types.Block nonBlockingDeliver(int index);
     void setByzSetting(boolean fullByz, List<List<Integer>> groups);
-    void setAsyncParam(int tiem);
+    void setAsyncParam(int time);
     Statistics getStatistics();
 
 }

@@ -127,8 +127,8 @@ public class Cli {
                 }
 
                 if (args[0].equals("async")) {
-                    if (!JToy.type.equals("a")) {
-                        logger.debug("Unable to set async behaviour to non async server");
+                    if (!JToy.type.equals("a") && !JToy.type.equals("b")) {
+                        logger.debug("Unable to set async behaviour to a correct server");
                         return;
                     }
                     if (args.length == 3) {
@@ -607,7 +607,7 @@ public class Cli {
 //            executor.shutdownNow();
 //        }
         private void setByzSetting(String[] args) {
-            logger.info("Setting byz");
+            System.out.println("Setting byz");
             boolean fullByz = Integer.parseInt(args[1]) == 1;
             List<List<Integer>> groups = new ArrayList<>();
             int i = 2;
@@ -624,12 +624,12 @@ public class Cli {
         }
 
         private void asyncPeriod(int sec, int duration) throws InterruptedException {
-            logger.debug(format("setting async params [%d, %d]", sec, duration));
+            System.out.println(format("setting async params [%d] sec delay for [%d] sec", sec/1000, duration/1000));
             JToy.s.setAsyncParam(sec);
             if (duration > 0) {
                 Thread.sleep(duration);
             }
-            logger.debug(format("return to normal"));
+            System.out.println(format("return to normal"));
             JToy.s.setAsyncParam(0);
         }
 

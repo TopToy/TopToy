@@ -93,4 +93,9 @@ public class AsyncToyServer extends ToyBaseServer {
     public BaseBlockchain getEmptyBC() {
         return new SBlockchain(getID());
     }
+
+    @Override
+    void potentialBehaviourForSync() throws InterruptedException {
+
+    }
 }

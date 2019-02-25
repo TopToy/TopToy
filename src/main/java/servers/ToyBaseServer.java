@@ -25,10 +25,10 @@ import static java.lang.Math.max;
 import static java.lang.String.format;
 
 public abstract class ToyBaseServer extends Node {
-    class fpEntry {
-        ForkProof fp;
-        boolean done;
-    }
+//    class fpEntry {
+//        ForkProof fp;
+//        boolean done;
+//    }
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ToyBaseServer.class);
     WrbNode rmfServer;
     private RBrodcastService panicRB;
@@ -47,7 +47,8 @@ public abstract class ToyBaseServer extends Node {
     private Thread panicThread;
     int cid = 0;
     int cidSeries = 0;
-    private final HashMap<Integer, List<ForkProof>> fp;
+//    private final HashMap<Integer, List<ForkProof>> fp;
+    private final HashMap<Integer, Boolean> fp;
     private final ConcurrentHashMap<Integer, ArrayList<subChainVersion>> scVersions;
     private final ConcurrentLinkedQueue<Transaction> transactionsPool = new ConcurrentLinkedQueue<>();
     boolean configuredFastMode;
@@ -253,32 +254,46 @@ public abstract class ToyBaseServer extends Node {
         panicRB.clearBuffers(rKey);
         bc.setBlock(index, null);
     }
+    private void checkSyncEvent() {
+        synchronized (fp) {
+//            if (fp.containsKey(currHeight)
+//                    && fp.get(currHeight).size() > 0
+//                    && fp.get(currHeight).get(0).equals(ForkProof.getDefaultInstance())) {
+//                scVersions.computeIfPresent(currHeight, (k, v) -> {
+//                    if (v.size() > 0 && !v.get(0).equals(subChainVersion.getDefaultInstance())) {
+//                        try {
+//                            adoptSubVersion(currHeight);
+//                        } catch (IOException e) {
+//                            logger.error(String.format("[#%d-C[%d]] unable to sync", getID(), channel), e);
+//                        }
+//                    }
+//                    return v;
+//                });
+//            }
+            if (fp.containsKey(currHeight) && fp.get(currHeight)) {
+                scVersions.computeIfPresent(currHeight, (k, v) -> {
+                    if (v.size() > 0 && !v.get(0).equals(subChainVersion.getDefaultInstance())) {
+                        try {
+                            adoptSubVersion(currHeight);
+                        } catch (IOException e) {
+                            logger.error(String.format("[#%d-C[%d]] unable to sync", getID(), channel), e);
+                        }
+                    }
+                    return v;
+                });
+            }
+        }
+    }
     private void mainLoop() throws RuntimeException {
 //        boolean interrupted = false;
         while (!stopped.get()) {
-//            skipCurrentBlock = false;
-            synchronized (fp) {
-                if (fp.containsKey(currHeight)
-                    && fp.get(currHeight).size() > 0
-                    && fp.get(currHeight).get(0).equals(ForkProof.getDefaultInstance())) {
-                    scVersions.computeIfPresent(currHeight, (k, v) -> {
-                        if (v.size() > 0 && !v.get(0).equals(subChainVersion.getDefaultInstance())) {
-                            try {
-                                adoptSubVersion(currHeight);
-                            } catch (IOException e) {
-                                logger.error(String.format("[#%d-C[%d]] unable to sync", getID(), channel), e);
-                            }
-                        }
-                        return v;
-                    });
-                }
-            }
+            checkSyncEvent();
             while (!bc.validateCurrentLeader(currLeader, f)) {
                 currLeader = (currLeader + 1) % n;
                 fastMode = false;
                 cid += 2; // I think we have no reason to increase CID.
             }
-            Block next = null;
+            Block next;
             try {
                     next = leaderImpl();
             } catch (InterruptedException e) {
@@ -500,10 +515,13 @@ public abstract class ToyBaseServer extends Node {
 
             int forkPoint = p.getCurr().getHeader().getHeight();
 
-            if (fp.containsKey(forkPoint) && fp.get(forkPoint).size() > 0
-                    && fp.get(forkPoint)
-                    .get(0)
-                    .equals(ForkProof.getDefaultInstance())) {
+//            if (fp.containsKey(forkPoint) && fp.get(forkPoint).size() > 0
+//                    && fp.get(forkPoint)
+//                    .get(0)
+//                    .equals(ForkProof.getDefaultInstance()))
+            if (fp.containsKey(forkPoint) && fp.get(forkPoint))
+            {
+
                 logger.debug(format("[#%d-C[%d]] already synchronized for this point [r=%d]",
                         getID(), channel, forkPoint));
                 continue;
@@ -523,14 +541,14 @@ public abstract class ToyBaseServer extends Node {
             }
             synchronized (fp) {
                 if (!fp.containsKey(forkPoint)) {
-                    fp.put(forkPoint, new ArrayList<>());
+                    fp.put(forkPoint, false);
                 }
-                if (fp.get(forkPoint).size() > 0) {
-                    logger.debug(format("[#%d-C[%d]] already has this proof [r=%d]",
-                            getID(), channel, forkPoint));
-                    continue;
-                }
-                fp.get(forkPoint).add(p);
+//                if (fp.get(forkPoint).size() > 0) {
+//                    logger.debug(format("[#%d-C[%d]] already has this proof [r=%d]",
+//                            getID(), channel, forkPoint));
+//                    continue;
+//                }
+//                fp.get(forkPoint).add(p);
                 syncEvents++;
                 sync(forkPoint);
             }
@@ -692,13 +710,18 @@ public abstract class ToyBaseServer extends Node {
 
         }
     }
+
+    abstract void potentialBehaviourForSync() throws InterruptedException;
+
     private void sync(int forkPoint) throws IOException, InterruptedException {
         logger.debug(format("[#%d-C[%d]] start sync method with [r=%d]", getID(),channel, forkPoint));
+        potentialBehaviourForSync();
         proposeVersion(forkPoint);
         syncBlockingPhase(forkPoint);
         if (stopped.get()) return;
-        fp.get(forkPoint).clear();
-        fp.get(forkPoint).add(ForkProof.getDefaultInstance());
+//        fp.get(forkPoint).clear();
+//        fp.get(forkPoint).add(ForkProof.getDefaultInstance());
+        fp.replace(forkPoint, true);
         adoptSubVersion(forkPoint);
         logger.debug(format("[#%d-C[%d]] post sync: [cHeight=%d] [cLeader=%d] [cidSeries=%d]"
                 , getID(), channel, currHeight, currLeader, cidSeries));

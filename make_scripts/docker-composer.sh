@@ -131,7 +131,7 @@ compose_byz_network() {
         if ((i < ${F})); then
             compose_byz_server $i ${docker_image} ${byzdest} ${docker_out} ${compose_file_byz}
         else
-            compose_correct_server $i ${docker_image} ${cdest} ${docker_out} ${compose_file_byz}
+            compose_async_server $i ${docker_image} ${asdest} ${docker_out} ${compose_file_byz}
         fi
     done
 

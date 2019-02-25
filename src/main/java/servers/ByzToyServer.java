@@ -23,6 +23,7 @@ public class ByzToyServer extends ToyBaseServer {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ByzToyServer.class);
     private boolean fullByz = false;
     List<List<Integer>> groups = new ArrayList<>();
+    private int delayTime;
 
     public ByzToyServer(String addr, int rmfPort, int id, int channel, int f, int tmo, int tmoInterval,
                         int maxTx, boolean fastMode, ArrayList<Node> cluster, WrbNode rmf, RBrodcastService panic, RBrodcastService sync) {
@@ -53,6 +54,11 @@ public class ByzToyServer extends ToyBaseServer {
 
     }
 
+    public void setAsyncParam(int maxTime) {
+        this.delayTime = maxTime;
+
+    }
+
     private void addByzData() {
         SecureRandom random = new SecureRandom();
         byte[] byzTx = new byte[40];
@@ -68,11 +74,18 @@ public class ByzToyServer extends ToyBaseServer {
             currBlock.removeTransaction(0);
         }
     }
-    Block leaderImpl() {
+    Block leaderImpl() throws InterruptedException {
         if (currLeader != getID()) {
             return null;
         }
-    logger.debug(format("[#%d] prepare to disseminate a new block of [height=%d]", getID(), currHeight));
+        if (delayTime > 0) {
+            Random rand = new Random();
+            int x = rand.nextInt(delayTime);
+//            int x = maxTime;
+            logger.info(format("[#%d] sleeps for %d ms", getID(), x));
+            Thread.sleep(x);
+        }
+        logger.debug(format("[#%d] prepare to disseminate a new block of [height=%d]", getID(), currHeight));
 
     //        synchronized (blockLock) {
         addTransactionsToCurrBlock();
@@ -116,6 +129,14 @@ public class ByzToyServer extends ToyBaseServer {
     @Override
     public BaseBlockchain getEmptyBC() {
         return new SBlockchain(getID());
+    }
+
+    @Override
+    void potentialBehaviourForSync() throws InterruptedException {
+        if (delayTime > 0) {
+            logger.debug(format("[#%d-%c] potentialBehaviourForSync sleeps for [%d]", getID(), channel, delayTime));
+            Thread.sleep(delayTime);
+        }
     }
 
 //    public void setFullByz() {

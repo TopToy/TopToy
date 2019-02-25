@@ -31,6 +31,18 @@ stop
 quit" > ${2}/inst/input.inst
 }
 
+configure_async_byz_inst(){
+local tme=$((${1}/2))
+echo \
+"init
+serve
+wait ${tme}
+byz 1 -g 0 2 -g 1 3
+async ${2} ${tme}
+stop
+quit" > ${3}/inst/input.inst
+}
+
 configure_channels(){
     sed -i 's/c =.*/c = '${1}'/g' ${2}/config.toml
 
