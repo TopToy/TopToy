@@ -180,8 +180,8 @@ public class Cli {
                             if (args.length == 4) {
                                 String tx = args[2].replaceAll("\"", "");
                                 int cID = Integer.parseInt(args[3]);
-                                String txID = addtx(tx, cID);
-                                System.out.println(format("txID=%s", txID));
+                                Types.txID id = addtx(tx, cID);
+                                System.out.println(format("txID=[%d:%d]", id.getProposerID(), id.getTxNum()));
                                 return;
                             }
                         }
@@ -229,7 +229,7 @@ public class Cli {
 //                Thread.sleep(10 * 60 * 1000);
 //            }
 //        }
-        private String addtx(String data, int clientID) {
+        private Types.txID addtx(String data, int clientID) {
             return JToy.s.addTransaction(data.getBytes(), clientID);
         }
 
@@ -259,7 +259,10 @@ public class Cli {
                 byte[] tx = new byte[txSize];
                 random.nextBytes(tx);
                 bb.addData(Types.Transaction.newBuilder()
-                        .setId(Types.txID.newBuilder().setTxID(UUID.randomUUID().toString()).build())
+                        .setId(Types.txID.newBuilder()
+                                .setTxNum(0)
+                                .setProposerID(0)
+                                .build())
                         .setClientID(0)
                         .setData(ByteString.copyFrom(tx))
                         .build());
@@ -285,7 +288,10 @@ public class Cli {
             ExecutorService executor = Executors.newFixedThreadPool(Config.getC());
             int bareTxSize = Types.Transaction.newBuilder()
                     .setClientID(0)
-                    .setId(Types.txID.newBuilder().setTxID(UUID.randomUUID().toString()).build())
+                    .setId(Types.txID.newBuilder()
+                            .setTxNum(0)
+                            .setProposerID(0)
+                            .build())
                     .setClientTs(System.currentTimeMillis())
                     .setServerTs(System.currentTimeMillis())
                     .build().getSerializedSize();
@@ -371,7 +377,8 @@ public class Cli {
                         if (txSize == -1) {
                             txSize = t.getSerializedSize();
                         }
-                        List<String> row = Arrays.asList(t.getId().getTxID(), String.valueOf(t.getSerializedSize()),
+                        List<String> row = Arrays.asList(format("[%d:%d]", t.getId().getProposerID(), t.getId().getTxNum())
+                                , String.valueOf(t.getSerializedSize()),
                                 String.valueOf(t.getClientID()), String.valueOf(b.getSt().getDecided()),
                                 String.valueOf(t.getData().size()), String.valueOf(i),
                                 String.valueOf(b.getHeader().getM().getSender()));

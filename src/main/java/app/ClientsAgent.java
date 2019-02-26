@@ -48,7 +48,10 @@ public class ClientsAgent {
         int tSize = Integer.parseInt(argv[2]);
         int bareTxSize = Types.Transaction.newBuilder()
                 .setClientID(0)
-                .setId(Types.txID.newBuilder().setTxID(UUID.randomUUID().toString()).build())
+                .setId(Types.txID.newBuilder()
+                        .setProposerID(0)
+                        .setTxNum(0)
+                        .build())
                 .build().getSerializedSize() + 8;
         int txSize = max(0, tSize - bareTxSize);
         String pathString = argv[3];

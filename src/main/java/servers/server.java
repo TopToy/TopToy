@@ -8,7 +8,7 @@ public interface server {
     void start();
     void serve();
     void shutdown();
-    String addTransaction(byte[] data, int clientID);
+    Types.txID addTransaction(byte[] data, int clientID);
     int isTxPresent(String txID);
     int getID();
     int getBCSize();

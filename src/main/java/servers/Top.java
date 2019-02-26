@@ -334,14 +334,10 @@ public class Top implements server {
                 chan = i;
             }
         }
-        Types.Transaction ntx = tx.toBuilder()
-                .setServerTs(System.currentTimeMillis())
-                .setId(Types.txID.newBuilder().setTxID(UUID.randomUUID().toString()))
-                .build();
-        return group[chan].addTransaction(ntx);
+        return group[chan].addTransaction(tx);
     }
 
-    public String addTransaction(byte[] data, int clientID) {
+    public Types.txID addTransaction(byte[] data, int clientID) {
 //        if (!up) return "";
        int ps = group[0].getTxPoolSize();
        int chan = 0;
@@ -375,7 +371,7 @@ public class Top implements server {
         }
         if (b == null) return Types.approved.getDefaultInstance();
         for (Types.Transaction t : b.getDataList()) {
-            if (t.getId().getTxID().equals(txID.getTxID())) {
+            if (t.getId().equals(txID)) {
                 return Types.approved.newBuilder().setSt(b.getSt()).setTx(t).build();
             }
         }
@@ -435,8 +431,6 @@ class TxServer extends blockchainServiceImplBase {
     }
     @Override
     public void addTransaction(Types.Transaction request, StreamObserver<Types.accepted> responseObserver) {
-        logger.info("add tx...");
-        logger.info("receive write request");
         boolean ac = true;
         Types.txID id = server.addTransaction(request);
         if (id == null) ac = false;

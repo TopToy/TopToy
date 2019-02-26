@@ -58,8 +58,13 @@ message Block {
 }
 
 //TODO: Adding: client signature, client public key etc.
+//message txID {
+//    string txID = 1;
+//}
+
 message txID {
-    string txID = 1;
+    int32 proposerID = 1;
+    int64 txNum = 2;
 }
 message Transaction {
     int32 clientID = 1;

@@ -63,10 +63,13 @@ public class ByzToyServer extends ToyBaseServer {
         SecureRandom random = new SecureRandom();
         byte[] byzTx = new byte[40];
         random.nextBytes(byzTx);
-        String txID = UUID.randomUUID().toString();
+//        String txID = UUID.randomUUID().toString();
         Transaction t = Transaction.newBuilder()
                 .setClientID(-1)
-                .setId(Types.txID.newBuilder().setTxID(txID).build())
+                .setId(Types.txID.newBuilder()
+                        .setTxNum(txNum.getAndIncrement())
+                        .setProposerID(getID())
+                        .build())
                 .setData(ByteString.copyFrom(byzTx))
                 .build();
         currBlock.addTransaction(t);

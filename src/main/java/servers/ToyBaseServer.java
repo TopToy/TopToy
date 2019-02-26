@@ -10,6 +10,7 @@ import das.RBroadcast.RBrodcastService;
 import das.wrb.WrbNode;
 import proto.Types;
 import proto.Types.*;
+import sun.security.util.Cache;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -18,6 +19,7 @@ import java.security.SecureRandom;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 import static blockchain.BaseBlockchain.validateBlockHash;
@@ -38,7 +40,6 @@ public abstract class ToyBaseServer extends Node {
     protected int f;
     protected int n;
     int currLeader;
-    final Object forkLock = new Object();
     protected AtomicBoolean stopped = new AtomicBoolean(false);
     BaseBlock currBlock;
     private final Object newBlockNotifyer = new Object();
@@ -58,16 +59,15 @@ public abstract class ToyBaseServer extends Node {
     int txPoolMax = 100000;
     int bareTxSize = Transaction.newBuilder()
             .setClientID(0)
-            .setId(txID.newBuilder().setTxID(UUID.randomUUID().toString()).build())
+            .setId(txID.newBuilder().setProposerID(0).setTxNum(0).build())
             .build().getSerializedSize() + 8;
     int txSize = 0;
     int cID = new Random().nextInt(10000);
     Path sPath = Paths.get("disk", String.valueOf(channel));
-//    boolean skipCurrentBlock = false;
     ExecutorService storageWorker = Executors.newSingleThreadExecutor();
-//    Semaphore sem = new Semaphore(1);
-//    private Block recBlock;
     int syncEvents = 0;
+    AtomicLong txNum = new AtomicLong(0);
+//    private Cache<> txCache;
 
 
 
@@ -389,21 +389,45 @@ public abstract class ToyBaseServer extends Node {
 
     public txID addTransaction(Transaction tx) {
         if (transactionsPool.size() > txPoolMax) return null;
-        transactionsPool.add(tx);
+        transactionsPool.add(
+            tx.toBuilder()
+                    .setId(txID.newBuilder()
+                            .setProposerID(getID())
+                            .setTxNum(txNum.getAndIncrement()))
+                    .setServerTs(System.currentTimeMillis())
+                    .build());
         return tx.getId();
     }
 
-    public String addTransaction(byte[] data, int clientID) {
-        if (transactionsPool.size() > txPoolMax) return "";
-        String txID = UUID.randomUUID().toString();
-        Transaction t = Transaction.newBuilder()
-                .setClientID(clientID)
-                .setId(Types.txID.newBuilder().setTxID(txID).build())
-                .setData(ByteString.copyFrom(data))
-                .build();
-        transactionsPool.add(t);
-        return txID;
-    }
+//    public String addTransaction(byte[] data, int clientID) {
+//        if (transactionsPool.size() > txPoolMax) return "";
+////        String txID = UUID.randomUUID().toString();
+//        Transaction t = Transaction.newBuilder()
+//                .setClientID(clientID)
+//                .setId(Types.txID.newBuilder()
+//                        .setTxNum(txNum++)
+//                        .setProposerID(getID())
+//                        .build())
+//                .setData(ByteString.copyFrom(data))
+//                .build();
+//        transactionsPool.add(t);
+//        return txID;
+//    }
+public txID addTransaction(byte[] data, int clientID) {
+    if (transactionsPool.size() > txPoolMax) return null;
+//        String txID = UUID.randomUUID().toString();
+    long currTx = txNum.getAndIncrement();
+    Transaction t = Transaction.newBuilder()
+            .setClientID(clientID)
+            .setId(Types.txID.newBuilder()
+                    .setTxNum(currTx)
+                    .setProposerID(getID())
+                    .build())
+            .setData(ByteString.copyFrom(data))
+            .build();
+    transactionsPool.add(t);
+    return t.getId();
+}
     private void addApprovedTransactions(List<Transaction> txs) {
 //        synchronized (approvedTx) {
 //            for (Transaction tx :txs) {
@@ -447,8 +471,12 @@ public abstract class ToyBaseServer extends Node {
             SecureRandom random = new SecureRandom();
             byte[] tx = new byte[txSize];
             random.nextBytes(tx);
+            long currTx = txNum.getAndIncrement();
             currBlock.addTransaction(Transaction.newBuilder()
-                    .setId(txID.newBuilder().setTxID(UUID.randomUUID().toString()).build())
+                    .setId(txID.newBuilder()
+                            .setProposerID(getID())
+                            .setTxNum(currTx)
+                            .build())
                     .setClientID(cID)
                     .setClientTs(ts)
                     .setServerTs(ts)
