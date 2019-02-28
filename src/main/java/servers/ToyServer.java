@@ -4,11 +4,8 @@ import blockchain.BaseBlockchain;
 import blockchain.SBlockchain;
 import config.Node;
 import das.RBroadcast.RBrodcastService;
-
 import proto.Types.*;
 import das.wrb.WrbNode;
-
-import java.io.IOException;
 import java.util.ArrayList;
 
 import static java.lang.String.format;

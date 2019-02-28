@@ -3,10 +3,7 @@ package utils;
 import org.h2.jdbcx.JdbcDataSource;
 import proto.Types;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -33,7 +30,7 @@ public class DBUtils {
         eds.setPassword("sa");
     }
 
-    static void shutdown(int channel) {
+    static public void shutdown(int channel) {
         try {
             rc.get(channel).close();
             wc.get(channel).close();
@@ -41,6 +38,21 @@ public class DBUtils {
             logger.error(format("unable shutdown connection [channel=%d]", channel));
         }
     }
+
+    static public void shutdown() {
+
+        try {
+            for (Connection c : rc.values()) {
+                c.close();
+            }
+            for (Connection c : wc.values()) {
+                c.close();
+            }
+        } catch (SQLException e) {
+            logger.error(format("unable shutdown connection"));
+        }
+    }
+
     static private String getTableName(int channel) {
         return txTableName + "_" + channel;
     }
@@ -50,14 +62,6 @@ public class DBUtils {
         stmt.execute("DROP INDEX IF EXISTS id");
         stmt.execute("DROP TABLE IF EXISTS " +
                 getTableName(channel));
-//        stmt.execute("CREATE TABLE IF NOT EXISTS " +
-//                getTableName(channel) +
-//                " (pid INTEGER not NULL, " +
-//                "tid BIGINT not NULL, " +
-//                "cid INTEGER not NULL, " +
-//                "cts BIGINT, " +
-//                "sts BIGINT, " +
-//                "data BINARY)");
         stmt.execute("CREATE TABLE IF NOT EXISTS " +
                 getTableName(channel) +
                 " (pid INTEGER not NULL, " +
@@ -84,6 +88,17 @@ public class DBUtils {
             }
         }
     }
+
+    static private void createReadConn(int channel) {
+        if (!rc.containsKey(channel)) {
+            try {
+                rc.put(channel, eds.getConnection());
+            } catch (SQLException e) {
+                logger.error(format("unable to create read connection [channel=%d]", channel));
+            }
+        }
+    }
+
     static public void writeTxToTable(int channel, int bid, Types.Transaction tx) {
         createWriteConn(channel);
         try {
@@ -108,6 +123,20 @@ public class DBUtils {
             stmt.close();
         } catch (SQLException e) {
             logger.error(format("unable to create statement for block [channel=%d]", channel), e);
+        }
+    }
+
+    static public int getTxRecord(Types.txID txid, int channel) {
+        createReadConn(channel);
+        try {
+            Statement stmt = wc.get(channel).createStatement();
+            ResultSet rs = stmt.executeQuery(format("SELECT bid FROM %s WHERE pid=%d AND tid=%d",
+                    getTableName(channel), txid.getProposerID(), txid.getTxNum()));
+            rs.next();
+            return rs.getInt("bid");
+        } catch (SQLException e) {
+            logger.error(format("unable to create statement for read [channel=%d]", channel), e);
+            return -1;
         }
     }
 }

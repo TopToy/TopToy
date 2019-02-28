@@ -11,6 +11,7 @@ import org.apache.commons.lang.ArrayUtils;
 import proto.Types;
 import servers.Statistics;
 import utils.CSVUtils;
+import utils.DBUtils;
 
 import java.io.FileWriter;
 import java.io.File;
@@ -71,6 +72,7 @@ public class Cli {
 //                writeToScv(outPath);
 //                writeBlocksStatistics(outPath);
                 writeBlocksStatisticsSummery(outPath);
+                DBUtils.shutdown();
             }));
         }
 
@@ -173,29 +175,16 @@ public class Cli {
 //                    return;
 //                }
 
-                if (args[0].equals("tx")) {
-                    if (args.length >= 3) {
-                        String cmd = args[1];
-                        if (cmd.equals("-a")) {
-                            if (args.length == 4) {
-                                String tx = args[2].replaceAll("\"", "");
-                                int cID = Integer.parseInt(args[3]);
-                                Types.txID id = addtx(tx, cID);
-                                System.out.println(format("txID=[%d:%d]", id.getProposerID(), id.getTxNum()));
-                                return;
-                            }
-                        }
-                        if (cmd.equals("-s")) {
-                            if (args.length == 3) {
-                                String txID = args[2];
-                                String stat = txStatus(txID);
-                                System.out.println(format("txID=%s status=%s", txID, stat));
-                                return;
-                            }
-                        }
+                if (args[0].equals("status")) {
+                    if (args.length == 4) {
+                        int pid = Integer.parseInt(args[1]);
+                        int tid = Integer.parseInt(args[2]);
+                        int channel = Integer.parseInt(args[3]);
+                        String stat = txStatus(pid, tid, channel);
+                        System.out.println(format("[pid:%d ; tid=%d ; channel=%d] status=%s", pid,
+                                tid, channel, stat));
+                        return;
                     }
-
-
                 }
                 logger.error(format("Invalid command %s", Arrays.toString(args)));
 //            } catch (Exception e) {
@@ -233,15 +222,20 @@ public class Cli {
             return JToy.s.addTransaction(data.getBytes(), clientID);
         }
 
-        private String txStatus(String txID) {
-            int stat = JToy.s.isTxPresent(txID);
+        private String txStatus(int pid, int tid, int channel) {
+            Types.txID txid = Types.txID.newBuilder()
+                    .setProposerID(pid)
+                    .setTxNum(tid)
+                    .setChannel(channel)
+                    .build();
+            int stat = JToy.s.isTxPresent(txid);
 
             switch (stat) {
                 case -1: return "Not exist";
-                case 0: return "Waiting";
-                case 1: return "Proposed";
-                case 2: return "Approved";
-                case 3: return "Pending";
+                case 0: return "Approved";
+//                case 1: return "Proposed";
+//                case 2: return "Approved";
+//                case 3: return "Pending";
             }
             return null;
         }

@@ -18,6 +18,7 @@ import proto.Types.*;
 import utils.CacheUtils;
 import utils.DBUtils;
 
+import javax.imageio.plugins.tiff.TIFFDirectory;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -377,12 +378,7 @@ public abstract class ToyBaseServer extends Node {
 ////                    }
 //                }
 
-            if (currLeader == getID()) {
-                removeFromProposed(recBlock.getDataList());
-            }
             updateLeaderAndHeight();
-//            bc.writeNextToDisk();
-//            new Thread(()->bc.writeNextToDisk()).start();
             storageWorker.execute(bc::writeNextToDisk);
         }
 //        }
@@ -413,35 +409,21 @@ public abstract class ToyBaseServer extends Node {
         return tx.getId();
     }
 
-//    public String addTransaction(byte[] data, int clientID) {
-//        if (transactionsPool.size() > txPoolMax) return "";
-////        String txID = UUID.randomUUID().toString();
-//        Transaction t = Transaction.newBuilder()
-//                .setClientID(clientID)
-//                .setId(Types.txID.newBuilder()
-//                        .setTxNum(txNum++)
-//                        .setProposerID(getID())
-//                        .build())
-//                .setData(ByteString.copyFrom(data))
-//                .build();
-//        transactionsPool.add(t);
-//        return txID;
-//    }
-public txID addTransaction(byte[] data, int clientID) {
-    if (transactionsPool.size() > txPoolMax) return null;
-//        String txID = UUID.randomUUID().toString();
-    long currTx = txNum.getAndIncrement();
-    Transaction t = Transaction.newBuilder()
-            .setClientID(clientID)
-            .setId(Types.txID.newBuilder()
-                    .setTxNum(currTx)
-                    .setProposerID(getID())
-                    .setChannel(channel))
-            .setData(ByteString.copyFrom(data))
-            .build();
-    transactionsPool.add(t);
-    return t.getId();
-}
+    public txID addTransaction(byte[] data, int clientID) {
+        if (transactionsPool.size() > txPoolMax) return null;
+    //        String txID = UUID.randomUUID().toString();
+        long currTx = txNum.getAndIncrement();
+        Transaction t = Transaction.newBuilder()
+                .setClientID(clientID)
+                .setId(Types.txID.newBuilder()
+                        .setTxNum(currTx)
+                        .setProposerID(getID())
+                        .setChannel(channel))
+                .setData(ByteString.copyFrom(data))
+                .build();
+        transactionsPool.add(t);
+        return t.getId();
+    }
     private void addApprovedTransactions(List<Transaction> txs) {
 //        synchronized (approvedTx) {
 //            for (Transaction tx :txs) {
@@ -450,32 +432,17 @@ public txID addTransaction(byte[] data, int clientID) {
 //        }
 
     }
-    public int isTxPresent(String txID) {
-//        synchronized (approvedTx) {
-//            if (approvedTx.containsKey(txID)) {
-//                return 2;
-//            }
-//        }
-////        synchronized (transactionsPool) {
-//            if (transactionsPool.stream().map(Transaction::getTxID).anyMatch(tid -> tid.equals(txID))) {
-//                return 0;
-//            }
-//            if (proposedTx.contains(txID)) {
-//                return 1;
-//            }
-////        }
-//        ArrayList<Block> cbc;
-//        synchronized (bc) {
-//            cbc = new ArrayList<Block>(bc.getBlocks(bc.getHeight() - f + 1, bc.getHeight() + 1));
-//        }
-//        if (cbc.stream()
-//                .map(Block::getDataList)
-//                .anyMatch(tl -> tl
-//                        .stream()
-//                        .map(Transaction::getTxID)
-//                        .anyMatch(tid -> tid.equals(txID)))) {
-//            return 3;
-//        }
+    public int isTxPresent(txID tid) {
+        int bid = txCache.get(tid);
+        if (bid != -1) {
+            txCache.add(tid, bid);
+            return 0;
+        }
+        bid = DBUtils.getTxRecord(tid, channel);
+        if (bid != -1) {
+            txCache.add(tid, bid);
+            return 0;
+        }
         return -1;
     }
 
@@ -524,9 +491,6 @@ public txID addTransaction(byte[] data, int clientID) {
             }
     }
 
-    void removeFromProposed(List<Transaction> txs) {
-//        proposedTx.removeAll(txs.stream().map(Transaction::getTxID).collect(Collectors.toList()));
-    }
 
     private boolean validateForkProof(ForkProof p)  {
         logger.debug(format("[#%d-C[%d]] starts validating fp", getID(), channel));

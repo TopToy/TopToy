@@ -9,7 +9,7 @@ public interface server {
     void serve();
     void shutdown();
     Types.txID addTransaction(byte[] data, int clientID);
-    int isTxPresent(String txID);
+    int isTxPresent(Types.txID tid);
     int getID();
     int getBCSize();
     Types.Block nonBlockingDeliver(int index);

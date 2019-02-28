@@ -7,6 +7,16 @@ echo \
 serve
 wait ${1}
 stop
+status 0 1 0
+status 0 1 0
+status 0 1 0
+status 0 1 0
+status 0 1 0
+status 0 1 0
+status 0 1 0
+status 0 1 0
+status 0 1 0
+status 0 1 0
 quit" > ${2}/inst/input.inst
 }
 

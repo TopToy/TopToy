@@ -20,18 +20,20 @@ public class CacheUtils {
                 .build();
     }
 
-    public void add(Types.Transaction tx, int bid) {
-        cache.put(tx.getId(), bid);
+    public void add(Types.txID tid, int bid) {
+        cache.put(tid, bid);
     }
 
     public int get(Types.txID id) {
-        return (int) cache.getIfPresent(id);
+        Object ret = cache.getIfPresent(id);
+        if (ret == null) return -1;
+        return (int) ret;
     }
 
     public void addBlock(Types.Block b) {
         int bid = b.getHeader().getHeight();
         for (Types.Transaction tx : b.getDataList()) {
-            add(tx, bid);
+            add(tx.getId(), bid);
         }
     }
 }

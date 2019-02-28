@@ -351,12 +351,8 @@ public class Top implements server {
         return group[chan].addTransaction(data, clientID);
     }
 
-    public int isTxPresent(String txID) {
-        for (int i = 0 ; i < c ; i++) {
-            int ret = group[i].isTxPresent(txID);
-            if (ret != -1) return ret;
-        }
-        return -1;
+    public int isTxPresent(Types.txID tid) {
+        return group[tid.getChannel()].isTxPresent(tid);
     }
 
     Types.approved getTransaction(Types.txID txID) throws InterruptedException {
