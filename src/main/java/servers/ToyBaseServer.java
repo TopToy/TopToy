@@ -15,6 +15,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.h2.jdbcx.JdbcDataSource;
 import proto.Types;
 import proto.Types.*;
+import utils.CacheUtils;
 import utils.DBUtils;
 
 import java.io.IOException;
@@ -73,12 +74,8 @@ public abstract class ToyBaseServer extends Node {
     ExecutorService storageWorker = Executors.newSingleThreadExecutor();
     private int syncEvents = 0;
     AtomicLong txNum = new AtomicLong(0);
-    private int maxCacheSize = 100000;
-    private @NonNull
-            Cache<Object, Object> txCache = Caffeine
-            .newBuilder()
-            .maximumSize(maxCacheSize)
-            .build();
+    CacheUtils txCache = new CacheUtils(0);
+
 
 
 
@@ -357,6 +354,10 @@ public abstract class ToyBaseServer extends Node {
                         logger.error(String.format("[#%d-C[%d]] unable to record permanent time for block [height=%d] [cidSeries=%d ; cid=%d] [size=%d]",
                                 getID(), channel, recBlock.getHeader().getHeight(), cidSeries, cid, recBlock.getDataCount()));
                     }
+
+                    Block finalPermanent = permanent;
+                    storageWorker.execute(() ->
+                            DBUtils.writeBlockToTable(channel, finalPermanent.getHeader().getHeight(), finalPermanent));
                 }
 
                 logger.debug(String.format("[#%d-C[%d]] adds new Block with [height=%d] [cidSeries=%d ; cid=%d] [size=%d]",
@@ -405,7 +406,8 @@ public abstract class ToyBaseServer extends Node {
             tx.toBuilder()
                     .setId(txID.newBuilder()
                             .setProposerID(getID())
-                            .setTxNum(txNum.getAndIncrement()))
+                            .setTxNum(txNum.getAndIncrement())
+                            .setChannel(channel))
                     .setServerTs(System.currentTimeMillis())
                     .build());
         return tx.getId();
@@ -434,7 +436,7 @@ public txID addTransaction(byte[] data, int clientID) {
             .setId(Types.txID.newBuilder()
                     .setTxNum(currTx)
                     .setProposerID(getID())
-                    .build())
+                    .setChannel(channel))
             .setData(ByteString.copyFrom(data))
             .build();
     transactionsPool.add(t);
@@ -488,7 +490,7 @@ public txID addTransaction(byte[] data, int clientID) {
                     .setId(txID.newBuilder()
                             .setProposerID(getID())
                             .setTxNum(currTx)
-                            .build())
+                            .setChannel(channel))
                     .setClientID(cID)
                     .setClientTs(ts)
                     .setServerTs(ts)
@@ -609,9 +611,7 @@ public txID addTransaction(byte[] data, int clientID) {
             }
         }
         Block b = bc.getBlock(index);
-        for (Transaction tx : b.getDataList()) {
-            txCache.put(tx.getId(), tx);
-        }
+        txCache.addBlock(b);
         return b;
     }
 
@@ -622,9 +622,7 @@ public txID addTransaction(byte[] data, int clientID) {
             }
         }
         Block b = bc.getBlock(index);
-        for (Transaction tx : b.getDataList()) {
-            txCache.put(tx.getId(), tx);
-        }
+        txCache.addBlock(b);
         return b;
     }
 

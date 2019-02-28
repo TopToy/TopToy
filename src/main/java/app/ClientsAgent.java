@@ -51,7 +51,7 @@ public class ClientsAgent {
                 .setId(Types.txID.newBuilder()
                         .setProposerID(0)
                         .setTxNum(0)
-                        .build())
+                        .setChannel(0))
                 .build().getSerializedSize() + 8;
         int txSize = max(0, tSize - bareTxSize);
         String pathString = argv[3];

@@ -136,7 +136,6 @@ public abstract class BaseBlockchain {
             DiskUtils.cutBlock(blocks.get(swapSize), swapPath);
             blocks.remove(swapSize);
             swapSize++;
-            System.out.println("4 -------");
             } catch (IOException e) {
                 logger.error("Unable to remove block", e);
             }

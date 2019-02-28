@@ -5179,6 +5179,11 @@ public final class Types {
      * <code>int64 txNum = 2;</code>
      */
     long getTxNum();
+
+    /**
+     * <code>int32 channel = 3;</code>
+     */
+    int getChannel();
   }
   /**
    * Protobuf type {@code proto.txID}
@@ -5195,6 +5200,7 @@ public final class Types {
     private txID() {
       proposerID_ = 0;
       txNum_ = 0L;
+      channel_ = 0;
     }
 
     @java.lang.Override
@@ -5236,6 +5242,11 @@ public final class Types {
             case 16: {
 
               txNum_ = input.readInt64();
+              break;
+            }
+            case 24: {
+
+              channel_ = input.readInt32();
               break;
             }
           }
@@ -5280,6 +5291,15 @@ public final class Types {
       return txNum_;
     }
 
+    public static final int CHANNEL_FIELD_NUMBER = 3;
+    private int channel_;
+    /**
+     * <code>int32 channel = 3;</code>
+     */
+    public int getChannel() {
+      return channel_;
+    }
+
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -5298,6 +5318,9 @@ public final class Types {
       if (txNum_ != 0L) {
         output.writeInt64(2, txNum_);
       }
+      if (channel_ != 0) {
+        output.writeInt32(3, channel_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -5313,6 +5336,10 @@ public final class Types {
       if (txNum_ != 0L) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt64Size(2, txNum_);
+      }
+      if (channel_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(3, channel_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -5334,6 +5361,8 @@ public final class Types {
           == other.getProposerID());
       result = result && (getTxNum()
           == other.getTxNum());
+      result = result && (getChannel()
+          == other.getChannel());
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -5350,6 +5379,8 @@ public final class Types {
       hash = (37 * hash) + TXNUM_FIELD_NUMBER;
       hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
           getTxNum());
+      hash = (37 * hash) + CHANNEL_FIELD_NUMBER;
+      hash = (53 * hash) + getChannel();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -5483,6 +5514,8 @@ public final class Types {
 
         txNum_ = 0L;
 
+        channel_ = 0;
+
         return this;
       }
 
@@ -5507,6 +5540,7 @@ public final class Types {
         proto.Types.txID result = new proto.Types.txID(this);
         result.proposerID_ = proposerID_;
         result.txNum_ = txNum_;
+        result.channel_ = channel_;
         onBuilt();
         return result;
       }
@@ -5553,6 +5587,9 @@ public final class Types {
         }
         if (other.getTxNum() != 0L) {
           setTxNum(other.getTxNum());
+        }
+        if (other.getChannel() != 0) {
+          setChannel(other.getChannel());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -5629,6 +5666,32 @@ public final class Types {
       public Builder clearTxNum() {
         
         txNum_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      private int channel_ ;
+      /**
+       * <code>int32 channel = 3;</code>
+       */
+      public int getChannel() {
+        return channel_;
+      }
+      /**
+       * <code>int32 channel = 3;</code>
+       */
+      public Builder setChannel(int value) {
+        
+        channel_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int32 channel = 3;</code>
+       */
+      public Builder clearChannel() {
+        
+        channel_ = 0;
         onChanged();
         return this;
       }
@@ -13592,25 +13655,25 @@ public final class Types {
       "\022\017\n\007decided\030\007 \001(\003\"q\n\005Block\022\"\n\006header\030\001 \001" +
       "(\0132\022.proto.BlockHeader\022 \n\004data\030\002 \003(\0132\022.p" +
       "roto.Transaction\022\"\n\002st\030\003 \001(\0132\026.proto.blo" +
-      "ckStatistics\")\n\004txID\022\022\n\nproposerID\030\001 \001(\005" +
-      "\022\r\n\005txNum\030\002 \001(\003\"j\n\013Transaction\022\020\n\010client" +
-      "ID\030\001 \001(\005\022\027\n\002id\030\002 \001(\0132\013.proto.txID\022\014\n\004dat" +
-      "a\030\003 \001(\014\022\020\n\010clientTs\030\004 \001(\003\022\020\n\010serverTs\030\005 " +
-      "\001(\003\"7\n\010accepted\022\020\n\010accepted\030\001 \001(\010\022\031\n\004txI" +
-      "D\030\002 \001(\0132\013.proto.txID\"N\n\010approved\022\036\n\002tx\030\001" +
-      " \001(\0132\022.proto.Transaction\022\"\n\002st\030\003 \001(\0132\026.p" +
-      "roto.blockStatistics\"!\n\004read\022\031\n\004txID\030\001 \001" +
-      "(\0132\013.proto.txID\"S\n\tForkProof\022\016\n\006sender\030\001" +
-      " \001(\005\022\032\n\004curr\030\002 \001(\0132\014.proto.Block\022\032\n\004prev" +
-      "\030\004 \001(\0132\014.proto.Block\"-\n\005RBMsg\022\026\n\001m\030\001 \001(\013" +
-      "2\013.proto.Meta\022\014\n\004data\030\003 \001(\014\"\007\n\005Empty\"!\n\003" +
-      "Req\022\032\n\005_meta\030\001 \001(\0132\013.proto.Meta\"(\n\nPreCo" +
-      "nsReq\022\032\n\005_meta\030\001 \001(\0132\013.proto.Meta\"9\n\003Res" +
-      "\022\026\n\001m\030\001 \001(\0132\013.proto.Meta\022\032\n\004data\030\002 \001(\0132\014" +
-      ".proto.Block\"`\n\017subChainVersion\022\021\n\tforkP" +
-      "oint\030\001 \001(\005\022\021\n\tsuggested\030\002 \001(\005\022\027\n\001v\030\003 \003(\013" +
-      "2\014.proto.Block\022\016\n\006sender\030\004 \001(\005B\007\n\005protob" +
-      "\006proto3"
+      "ckStatistics\":\n\004txID\022\022\n\nproposerID\030\001 \001(\005" +
+      "\022\r\n\005txNum\030\002 \001(\003\022\017\n\007channel\030\003 \001(\005\"j\n\013Tran" +
+      "saction\022\020\n\010clientID\030\001 \001(\005\022\027\n\002id\030\002 \001(\0132\013." +
+      "proto.txID\022\014\n\004data\030\003 \001(\014\022\020\n\010clientTs\030\004 \001" +
+      "(\003\022\020\n\010serverTs\030\005 \001(\003\"7\n\010accepted\022\020\n\010acce" +
+      "pted\030\001 \001(\010\022\031\n\004txID\030\002 \001(\0132\013.proto.txID\"N\n" +
+      "\010approved\022\036\n\002tx\030\001 \001(\0132\022.proto.Transactio" +
+      "n\022\"\n\002st\030\003 \001(\0132\026.proto.blockStatistics\"!\n" +
+      "\004read\022\031\n\004txID\030\001 \001(\0132\013.proto.txID\"S\n\tFork" +
+      "Proof\022\016\n\006sender\030\001 \001(\005\022\032\n\004curr\030\002 \001(\0132\014.pr" +
+      "oto.Block\022\032\n\004prev\030\004 \001(\0132\014.proto.Block\"-\n" +
+      "\005RBMsg\022\026\n\001m\030\001 \001(\0132\013.proto.Meta\022\014\n\004data\030\003" +
+      " \001(\014\"\007\n\005Empty\"!\n\003Req\022\032\n\005_meta\030\001 \001(\0132\013.pr" +
+      "oto.Meta\"(\n\nPreConsReq\022\032\n\005_meta\030\001 \001(\0132\013." +
+      "proto.Meta\"9\n\003Res\022\026\n\001m\030\001 \001(\0132\013.proto.Met" +
+      "a\022\032\n\004data\030\002 \001(\0132\014.proto.Block\"`\n\017subChai" +
+      "nVersion\022\021\n\tforkPoint\030\001 \001(\005\022\021\n\tsuggested" +
+      "\030\002 \001(\005\022\027\n\001v\030\003 \003(\0132\014.proto.Block\022\016\n\006sende" +
+      "r\030\004 \001(\005B\007\n\005protob\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -13665,7 +13728,7 @@ public final class Types {
     internal_static_proto_txID_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_txID_descriptor,
-        new java.lang.String[] { "ProposerID", "TxNum", });
+        new java.lang.String[] { "ProposerID", "TxNum", "Channel", });
     internal_static_proto_Transaction_descriptor =
       getDescriptor().getMessageTypes().get(7);
     internal_static_proto_Transaction_fieldAccessorTable = new

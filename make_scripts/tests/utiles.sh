@@ -6,6 +6,7 @@ echo \
 "init
 serve
 wait ${1}
+stop
 quit" > ${2}/inst/input.inst
 }
 

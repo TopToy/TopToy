@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.google.protobuf.Internal.toStringUtf8;
 import static java.lang.String.format;
@@ -32,6 +33,14 @@ public class DBUtils {
         eds.setPassword("sa");
     }
 
+    static void shutdown(int channel) {
+        try {
+            rc.get(channel).close();
+            wc.get(channel).close();
+        } catch (SQLException e) {
+            logger.error(format("unable shutdown connection [channel=%d]", channel));
+        }
+    }
     static private String getTableName(int channel) {
         return txTableName + "_" + channel;
     }
@@ -41,16 +50,23 @@ public class DBUtils {
         stmt.execute("DROP INDEX IF EXISTS id");
         stmt.execute("DROP TABLE IF EXISTS " +
                 getTableName(channel));
+//        stmt.execute("CREATE TABLE IF NOT EXISTS " +
+//                getTableName(channel) +
+//                " (pid INTEGER not NULL, " +
+//                "tid BIGINT not NULL, " +
+//                "cid INTEGER not NULL, " +
+//                "cts BIGINT, " +
+//                "sts BIGINT, " +
+//                "data BINARY)");
         stmt.execute("CREATE TABLE IF NOT EXISTS " +
                 getTableName(channel) +
                 " (pid INTEGER not NULL, " +
                 "tid BIGINT not NULL, " +
-                "cid INTEGER not NULL, " +
-                "cts BIGINT, " +
-                "sts BIGINT, " +
-                "data BINARY)");
-        stmt.execute("CREATE INDEX IF NOT EXISTS id ON " + getTableName(channel) + " (pid, cid)");
+                "bid INTEGER not NULL)"
+                );
+        stmt.execute("CREATE INDEX IF NOT EXISTS id ON " + getTableName(channel) + " (pid, tid)");
         stmt.close();
+        conn.close();
         logger.debug(format("successfully created a table for [channel=%d]", channel));
     }
 
@@ -59,32 +75,39 @@ public class DBUtils {
 
     }
 
-    static public void writeTxToTable(int channel, Types.Transaction tx) {
+    static private void createWriteConn(int channel) {
         if (!wc.containsKey(channel)) {
             try {
                 wc.put(channel, eds.getConnection());
             } catch (SQLException e) {
-
-                return;
+                logger.error(format("unable to create write connection [channel=%d]", channel));
             }
         }
+    }
+    static public void writeTxToTable(int channel, int bid, Types.Transaction tx) {
+        createWriteConn(channel);
         try {
-            PreparedStatement stmt = wc.get(channel).prepareStatement(
-                    format("INSERT INTO %s VALUES(?, ?, ?, ?, ?, ?)",
-                            getTableName(channel))
-            );
-            stmt.setInt(1, tx.getId().getProposerID());
-            stmt.setLong(2, tx.getId().getTxNum());
-            stmt.setInt(3, tx.getClientID());
-            stmt.setLong(4, tx.getClientTs());
-            stmt.setLong(5, tx.getServerTs());
-            stmt.setBytes(6, tx.getData().toByteArray());
-            if (!stmt.execute()) {
-                logger.debug(format("unable to add tx [%d ; %d] to [%s]", tx.getId().getProposerID(),
-                        tx.getId().getTxNum(), getTableName(channel)));
-            }
+            Statement stmt = wc.get(channel).createStatement();
+            stmt.executeUpdate(format("INSERT INTO %s VALUES(%d, %d, %d)", getTableName(channel),
+                    tx.getId().getProposerID(), tx.getId().getTxNum(), bid));
+            stmt.close();
         } catch (SQLException e) {
-            logger.error(format("unable to create statement [channel=%d]", channel));
+            logger.error(format("unable to create statement for tx [channel=%d]", channel), e);
+        }
+    }
+
+    static public void writeBlockToTable(int channel, int bid, Types.Block b) {
+        createWriteConn(channel);
+        try {
+            Statement stmt = wc.get(channel).createStatement();
+            for (Types.Transaction tx : b.getDataList()) {
+                stmt.addBatch(format("INSERT INTO %s VALUES(%d, %d, %d)", getTableName(channel),
+                        tx.getId().getProposerID(), tx.getId().getTxNum(), bid));
+            }
+            stmt.executeBatch();
+            stmt.close();
+        } catch (SQLException e) {
+            logger.error(format("unable to create statement for block [channel=%d]", channel), e);
         }
     }
 }

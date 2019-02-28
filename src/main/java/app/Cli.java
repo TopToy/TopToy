@@ -262,7 +262,7 @@ public class Cli {
                         .setId(Types.txID.newBuilder()
                                 .setTxNum(0)
                                 .setProposerID(0)
-                                .build())
+                                .setChannel(0))
                         .setClientID(0)
                         .setData(ByteString.copyFrom(tx))
                         .build());
@@ -291,7 +291,7 @@ public class Cli {
                     .setId(Types.txID.newBuilder()
                             .setTxNum(0)
                             .setProposerID(0)
-                            .build())
+                            .setChannel(0))
                     .setClientTs(System.currentTimeMillis())
                     .setServerTs(System.currentTimeMillis())
                     .build().getSerializedSize();
