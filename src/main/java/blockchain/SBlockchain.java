@@ -1,15 +1,16 @@
 package blockchain;
 
 import java.io.IOException;
+import java.nio.file.Path;
 
 public class SBlockchain extends BaseBlockchain {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(SBlockchain.class);
 
-    public SBlockchain(BaseBlockchain orig, int start, int end) throws IOException {
+    public SBlockchain(BaseBlockchain orig, int start, int end) {
         super(orig, start, end);
     }
-    public SBlockchain(int creatorID, int channel) {
-        super(creatorID, channel);
+    public SBlockchain(int creatorID, int channel, int maxCacheSize, Path swapPath) {
+        super(creatorID, channel, maxCacheSize, swapPath);
     }
 
     public SBlockchain(int creatorID) {

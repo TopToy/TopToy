@@ -216,16 +216,16 @@ public class Top implements server {
         }
     }
     void gcForChannel(int channel) throws IOException {
-        int minHeight = lastDelivered[channel][0];
-        for (int i = 0 ; i < n ; i++) {
-            minHeight = min(minHeight, lastDelivered[channel][i]);
-        }
-        logger.debug(format("G-%d starting GC [OrigHeight=%d ; lastGCPoint=%d ;" +
-                " channel=%d]",id, minHeight, lastGCpoint[channel], channel));
-        for (int i = lastGCpoint[channel] ; i < minHeight ; i++) {
-            group[channel].gc(i);
-        }
-        lastGCpoint[channel] = minHeight;
+//        int minHeight = lastDelivered[channel][0];
+//        for (int i = 0 ; i < n ; i++) {
+//            minHeight = min(minHeight, lastDelivered[channel][i]);
+//        }
+//        logger.debug(format("G-%d starting GC [OrigHeight=%d ; lastGCPoint=%d ;" +
+//                " channel=%d]",id, minHeight, lastGCpoint[channel], channel));
+//        for (int i = lastGCpoint[channel] ; i < minHeight ; i++) {
+//            group[channel].gc(i);
+//        }
+//        lastGCpoint[channel] = minHeight;
 
     }
     public void start() {

@@ -2,25 +2,31 @@ package servers;
 
 import blockchain.BaseBlock;
 import blockchain.BaseBlockchain;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
 import config.Config;
 import config.Node;
 import crypto.blockDigSig;
 import das.RBroadcast.RBrodcastService;
 import das.wrb.WrbNode;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.h2.jdbcx.JdbcDataSource;
 import proto.Types;
 import proto.Types.*;
-import sun.security.util.Cache;
+import utils.DBUtils;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.SecureRandom;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
 
 import static blockchain.BaseBlockchain.validateBlockHash;
 import static java.lang.Math.max;
@@ -63,11 +69,17 @@ public abstract class ToyBaseServer extends Node {
             .build().getSerializedSize() + 8;
     int txSize = 0;
     int cID = new Random().nextInt(10000);
-    Path sPath = Paths.get("disk", String.valueOf(channel));
+    Path sPath = Paths.get("blocks", String.valueOf(channel));
     ExecutorService storageWorker = Executors.newSingleThreadExecutor();
-    int syncEvents = 0;
+    private int syncEvents = 0;
     AtomicLong txNum = new AtomicLong(0);
-//    private Cache<> txCache;
+    private int maxCacheSize = 100000;
+    private @NonNull
+            Cache<Object, Object> txCache = Caffeine
+            .newBuilder()
+            .maximumSize(maxCacheSize)
+            .build();
+
 
 
 
@@ -106,7 +118,6 @@ public abstract class ToyBaseServer extends Node {
         this.channel = channel;
         rmfServer = rmf;
         currLeader = channel % n;
-
         if (testing) {
             txSize = StrictMath.max(0, Config.getTxSize() - bareTxSize);
         }
@@ -145,7 +156,6 @@ public abstract class ToyBaseServer extends Node {
         this.configuredFastMode = fastMode;
         this.fastMode = fastMode;
         currLeader = channel % n;
-
         if (testing) {
             txSize = StrictMath.max(0, Config.getTxSize() - bareTxSize);
         }
@@ -160,6 +170,13 @@ public abstract class ToyBaseServer extends Node {
             logger.debug(format("[#%d-C[%d]] sync server is up", getID(), channel));
             panicRB.start();
             logger.debug(format("[#%d-C[%d]] panic server is up", getID(), channel));
+        }
+        new DBUtils();
+        try {
+            DBUtils.initTables(channel);
+        } catch (SQLException e) {
+            logger.error(format("[#%d-C[%d]] unable to start DBUtils", getID(), channel), e);
+            shutdown(group);
         }
         logger.info(format("[#%d-C[%d]] is up", getID(), channel));
     }
@@ -176,15 +193,9 @@ public abstract class ToyBaseServer extends Node {
 
     public void shutdown(boolean group) {
         stopped.set(true);
+        storageWorker.shutdownNow();
         logger.debug(format("[#%d-C[%d]] interrupt main thread", getID(), channel));
-//        AtomicBoolean joined = new AtomicBoolean(false);
-//        Thread t = new Thread(() -> {
-//            while (!joined.get())
-//        });
-//        t.start();
         AtomicBoolean j = new AtomicBoolean(false);
-        long start = System.currentTimeMillis();
-//            Object lock = new Object();
         Thread t = new Thread(() -> {
             while (!j.get()) {
                 mainThread.interrupt();
@@ -199,7 +210,6 @@ public abstract class ToyBaseServer extends Node {
         try {
             mainThread.join();
             j.set(true);
-//            t.interrupt();
             t.join();
         } catch (InterruptedException e) {
             logger.error(format("[#%d-C[%d]]", getID(), channel), e);
@@ -231,7 +241,6 @@ public abstract class ToyBaseServer extends Node {
         } catch (InterruptedException e) {
             logger.error(format("[#%d-C[%d]]", getID(), channel), e);
         }
-//        txSem.release(txPoolMax);
         logger.info(format("[#%d-C[%d]] shutdown bc server", getID(), channel));
     }
     private void updateLeaderAndHeight() {
@@ -240,20 +249,19 @@ public abstract class ToyBaseServer extends Node {
         cid++;
     }
 
-     void gc(int index) throws IOException {
-        logger.debug(format("[#%d-C[%d]] clear buffers of [height=%d]", getID(), channel, index));
-//        if (bc.getBlock(index) == null) return;
-        Meta key = bc.getBlock(index).getHeader().getM();
-        Meta rKey = Meta.newBuilder()
-                .setChannel(key.getChannel())
-                .setCidSeries(key.getCidSeries())
-                .setCid(key.getCid())
-                .build();
-        rmfServer.clearBuffers(rKey);
-        syncRB.clearBuffers(rKey);
-        panicRB.clearBuffers(rKey);
-        bc.setBlock(index, null);
-    }
+//     void gc(int index) throws IOException {
+//        logger.debug(format("[#%d-C[%d]] clear buffers of [height=%d]", getID(), channel, index));
+//        Meta key = bc.getBlock(index).getHeader().getM();
+//        Meta rKey = Meta.newBuilder()
+//                .setChannel(key.getChannel())
+//                .setCidSeries(key.getCidSeries())
+//                .setCid(key.getCid())
+//                .build();
+//        rmfServer.clearBuffers(rKey);
+//        syncRB.clearBuffers(rKey);
+//        panicRB.clearBuffers(rKey);
+//        bc.setBlock(index, null);
+//    }
     private void checkSyncEvent() {
         synchronized (fp) {
 //            if (fp.containsKey(currHeight)
@@ -285,7 +293,6 @@ public abstract class ToyBaseServer extends Node {
         }
     }
     private void mainLoop() throws RuntimeException {
-//        boolean interrupted = false;
         while (!stopped.get()) {
             checkSyncEvent();
             while (!bc.validateCurrentLeader(currLeader, f)) {
@@ -334,7 +341,6 @@ public abstract class ToyBaseServer extends Node {
             }
 
             synchronized (newBlockNotifyer) {
-//                if (skipCurrentBlock) continue;
                 recBlock = recBlock
                         .toBuilder()
                         .setSt(recBlock.getSt()
@@ -355,9 +361,12 @@ public abstract class ToyBaseServer extends Node {
 
                 logger.debug(String.format("[#%d-C[%d]] adds new Block with [height=%d] [cidSeries=%d ; cid=%d] [size=%d]",
                         getID(), channel, recBlock.getHeader().getHeight(), cidSeries, cid, recBlock.getDataCount()));
+
                 newBlockNotifyer.notify();
 
+
             }
+
             // TODO: Improve mechanism
 //              lastReceivedBlock[recBlock.getHeader().getM().getSender()] = recBlock.getHeader().getHeight();
 //              gc();     lastReceivedBlock[recBlock.getHeader().getM().getSender()] = recBlock.getHeader().getHeight();
@@ -371,6 +380,9 @@ public abstract class ToyBaseServer extends Node {
                 removeFromProposed(recBlock.getDataList());
             }
             updateLeaderAndHeight();
+//            bc.writeNextToDisk();
+//            new Thread(()->bc.writeNextToDisk()).start();
+            storageWorker.execute(bc::writeNextToDisk);
         }
 //        }
     }
@@ -536,17 +548,13 @@ public txID addTransaction(byte[] data, int clientID) {
             ForkProof p;
             try {
                 p = ForkProof.parseFrom(panicRB.deliver(channel));
-            } catch (Exception e) {
-                logger.error(format("[#%d-C[%d]] unable to parse fork message", getID(), channel), e);
+            } catch (InvalidProtocolBufferException e) {
+                logger.error(format("[#%d-C[%d]] Unable to parse fork message",
+                        getID(), channel));
                 continue;
             }
 
             int forkPoint = p.getCurr().getHeader().getHeight();
-
-//            if (fp.containsKey(forkPoint) && fp.get(forkPoint).size() > 0
-//                    && fp.get(forkPoint)
-//                    .get(0)
-//                    .equals(ForkProof.getDefaultInstance()))
             if (fp.containsKey(forkPoint) && fp.get(forkPoint))
             {
 
@@ -600,7 +608,11 @@ public txID addTransaction(byte[] data, int clientID) {
                 newBlockNotifyer.wait();
             }
         }
-        return bc.getBlock(index);
+        Block b = bc.getBlock(index);
+        for (Transaction tx : b.getDataList()) {
+            txCache.put(tx.getId(), tx);
+        }
+        return b;
     }
 
     public Block nonBlockingdeliver(int index) {
@@ -609,7 +621,11 @@ public txID addTransaction(byte[] data, int clientID) {
                 return null;
             }
         }
-        return bc.getBlock(index);
+        Block b = bc.getBlock(index);
+        for (Transaction tx : b.getDataList()) {
+            txCache.put(tx.getId(), tx);
+        }
+        return b;
     }
 
     public int bcSize() {
@@ -656,7 +672,7 @@ public txID addTransaction(byte[] data, int clientID) {
     private boolean validateSubChainVersion(subChainVersion v, int forkPoint) {
         BaseBlockchain subV = getEmptyBC();
         subV.addBlock(v.getV(0));
-        for (int i = 0 ; i < v.getVList().size() ; i++ ) {
+        for (int i = 1 ; i < v.getVList().size() ; i++ ) {
             Block pb = v.getV(i);
             if (!blockDigSig.verify(pb.getHeader().getM().getSender(), pb)) {
                 logger.debug(format("[#%d-C[%d] #1] invalid sub chain version, block [height=%d] digital signature is invalid " +
@@ -670,13 +686,13 @@ public txID addTransaction(byte[] data, int clientID) {
                     return false;
                 }
             }
-            if (subV.getHeight() >= f) {
-                if (!subV.validateBlockCreator(pb, f)) {
-                    logger.debug(format("[#%d-C[%d]] invalid invalid sub chain version, block creator is invalid [height=%d] [fp=%d]",
-                            getID(),channel, pb.getHeader().getHeight(), forkPoint));
-                    return false;
-                }
+//            if (subV.getHeight() >= f) {
+            if (!subV.validateCurrentLeader(pb.getHeader().getM().getSender(), f)) {
+                logger.debug(format("[#%d-C[%d]] invalid invalid sub chain version, block creator is invalid [height=%d] [fp=%d]",
+                        getID(),channel, pb.getHeader().getHeight(), forkPoint));
+                return false;
             }
+//            }
             subV.addBlock(pb);
         }
         return true;
@@ -741,7 +757,7 @@ public txID addTransaction(byte[] data, int clientID) {
 
     abstract void potentialBehaviourForSync() throws InterruptedException;
 
-    private void sync(int forkPoint) throws IOException, InterruptedException {
+    private void sync(int forkPoint) throws InterruptedException, IOException {
         logger.debug(format("[#%d-C[%d]] start sync method with [r=%d]", getID(),channel, forkPoint));
         potentialBehaviourForSync();
         proposeVersion(forkPoint);

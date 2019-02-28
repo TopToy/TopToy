@@ -76,17 +76,13 @@ public class AsyncToyServer extends ToyBaseServer {
     }
     @Override
     public BaseBlockchain initBC(int id, int channel) {
-        return new SBlockchain(id, channel);
+        return new SBlockchain(id, channel, 0, sPath);
     }
 
     @Override
     public BaseBlockchain getBC(int start, int end) {
-        try {
-            return new SBlockchain(this.bc, start, end);
-        } catch (IOException e) {
-            logger.error("Unable to return the blockchain", e);
-            return null;
-        }
+        return new SBlockchain(this.bc, start, end);
+
     }
 
     @Override
