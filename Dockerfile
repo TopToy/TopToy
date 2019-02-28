@@ -1,6 +1,6 @@
 # Dockerfile
 
-FROM openjdk:10
+FROM openjdk:11
 MAINTAINER Yehonatan Buchnik <yon_b@cs.technion.ac.il>
 
 ENV TOY_HOME /JToy

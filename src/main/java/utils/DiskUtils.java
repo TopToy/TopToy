@@ -55,7 +55,6 @@ public class DiskUtils {
 
     public static Types.Block getBlockFromFile(int height, Path path) throws IOException {
         Path blockFile = Paths.get(path.toString(), String.valueOf(height));
-        Types.Block.Builder b = Types.Block.newBuilder();
         try (FileInputStream input = new FileInputStream(blockFile.toString())) {
             return Types.Block.parseDelimitedFrom((input));
         }
