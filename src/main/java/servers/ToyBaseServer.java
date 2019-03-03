@@ -2,6 +2,7 @@ package servers;
 
 import blockchain.BaseBlock;
 import blockchain.BaseBlockchain;
+import blockchain.SBlock;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.protobuf.ByteString;
@@ -32,6 +33,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import static blockchain.BaseBlockchain.validateBlockHash;
 import static java.lang.Math.max;
+import static java.lang.Math.toRadians;
 import static java.lang.String.format;
 
 public abstract class ToyBaseServer extends Node {
@@ -49,7 +51,7 @@ public abstract class ToyBaseServer extends Node {
     protected int n;
     int currLeader;
     protected AtomicBoolean stopped = new AtomicBoolean(false);
-    BaseBlock currBlock;
+//    BaseBlock currBlock;
     private final Object newBlockNotifyer = new Object();
     private int maxTransactionInBlock;
     private Thread mainThread;
@@ -59,7 +61,7 @@ public abstract class ToyBaseServer extends Node {
 //    private final HashMap<Integer, List<ForkProof>> fp;
     private final HashMap<Integer, Boolean> fp;
     private final ConcurrentHashMap<Integer, ArrayList<subChainVersion>> scVersions;
-    private final ConcurrentLinkedQueue<Transaction> transactionsPool = new ConcurrentLinkedQueue<>();
+//    private final ConcurrentLinkedQueue<Transaction> transactionsPool = new ConcurrentLinkedQueue<>();
     boolean configuredFastMode;
     boolean fastMode;
     int channel;
@@ -74,12 +76,10 @@ public abstract class ToyBaseServer extends Node {
     Path sPath = Paths.get("blocks", String.valueOf(channel));
     ExecutorService storageWorker = Executors.newSingleThreadExecutor();
     private int syncEvents = 0;
-    AtomicLong txNum = new AtomicLong(0);
+//    AtomicLong txNum = new AtomicLong(0);
+    int bid = 0;
+    final Queue<BaseBlock> blocksForPropose = new LinkedList<>();
     CacheUtils txCache = new CacheUtils(0);
-
-
-
-
 
     public ToyBaseServer(String addr, int rmfPort, int id, int channel, int f, int tmo, int tmoInterval,
                          int maxTx, boolean fastMode, ArrayList<Node> cluster,
@@ -90,7 +90,7 @@ public abstract class ToyBaseServer extends Node {
         this.panicRB = panic;
         this.syncRB = sync;
         bc = initBC(id, channel);
-        currBlock = null;
+//        currBlock = null;
         currHeight = 1; // starts from 1 due to the genesis BaseBlock
         currLeader = 0;
         this.maxTransactionInBlock = maxTx;
@@ -134,7 +134,7 @@ public abstract class ToyBaseServer extends Node {
         panicRB = new RBrodcastService(1, id, panicConfig);
         syncRB = new RBrodcastService(1, id, syncConfig);
         bc = initBC(id, channel);
-        currBlock = null;
+//        currBlock = null;
         currHeight = 1; // starts from 1 due to the genesis BaseBlock
         currLeader = 0;
 //        this.tmo =  tmo;
@@ -330,7 +330,10 @@ public abstract class ToyBaseServer extends Node {
             if (currLeader == getID()) {
                 logger.debug(format("[#%d-C[%d]] nullifies currBlock [sender=%d] [height=%d] [cidSeries=%d, cid=%d]",
                         getID(), channel, recBlock.getHeader().getM().getSender(), currHeight, cidSeries, cid));
-                currBlock = null;
+//                currBlock = null;
+                synchronized (blocksForPropose) {
+                    blocksForPropose.remove();
+                }
             }
             if (!bc.validateBlockHash(recBlock)) {
                 announceFork(recBlock);
@@ -357,8 +360,8 @@ public abstract class ToyBaseServer extends Node {
                     }
 
                     Block finalPermanent = permanent;
-                    storageWorker.execute(() ->
-                            DBUtils.writeBlockToTable(channel, finalPermanent.getHeader().getHeight(), finalPermanent));
+//                    storageWorker.execute(() ->
+//                            DBUtils.writeBlockToTable(channel, finalPermanent.getHeader().getHeight(), finalPermanent));
                 }
 
                 logger.debug(String.format("[#%d-C[%d]] adds new Block with [height=%d] [cidSeries=%d ; cid=%d] [size=%d]",
@@ -379,7 +382,7 @@ public abstract class ToyBaseServer extends Node {
 //                }
 
             updateLeaderAndHeight();
-            storageWorker.execute(bc::writeNextToDisk);
+//            storageWorker.execute(bc::writeNextToDisk);
         }
 //        }
     }
@@ -393,36 +396,67 @@ public abstract class ToyBaseServer extends Node {
     abstract public BaseBlockchain getEmptyBC();
 
     public int getTxPoolSize() {
-        return transactionsPool.size();
+        if (blocksForPropose.size() == 0) return 0;
+        return ((blocksForPropose.size() - 1) * maxTransactionInBlock) +
+                blocksForPropose.element().getTransactionCount();
     }
 
     public txID addTransaction(Transaction tx) {
-        if (transactionsPool.size() > txPoolMax) return null;
-        transactionsPool.add(
-            tx.toBuilder()
+        synchronized (blocksForPropose) {
+            if (getTxPoolSize() > txPoolMax) return null;
+            if (blocksForPropose.size() == 0 ||
+                    blocksForPropose.element().getTransactionCount() >= maxTransactionInBlock) {
+                blocksForPropose.add(new SBlock());
+                blocksForPropose.element().blockBuilder
+                        .setHeader(BlockHeader.newBuilder()
+                                .setBid(++bid));
+            }
+        }
+        synchronized (blocksForPropose.element()) {
+            int cbid = blocksForPropose.element().blockBuilder.getHeader().getBid();
+            int txnum = blocksForPropose.element().getTransactionCount() + 1;
+            Transaction ntx = tx.toBuilder()
                     .setId(txID.newBuilder()
                             .setProposerID(getID())
-                            .setTxNum(txNum.getAndIncrement())
+                            .setBid(cbid)
+                            .setTxNum(txnum)
                             .setChannel(channel))
                     .setServerTs(System.currentTimeMillis())
-                    .build());
-        return tx.getId();
+                    .build();
+            blocksForPropose.element().addTransaction(ntx);
+            return ntx.getId();
+        }
+
+//        if (transactionsPool.size() > txPoolMax) return null;
+//        transactionsPool.add(
+//            tx.toBuilder()
+//                    .setId(txID.newBuilder()
+//                            .setProposerID(getID())
+//                            .setTxNum(txNum.getAndIncrement())
+//                            .setChannel(channel))
+//                    .setServerTs(System.currentTimeMillis())
+//                    .build());
+//        return tx.getId();
     }
 
     public txID addTransaction(byte[] data, int clientID) {
-        if (transactionsPool.size() > txPoolMax) return null;
-    //        String txID = UUID.randomUUID().toString();
-        long currTx = txNum.getAndIncrement();
-        Transaction t = Transaction.newBuilder()
+        Transaction tx = Transaction.newBuilder()
                 .setClientID(clientID)
-                .setId(Types.txID.newBuilder()
-                        .setTxNum(currTx)
-                        .setProposerID(getID())
-                        .setChannel(channel))
-                .setData(ByteString.copyFrom(data))
-                .build();
-        transactionsPool.add(t);
-        return t.getId();
+                .setData(ByteString.copyFrom(data)).build();
+        return addTransaction(tx);
+//        if (transactionsPool.size() > txPoolMax) return null;
+//    //        String txID = UUID.randomUUID().toString();
+//        long currTx = txNum.getAndIncrement();
+//        Transaction t = Transaction.newBuilder()
+//                .setClientID(clientID)
+//                .setId(Types.txID.newBuilder()
+//                        .setTxNum(currTx)
+//                        .setProposerID(getID())
+//                        .setChannel(channel))
+//                .setData()
+//                .build();
+//        transactionsPool.add(t);
+//        return t.getId();
     }
     private void addApprovedTransactions(List<Transaction> txs) {
 //        synchronized (approvedTx) {
@@ -433,59 +467,72 @@ public abstract class ToyBaseServer extends Node {
 
     }
     public int isTxPresent(txID tid) {
-        int bid = txCache.get(tid);
-        if (bid != -1) {
-            txCache.add(tid, bid);
-            return 0;
-        }
-        bid = DBUtils.getTxRecord(tid, channel);
-        if (bid != -1) {
-            txCache.add(tid, bid);
-            return 0;
-        }
+//        if (txCache.contains(tid)) return 0;
         return -1;
     }
 
     void createTxToBlock() {
-        while (currBlock.getTransactionCount() < maxTransactionInBlock) {
-            long ts = System.currentTimeMillis();
-            SecureRandom random = new SecureRandom();
-            byte[] tx = new byte[txSize];
-            random.nextBytes(tx);
-            long currTx = txNum.getAndIncrement();
-            currBlock.addTransaction(Transaction.newBuilder()
-                    .setId(txID.newBuilder()
-                            .setProposerID(getID())
-                            .setTxNum(currTx)
-                            .setChannel(channel))
-                    .setClientID(cID)
-                    .setClientTs(ts)
-                    .setServerTs(ts)
-                    .setData(ByteString.copyFrom(tx))
-                    .build());
+        synchronized (blocksForPropose) {
+            if (blocksForPropose.size() == 0) {
+                blocksForPropose.add(new SBlock());
+                blocksForPropose.element().blockBuilder
+                        .setHeader(BlockHeader.newBuilder()
+                                .setBid(++bid));
+            }
         }
+        synchronized (blocksForPropose.element()) {
+            while (blocksForPropose.element().getTransactionCount() < maxTransactionInBlock) {
+                long ts = System.currentTimeMillis();
+                SecureRandom random = new SecureRandom();
+                byte[] tx = new byte[txSize];
+                random.nextBytes(tx);
+                addTransaction(Transaction.newBuilder()
+                        .setClientID(cID)
+                        .setClientTs(ts)
+                        .setServerTs(ts)
+                        .setData(ByteString.copyFrom(tx))
+                        .build());
+            }
+        }
+//        while (currBlock.getTransactionCount() < maxTransactionInBlock) {
+//            long ts = System.currentTimeMillis();
+//            SecureRandom random = new SecureRandom();
+//            byte[] tx = new byte[txSize];
+//            random.nextBytes(tx);
+//            long currTx = txNum.getAndIncrement();
+//            currBlock.addTransaction(Transaction.newBuilder()
+//                    .setId(txID.newBuilder()
+//                            .setProposerID(getID())
+//                            .setTxNum(currTx)
+//                            .setChannel(channel))
+//                    .setClientID(cID)
+//                    .setClientTs(ts)
+//                    .setServerTs(ts)
+//                    .setData(ByteString.copyFrom(tx))
+//                    .build());
+//        }
 
     }
 
     void addTransactionsToCurrBlock() {
-        if (currBlock != null) {
-            logger.debug(format("[#%d-C[%d]] block is already build",
-                    getID(), channel));
-            return;
-        }
-        currBlock = bc.createNewBLock();
-        currBlock.blockBuilder.setSt(blockStatistics
-                .newBuilder()
-                .build());
-            while ((!transactionsPool.isEmpty()) && currBlock.getTransactionCount() < maxTransactionInBlock) {
-                Transaction t = transactionsPool.poll();
-                if (!currBlock.validateTransaction(t)) {
-                    logger.debug(format("[#%d-C[%d]] detects an invalid transaction from [client=%d]",
-                            getID(), channel, t.getClientID()));
-                    continue;
-                }
-                currBlock.addTransaction(t);
-            }
+//        if (currBlock != null) {
+//            logger.debug(format("[#%d-C[%d]] block is already build",
+//                    getID(), channel));
+//            return;
+//        }
+//        currBlock = bc.createNewBLock();
+//        currBlock.blockBuilder.setSt(blockStatistics
+//                .newBuilder()
+//                .build());
+//            while ((!transactionsPool.isEmpty()) && currBlock.getTransactionCount() < maxTransactionInBlock) {
+//                Transaction t = transactionsPool.poll();
+//                if (!currBlock.validateTransaction(t)) {
+//                    logger.debug(format("[#%d-C[%d]] detects an invalid transaction from [client=%d]",
+//                            getID(), channel, t.getClientID()));
+//                    continue;
+//                }
+//                currBlock.addTransaction(t);
+//            }
             if (testing) {
                 createTxToBlock();
             }

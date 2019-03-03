@@ -26,13 +26,10 @@ message BbcDecision {
 message BlockHeader {
     Meta m = 1;
     bytes prev= 2;
-//    int32 creatorID = 2;
     int32 height = 3;
     bytes transactionHash = 4;
     string proof = 5;
-//    bool present = 6;
-//    int32 cid = 5;
-//    int32 cidSeries = 6;
+    int32 bid = 6;
 }
 
 //message BlockFooter {
@@ -64,8 +61,9 @@ message Block {
 
 message txID {
     int32 proposerID = 1;
-    int64 txNum = 2;
-    int32 channel = 3;
+    int32 bid = 2;
+    int64 txNum = 3;
+    int32 channel = 4;
 }
 message Transaction {
     int32 clientID = 1;

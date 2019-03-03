@@ -12,7 +12,6 @@ import proto.Types.*;
 import das.wrb.ByzantineWrbNode;
 import das.wrb.WrbNode;
 
-import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.*;
 
@@ -64,19 +63,37 @@ public class ByzToyServer extends ToyBaseServer {
         byte[] byzTx = new byte[40];
         random.nextBytes(byzTx);
 //        String txID = UUID.randomUUID().toString();
-        Transaction t = Transaction.newBuilder()
-                .setClientID(-1)
-                .setId(Types.txID.newBuilder()
-                        .setTxNum(txNum.getAndIncrement())
-                        .setProposerID(getID())
-                        .build())
-                .setData(ByteString.copyFrom(byzTx))
-                .build();
-        currBlock.addTransaction(t);
-        if (currBlock.getTransactionCount() > 1) {
-            currBlock.removeTransaction(0);
+        synchronized (blocksForPropose.element()) {
+            int cbid = blocksForPropose.element().blockBuilder.getHeader().getBid();
+            int txNum = blocksForPropose.element().getTransactionCount() + 1;
+            Transaction t = Transaction.newBuilder()
+                    .setClientID(-1)
+                    .setId(Types.txID.newBuilder()
+                            .setTxNum(txNum)
+                            .setBid(cbid)
+                            .setProposerID(getID())
+                            .build())
+                    .setData(ByteString.copyFrom(byzTx))
+                    .build();
+            blocksForPropose.element().addTransaction(t);
+            if(blocksForPropose.element().getTransactionCount() > 1) {
+                blocksForPropose.element().removeTransaction(0);
+            }
         }
+//        Transaction t = Transaction.newBuilder()
+//                .setClientID(-1)
+//                .setId(Types.txID.newBuilder()
+//                        .setTxNum(txNum.getAndIncrement())
+//                        .setProposerID(getID())
+//                        .build())
+//                .setData(ByteString.copyFrom(byzTx))
+//                .build();
+//        currBlock.addTransaction(t);
+//        if (currBlock.getTransactionCount() > 1) {
+//            currBlock.removeTransaction(0);
+//        }
     }
+
     Block leaderImpl() throws InterruptedException {
         if (currLeader != getID()) {
             return null;
@@ -92,18 +109,35 @@ public class ByzToyServer extends ToyBaseServer {
 
     //        synchronized (blockLock) {
         addTransactionsToCurrBlock();
-        Block sealedBlock1 = currBlock.construct(getID(), currHeight, cidSeries, cid,
-                channel, bc.getBlock(currHeight - 1).getHeader());
-
+        Block sealedBlock1;
+        Block byzBlock;
         List<Block> msgs = new ArrayList<>();
-        List<Integer> heights = new ArrayList<>();
-        for (int i = 0 ; i < groups.size() ; i++) {
-            addByzData();
-            Block byzBlock = currBlock.construct(getID(), currHeight, cidSeries, cid,
+//        List<Integer> heights = new ArrayList<>();
+        synchronized (blocksForPropose.element()) {
+            sealedBlock1 = blocksForPropose.element().construct(getID(), currHeight, cidSeries, cid,
                     channel, bc.getBlock(currHeight - 1).getHeader());
-            msgs.add(byzBlock);
-            heights.add(currHeight);
+
+            for (int i = 0 ; i < groups.size() ; i++) {
+                addByzData();
+                byzBlock = blocksForPropose.element()
+                        .construct(getID(), currHeight, cidSeries, cid,
+                        channel, bc.getBlock(currHeight - 1).getHeader());
+                msgs.add(byzBlock);
+//                heights.add(currHeight);
+            }
         }
+//        Block sealedBlock1 = currBlock.construct(getID(), currHeight, cidSeries, cid,
+//                channel, bc.getBlock(currHeight - 1).getHeader());
+//
+//        List<Block> msgs = new ArrayList<>();
+//        List<Integer> heights = new ArrayList<>();
+//        for (int i = 0 ; i < groups.size() ; i++) {
+//            addByzData();
+//            Block byzBlock = currBlock.construct(getID(), currHeight, cidSeries, cid,
+//                    channel, bc.getBlock(currHeight - 1).getHeader());
+//            msgs.add(byzBlock);
+//            heights.add(currHeight);
+//        }
 
         if (fullByz) {
             ((ByzantineWrbNode)rmfServer).devidedBroadcast(msgs, groups);

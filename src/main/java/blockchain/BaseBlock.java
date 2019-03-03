@@ -45,7 +45,9 @@ public abstract class BaseBlock {
             headerArray = header.toByteArray();
         }
         blockBuilder
-                .setHeader(BlockHeader.newBuilder()
+                .setHeader(blockBuilder
+                        .getHeader()
+                        .toBuilder()
                         .setM(Meta.newBuilder()
                                 .setCid(cid)
                                 .setCidSeries(cidSeries)

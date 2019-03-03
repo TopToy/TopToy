@@ -8,14 +8,18 @@ docker_build:
 docker-composer:
 	./make_scripts/docker-composer.sh
 
-docker-generate_configuration:
+docker-generate-configuration:
 	./make_scripts/generate_configuration.sh
 
 docker-full-build:
-	make docker-generate_configuration
+	make docker-generate-configuration
 	make docker-composer
 	make bin-build
 	make docker_build
+
+docker-generate-run:
+	make docker-generate-configuration
+	make docker-composer
 
 docker-run:
 	docker-compose up

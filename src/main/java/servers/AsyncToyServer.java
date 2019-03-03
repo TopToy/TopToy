@@ -55,7 +55,13 @@ public class AsyncToyServer extends ToyBaseServer {
         logger.debug(format("[#%d] prepare to disseminate a new block of [height=%d] [cidSeries=%d ; cid=%d]",
                 getID(), currHeight, cidSeries, cid));
         addTransactionsToCurrBlock();
-        Types.Block sealedBlock = currBlock.construct(getID(), currHeight, cidSeries, cid, channel, bc.getBlock(currHeight - 1).getHeader());
+//        Types.Block sealedBlock = currBlock.construct(getID(), currHeight, cidSeries, cid, channel, bc.getBlock(currHeight - 1).getHeader());
+        Types.Block sealedBlock;
+        synchronized (blocksForPropose.element()) {
+            sealedBlock = blocksForPropose
+                    .element()
+                    .construct(getID(), currHeight, cidSeries, cid, channel, bc.getBlock(currHeight - 1).getHeader());
+        }
         rmfServer.broadcast(sealedBlock);
         return null;
     }
@@ -67,7 +73,12 @@ public class AsyncToyServer extends ToyBaseServer {
         logger.debug(format("[#%d] prepare fast mode phase for [height=%d] [cidSeries=%d ; cid=%d]",
                 getID(), currHeight + 1, cidSeries, cid + 1));
         addTransactionsToCurrBlock();
-        return currBlock.construct(getID(), currHeight + 1, cidSeries, cid + 1, channel, null);
+        synchronized (blocksForPropose.element()) {
+            return blocksForPropose
+                    .element()
+                    .construct(getID(), currHeight + 1, cidSeries, cid + 1, channel, null);
+        }
+//        return currBlock.construct(getID(), currHeight + 1, cidSeries, cid + 1, channel, null);
     }
 
     public void setAsyncParam(int maxTime) {

@@ -2161,10 +2161,6 @@ public final class Types {
     com.google.protobuf.ByteString getPrev();
 
     /**
-     * <pre>
-     *    int32 creatorID = 2;
-     * </pre>
-     *
      * <code>int32 height = 3;</code>
      */
     int getHeight();
@@ -2175,26 +2171,19 @@ public final class Types {
     com.google.protobuf.ByteString getTransactionHash();
 
     /**
-     * <pre>
-     *    bool present = 6;
-     *    int32 cid = 5;
-     *    int32 cidSeries = 6;
-     * </pre>
-     *
      * <code>string proof = 5;</code>
      */
     java.lang.String getProof();
     /**
-     * <pre>
-     *    bool present = 6;
-     *    int32 cid = 5;
-     *    int32 cidSeries = 6;
-     * </pre>
-     *
      * <code>string proof = 5;</code>
      */
     com.google.protobuf.ByteString
         getProofBytes();
+
+    /**
+     * <code>int32 bid = 6;</code>
+     */
+    int getBid();
   }
   /**
    * Protobuf type {@code proto.BlockHeader}
@@ -2213,6 +2202,7 @@ public final class Types {
       height_ = 0;
       transactionHash_ = com.google.protobuf.ByteString.EMPTY;
       proof_ = "";
+      bid_ = 0;
     }
 
     @java.lang.Override
@@ -2280,6 +2270,11 @@ public final class Types {
               proof_ = s;
               break;
             }
+            case 48: {
+
+              bid_ = input.readInt32();
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -2337,10 +2332,6 @@ public final class Types {
     public static final int HEIGHT_FIELD_NUMBER = 3;
     private int height_;
     /**
-     * <pre>
-     *    int32 creatorID = 2;
-     * </pre>
-     *
      * <code>int32 height = 3;</code>
      */
     public int getHeight() {
@@ -2359,12 +2350,6 @@ public final class Types {
     public static final int PROOF_FIELD_NUMBER = 5;
     private volatile java.lang.Object proof_;
     /**
-     * <pre>
-     *    bool present = 6;
-     *    int32 cid = 5;
-     *    int32 cidSeries = 6;
-     * </pre>
-     *
      * <code>string proof = 5;</code>
      */
     public java.lang.String getProof() {
@@ -2380,12 +2365,6 @@ public final class Types {
       }
     }
     /**
-     * <pre>
-     *    bool present = 6;
-     *    int32 cid = 5;
-     *    int32 cidSeries = 6;
-     * </pre>
-     *
      * <code>string proof = 5;</code>
      */
     public com.google.protobuf.ByteString
@@ -2400,6 +2379,15 @@ public final class Types {
       } else {
         return (com.google.protobuf.ByteString) ref;
       }
+    }
+
+    public static final int BID_FIELD_NUMBER = 6;
+    private int bid_;
+    /**
+     * <code>int32 bid = 6;</code>
+     */
+    public int getBid() {
+      return bid_;
     }
 
     private byte memoizedIsInitialized = -1;
@@ -2429,6 +2417,9 @@ public final class Types {
       if (!getProofBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 5, proof_);
       }
+      if (bid_ != 0) {
+        output.writeInt32(6, bid_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -2455,6 +2446,10 @@ public final class Types {
       }
       if (!getProofBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(5, proof_);
+      }
+      if (bid_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(6, bid_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -2485,6 +2480,8 @@ public final class Types {
           .equals(other.getTransactionHash());
       result = result && getProof()
           .equals(other.getProof());
+      result = result && (getBid()
+          == other.getBid());
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -2508,6 +2505,8 @@ public final class Types {
       hash = (53 * hash) + getTransactionHash().hashCode();
       hash = (37 * hash) + PROOF_FIELD_NUMBER;
       hash = (53 * hash) + getProof().hashCode();
+      hash = (37 * hash) + BID_FIELD_NUMBER;
+      hash = (53 * hash) + getBid();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -2651,6 +2650,8 @@ public final class Types {
 
         proof_ = "";
 
+        bid_ = 0;
+
         return this;
       }
 
@@ -2682,6 +2683,7 @@ public final class Types {
         result.height_ = height_;
         result.transactionHash_ = transactionHash_;
         result.proof_ = proof_;
+        result.bid_ = bid_;
         onBuilt();
         return result;
       }
@@ -2738,6 +2740,9 @@ public final class Types {
         if (!other.getProof().isEmpty()) {
           proof_ = other.proof_;
           onChanged();
+        }
+        if (other.getBid() != 0) {
+          setBid(other.getBid());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -2914,20 +2919,12 @@ public final class Types {
 
       private int height_ ;
       /**
-       * <pre>
-       *    int32 creatorID = 2;
-       * </pre>
-       *
        * <code>int32 height = 3;</code>
        */
       public int getHeight() {
         return height_;
       }
       /**
-       * <pre>
-       *    int32 creatorID = 2;
-       * </pre>
-       *
        * <code>int32 height = 3;</code>
        */
       public Builder setHeight(int value) {
@@ -2937,10 +2934,6 @@ public final class Types {
         return this;
       }
       /**
-       * <pre>
-       *    int32 creatorID = 2;
-       * </pre>
-       *
        * <code>int32 height = 3;</code>
        */
       public Builder clearHeight() {
@@ -2981,12 +2974,6 @@ public final class Types {
 
       private java.lang.Object proof_ = "";
       /**
-       * <pre>
-       *    bool present = 6;
-       *    int32 cid = 5;
-       *    int32 cidSeries = 6;
-       * </pre>
-       *
        * <code>string proof = 5;</code>
        */
       public java.lang.String getProof() {
@@ -3002,12 +2989,6 @@ public final class Types {
         }
       }
       /**
-       * <pre>
-       *    bool present = 6;
-       *    int32 cid = 5;
-       *    int32 cidSeries = 6;
-       * </pre>
-       *
        * <code>string proof = 5;</code>
        */
       public com.google.protobuf.ByteString
@@ -3024,12 +3005,6 @@ public final class Types {
         }
       }
       /**
-       * <pre>
-       *    bool present = 6;
-       *    int32 cid = 5;
-       *    int32 cidSeries = 6;
-       * </pre>
-       *
        * <code>string proof = 5;</code>
        */
       public Builder setProof(
@@ -3043,12 +3018,6 @@ public final class Types {
         return this;
       }
       /**
-       * <pre>
-       *    bool present = 6;
-       *    int32 cid = 5;
-       *    int32 cidSeries = 6;
-       * </pre>
-       *
        * <code>string proof = 5;</code>
        */
       public Builder clearProof() {
@@ -3058,12 +3027,6 @@ public final class Types {
         return this;
       }
       /**
-       * <pre>
-       *    bool present = 6;
-       *    int32 cid = 5;
-       *    int32 cidSeries = 6;
-       * </pre>
-       *
        * <code>string proof = 5;</code>
        */
       public Builder setProofBytes(
@@ -3074,6 +3037,32 @@ public final class Types {
   checkByteStringIsUtf8(value);
         
         proof_ = value;
+        onChanged();
+        return this;
+      }
+
+      private int bid_ ;
+      /**
+       * <code>int32 bid = 6;</code>
+       */
+      public int getBid() {
+        return bid_;
+      }
+      /**
+       * <code>int32 bid = 6;</code>
+       */
+      public Builder setBid(int value) {
+        
+        bid_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int32 bid = 6;</code>
+       */
+      public Builder clearBid() {
+        
+        bid_ = 0;
         onChanged();
         return this;
       }
@@ -5176,12 +5165,17 @@ public final class Types {
     int getProposerID();
 
     /**
-     * <code>int64 txNum = 2;</code>
+     * <code>int32 bid = 2;</code>
+     */
+    int getBid();
+
+    /**
+     * <code>int64 txNum = 3;</code>
      */
     long getTxNum();
 
     /**
-     * <code>int32 channel = 3;</code>
+     * <code>int32 channel = 4;</code>
      */
     int getChannel();
   }
@@ -5199,6 +5193,7 @@ public final class Types {
     }
     private txID() {
       proposerID_ = 0;
+      bid_ = 0;
       txNum_ = 0L;
       channel_ = 0;
     }
@@ -5241,10 +5236,15 @@ public final class Types {
             }
             case 16: {
 
-              txNum_ = input.readInt64();
+              bid_ = input.readInt32();
               break;
             }
             case 24: {
+
+              txNum_ = input.readInt64();
+              break;
+            }
+            case 32: {
 
               channel_ = input.readInt32();
               break;
@@ -5282,19 +5282,28 @@ public final class Types {
       return proposerID_;
     }
 
-    public static final int TXNUM_FIELD_NUMBER = 2;
+    public static final int BID_FIELD_NUMBER = 2;
+    private int bid_;
+    /**
+     * <code>int32 bid = 2;</code>
+     */
+    public int getBid() {
+      return bid_;
+    }
+
+    public static final int TXNUM_FIELD_NUMBER = 3;
     private long txNum_;
     /**
-     * <code>int64 txNum = 2;</code>
+     * <code>int64 txNum = 3;</code>
      */
     public long getTxNum() {
       return txNum_;
     }
 
-    public static final int CHANNEL_FIELD_NUMBER = 3;
+    public static final int CHANNEL_FIELD_NUMBER = 4;
     private int channel_;
     /**
-     * <code>int32 channel = 3;</code>
+     * <code>int32 channel = 4;</code>
      */
     public int getChannel() {
       return channel_;
@@ -5315,11 +5324,14 @@ public final class Types {
       if (proposerID_ != 0) {
         output.writeInt32(1, proposerID_);
       }
+      if (bid_ != 0) {
+        output.writeInt32(2, bid_);
+      }
       if (txNum_ != 0L) {
-        output.writeInt64(2, txNum_);
+        output.writeInt64(3, txNum_);
       }
       if (channel_ != 0) {
-        output.writeInt32(3, channel_);
+        output.writeInt32(4, channel_);
       }
       unknownFields.writeTo(output);
     }
@@ -5333,13 +5345,17 @@ public final class Types {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(1, proposerID_);
       }
+      if (bid_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(2, bid_);
+      }
       if (txNum_ != 0L) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt64Size(2, txNum_);
+          .computeInt64Size(3, txNum_);
       }
       if (channel_ != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(3, channel_);
+          .computeInt32Size(4, channel_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -5359,6 +5375,8 @@ public final class Types {
       boolean result = true;
       result = result && (getProposerID()
           == other.getProposerID());
+      result = result && (getBid()
+          == other.getBid());
       result = result && (getTxNum()
           == other.getTxNum());
       result = result && (getChannel()
@@ -5376,6 +5394,8 @@ public final class Types {
       hash = (19 * hash) + getDescriptor().hashCode();
       hash = (37 * hash) + PROPOSERID_FIELD_NUMBER;
       hash = (53 * hash) + getProposerID();
+      hash = (37 * hash) + BID_FIELD_NUMBER;
+      hash = (53 * hash) + getBid();
       hash = (37 * hash) + TXNUM_FIELD_NUMBER;
       hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
           getTxNum());
@@ -5512,6 +5532,8 @@ public final class Types {
         super.clear();
         proposerID_ = 0;
 
+        bid_ = 0;
+
         txNum_ = 0L;
 
         channel_ = 0;
@@ -5539,6 +5561,7 @@ public final class Types {
       public proto.Types.txID buildPartial() {
         proto.Types.txID result = new proto.Types.txID(this);
         result.proposerID_ = proposerID_;
+        result.bid_ = bid_;
         result.txNum_ = txNum_;
         result.channel_ = channel_;
         onBuilt();
@@ -5584,6 +5607,9 @@ public final class Types {
         if (other == proto.Types.txID.getDefaultInstance()) return this;
         if (other.getProposerID() != 0) {
           setProposerID(other.getProposerID());
+        }
+        if (other.getBid() != 0) {
+          setBid(other.getBid());
         }
         if (other.getTxNum() != 0L) {
           setTxNum(other.getTxNum());
@@ -5644,15 +5670,41 @@ public final class Types {
         return this;
       }
 
+      private int bid_ ;
+      /**
+       * <code>int32 bid = 2;</code>
+       */
+      public int getBid() {
+        return bid_;
+      }
+      /**
+       * <code>int32 bid = 2;</code>
+       */
+      public Builder setBid(int value) {
+        
+        bid_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int32 bid = 2;</code>
+       */
+      public Builder clearBid() {
+        
+        bid_ = 0;
+        onChanged();
+        return this;
+      }
+
       private long txNum_ ;
       /**
-       * <code>int64 txNum = 2;</code>
+       * <code>int64 txNum = 3;</code>
        */
       public long getTxNum() {
         return txNum_;
       }
       /**
-       * <code>int64 txNum = 2;</code>
+       * <code>int64 txNum = 3;</code>
        */
       public Builder setTxNum(long value) {
         
@@ -5661,7 +5713,7 @@ public final class Types {
         return this;
       }
       /**
-       * <code>int64 txNum = 2;</code>
+       * <code>int64 txNum = 3;</code>
        */
       public Builder clearTxNum() {
         
@@ -5672,13 +5724,13 @@ public final class Types {
 
       private int channel_ ;
       /**
-       * <code>int32 channel = 3;</code>
+       * <code>int32 channel = 4;</code>
        */
       public int getChannel() {
         return channel_;
       }
       /**
-       * <code>int32 channel = 3;</code>
+       * <code>int32 channel = 4;</code>
        */
       public Builder setChannel(int value) {
         
@@ -5687,7 +5739,7 @@ public final class Types {
         return this;
       }
       /**
-       * <code>int32 channel = 3;</code>
+       * <code>int32 channel = 4;</code>
        */
       public Builder clearChannel() {
         
@@ -13646,34 +13698,35 @@ public final class Types {
       "dSeries\030\004 \001(\005\"J\n\006BbcMsg\022\026\n\001m\030\001 \001(\0132\013.pro" +
       "to.Meta\022\014\n\004vote\030\002 \001(\005\022\032\n\004next\030\003 \001(\0132\014.pr" +
       "oto.Block\"7\n\013BbcDecision\022\026\n\001m\030\001 \001(\0132\013.pr" +
-      "oto.Meta\022\020\n\010decosion\030\002 \001(\005\"k\n\013BlockHeade" +
+      "oto.Meta\022\020\n\010decosion\030\002 \001(\005\"x\n\013BlockHeade" +
       "r\022\026\n\001m\030\001 \001(\0132\013.proto.Meta\022\014\n\004prev\030\002 \001(\014\022" +
       "\016\n\006height\030\003 \001(\005\022\027\n\017transactionHash\030\004 \001(\014" +
-      "\022\r\n\005proof\030\005 \001(\t\"x\n\017blockStatistics\022\014\n\004si" +
-      "gn\030\002 \001(\003\022\020\n\010proposed\030\003 \001(\003\022\020\n\010verified\030\004" +
-      " \001(\003\022\026\n\016channelDecided\030\005 \001(\003\022\n\n\002pd\030\006 \001(\003" +
-      "\022\017\n\007decided\030\007 \001(\003\"q\n\005Block\022\"\n\006header\030\001 \001" +
-      "(\0132\022.proto.BlockHeader\022 \n\004data\030\002 \003(\0132\022.p" +
-      "roto.Transaction\022\"\n\002st\030\003 \001(\0132\026.proto.blo" +
-      "ckStatistics\":\n\004txID\022\022\n\nproposerID\030\001 \001(\005" +
-      "\022\r\n\005txNum\030\002 \001(\003\022\017\n\007channel\030\003 \001(\005\"j\n\013Tran" +
-      "saction\022\020\n\010clientID\030\001 \001(\005\022\027\n\002id\030\002 \001(\0132\013." +
-      "proto.txID\022\014\n\004data\030\003 \001(\014\022\020\n\010clientTs\030\004 \001" +
-      "(\003\022\020\n\010serverTs\030\005 \001(\003\"7\n\010accepted\022\020\n\010acce" +
-      "pted\030\001 \001(\010\022\031\n\004txID\030\002 \001(\0132\013.proto.txID\"N\n" +
-      "\010approved\022\036\n\002tx\030\001 \001(\0132\022.proto.Transactio" +
-      "n\022\"\n\002st\030\003 \001(\0132\026.proto.blockStatistics\"!\n" +
-      "\004read\022\031\n\004txID\030\001 \001(\0132\013.proto.txID\"S\n\tFork" +
-      "Proof\022\016\n\006sender\030\001 \001(\005\022\032\n\004curr\030\002 \001(\0132\014.pr" +
-      "oto.Block\022\032\n\004prev\030\004 \001(\0132\014.proto.Block\"-\n" +
-      "\005RBMsg\022\026\n\001m\030\001 \001(\0132\013.proto.Meta\022\014\n\004data\030\003" +
-      " \001(\014\"\007\n\005Empty\"!\n\003Req\022\032\n\005_meta\030\001 \001(\0132\013.pr" +
-      "oto.Meta\"(\n\nPreConsReq\022\032\n\005_meta\030\001 \001(\0132\013." +
-      "proto.Meta\"9\n\003Res\022\026\n\001m\030\001 \001(\0132\013.proto.Met" +
-      "a\022\032\n\004data\030\002 \001(\0132\014.proto.Block\"`\n\017subChai" +
-      "nVersion\022\021\n\tforkPoint\030\001 \001(\005\022\021\n\tsuggested" +
-      "\030\002 \001(\005\022\027\n\001v\030\003 \003(\0132\014.proto.Block\022\016\n\006sende" +
-      "r\030\004 \001(\005B\007\n\005protob\006proto3"
+      "\022\r\n\005proof\030\005 \001(\t\022\013\n\003bid\030\006 \001(\005\"x\n\017blockSta" +
+      "tistics\022\014\n\004sign\030\002 \001(\003\022\020\n\010proposed\030\003 \001(\003\022" +
+      "\020\n\010verified\030\004 \001(\003\022\026\n\016channelDecided\030\005 \001(" +
+      "\003\022\n\n\002pd\030\006 \001(\003\022\017\n\007decided\030\007 \001(\003\"q\n\005Block\022" +
+      "\"\n\006header\030\001 \001(\0132\022.proto.BlockHeader\022 \n\004d" +
+      "ata\030\002 \003(\0132\022.proto.Transaction\022\"\n\002st\030\003 \001(" +
+      "\0132\026.proto.blockStatistics\"G\n\004txID\022\022\n\npro" +
+      "poserID\030\001 \001(\005\022\013\n\003bid\030\002 \001(\005\022\r\n\005txNum\030\003 \001(" +
+      "\003\022\017\n\007channel\030\004 \001(\005\"j\n\013Transaction\022\020\n\010cli" +
+      "entID\030\001 \001(\005\022\027\n\002id\030\002 \001(\0132\013.proto.txID\022\014\n\004" +
+      "data\030\003 \001(\014\022\020\n\010clientTs\030\004 \001(\003\022\020\n\010serverTs" +
+      "\030\005 \001(\003\"7\n\010accepted\022\020\n\010accepted\030\001 \001(\010\022\031\n\004" +
+      "txID\030\002 \001(\0132\013.proto.txID\"N\n\010approved\022\036\n\002t" +
+      "x\030\001 \001(\0132\022.proto.Transaction\022\"\n\002st\030\003 \001(\0132" +
+      "\026.proto.blockStatistics\"!\n\004read\022\031\n\004txID\030" +
+      "\001 \001(\0132\013.proto.txID\"S\n\tForkProof\022\016\n\006sende" +
+      "r\030\001 \001(\005\022\032\n\004curr\030\002 \001(\0132\014.proto.Block\022\032\n\004p" +
+      "rev\030\004 \001(\0132\014.proto.Block\"-\n\005RBMsg\022\026\n\001m\030\001 " +
+      "\001(\0132\013.proto.Meta\022\014\n\004data\030\003 \001(\014\"\007\n\005Empty\"" +
+      "!\n\003Req\022\032\n\005_meta\030\001 \001(\0132\013.proto.Meta\"(\n\nPr" +
+      "eConsReq\022\032\n\005_meta\030\001 \001(\0132\013.proto.Meta\"9\n\003" +
+      "Res\022\026\n\001m\030\001 \001(\0132\013.proto.Meta\022\032\n\004data\030\002 \001(" +
+      "\0132\014.proto.Block\"`\n\017subChainVersion\022\021\n\tfo" +
+      "rkPoint\030\001 \001(\005\022\021\n\tsuggested\030\002 \001(\005\022\027\n\001v\030\003 " +
+      "\003(\0132\014.proto.Block\022\016\n\006sender\030\004 \001(\005B\007\n\005pro" +
+      "tob\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -13710,7 +13763,7 @@ public final class Types {
     internal_static_proto_BlockHeader_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_BlockHeader_descriptor,
-        new java.lang.String[] { "M", "Prev", "Height", "TransactionHash", "Proof", });
+        new java.lang.String[] { "M", "Prev", "Height", "TransactionHash", "Proof", "Bid", });
     internal_static_proto_blockStatistics_descriptor =
       getDescriptor().getMessageTypes().get(4);
     internal_static_proto_blockStatistics_fieldAccessorTable = new
@@ -13728,7 +13781,7 @@ public final class Types {
     internal_static_proto_txID_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_txID_descriptor,
-        new java.lang.String[] { "ProposerID", "TxNum", "Channel", });
+        new java.lang.String[] { "ProposerID", "Bid", "TxNum", "Channel", });
     internal_static_proto_Transaction_descriptor =
       getDescriptor().getMessageTypes().get(7);
     internal_static_proto_Transaction_fieldAccessorTable = new
