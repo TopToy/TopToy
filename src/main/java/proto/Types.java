@@ -672,9 +672,9 @@ public final class Types {
     proto.Types.MetaOrBuilder getMOrBuilder();
 
     /**
-     * <code>int32 vote = 2;</code>
+     * <code>bool vote = 2;</code>
      */
-    int getVote();
+    boolean getVote();
 
     /**
      * <code>.proto.Block next = 3;</code>
@@ -702,7 +702,7 @@ public final class Types {
       super(builder);
     }
     private BbcMsg() {
-      vote_ = 0;
+      vote_ = false;
     }
 
     @java.lang.Override
@@ -751,7 +751,7 @@ public final class Types {
             }
             case 16: {
 
-              vote_ = input.readInt32();
+              vote_ = input.readBool();
               break;
             }
             case 26: {
@@ -813,11 +813,11 @@ public final class Types {
     }
 
     public static final int VOTE_FIELD_NUMBER = 2;
-    private int vote_;
+    private boolean vote_;
     /**
-     * <code>int32 vote = 2;</code>
+     * <code>bool vote = 2;</code>
      */
-    public int getVote() {
+    public boolean getVote() {
       return vote_;
     }
 
@@ -857,8 +857,8 @@ public final class Types {
       if (m_ != null) {
         output.writeMessage(1, getM());
       }
-      if (vote_ != 0) {
-        output.writeInt32(2, vote_);
+      if (vote_ != false) {
+        output.writeBool(2, vote_);
       }
       if (next_ != null) {
         output.writeMessage(3, getNext());
@@ -875,9 +875,9 @@ public final class Types {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(1, getM());
       }
-      if (vote_ != 0) {
+      if (vote_ != false) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(2, vote_);
+          .computeBoolSize(2, vote_);
       }
       if (next_ != null) {
         size += com.google.protobuf.CodedOutputStream
@@ -927,7 +927,8 @@ public final class Types {
         hash = (53 * hash) + getM().hashCode();
       }
       hash = (37 * hash) + VOTE_FIELD_NUMBER;
-      hash = (53 * hash) + getVote();
+      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+          getVote());
       if (hasNext()) {
         hash = (37 * hash) + NEXT_FIELD_NUMBER;
         hash = (53 * hash) + getNext().hashCode();
@@ -1067,7 +1068,7 @@ public final class Types {
           m_ = null;
           mBuilder_ = null;
         }
-        vote_ = 0;
+        vote_ = false;
 
         if (nextBuilder_ == null) {
           next_ = null;
@@ -1152,7 +1153,7 @@ public final class Types {
         if (other.hasM()) {
           mergeM(other.getM());
         }
-        if (other.getVote() != 0) {
+        if (other.getVote() != false) {
           setVote(other.getVote());
         }
         if (other.hasNext()) {
@@ -1302,28 +1303,28 @@ public final class Types {
         return mBuilder_;
       }
 
-      private int vote_ ;
+      private boolean vote_ ;
       /**
-       * <code>int32 vote = 2;</code>
+       * <code>bool vote = 2;</code>
        */
-      public int getVote() {
+      public boolean getVote() {
         return vote_;
       }
       /**
-       * <code>int32 vote = 2;</code>
+       * <code>bool vote = 2;</code>
        */
-      public Builder setVote(int value) {
+      public Builder setVote(boolean value) {
         
         vote_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>int32 vote = 2;</code>
+       * <code>bool vote = 2;</code>
        */
       public Builder clearVote() {
         
-        vote_ = 0;
+        vote_ = false;
         onChanged();
         return this;
       }
@@ -13695,7 +13696,7 @@ public final class Types {
       "\n\013types.proto\022\005proto\"G\n\004Meta\022\017\n\007channel\030" +
       "\001 \001(\005\022\016\n\006sender\030\002 \001(\005\022\013\n\003cid\030\003 \001(\005\022\021\n\tci" +
       "dSeries\030\004 \001(\005\"J\n\006BbcMsg\022\026\n\001m\030\001 \001(\0132\013.pro" +
-      "to.Meta\022\014\n\004vote\030\002 \001(\005\022\032\n\004next\030\003 \001(\0132\014.pr" +
+      "to.Meta\022\014\n\004vote\030\002 \001(\010\022\032\n\004next\030\003 \001(\0132\014.pr" +
       "oto.Block\"7\n\013BbcDecision\022\026\n\001m\030\001 \001(\0132\013.pr" +
       "oto.Meta\022\020\n\010decosion\030\002 \001(\005\"x\n\013BlockHeade" +
       "r\022\026\n\001m\030\001 \001(\0132\013.proto.Meta\022\014\n\004prev\030\002 \001(\014\022" +
