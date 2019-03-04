@@ -65,7 +65,7 @@ public class ByzToyServer extends ToyBaseServer {
 //        String txID = UUID.randomUUID().toString();
         synchronized (blocksForPropose.element()) {
             int cbid = blocksForPropose.element().blockBuilder.getHeader().getBid();
-            int txNum = blocksForPropose.element().getTransactionCount() + 1;
+            int txNum = blocksForPropose.element().getTransactionCount();
             Transaction t = Transaction.newBuilder()
                     .setClientID(-1)
                     .setId(Types.txID.newBuilder()

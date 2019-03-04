@@ -5170,9 +5170,9 @@ public final class Types {
     int getBid();
 
     /**
-     * <code>int64 txNum = 3;</code>
+     * <code>int32 txNum = 3;</code>
      */
-    long getTxNum();
+    int getTxNum();
 
     /**
      * <code>int32 channel = 4;</code>
@@ -5194,7 +5194,7 @@ public final class Types {
     private txID() {
       proposerID_ = 0;
       bid_ = 0;
-      txNum_ = 0L;
+      txNum_ = 0;
       channel_ = 0;
     }
 
@@ -5241,7 +5241,7 @@ public final class Types {
             }
             case 24: {
 
-              txNum_ = input.readInt64();
+              txNum_ = input.readInt32();
               break;
             }
             case 32: {
@@ -5292,11 +5292,11 @@ public final class Types {
     }
 
     public static final int TXNUM_FIELD_NUMBER = 3;
-    private long txNum_;
+    private int txNum_;
     /**
-     * <code>int64 txNum = 3;</code>
+     * <code>int32 txNum = 3;</code>
      */
-    public long getTxNum() {
+    public int getTxNum() {
       return txNum_;
     }
 
@@ -5327,8 +5327,8 @@ public final class Types {
       if (bid_ != 0) {
         output.writeInt32(2, bid_);
       }
-      if (txNum_ != 0L) {
-        output.writeInt64(3, txNum_);
+      if (txNum_ != 0) {
+        output.writeInt32(3, txNum_);
       }
       if (channel_ != 0) {
         output.writeInt32(4, channel_);
@@ -5349,9 +5349,9 @@ public final class Types {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(2, bid_);
       }
-      if (txNum_ != 0L) {
+      if (txNum_ != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt64Size(3, txNum_);
+          .computeInt32Size(3, txNum_);
       }
       if (channel_ != 0) {
         size += com.google.protobuf.CodedOutputStream
@@ -5397,8 +5397,7 @@ public final class Types {
       hash = (37 * hash) + BID_FIELD_NUMBER;
       hash = (53 * hash) + getBid();
       hash = (37 * hash) + TXNUM_FIELD_NUMBER;
-      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
-          getTxNum());
+      hash = (53 * hash) + getTxNum();
       hash = (37 * hash) + CHANNEL_FIELD_NUMBER;
       hash = (53 * hash) + getChannel();
       hash = (29 * hash) + unknownFields.hashCode();
@@ -5534,7 +5533,7 @@ public final class Types {
 
         bid_ = 0;
 
-        txNum_ = 0L;
+        txNum_ = 0;
 
         channel_ = 0;
 
@@ -5611,7 +5610,7 @@ public final class Types {
         if (other.getBid() != 0) {
           setBid(other.getBid());
         }
-        if (other.getTxNum() != 0L) {
+        if (other.getTxNum() != 0) {
           setTxNum(other.getTxNum());
         }
         if (other.getChannel() != 0) {
@@ -5696,28 +5695,28 @@ public final class Types {
         return this;
       }
 
-      private long txNum_ ;
+      private int txNum_ ;
       /**
-       * <code>int64 txNum = 3;</code>
+       * <code>int32 txNum = 3;</code>
        */
-      public long getTxNum() {
+      public int getTxNum() {
         return txNum_;
       }
       /**
-       * <code>int64 txNum = 3;</code>
+       * <code>int32 txNum = 3;</code>
        */
-      public Builder setTxNum(long value) {
+      public Builder setTxNum(int value) {
         
         txNum_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>int64 txNum = 3;</code>
+       * <code>int32 txNum = 3;</code>
        */
       public Builder clearTxNum() {
         
-        txNum_ = 0L;
+        txNum_ = 0;
         onChanged();
         return this;
       }
@@ -13709,7 +13708,7 @@ public final class Types {
       "ata\030\002 \003(\0132\022.proto.Transaction\022\"\n\002st\030\003 \001(" +
       "\0132\026.proto.blockStatistics\"G\n\004txID\022\022\n\npro" +
       "poserID\030\001 \001(\005\022\013\n\003bid\030\002 \001(\005\022\r\n\005txNum\030\003 \001(" +
-      "\003\022\017\n\007channel\030\004 \001(\005\"j\n\013Transaction\022\020\n\010cli" +
+      "\005\022\017\n\007channel\030\004 \001(\005\"j\n\013Transaction\022\020\n\010cli" +
       "entID\030\001 \001(\005\022\027\n\002id\030\002 \001(\0132\013.proto.txID\022\014\n\004" +
       "data\030\003 \001(\014\022\020\n\010clientTs\030\004 \001(\003\022\020\n\010serverTs" +
       "\030\005 \001(\003\"7\n\010accepted\022\020\n\010accepted\030\001 \001(\010\022\031\n\004" +

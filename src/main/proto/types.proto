@@ -62,7 +62,7 @@ message Block {
 message txID {
     int32 proposerID = 1;
     int32 bid = 2;
-    int64 txNum = 3;
+    int32 txNum = 3;
     int32 channel = 4;
 }
 message Transaction {

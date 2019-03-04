@@ -176,13 +176,15 @@ public class Cli {
 //                }
 
                 if (args[0].equals("status")) {
-                    if (args.length == 4) {
-                        int pid = Integer.parseInt(args[1]);
-                        int tid = Integer.parseInt(args[2]);
-                        int channel = Integer.parseInt(args[3]);
-                        String stat = txStatus(pid, tid, channel);
-                        System.out.println(format("[pid:%d ; tid=%d ; channel=%d] status=%s", pid,
-                                tid, channel, stat));
+                    if (args.length == 5) {
+                        int channel = Integer.parseInt(args[1]);
+                        int pid = Integer.parseInt(args[2]);
+                        int bid = Integer.parseInt(args[3]);
+                        int tid  = Integer.parseInt(args[4]);
+
+                        String stat = txStatus(channel, pid, bid, tid);
+                        System.out.println(format("[channel=%d ; pid:%d ; bid=%d ; tid=%d] status=%s", channel, pid,
+                                bid, tid, stat));
                         return;
                     }
                 }
@@ -222,9 +224,10 @@ public class Cli {
             return JToy.s.addTransaction(data.getBytes(), clientID);
         }
 
-        private String txStatus(int pid, int tid, int channel) {
+        private String txStatus(int channel, int pid, int bid, int tid) {
             Types.txID txid = Types.txID.newBuilder()
                     .setProposerID(pid)
+                    .setBid(bid)
                     .setTxNum(tid)
                     .setChannel(channel)
                     .build();

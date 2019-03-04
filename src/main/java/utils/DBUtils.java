@@ -100,6 +100,7 @@ public class DBUtils {
             stmt.executeUpdate(format("INSERT INTO %s VALUES(%d, %d, %d)", getTableName(channel),
                     pid, bid, height));
             stmt.close();
+//            System.out.println(format("insert [%d, %d, %d]", pid, bid, height));
         } catch (SQLException e) {
             logger.error(format("unable to create statement for tx [channel=%d]", channel), e);
         }
@@ -124,10 +125,10 @@ public class DBUtils {
         createReadConn(channel);
         try {
             Statement stmt = wc.get(channel).createStatement();
-            ResultSet rs = stmt.executeQuery(format("SELECT bid FROM %s WHERE pid=%d AND bid=%d",
+            ResultSet rs = stmt.executeQuery(format("SELECT height FROM %s WHERE pid=%d AND bid=%d",
                     getTableName(channel), pid, bid));
             rs.next();
-            return rs.getInt("bid");
+            return rs.getInt("height");
         } catch (SQLException e) {
             logger.error(format("unable to create statement for read [channel=%d]", channel), e);
             return -1;

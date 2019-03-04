@@ -5,6 +5,8 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import proto.Types;
 
+import static java.lang.String.format;
+
 public class CacheUtils {
     private int maxCacheSize = 100000;
     private @NonNull
@@ -21,6 +23,7 @@ public class CacheUtils {
     }
 
     public void add(Types.Transaction tx) {
+        if (cache.getIfPresent(tx.getId()) != null) return;
         cache.put(tx.getId(), tx);
     }
 
@@ -36,6 +39,7 @@ public class CacheUtils {
     }
 
     public boolean contains(Types.txID tid) {
+        Types.Transaction t = (Types.Transaction) cache.getIfPresent(tid);
         return (cache.getIfPresent(tid) != null);
-    };
+    }
 }

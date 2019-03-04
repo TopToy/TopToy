@@ -359,9 +359,11 @@ public abstract class ToyBaseServer extends Node {
                                 getID(), channel, recBlock.getHeader().getHeight(), cidSeries, cid, recBlock.getDataCount()));
                     }
 
-                    Block finalPermanent = permanent;
-//                    storageWorker.execute(() ->
-//                            DBUtils.writeBlockToTable(channel, finalPermanent.getHeader().getHeight(), finalPermanent));
+                    int pid = permanent.getHeader().getM().getSender();
+                    int bid = permanent.getHeader().getBid();
+                    int height = permanent.getHeader().getHeight();
+                    storageWorker.execute(() ->
+                            DBUtils.writeBlockToTable(channel, pid, bid, height));
                 }
 
                 logger.debug(String.format("[#%d-C[%d]] adds new Block with [height=%d] [cidSeries=%d ; cid=%d] [size=%d]",
@@ -382,7 +384,7 @@ public abstract class ToyBaseServer extends Node {
 //                }
 
             updateLeaderAndHeight();
-//            storageWorker.execute(bc::writeNextToDisk);
+            storageWorker.execute(bc::writeNextToDisk);
         }
 //        }
     }
@@ -414,7 +416,7 @@ public abstract class ToyBaseServer extends Node {
         }
         synchronized (blocksForPropose.element()) {
             int cbid = blocksForPropose.element().blockBuilder.getHeader().getBid();
-            int txnum = blocksForPropose.element().getTransactionCount() + 1;
+            int txnum = blocksForPropose.element().getTransactionCount();
             Transaction ntx = tx.toBuilder()
                     .setId(txID.newBuilder()
                             .setProposerID(getID())
@@ -467,7 +469,18 @@ public abstract class ToyBaseServer extends Node {
 
     }
     public int isTxPresent(txID tid) {
-//        if (txCache.contains(tid)) return 0;
+         if (txCache.contains(tid)) {
+             return 0;
+        }
+        int height = DBUtils.getBlockRecord(tid.getChannel(), tid.getProposerID(), tid.getBid());
+        if (height == -1) return -1;
+        Block b = bc.getBlock(height);
+        if (b == null) return -1;
+        Transaction tx = b.getData(tid.getTxNum());
+        if (tx.getId().equals(tid)) {
+            txCache.add(tx);
+              return 0;
+        }
         return -1;
     }
 
@@ -680,6 +693,7 @@ public abstract class ToyBaseServer extends Node {
      */
     private boolean validateSubChainVersion(subChainVersion v, int forkPoint) {
         BaseBlockchain subV = getEmptyBC();
+        if (v.getVCount() == 0) return true;
         subV.addBlock(v.getV(0));
         for (int i = 1 ; i < v.getVList().size() ; i++ ) {
             Block pb = v.getV(i);
