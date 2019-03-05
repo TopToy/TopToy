@@ -352,6 +352,7 @@ public class Top implements server {
     }
 
     public int isTxPresent(Types.txID tid) {
+        System.out.println(format("direct request to [%d]", tid.getChannel()));
         return group[tid.getChannel()].isTxPresent(tid);
     }
 

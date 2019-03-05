@@ -15,22 +15,8 @@ public class ByzantineWrbNode extends WrbNode {
     }
 
     public void selectiveBroadcast(Block msg, List<Integer> ids) {
-//        Meta metaMsg = Meta.
-//                newBuilder().
-//                setSender(getID()).
-//              //  setHeight(height).
-//                setCid(cid).
-//                setCidSeries(cidSeries).
-//                setChannel(channel).
-//                build();
-//        Data.Builder dataMsg = Data.
-//                newBuilder().
-//                setData(ByteString.copyFrom(msg)).
-//                setMeta(metaMsg);
-//        Data dmsg = dataMsg.setSig(rmfDigSig.sign(dataMsg)).build();
         for (Map.Entry<Integer, WrbService.peer>  p: wrbService.peers.entrySet()) {
             if (ids.contains(p.getKey())) {
-//                logger.debug("sending message " + Arrays.toString(msg) + " to " + p.getKey() + " with height of " + height);
                 wrbService.sendDataMessage(p.getValue().stub, msg);
             }
 

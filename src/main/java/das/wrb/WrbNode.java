@@ -20,44 +20,18 @@ public class WrbNode extends Node{
         wrbService = new WrbService(channels, id, f, tmo, tmoInterval, nodes, bbcConfig, serverCrt, serverPrivKey, caRoot);
     }
 
-//    public WrbNode(int channel, int id, String addr, int rmfPort, int f , ArrayList<Node> nodes, BbcService bbc) {
-//        super(addr, rmfPort,  id);
-//        wrbService = new WrbService(channel, id, f, nodes, bbc);
-//    }
 
     public void stop() {
-//        stopped = true;
         if (wrbService != null)
             wrbService.shutdown();
     }
 
-//    public void blockUntilShutdown() throws InterruptedException {
-//        wrbService.shutdown();
-//    }
 
     // This should be called only after all servers are running (as this object contains also the client logic)
     public void start() {
         wrbService.start();
     }
 
-//    Data buildData(byte[] msg, int channel, int cidSeries, int cid, int height, boolean fm) {
-//        Meta metaMsg = Meta.
-//                newBuilder().
-//                setSender(getID()).
-//               // setHeight(height).
-//                setCid(cid).
-//                setCidSeries(cidSeries).
-//                setChannel(channel).
-//                build();
-//        Data.Builder dataMsg = Data.
-//                newBuilder().
-//                setData(ByteString.copyFrom(msg)).
-//                setMeta(metaMsg);
-//        if (!fm) {
-//            dataMsg = dataMsg.setSig(rmfDigSig.sign(dataMsg));
-//        }
-//        return dataMsg.build();
-//    }
     public void broadcast(Block data) {
         logger.debug(format("[#%d] broadcasts data message with [height=%d]", getID(), data.getHeader().getHeight()));
 
@@ -66,32 +40,16 @@ public class WrbNode extends Node{
 
     public Block deliver(int channel, int cidSeries, int cid, int height, int sender, Block msg)
             throws InterruptedException {
-//        Data dMsg = null;
-//        if (msg != null) {
-//            dMsg = buildData(msg, channel, cidSeries, cid + 1, height + 1, true);
-//        }
         long start = System.currentTimeMillis();
         Block m = wrbService.deliver(channel, cidSeries, cid, sender, height, msg);
-        logger.debug(format("[#%d-C[%d]] Deliver on wrb node took about %d [cidSeries=%d ; cid=%d]", getID(), channel,
+        logger.debug(format("[#%d-C[%d]] Deliver on wrb node took about [%d] ms [cidSeries=%d ; cid=%d]", getID(), channel,
                 System.currentTimeMillis() - start, cidSeries, cid));
         return m;
-//        Data data = (td == null ? null : td.d);
-//        String type = (data == null ? "FULL" : td.t.name());
-//        return RmfResult.
-//                newBuilder().
-//                setCid(cid).
-//                setCidSeries(cidSeries).
-//                setData(data == null ? ByteString.EMPTY : data.getData()).
-//                setType(type).
-//                build();
     }
 
-//    public String getRmfDataSig(int channel, int cidSeries, int cid) {
-//        return wrbService.getMessageSig(channel, cidSeries, cid);
+//    public void clearBuffers(Meta key) {
+//        wrbService.clearBuffers(key);
 //    }
-    public void clearBuffers(Meta key) {
-        wrbService.clearBuffers(key);
-    }
 
     public long getTotolDec() {
         return wrbService.getTotalDeliveredTries();

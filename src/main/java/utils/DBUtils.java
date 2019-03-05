@@ -127,7 +127,7 @@ public class DBUtils {
             Statement stmt = wc.get(channel).createStatement();
             ResultSet rs = stmt.executeQuery(format("SELECT height FROM %s WHERE pid=%d AND bid=%d",
                     getTableName(channel), pid, bid));
-            rs.next();
+            if (!rs.next()) return -1;
             return rs.getInt("height");
         } catch (SQLException e) {
             logger.error(format("unable to create statement for read [channel=%d]", channel), e);

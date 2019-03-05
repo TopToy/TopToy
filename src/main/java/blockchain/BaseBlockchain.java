@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static java.lang.String.format;
 import static java.util.Collections.max;
 import static java.util.Collections.min;
 
@@ -61,8 +62,8 @@ public abstract class BaseBlockchain {
 
     public void setBlocks(List<Block> Nblocks, int start) throws IOException {
         for (int i = start ; i < start + Nblocks.size() ; i++) {
-            if (i > getHeight() + 1) {
-                addBlock(Nblocks.get(i));
+            if (i > getHeight()) {
+                addBlock(Nblocks.get(i - start));
             } else {
                 setBlock(i, Nblocks.get((i - start)));
             }
