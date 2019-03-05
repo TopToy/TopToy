@@ -36,6 +36,7 @@ public class Cli {
         private Options options = new Options();
         private long totalRT = 0;
         static String outPath = "/tmp/JToy/res/";
+        AtomicBoolean recorded = new AtomicBoolean(false);
         public Cli() {
             options.addOption("help", "print this message");
             options.addOption("init", "init the server");
@@ -68,11 +69,14 @@ public class Cli {
                     .build());
 
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                writeSummery(outPath);
-//                writeToScv(outPath);
-//                writeBlocksStatistics(outPath);
-                writeBlocksStatisticsSummery(outPath);
-                DBUtils.shutdown();
+                if (!recorded.get()) {
+                    writeSummery(outPath);
+////                writeToScv(outPath);
+////                writeBlocksStatistics(outPath);
+                    writeBlocksStatisticsSummery(outPath);
+                    DBUtils.shutdown();
+                }
+//
             }));
         }
 
@@ -109,7 +113,10 @@ public class Cli {
                     return;
                 }
                 if (args[0].equals("quit")) {
-//                    writeSummery("/tmp/JToy/res");
+                    writeSummery(outPath);
+                    writeBlocksStatisticsSummery(outPath);
+                    DBUtils.shutdown();
+                    recorded.set(true);
                     System.out.println("Goodbye :)");
                     System.exit(0);
                     return;

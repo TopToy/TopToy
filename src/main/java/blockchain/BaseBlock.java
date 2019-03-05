@@ -58,24 +58,10 @@ public abstract class BaseBlock {
                         .setPrev(ByteString.copyFrom(DigestMethod.hash(headerArray)))
                         .setTransactionHash(ByteString.copyFrom(tHash))
                         .build());
-//        Block
-//                blockBuilder.
-//                getHeaderBuilder().
-//                    setCreatorID(creatorID).
-//                    setHeight(height).
-//                    setCidSeries(cidSeries).
-//                    setCid(cid).
-//                    setPrev(ByteString.copyFrom(prevHash)).
-//                    setTransactionHash(ByteString.copyFrom(tHash)));
+
         if (creatorID == -1) {
             return blockBuilder.build();
         }
-//        return blockBuilder
-//                .setHeader(blockBuilder
-//                        .getHeader()
-//                        .toBuilder()
-//                        .build())
-//                .build();
 
         String signature = blockDigSig.sign(blockBuilder.getHeader());
         return blockBuilder

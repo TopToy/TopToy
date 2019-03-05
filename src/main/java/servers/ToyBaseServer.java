@@ -73,7 +73,7 @@ public abstract class ToyBaseServer extends Node {
             .build().getSerializedSize() + 8;
     int txSize = 0;
     int cID = new Random().nextInt(10000);
-    Path sPath = Paths.get("blocks", String.valueOf(channel));
+    Path sPath;
     ExecutorService storageWorker = Executors.newSingleThreadExecutor();
     private int syncEvents = 0;
 //    AtomicLong txNum = new AtomicLong(0);
@@ -89,6 +89,7 @@ public abstract class ToyBaseServer extends Node {
         this.n = 3*f + 1;
         this.panicRB = panic;
         this.syncRB = sync;
+        sPath = Paths.get("blocks", String.valueOf(channel));
         bc = initBC(id, channel);
 //        currBlock = null;
         currHeight = 1; // starts from 1 due to the genesis BaseBlock
@@ -348,7 +349,16 @@ public abstract class ToyBaseServer extends Node {
                                 .toBuilder()
                                 .setChannelDecided(System.currentTimeMillis()))
                         .build();
+
                 bc.addBlock(recBlock);
+
+//                if (recBlock.getHeader().getM().getChannel() != channel) {
+//                    System.out.println(format("block data [b.c=%d, s.c=%d, pid=%d, bid=%d, height=%d]"
+//                            , recBlock.getHeader().getM().getChannel(), channel,
+//                            recBlock.getHeader().getM().getSender()
+//                            , recBlock.getHeader().getBid(), bc.getHeight()));
+//                }
+
                 if (recBlock.getHeader().getHeight() - (f + 2) > 0) {
                     Block permanent = bc.getBlock(recBlock.getHeader().getHeight() - (f + 2));
                     permanent = permanent.toBuilder().setSt(permanent.getSt().toBuilder().setPd(System.currentTimeMillis())).build();
@@ -473,11 +483,12 @@ public abstract class ToyBaseServer extends Node {
              return 0;
         }
         int height = DBUtils.getBlockRecord(tid.getChannel(), tid.getProposerID(), tid.getBid());
+
         if (height == -1) return -1;
         Block b = bc.getBlock(height);
         if (b == null) return -1;
         Transaction tx = b.getData(tid.getTxNum());
-        if (tx.getId().equals(tid)) {
+         if (tx.getId().equals(tid)) {
             txCache.add(tx);
               return 0;
         }
@@ -825,7 +836,7 @@ public abstract class ToyBaseServer extends Node {
         });
 
         synchronized (newBlockNotifyer) {
-            for (int i = sPoint[0] ; i < bc.getHeight() ; i++) {
+            for (int i = sPoint[0] ; i <= bc.getHeight() ; i++) {
                 bc.removeBlock(i);
             }
 

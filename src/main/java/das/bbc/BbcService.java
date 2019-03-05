@@ -8,10 +8,11 @@ import bftsmart.tom.ServiceReplica;
 import bftsmart.tom.core.messages.TOMMessage;
 import bftsmart.tom.core.messages.TOMMessageType;
 import bftsmart.tom.server.defaultservices.DefaultSingleRecoverable;
+import das.data.BbcDecData;
 import das.data.GlobalData;
 import das.data.VoteData;
 import proto.Types.*;
-import java.util.concurrent.atomic.AtomicBoolean;
+
 import static java.lang.String.format;
 
 public class BbcService extends DefaultSingleRecoverable {
@@ -87,28 +88,37 @@ public class BbcService extends DefaultSingleRecoverable {
                     .build();
             logger.debug(format("[#%d] has received bbc message from [sender=%d ; channel=%d ; cidSeries=%d ; cid=%d]",
                     id, msg.getM().getSender(), channel, cidSeries, cid));
-            AtomicBoolean done = new AtomicBoolean(false);
-            GlobalData.bbcDec.computeIfPresent(key, (k, v) -> {
-                logger.debug(format("[#%d] already has a decision, re-participating consensus" +
-                        "[channel=%d ; cidSeries=%d ; cid=%d]", id, channel, cidSeries, cid));
-                propose(v, channel, cidSeries, cid);
-                done.set(true);
-                return v;
+
+            GlobalData.votes[channel].computeIfAbsent(key, k -> {
+                GlobalData.bbcDec[channel].computeIfPresent(k, (k1, v1) -> {
+                    if (v1.getDec() != -1) {
+                        logger.debug(format("[#%d] already has a decision, re-participating consensus" +
+                                "[channel=%d ; cidSeries=%d ; cid=%d]", id, channel, cidSeries, cid));
+                        propose(v1.getDec(), channel, cidSeries, cid);
+                    }
+
+                    return v1;
+                });
+                return new VoteData();
             });
 
-            if (done.get()) return new byte[0];
-
-            GlobalData.votes.computeIfAbsent(key, k -> new VoteData());
-            GlobalData.votes.computeIfPresent(key, (k, v) -> {
+            GlobalData.votes[channel].computeIfPresent(key, (k, v) -> {
                 if (v.getVotersNum() == quorumSize) return v;
-                v.addVote(msg.getM().getSender(), msg.getVote());
+                if (!v.addVote(msg.getM().getSender(), msg.getVote())) return v;
                 if (v.getVotersNum() == quorumSize) {
-                    GlobalData.bbcDec.computeIfAbsent(key, k1 -> v.getVoteReasult());
-                    logger.debug(format("[#%d] notifies on  [channel=%d ; cidSeries=%d ; cid=%d]", id, channel, cidSeries, cid));
-                    notes[channel].notify();
+                    synchronized (notes[channel]) {
+                        GlobalData.bbcDec[channel].computeIfPresent(key, (k1, v1)
+                                -> new BbcDecData(v.getVoteReasult(), false));
+                        GlobalData.bbcDec[channel].computeIfAbsent(key, k1 ->
+                                new BbcDecData(v.getVoteReasult(), false));
+                        logger.debug(format("[#%d] notifies on  [channel=%d ; cidSeries=%d ; cid=%d]", id, channel, cidSeries, cid));
+                        notes[channel].notifyAll();
+                    }
                 }
+
                 return v;
             });
+
         } catch (Exception e) {
             logger.error(format("[#%d]", id), e);
         }
@@ -127,14 +137,15 @@ public class BbcService extends DefaultSingleRecoverable {
                 .setChannel(channel)
                 .build();
         synchronized (notes[channel]) {
-            while (!GlobalData.bbcDec.containsKey(key)) {
+            while (!GlobalData.bbcDec[channel].containsKey(key)
+                    || GlobalData.bbcDec[channel].get(key).getDec() == -1) {
                 notes[channel].wait();
             }
         }
-        return GlobalData.bbcDec.get(key);
+        return GlobalData.bbcDec[channel].get(key).getDec() == 1;
     }
 
-    public int propose(boolean vote, int channel, int cidSeries, int cid) {
+    public int propose(int vote, int channel, int cidSeries, int cid) {
         BbcMsg msg= BbcMsg.newBuilder()
                 .setM(Meta.newBuilder()
                         .setChannel(channel)
@@ -142,7 +153,7 @@ public class BbcService extends DefaultSingleRecoverable {
                         .setCid(cid)
                         .setSender(id)
                         .build())
-                .setVote(vote)
+                .setVote(vote == 1)
                 .build();
         byte[] data = msg.toByteArray();
         bbcProxy.invokeAsynchRequest(data, new ReplyListener() {
