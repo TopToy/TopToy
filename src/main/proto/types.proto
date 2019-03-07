@@ -90,13 +90,13 @@ message read {
 message ForkProof {
     int32 sender = 1;
     Block curr = 2;
-//    string currSig = 3;
-    Block prev = 4;
-//    string prevSig = 5;
+    Block prev = 3;
+//    bool done = 4;
 }
 
 message RBMsg {
     Meta m = 1;
+    int32 type = 2;
     bytes data = 3;
 }
 

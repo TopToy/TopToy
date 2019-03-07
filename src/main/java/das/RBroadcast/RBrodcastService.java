@@ -10,6 +10,8 @@ import bftsmart.tom.core.messages.TOMMessageType;
 import bftsmart.tom.server.defaultservices.DefaultSingleRecoverable;
 import com.google.protobuf.ByteString;
 
+import com.google.protobuf.InvalidProtocolBufferException;
+import das.data.GlobalData;
 import proto.Types.*;
 
 import java.util.ArrayList;
@@ -22,40 +24,21 @@ import static java.lang.String.format;
 public class RBrodcastService extends DefaultSingleRecoverable {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(RBrodcastService.class);
     private int id;
-    private final HashMap<Integer, List<RBMsg>> recMsg;
     private AsynchServiceProxy RBProxy;
     private ServiceReplica sr;
     private String configHome;
-//    private final Object globalLock = new Object();
-//    Semaphore[] notifyer;
-    Object[] cNotifyer;
-    private int cid = 0;
+    private int n;
+    private int f;
     private boolean stopped = false;
 
-    public RBrodcastService(int channels, int id, String configHome) {
+    public RBrodcastService(int id, int n, int f, String configHome) {
         this.id = id;
         this.configHome = configHome;
         sr = null;
-        recMsg = new HashMap<>();
-        cNotifyer = new Object[channels];
-//        notifyer = new Semaphore[channels];
-        for (int i = 0 ; i < channels ; i++) {
-            cNotifyer[i] = new Object();
-        }
+        this.n = n;
+        this.f = f;
     }
 
-    public void clearBuffers(Meta key) {
-        synchronized (recMsg) {
-            int channel = key.getChannel();
-            int cid = key.getCid();
-            if (!recMsg.containsKey(channel)) return;
-            recMsg.replace(channel, recMsg
-                    .get(key.getChannel())
-                    .stream()
-                    .filter(m -> m.getM().getChannel() == channel && m.getM().getCid() == cid)
-                    .collect(Collectors.toList()));
-        }
-    }
 
     public void start() {
         sr = new ServiceReplica(id, this, this, configHome);
@@ -72,7 +55,6 @@ public class RBrodcastService extends DefaultSingleRecoverable {
     }
     public void shutdown() {
         stopped = true;
-//        releaseWaiting();
         if (RBProxy != null) {
             RBProxy.close();
             logger.debug(format("[#%d] shut down rb client", id));
@@ -85,11 +67,6 @@ public class RBrodcastService extends DefaultSingleRecoverable {
         logger.info(format("[#%d] shutting down rb service", id));
     }
 
-//    private void releaseWaiting() {
-//        synchronized (globalLock) {
-//            globalLock.notifyAll();
-//        }
-//    }
 
     @Override
     public void installSnapshot(byte[] state) {
@@ -107,25 +84,24 @@ public class RBrodcastService extends DefaultSingleRecoverable {
         try {
             RBMsg msg = RBMsg.parseFrom(command);
             if (msg == null) {
-                logger.debug("Received NULL message!!!!!");
+                logger.debug("Received NULL message!");
+                return new byte[0];
             }
-//            synchronized (globalLock) {
-                int channel = msg.getM().getChannel();
-                synchronized (cNotifyer[channel]) {
-                    recMsg.computeIfAbsent(channel, k -> new ArrayList<>());
-//                if (!recMsg.containsKey(channel)) {
-//                    recMsg.put(channel, new ArrayList<>());
-//                }
-                    recMsg.computeIfPresent(channel, (k, v) -> {
-                        v.add(msg);
-                        cNotifyer[channel].notifyAll();
-                        return v;
-                    });
-                }
 
-//                recMsg.get(msg.getM().getChannel()).add(msg);
-//                globalLock.notifyAll();
-//            }
+            Meta key = Meta.newBuilder()
+                    .setCidSeries(msg.getM().getCidSeries())
+                    .setCid(msg.getM().getCidSeries())
+                    .setChannel(msg.getM().getChannel())
+                    .build();
+            switch (GlobalData.getRBType(msg.getType())) {
+                case FORK: addForkProof(msg, key);
+                    break;
+                case SYNC: addToSyncData(msg, key);
+                    break;
+                case NOT_MAPPED:
+                    logger.error("Invalid type for RB message");
+                    return new byte[0];
+            }
         } catch (Exception e) {
             logger.error(format("[#%d]", id), e);
         }
@@ -133,73 +109,48 @@ public class RBrodcastService extends DefaultSingleRecoverable {
         return new byte[0];
     }
 
+    private void addForkProof(RBMsg msg, Meta key) throws InvalidProtocolBufferException {
+        int channel = key.getChannel();
+        synchronized (GlobalData.forksRBData[channel]) {
+            if (GlobalData.forksRBData[channel].containsKey(key)) return;
+            ForkProof p = ForkProof.parseFrom(msg.getData());
+            if (!GlobalData.validateForkProof(p)) return;
+            GlobalData.forksRBData[channel].put(key, p);
+            GlobalData.forksRBData[channel].notifyAll();
+        }
+    }
+
+    private void addToSyncData(RBMsg msg, Meta key) throws InvalidProtocolBufferException {
+        int channel = key.getChannel();
+        synchronized (GlobalData.syncRBData[channel]) {
+            if (GlobalData.syncRBData[channel].containsKey(key)
+                    && GlobalData.syncRBData[channel].get(key).size() == n - f) return;
+        }
+        subChainVersion sbv = subChainVersion.parseFrom(msg.getData());
+        synchronized (GlobalData.syncRBData[channel]) {
+            if (!GlobalData.validateSubChainVersion(sbv, f)) return;
+            GlobalData.syncRBData[channel].computeIfAbsent(key, k -> new ArrayList<>());
+            GlobalData.syncRBData[channel].computeIfPresent(key, (k, v) -> {
+                v.add(sbv);
+                return v;
+            });
+            if (GlobalData.syncRBData[channel].get(key).size() == n - f) {
+                GlobalData.syncRBData[channel].notifyAll();
+            }
+        }
+    }
+
     @Override
     public byte[] appExecuteUnordered(byte[] command, MessageContext msgCtx) {
         return new byte[1];
     }
 
-    public byte[] deliver(int channel) throws InterruptedException {
-//        synchronized (globalLock) {
-        synchronized (cNotifyer[channel]) {
-            while (!recMsg.containsKey(channel) || recMsg.get(channel).isEmpty()) {
-//                globalLock.wait();
-                cNotifyer[channel].wait();
-            }
-            RBMsg msg = recMsg.get(channel).get(0);
-            recMsg.get(channel).remove(0);
-            return msg.getData().toByteArray();
-        }
-
-
-//            if (msg == null) {
-//                logger.debug(format("[#%d] received NULL [size of queue=%d]", id, recMsg.get(channel).size()));
-//                for (RBMsg m : recMsg.get(channel)) {
-//                    if (m == null) {
-//                        logger.debug("---------------------------NULL MSG -----------------");
-//                        continue;
-//                    }
-//                    logger.debug(format("------ [%s]------",  Arrays.toString(m.toByteArray())));
-//                }
-////            }
-//        logger.debug(format("[#%d] #1 received msg, [size=%d]", id, recMsg.get(channel).size()));
-//
-//            logger.debug(format("[#%d] #2 received msg, [size=%d]", id, recMsg.get(channel).size()));
-
-//        }
-    }
-
-//    public void notifyOnNewBlock() throws InterruptedException {
-//        synchronized (globalLock) {
-//            while (recMsg.isEmpty()) {
-//                globalLock.wait();
-//            }
-//        }
-//    }
-
-//    public byte[] nonBlockingDeliver() {
-//        synchronized (globalLock) {
-//            if(recMsg.isEmpty()) {
-//                return null;
-//            }
-//            RBMsg msg = recMsg.get(0);
-//            recMsg.remove(0);
-//            return msg.getData().toByteArray();
-//        }
-//    }
-
-
-    public int broadcast(byte[] m, int channel, int id) {
+    public void broadcast(byte[] m, Meta key) {
         RBMsg msg = RBMsg.
                 newBuilder().
-                setM(Meta.newBuilder()
-                        .setChannel(channel)
-                        .setSender(id)
-                        .setCid(cid)
-                        .build()).
+                setM(key).
                 setData(ByteString.copyFrom(m)).
                 build();
-        int ret = cid;
-        cid++;
         byte[] data = msg.toByteArray();
         RBProxy.invokeAsynchRequest(data, new ReplyListener() {
             @Override
@@ -212,7 +163,6 @@ public class RBrodcastService extends DefaultSingleRecoverable {
 
             }
         }, TOMMessageType.ORDERED_REQUEST);
-        return ret;
     }
 
 }

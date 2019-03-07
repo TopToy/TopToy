@@ -563,22 +563,22 @@ public abstract class ToyBaseServer extends Node {
     }
 
 
-    private boolean validateForkProof(ForkProof p)  {
-        logger.debug(format("[#%d-C[%d]] starts validating fp", getID(), channel));
-        Block curr = p.getCurr();
-        Block prev = p.getPrev();
-        if (!blockDigSig.verify(curr.getHeader().getM().getSender(), curr)) {
-                logger.debug(format("[#%d-C[%d]] invalid fork proof #3", getID(), channel));
-                return false;
-        }
-        if (!blockDigSig.verify(prev.getHeader().getM().getSender(), prev)) {
-            logger.debug(format("[#%d-C[%d]] invalid fork proof #4", getID(), channel));
-            return false;
-        }
-
-        logger.debug(format("[#%d-C[%d]] panic for fork is valid [fp=%d]", getID(), channel, p.getCurr().getHeader().getHeight()));
-        return true;
-    }
+//    private boolean validateForkProof(ForkProof p)  {
+//        logger.debug(format("[#%d-C[%d]] starts validating fp", getID(), channel));
+//        Block curr = p.getCurr();
+//        Block prev = p.getPrev();
+//        if (!blockDigSig.verify(curr.getHeader().getM().getSender(), curr)) {
+//                logger.debug(format("[#%d-C[%d]] invalid fork proof #3", getID(), channel));
+//                return false;
+//        }
+//        if (!blockDigSig.verify(prev.getHeader().getM().getSender(), prev)) {
+//            logger.debug(format("[#%d-C[%d]] invalid fork proof #4", getID(), channel));
+//            return false;
+//        }
+//
+//        logger.debug(format("[#%d-C[%d]] panic for fork is valid [fp=%d]", getID(), channel, p.getCurr().getHeader().getHeight()));
+//        return true;
+//    }
 
     private void mainFork() throws InterruptedException, IOException {
         while (!stopped.get()) {
@@ -702,35 +702,35 @@ public abstract class ToyBaseServer extends Node {
     The only thing this method do is to check that a given subversion
     is valid with respect to itself.
      */
-    private boolean validateSubChainVersion(subChainVersion v, int forkPoint) {
-        BaseBlockchain subV = getEmptyBC();
-        if (v.getVCount() == 0) return true;
-        subV.addBlock(v.getV(0));
-        for (int i = 1 ; i < v.getVList().size() ; i++ ) {
-            Block pb = v.getV(i);
-            if (!blockDigSig.verify(pb.getHeader().getM().getSender(), pb)) {
-                logger.debug(format("[#%d-C[%d] #1] invalid sub chain version, block [height=%d] digital signature is invalid " +
-                        "[fp=%d ; sender=%d]", getID(),channel, pb.getHeader().getHeight(), forkPoint, v.getSender()));
-                return false;
-            }
-            if (subV.getHeight() > 0) {
-                if (!validateBlockHash(v.getV(i - 1), pb)) {
-                    logger.debug(format("[#%d-C[%d] #1] invalid sub chain version, block hash is invalid [height=%d] [fp=%d]",
-                            getID(),channel, pb.getHeader().getHeight(), forkPoint));
-                    return false;
-                }
-            }
-//            if (subV.getHeight() >= f) {
-            if (!subV.validateCurrentLeader(pb.getHeader().getM().getSender(), f)) {
-                logger.debug(format("[#%d-C[%d]] invalid invalid sub chain version, block creator is invalid [height=%d] [fp=%d]",
-                        getID(),channel, pb.getHeader().getHeight(), forkPoint));
-                return false;
-            }
+//    private boolean validateSubChainVersion(subChainVersion v, int forkPoint) {
+//        BaseBlockchain subV = getEmptyBC();
+//        if (v.getVCount() == 0) return true;
+//        subV.addBlock(v.getV(0));
+//        for (int i = 1 ; i < v.getVList().size() ; i++ ) {
+//            Block pb = v.getV(i);
+//            if (!blockDigSig.verify(pb.getHeader().getM().getSender(), pb)) {
+//                logger.debug(format("[#%d-C[%d] #1] invalid sub chain version, block [height=%d] digital signature is invalid " +
+//                        "[fp=%d ; sender=%d]", getID(),channel, pb.getHeader().getHeight(), forkPoint, v.getSender()));
+//                return false;
 //            }
-            subV.addBlock(pb);
-        }
-        return true;
-    }
+//            if (subV.getHeight() > 0) {
+//                if (!validateBlockHash(v.getV(i - 1), pb)) {
+//                    logger.debug(format("[#%d-C[%d] #1] invalid sub chain version, block hash is invalid [height=%d] [fp=%d]",
+//                            getID(),channel, pb.getHeader().getHeight(), forkPoint));
+//                    return false;
+//                }
+//            }
+////            if (subV.getHeight() >= f) {
+//            if (!subV.validateCurrentLeader(pb.getHeader().getM().getSender(), f)) {
+//                logger.debug(format("[#%d-C[%d]] invalid invalid sub chain version, block creator is invalid [height=%d] [fp=%d]",
+//                        getID(),channel, pb.getHeader().getHeight(), forkPoint));
+//                return false;
+//            }
+////            }
+//            subV.addBlock(pb);
+//        }
+//        return true;
+//    }
 
     private void syncBlockingPhase(int forkPoint) throws IOException {
         while ((!scVersions.containsKey(forkPoint)) ||
