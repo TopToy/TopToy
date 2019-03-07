@@ -13,16 +13,16 @@ import static java.lang.String.format;
 public class ToyServer extends ToyBaseServer {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ToyServer.class);
 
-    public ToyServer(String addr, int rmfPort, int id, int channel, int f, int tmo, int tmoInterval,
-                     int maxTx, boolean fastMode, ArrayList<Node> cluster, WrbNode rmf, RBrodcastService panic, RBrodcastService sync) {
-        super(addr, rmfPort, id, channel, f, tmo, tmoInterval, maxTx, fastMode, cluster, rmf, panic, sync);
+    public ToyServer(String addr, int wrbPort, int id, int channel, int f, int maxTx, boolean fastMode,
+                     WrbNode wrb, RBrodcastService rb) {
+        super(addr, wrbPort, id, channel, f, maxTx, fastMode, wrb, rb);
     }
 
-    public ToyServer(String addr, int rmfPort, int id, int channel, int f, int tmo, int tmoInterval,
+    public ToyServer(String addr, int wrbPort, int id, int channel, int f, int tmo, int tmoInterval,
                      int maxTx, boolean fastMode, ArrayList<Node> cluster,
-                     String bbcConfig, String panicConfig, String syncConfig, String serverCrt, String serverPrivKey, String caRoot) {
-        super(addr, rmfPort, id, channel, f, tmo, tmoInterval, maxTx, fastMode, cluster,
-                bbcConfig, panicConfig, syncConfig, serverCrt, serverPrivKey, caRoot);
+                     String bbcConfig, String rbConfigPath,  String serverCrt, String serverPrivKey, String caRoot) {
+        super(addr, wrbPort, id, channel, f, tmo, tmoInterval, maxTx, fastMode, cluster,
+                bbcConfig, rbConfigPath, serverCrt, serverPrivKey, caRoot);
     }
 
     Block leaderImpl() {
@@ -35,7 +35,7 @@ public class ToyServer extends ToyBaseServer {
         return fastModePhase();
     }
 
-    Block normalLeaderPhase() {
+    private Block normalLeaderPhase() {
         if (currLeader != getID()) {
             return null;
         }

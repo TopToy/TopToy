@@ -24,19 +24,18 @@ public class ByzToyServer extends ToyBaseServer {
     List<List<Integer>> groups = new ArrayList<>();
     private int delayTime;
 
-    public ByzToyServer(String addr, int rmfPort, int id, int channel, int f, int tmo, int tmoInterval,
-                        int maxTx, boolean fastMode, ArrayList<Node> cluster, WrbNode rmf, RBrodcastService panic, RBrodcastService sync) {
-        super(addr, rmfPort, id, channel, f, tmo, tmoInterval, maxTx, fastMode, cluster, rmf, panic, sync);
+    public ByzToyServer(String addr, int wrbPort, int id, int channel, int f,
+                        int maxTx, boolean fastMode, WrbNode wrb, RBrodcastService rb) {
+        super(addr, wrbPort, id, channel, f, maxTx, fastMode, wrb, rb);
     }
 
-    public ByzToyServer(String addr, int rmfPort, int id, int channel, int f, int tmo, int tmoInterval,
+    public ByzToyServer(String addr, int wrbPort, int id, int channel, int f, int tmo, int tmoInterval,
                         int maxTx, boolean fastMode, ArrayList<Node> cluster,
-                        String bbcConfig, String panicConfig, String syncConfig,
-                        String serverCrt, String serverPrivKey, String caRoot) {
-        super(addr, rmfPort, id, channel, f, tmo, tmoInterval, maxTx, fastMode, cluster,
-                bbcConfig, panicConfig, syncConfig, serverCrt, serverPrivKey, caRoot);
+                        String bbcConfig, String rbConfigPath, String serverCrt, String serverPrivKey, String caRoot) {
+        super(addr, wrbPort, id, channel, f, tmo, tmoInterval, maxTx, fastMode, cluster,
+                bbcConfig, rbConfigPath, serverCrt, serverPrivKey, caRoot);
         rmfServer.stop();
-        rmfServer = new ByzantineWrbNode(1, id, addr, rmfPort, f, tmo, tmoInterval,
+        rmfServer = new ByzantineWrbNode(1, id, addr, wrbPort, f, tmo, tmoInterval,
                 cluster, bbcConfig, serverCrt, serverPrivKey, caRoot);
         groups.add(new ArrayList<>());
         for (int i = 0 ; i < n ; i++) {
@@ -166,7 +165,7 @@ public class ByzToyServer extends ToyBaseServer {
     @Override
     void potentialBehaviourForSync() throws InterruptedException {
         if (delayTime > 0) {
-            logger.debug(format("[#%d-%c] potentialBehaviourForSync sleeps for [%d]", getID(), channel, delayTime));
+            logger.debug(format("[#%d-%d] potentialBehaviourForSync sleeps for [%d]", getID(), channel, delayTime));
             Thread.sleep(delayTime);
         }
     }

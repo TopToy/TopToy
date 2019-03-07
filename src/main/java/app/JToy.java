@@ -60,8 +60,7 @@ public class JToy {
                 default:
                     s = new Top(Config.getAddress(serverID), Config.getPort(serverID), serverID, Config.getF(), Config.getC(),
                             Config.getTMO(), Config.getTMOInterval(), Config.getMaxTransactionsInBlock(), Config.getFastMode(),
-                            Config.getCluster(), Config.getRMFbbcConfigHome(), Config.getPanicRBConfigHome(),
-                            Config.getSyncRBConfigHome(), type,
+                            Config.getCluster(), Config.getRMFbbcConfigHome(), Config.getRBConfigHome(), type,
                             Config.getServerCrtPath(), Config.getServerTlsPrivKeyPath(), Config.getCaRootPath());
                     break;
             }

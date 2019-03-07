@@ -36,6 +36,7 @@ public class Config {
         String SETTING_RMFBBCCONFIG_KEY = "setting.rmfBbcConfigPath";
         String SETTING_PAINCRBCONFIG_PATH = "setting.panicRBroadcastConfigPath";
         String SETTING_SYNCRBCONFIG_PATH = "setting.syncRBroadcastConfigPath";
+        String SETTING_RBCONFIG_PATH = "setting.RBConfigPath";
         String SETTING_MAXTRANSACTIONSINBLOCK_KEY = "setting.maxTransactionInBlock";
         String SETTING_CA_ROOT_PATH = "setting.caRootPath";
         String SETTING_FAST_MODE = "setting.fastMode";
@@ -146,12 +147,16 @@ public class Config {
         return conf.getString(tKeys.SETTING_RMFBBCCONFIG_KEY);
     }
 
-    public static String getPanicRBConfigHome() {
-        return conf.getString(tKeys.SETTING_PAINCRBCONFIG_PATH);
-    }
+//    public static String getPanicRBConfigHome() {
+//        return conf.getString(tKeys.SETTING_PAINCRBCONFIG_PATH);
+//    }
+//
+//    public static String getSyncRBConfigHome() {
+//        return conf.getString(tKeys.SETTING_SYNCRBCONFIG_PATH);
+//    }
 
-    public static String getSyncRBConfigHome() {
-        return conf.getString(tKeys.SETTING_SYNCRBCONFIG_PATH);
+    public static String getRBConfigHome() {
+        return conf.getString(tKeys.SETTING_RBCONFIG_PATH);
     }
 
     public static String getPrivateKey() {

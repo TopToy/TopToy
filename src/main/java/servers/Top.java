@@ -33,11 +33,12 @@ import static java.lang.String.format;
 public class Top implements server {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Top.class);
 
-    private WrbNode rmf;
+    private WrbNode wrb;
     boolean up = false;
     final HashMap<Types.txID, Integer> txMap = new HashMap<>();
-    private RBrodcastService deliverFork;
-    private RBrodcastService sync;
+//    private RBrodcastService deliverFork;
+//    private RBrodcastService sync;
+    private RBrodcastService RBservice;
     private int n;
     private int gcCount = 0;
     private int gcLimit = 1;
@@ -72,8 +73,8 @@ public class Top implements server {
 
 
     public Top(String addr, int port, int id, int f, int c, int tmo, int tmoInterval,
-               int maxTx, boolean fastMode, ArrayList<Node> cluster, String bbcConfig, String panicConfig,
-               String syncConfig, String type, String serverCrt, String serverPrivKey, String caRoot) {
+               int maxTx, boolean fastMode, ArrayList<Node> cluster, String bbcConfig, String rbConfig, String type,
+               String serverCrt, String serverPrivKey, String caRoot) {
         n = 3 *f +1;
         this.maxTx = maxTx;
         lastDelivered = new int[c][];
@@ -90,31 +91,29 @@ public class Top implements server {
         this.group = new ToyBaseServer[c];
         this.id = id;
         if (type.equals("r") || type.equals("a")) {
-            rmf = new WrbNode(c, id, addr, port, f, tmo, tmoInterval, cluster, bbcConfig, serverCrt, serverPrivKey, caRoot);
+            wrb = new WrbNode(c, id, addr, port, f, tmo, tmoInterval, cluster, bbcConfig, serverCrt, serverPrivKey, caRoot);
         }
         if (type.equals("b")) {
-            rmf = new ByzantineWrbNode(c, id, addr, port, f, tmo, tmoInterval, cluster, bbcConfig, serverCrt, serverPrivKey, caRoot);
+            wrb = new ByzantineWrbNode(c, id, addr, port, f, tmo, tmoInterval, cluster, bbcConfig, serverCrt, serverPrivKey, caRoot);
         }
-        deliverFork = new RBrodcastService(c, id, panicConfig);
-        sync = new RBrodcastService(c, id, syncConfig);
+//        deliverFork = new RBrodcastService(c, id, panicConfig);
+//        sync = new RBrodcastService(c, id, syncConfig);
+        RBservice = new RBrodcastService(id, n, f, rbConfig);
         this.type = type;
         // TODO: Apply to more types
         if (type.equals("r")) {
             for (int i = 0 ; i < c ; i++) {
-                group[i] = new ToyServer(addr, port, id, i, f, tmo, tmoInterval, maxTx,
-                        fastMode, cluster, rmf, deliverFork, sync);
+                group[i] = new ToyServer(addr, port, id, i, f, maxTx, fastMode, wrb, RBservice);
             }
         }
         if (type.equals("b")) {
             for (int i = 0 ; i < c ; i++) {
-                group[i] = new ByzToyServer(addr, port, id, i, f, tmo, tmoInterval, maxTx,
-                        fastMode, cluster, rmf, deliverFork, sync);
+                group[i] = new ByzToyServer(addr, port, id, i, f, maxTx, fastMode, wrb, RBservice);
             }
         }
         if (type.equals("a")) {
             for (int i = 0 ; i < c ; i++) {
-                group[i] = new AsyncToyServer(addr, port, id, i, f, tmo, tmoInterval, maxTx,
-                        fastMode, cluster, rmf, deliverFork, sync);
+                group[i] = new AsyncToyServer(addr, port, id, i, f, maxTx, fastMode, wrb, RBservice);
             }
         }
         bc = group[0].initBC(id, -1);
@@ -193,8 +192,8 @@ public class Top implements server {
     }
 
     public Statistics getStatistics() {
-        sts.totalDec = rmf.getTotolDec();
-        sts.optemisticDec = rmf.getOptemisticDec();
+        sts.totalDec = wrb.getTotolDec();
+        sts.optemisticDec = wrb.getOptemisticDec();
         for (int i = 0 ; i < c ; i++) {
             sts.syncEvents += group[i].getSyncEvents();
         }
@@ -230,17 +229,21 @@ public class Top implements server {
     }
     public void start() {
 
-        CountDownLatch latch = new CountDownLatch(3);
+        CountDownLatch latch = new CountDownLatch(2);
         new Thread(() -> {
-            this.rmf.start();
+            this.wrb.start();
             latch.countDown();
         }).run();
+//        new Thread(() -> {
+//            this.deliverFork.start();
+//            latch.countDown();
+//        }).run();
+//        new Thread(() -> {
+//            this.sync.start();
+//            latch.countDown();
+//        }).run();
         new Thread(() -> {
-            this.deliverFork.start();
-            latch.countDown();
-        }).run();
-        new Thread(() -> {
-            this.sync.start();
+            this.RBservice.start();
             latch.countDown();
         }).run();
         try {
@@ -270,13 +273,15 @@ public class Top implements server {
             logger.debug(format("G-%d shutdown channel %d", id, i));
         }
         logger.debug(format("G-%d shutdown deliverThread", id));
-        rmf.stop();
+        wrb.stop();
 //        sts.totalDec = wrb.getTotolDec();
 //        sts.optemisticDec = wrb.getOptemisticDec();
         logger.debug(format("G-%d shutdown wrb Service", id));
-        deliverFork.shutdown();
-        logger.debug(format("G-%d shutdown panic service", id));
-        sync.shutdown();
+//        deliverFork.shutdown();
+//        logger.debug(format("G-%d shutdown panic service", id));
+//        sync.shutdown();
+//        logger.debug(format("G-%d shutdown sync service", id));
+        RBservice.shutdown();
         logger.debug(format("G-%d shutdown sync service", id));
         txsServer.shutdown();
 //        chainCutterExecutor.shutdown();
@@ -404,13 +409,22 @@ public class Top implements server {
     }
 
     public void setAsyncParam(int maxTime) {
-        if (!type.equals("a")) {
+        if (!type.equals("a") && !type.equals("b")) {
             logger.debug(format("G-%d Unable to set async behaviour to non async node", id));
             return;
         }
-        for (int i = 0 ; i < c ; i++) {
-            ((AsyncToyServer) group[i]).setAsyncParam(maxTime);
+        if (type.equals("a")) {
+            for (int i = 0 ; i < c ; i++) {
+                ((AsyncToyServer) group[i]).setAsyncParam(maxTime);
+            }
         }
+
+        if (type.equals("b")) {
+            for (int i = 0 ; i < c ; i++) {
+                ((ByzToyServer) group[i]).setAsyncParam(maxTime);
+            }
+        }
+
     }
 
     public int getBCSize() {

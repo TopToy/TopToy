@@ -17,8 +17,7 @@ generate_config_toml() {
     tmo = 1000
     tmoInterval = 100
     rmfBbcConfigPath = \"src/main/resources/bbcConfig\"
-    panicRBroadcastConfigPath = \"src/main/resources/panicRBConfig\"
-    syncRBroadcastConfigPath = \"src/main/resources/syncRBConfig\"
+    RBConfigPath = \"src/main/resources/RBConfig\"
     maxTransactionInBlock = 1000
     caRootPath = \"\"
     fastMode = true
@@ -229,23 +228,27 @@ generate_log4j() {
 
 main(){
     mkdir -p ${1}/bbcConfig
-    mkdir -p ${1}/panicRBConfig
-    mkdir -p ${1}/syncRBConfig
+#    mkdir -p ${1}/panicRBConfig
+#    mkdir -p ${1}/syncRBConfig
+    mkdir -p ${1}/RBConfig
     mkdir -p ${1}/inst
 
     generate_config_toml ${1}
 
     generate_hosts ${1}/bbcConfig 12000
-    generate_hosts ${1}/panicRBConfig 11000
-    generate_hosts ${1}/syncRBConfig 13000
+#    generate_hosts ${1}/panicRBConfig 11000
+#    generate_hosts ${1}/syncRBConfig 13000
+    generate_hosts ${1}/RBConfig 13000
 
     generate_system ${1}/bbcConfig
-    generate_system ${1}/panicRBConfig
-    generate_system ${1}/syncRBConfig
+#    generate_system ${1}/panicRBConfig
+#    generate_system ${1}/syncRBConfig
+    generate_system ${1}/RBConfig
 
     generate_keys ${1}/bbcConfig
-    generate_keys ${1}/panicRBConfig
-    generate_keys ${1}/syncRBConfig
+#    generate_keys ${1}/panicRBConfig
+#    generate_keys ${1}/syncRBConfig
+    generate_keys ${1}/RBConfig
 
     generate_log4j ${1}
 

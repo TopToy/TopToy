@@ -5,9 +5,7 @@ import blockchain.SBlockchain;
 import crypto.blockDigSig;
 import proto.Types;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static blockchain.BaseBlockchain.validateBlockHash;
@@ -26,22 +24,22 @@ public class GlobalData {
     public static ConcurrentHashMap<Types.Meta, Types.Block>[] pending;
     public static ConcurrentHashMap<Types.Meta, Types.Block>[] received;
     public static ConcurrentHashMap<Types.Meta, VoteData>[] votes;
-    public static HashMap<Types.Meta, Types.ForkProof>[] forksRBData;
-    public static HashMap<Types.Meta, List<Types.subChainVersion>>[] syncRBData;
+    public static Queue<Types.ForkProof>[] forksRBData;
+    public static HashMap<Integer, List<Types.subChainVersion>>[] syncRBData;
 
     public GlobalData(int channels) {
         bbcDec = new ConcurrentHashMap[channels];
         pending = new ConcurrentHashMap[channels];
         received = new ConcurrentHashMap[channels];
         votes = new ConcurrentHashMap[channels];
-        forksRBData = new HashMap[channels];
+        forksRBData = new Queue[channels];
         syncRBData = new HashMap[channels];
         for (int i = 0 ; i < channels ; i++) {
             bbcDec[i] = new ConcurrentHashMap<>();
             pending[i] = new ConcurrentHashMap<>();
             received[i] = new ConcurrentHashMap<>();
             votes[i] = new ConcurrentHashMap<>();
-            forksRBData[i] = new HashMap<>();
+            forksRBData[i] = new LinkedList<>();
             syncRBData[i] = new HashMap<>();
         }
     }
@@ -53,6 +51,7 @@ public class GlobalData {
         }
         return RBTypes.NOT_MAPPED;
     }
+
 
     static public boolean validateForkProof(Types.ForkProof p) {
         logger.debug(format("starts validating fp"));

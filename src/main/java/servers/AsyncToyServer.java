@@ -18,17 +18,17 @@ public class AsyncToyServer extends ToyBaseServer {
 
     int maxTime = 0;
 
-    public AsyncToyServer(String addr, int rmfPort, int id, int channel, int f, int tmo, int tmoInterval,
-                          int maxTx, boolean fastMode, ArrayList<Node> cluster, WrbNode rmf,
-                          RBrodcastService panic, RBrodcastService sync) {
-        super(addr, rmfPort, id, channel, f, tmo, tmoInterval, maxTx, fastMode, cluster, rmf, panic, sync);
+    public AsyncToyServer(String addr, int wrbPort, int id, int channel, int f,
+                          int maxTx, boolean fastMode, WrbNode wrb,
+                          RBrodcastService rb) {
+        super(addr, wrbPort, id, channel, f, maxTx, fastMode, wrb, rb);
     }
-    public AsyncToyServer(String addr, int rmfPort, int id, int channel, int f, int tmo, int tmoInterval,
+    public AsyncToyServer(String addr, int wrbPort, int id, int channel, int f, int tmo, int tmoInterval,
                           int maxTx, boolean fastMode, ArrayList<Node> cluster,
-                          String bbcConfig, String panicConfig, String syncConfig,
+                          String bbcConfig, String rbConfigPath,
                           String serverCrt, String serverPrivKey, String caRoot) {
-        super(addr, rmfPort,  id, channel, f, tmo, tmoInterval, maxTx, fastMode, cluster,
-                bbcConfig, panicConfig, syncConfig, serverCrt, serverPrivKey, caRoot);
+        super(addr, wrbPort, id, channel, f, tmo, tmoInterval, maxTx, fastMode, cluster,
+                bbcConfig, rbConfigPath, serverCrt, serverPrivKey, caRoot);
     }
 
     Types.Block leaderImpl() throws InterruptedException {

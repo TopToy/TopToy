@@ -8682,22 +8682,29 @@ public final class Types {
     proto.Types.BlockOrBuilder getCurrOrBuilder();
 
     /**
+     * <pre>
+     *    bool done = 4;
+     * </pre>
+     *
      * <code>.proto.Block prev = 3;</code>
      */
     boolean hasPrev();
     /**
+     * <pre>
+     *    bool done = 4;
+     * </pre>
+     *
      * <code>.proto.Block prev = 3;</code>
      */
     proto.Types.Block getPrev();
     /**
+     * <pre>
+     *    bool done = 4;
+     * </pre>
+     *
      * <code>.proto.Block prev = 3;</code>
      */
     proto.Types.BlockOrBuilder getPrevOrBuilder();
-
-    /**
-     * <code>bool done = 4;</code>
-     */
-    boolean getDone();
   }
   /**
    * Protobuf type {@code proto.ForkProof}
@@ -8713,7 +8720,6 @@ public final class Types {
     }
     private ForkProof() {
       sender_ = 0;
-      done_ = false;
     }
 
     @java.lang.Override
@@ -8778,11 +8784,6 @@ public final class Types {
 
               break;
             }
-            case 32: {
-
-              done_ = input.readBool();
-              break;
-            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -8840,31 +8841,34 @@ public final class Types {
     public static final int PREV_FIELD_NUMBER = 3;
     private proto.Types.Block prev_;
     /**
+     * <pre>
+     *    bool done = 4;
+     * </pre>
+     *
      * <code>.proto.Block prev = 3;</code>
      */
     public boolean hasPrev() {
       return prev_ != null;
     }
     /**
+     * <pre>
+     *    bool done = 4;
+     * </pre>
+     *
      * <code>.proto.Block prev = 3;</code>
      */
     public proto.Types.Block getPrev() {
       return prev_ == null ? proto.Types.Block.getDefaultInstance() : prev_;
     }
     /**
+     * <pre>
+     *    bool done = 4;
+     * </pre>
+     *
      * <code>.proto.Block prev = 3;</code>
      */
     public proto.Types.BlockOrBuilder getPrevOrBuilder() {
       return getPrev();
-    }
-
-    public static final int DONE_FIELD_NUMBER = 4;
-    private boolean done_;
-    /**
-     * <code>bool done = 4;</code>
-     */
-    public boolean getDone() {
-      return done_;
     }
 
     private byte memoizedIsInitialized = -1;
@@ -8888,9 +8892,6 @@ public final class Types {
       if (prev_ != null) {
         output.writeMessage(3, getPrev());
       }
-      if (done_ != false) {
-        output.writeBool(4, done_);
-      }
       unknownFields.writeTo(output);
     }
 
@@ -8910,10 +8911,6 @@ public final class Types {
       if (prev_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(3, getPrev());
-      }
-      if (done_ != false) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(4, done_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -8943,8 +8940,6 @@ public final class Types {
         result = result && getPrev()
             .equals(other.getPrev());
       }
-      result = result && (getDone()
-          == other.getDone());
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -8966,9 +8961,6 @@ public final class Types {
         hash = (37 * hash) + PREV_FIELD_NUMBER;
         hash = (53 * hash) + getPrev().hashCode();
       }
-      hash = (37 * hash) + DONE_FIELD_NUMBER;
-      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
-          getDone());
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -9112,8 +9104,6 @@ public final class Types {
           prev_ = null;
           prevBuilder_ = null;
         }
-        done_ = false;
-
         return this;
       }
 
@@ -9147,7 +9137,6 @@ public final class Types {
         } else {
           result.prev_ = prevBuilder_.build();
         }
-        result.done_ = done_;
         onBuilt();
         return result;
       }
@@ -9197,9 +9186,6 @@ public final class Types {
         }
         if (other.hasPrev()) {
           mergePrev(other.getPrev());
-        }
-        if (other.getDone() != false) {
-          setDone(other.getDone());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -9375,12 +9361,20 @@ public final class Types {
       private com.google.protobuf.SingleFieldBuilderV3<
           proto.Types.Block, proto.Types.Block.Builder, proto.Types.BlockOrBuilder> prevBuilder_;
       /**
+       * <pre>
+       *    bool done = 4;
+       * </pre>
+       *
        * <code>.proto.Block prev = 3;</code>
        */
       public boolean hasPrev() {
         return prevBuilder_ != null || prev_ != null;
       }
       /**
+       * <pre>
+       *    bool done = 4;
+       * </pre>
+       *
        * <code>.proto.Block prev = 3;</code>
        */
       public proto.Types.Block getPrev() {
@@ -9391,6 +9385,10 @@ public final class Types {
         }
       }
       /**
+       * <pre>
+       *    bool done = 4;
+       * </pre>
+       *
        * <code>.proto.Block prev = 3;</code>
        */
       public Builder setPrev(proto.Types.Block value) {
@@ -9407,6 +9405,10 @@ public final class Types {
         return this;
       }
       /**
+       * <pre>
+       *    bool done = 4;
+       * </pre>
+       *
        * <code>.proto.Block prev = 3;</code>
        */
       public Builder setPrev(
@@ -9421,6 +9423,10 @@ public final class Types {
         return this;
       }
       /**
+       * <pre>
+       *    bool done = 4;
+       * </pre>
+       *
        * <code>.proto.Block prev = 3;</code>
        */
       public Builder mergePrev(proto.Types.Block value) {
@@ -9439,6 +9445,10 @@ public final class Types {
         return this;
       }
       /**
+       * <pre>
+       *    bool done = 4;
+       * </pre>
+       *
        * <code>.proto.Block prev = 3;</code>
        */
       public Builder clearPrev() {
@@ -9453,6 +9463,10 @@ public final class Types {
         return this;
       }
       /**
+       * <pre>
+       *    bool done = 4;
+       * </pre>
+       *
        * <code>.proto.Block prev = 3;</code>
        */
       public proto.Types.Block.Builder getPrevBuilder() {
@@ -9461,6 +9475,10 @@ public final class Types {
         return getPrevFieldBuilder().getBuilder();
       }
       /**
+       * <pre>
+       *    bool done = 4;
+       * </pre>
+       *
        * <code>.proto.Block prev = 3;</code>
        */
       public proto.Types.BlockOrBuilder getPrevOrBuilder() {
@@ -9472,6 +9490,10 @@ public final class Types {
         }
       }
       /**
+       * <pre>
+       *    bool done = 4;
+       * </pre>
+       *
        * <code>.proto.Block prev = 3;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
@@ -9486,32 +9508,6 @@ public final class Types {
           prev_ = null;
         }
         return prevBuilder_;
-      }
-
-      private boolean done_ ;
-      /**
-       * <code>bool done = 4;</code>
-       */
-      public boolean getDone() {
-        return done_;
-      }
-      /**
-       * <code>bool done = 4;</code>
-       */
-      public Builder setDone(boolean value) {
-        
-        done_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>bool done = 4;</code>
-       */
-      public Builder clearDone() {
-        
-        done_ = false;
-        onChanged();
-        return this;
       }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -13783,17 +13779,17 @@ public final class Types {
       "txID\030\002 \001(\0132\013.proto.txID\"N\n\010approved\022\036\n\002t" +
       "x\030\001 \001(\0132\022.proto.Transaction\022\"\n\002st\030\003 \001(\0132" +
       "\026.proto.blockStatistics\"!\n\004read\022\031\n\004txID\030" +
-      "\001 \001(\0132\013.proto.txID\"a\n\tForkProof\022\016\n\006sende" +
+      "\001 \001(\0132\013.proto.txID\"S\n\tForkProof\022\016\n\006sende" +
       "r\030\001 \001(\005\022\032\n\004curr\030\002 \001(\0132\014.proto.Block\022\032\n\004p" +
-      "rev\030\003 \001(\0132\014.proto.Block\022\014\n\004done\030\004 \001(\010\";\n" +
-      "\005RBMsg\022\026\n\001m\030\001 \001(\0132\013.proto.Meta\022\014\n\004type\030\002" +
-      " \001(\005\022\014\n\004data\030\003 \001(\014\"\007\n\005Empty\"!\n\003Req\022\032\n\005_m" +
-      "eta\030\001 \001(\0132\013.proto.Meta\"(\n\nPreConsReq\022\032\n\005" +
-      "_meta\030\001 \001(\0132\013.proto.Meta\"9\n\003Res\022\026\n\001m\030\001 \001" +
-      "(\0132\013.proto.Meta\022\032\n\004data\030\002 \001(\0132\014.proto.Bl" +
-      "ock\"`\n\017subChainVersion\022\021\n\tforkPoint\030\001 \001(" +
-      "\005\022\021\n\tsuggested\030\002 \001(\005\022\027\n\001v\030\003 \003(\0132\014.proto." +
-      "Block\022\016\n\006sender\030\004 \001(\005B\007\n\005protob\006proto3"
+      "rev\030\003 \001(\0132\014.proto.Block\";\n\005RBMsg\022\026\n\001m\030\001 " +
+      "\001(\0132\013.proto.Meta\022\014\n\004type\030\002 \001(\005\022\014\n\004data\030\003" +
+      " \001(\014\"\007\n\005Empty\"!\n\003Req\022\032\n\005_meta\030\001 \001(\0132\013.pr" +
+      "oto.Meta\"(\n\nPreConsReq\022\032\n\005_meta\030\001 \001(\0132\013." +
+      "proto.Meta\"9\n\003Res\022\026\n\001m\030\001 \001(\0132\013.proto.Met" +
+      "a\022\032\n\004data\030\002 \001(\0132\014.proto.Block\"`\n\017subChai" +
+      "nVersion\022\021\n\tforkPoint\030\001 \001(\005\022\021\n\tsuggested" +
+      "\030\002 \001(\005\022\027\n\001v\030\003 \003(\0132\014.proto.Block\022\016\n\006sende" +
+      "r\030\004 \001(\005B\007\n\005protob\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -13878,7 +13874,7 @@ public final class Types {
     internal_static_proto_ForkProof_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_ForkProof_descriptor,
-        new java.lang.String[] { "Sender", "Curr", "Prev", "Done", });
+        new java.lang.String[] { "Sender", "Curr", "Prev", });
     internal_static_proto_RBMsg_descriptor =
       getDescriptor().getMessageTypes().get(12);
     internal_static_proto_RBMsg_fieldAccessorTable = new

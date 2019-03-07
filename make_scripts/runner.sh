@@ -18,6 +18,8 @@ run() {
 
 run2() {
     while read -r line; do
+        rm -r ${docker_out}
+        mkdir -p ${docker_out}
         local name=`echo $line | cut -f 1 -d " "`
         local t=`echo $line | cut -f 2 -d " "`
 

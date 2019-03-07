@@ -9,10 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static java.lang.String.format;
 import static java.util.Collections.max;
-import static java.util.Collections.min;
 
 public abstract class BaseBlockchain {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(BaseBlockchain.class);
@@ -108,7 +105,7 @@ public abstract class BaseBlockchain {
         }
     }
 
-    public List<Block> getBlocks(int start, int end) throws IOException {
+    public List<Block> getBlocks(int start, int end) {
         List<Block> ret = new ArrayList<>();
         for (int i = start ; i < end ; i++) {
             ret.add(getBlock(i));
