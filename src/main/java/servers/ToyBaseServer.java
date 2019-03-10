@@ -20,6 +20,8 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
+
 import static java.lang.Math.max;
 import static java.lang.String.format;
 
@@ -711,7 +713,7 @@ public abstract class ToyBaseServer extends Node {
                 ret.add(subChainVersion.getDefaultInstance());
                 if (v1.stream().noneMatch(v -> v.getVCount() > 0)) {
                     noMatch.set(true);
-                    logger.error(format("all versions are empties [fp=%d]", forkPoint));
+                    logger.error(format("all versions are empties (might happen due to fast mode) [fp=%d] ", forkPoint));
                     return ret;
                 }
                 int max = v1.
@@ -719,11 +721,17 @@ public abstract class ToyBaseServer extends Node {
                         filter(v -> v.getVCount() > 0).
                         mapToInt(v -> v.getV(v.getVCount() - 1).getHeader().getHeight()).
                         max().getAsInt();
-                choosen[0] = v1.
+                List valid = v1.
                         stream().
                         filter(v -> v.getVCount() > 0).
                         filter(v -> v.getV(v.getVCount() - 1).getHeader().getHeight() == max
-                                && BaseBlockchain.validateBlockHash(bc.getBlock(forkPoint - (f + 2)), v.getV(0))).
+                                && BaseBlockchain.validateBlockHash(bc.getBlock(forkPoint - (f + 2)), v.getV(0))).collect(Collectors.toList());
+                if (valid.size() == 0) {
+                    noMatch.set(true);
+                    logger.error(format("No version is valid (might happen due to fast mode) [fp=%d]", forkPoint));
+                    return ret;
+                }
+                choosen[0] = (subChainVersion) valid.stream().
                         findFirst().get();
                 sPoint[0] = choosen[0].getV(0).getHeader().getHeight();
                 logger.info(format("[#%d-C[%d]] adopts sub chain version [length=%d] from [#%d] " +

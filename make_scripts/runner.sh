@@ -49,16 +49,16 @@ collect_res_from_servers() {
         cat ${summery} >> ${currOut}/servers/summery.csv
     done
 
-    for sigsummery in ${docker_out}/**/sig_summery.csv ; do
-        cat ${sigsummery} >> ${currOut}/servers/sig_summery.csv
-    done
+#    for sigsummery in ${docker_out}/**/sig_summery.csv ; do
+#        cat ${sigsummery} >> ${currOut}/servers/sig_summery.csv
+#    done
     shopt -u globstar
 }
 
 print_headers() {
     local currOut=${1}
     echo "valid,ts,id,type,channels,tmo,fm,txSize,txInBlock,txTotal,duration,txPsec,blocksNum,avgTxInBlock,avgDelay,opRate,eRate,dRate,syncEvents" >> $currOut/servers/summery.csv
-    echo "id,type,channels,txSize,maxTxInBlock,signaturePeriod,verificationPeriod,propose2tentative,tentative2permanent,channelPermanent2decide,propose2permanentchannel,propose2decide" >> $currOut/servers/blocksStatSummery.csv
+#    echo "id,type,channels,txSize,maxTxInBlock,signaturePeriod,verificationPeriod,propose2tentative,tentative2permanent,channelPermanent2decide,propose2permanentchannel,propose2decide" >> $currOut/servers/blocksStatSummery.csv
 #    echo "channels,txInBlock,ts,id,txSize,txCount,clientLatency,serverLatency,clientOnly" >> ${currOut}/clients/summery.csv
 }
 

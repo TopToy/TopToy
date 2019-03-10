@@ -79,6 +79,7 @@ public abstract class BaseBlockchain {
 
     public boolean validateBlockHash(Block b) {
         int index = b.getHeader().getHeight() - 1;
+        if (getHeight() < index) return false;
         Block prev = getBlock(index);
         return validateBlockHash(prev, b);
     }

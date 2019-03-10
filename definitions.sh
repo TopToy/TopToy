@@ -3,8 +3,8 @@
 BASE_DIR=.
 BIN_DIR=${BASE_DIR}/bin
 RESOURCES_DIR=${BIN_DIR}/src/main/resources
-C=4
-F=1
+C=7
+F=2
 make_script_dir=${BASE_DIR}/make_scripts
 docker_image=toy:0.1
 
