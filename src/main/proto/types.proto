@@ -10,6 +10,10 @@ message Meta {
     int32 cidSeries = 4;
 }
 
+message Comm {
+    int32 channel = 1;
+    bytes data = 2;
+}
 
 message BbcMsg {
     Meta m = 1;

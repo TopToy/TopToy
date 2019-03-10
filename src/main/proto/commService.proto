@@ -1,0 +1,10 @@
+syntax = "proto3";
+option java_package = "proto";
+//option java_multiple_files = true;
+
+package proto;
+import "types.proto";
+
+service Communication {
+    rpc dsm(Comm) returns (Empty) {};
+}

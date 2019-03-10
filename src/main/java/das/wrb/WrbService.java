@@ -83,7 +83,7 @@ public class WrbService extends RmfGrpc.RmfImplBase {
 
         peer(Node node) {
             try {
-                channel = sslUtils.buildSslChannel(node.getAddr(), node.getRmfPort(),
+                channel = sslUtils.buildSslChannel(node.getAddr(), node.getPort(),
                         sslUtils.buildSslContextForClient(Config.getCaRootPath(),
                                 Config.getServerCrtPath(), Config.getServerTlsPrivKeyPath())).
                         intercept(new clientTlsIntercepter()).build();
@@ -191,7 +191,7 @@ public class WrbService extends RmfGrpc.RmfImplBase {
 //            beg = new NioEventLoopGroup(cores + 1);
             EventLoopGroup weg = new NioEventLoopGroup(cores);
             rmfServer = NettyServerBuilder.
-                    forPort(nodes.get(id).getRmfPort()).
+                    forPort(nodes.get(id).getPort()).
                     executor(executor)
                     .workerEventLoopGroup(weg)
                     .bossEventLoopGroup(weg)

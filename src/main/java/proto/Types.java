@@ -654,6 +654,523 @@ public final class Types {
 
   }
 
+  public interface CommOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:proto.Comm)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>int32 channel = 1;</code>
+     */
+    int getChannel();
+
+    /**
+     * <code>bytes data = 2;</code>
+     */
+    com.google.protobuf.ByteString getData();
+  }
+  /**
+   * Protobuf type {@code proto.Comm}
+   */
+  public  static final class Comm extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:proto.Comm)
+      CommOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use Comm.newBuilder() to construct.
+    private Comm(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private Comm() {
+      channel_ = 0;
+      data_ = com.google.protobuf.ByteString.EMPTY;
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private Comm(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownFieldProto3(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 8: {
+
+              channel_ = input.readInt32();
+              break;
+            }
+            case 18: {
+
+              data_ = input.readBytes();
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return proto.Types.internal_static_proto_Comm_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return proto.Types.internal_static_proto_Comm_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              proto.Types.Comm.class, proto.Types.Comm.Builder.class);
+    }
+
+    public static final int CHANNEL_FIELD_NUMBER = 1;
+    private int channel_;
+    /**
+     * <code>int32 channel = 1;</code>
+     */
+    public int getChannel() {
+      return channel_;
+    }
+
+    public static final int DATA_FIELD_NUMBER = 2;
+    private com.google.protobuf.ByteString data_;
+    /**
+     * <code>bytes data = 2;</code>
+     */
+    public com.google.protobuf.ByteString getData() {
+      return data_;
+    }
+
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (channel_ != 0) {
+        output.writeInt32(1, channel_);
+      }
+      if (!data_.isEmpty()) {
+        output.writeBytes(2, data_);
+      }
+      unknownFields.writeTo(output);
+    }
+
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (channel_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(1, channel_);
+      }
+      if (!data_.isEmpty()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(2, data_);
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof proto.Types.Comm)) {
+        return super.equals(obj);
+      }
+      proto.Types.Comm other = (proto.Types.Comm) obj;
+
+      boolean result = true;
+      result = result && (getChannel()
+          == other.getChannel());
+      result = result && getData()
+          .equals(other.getData());
+      result = result && unknownFields.equals(other.unknownFields);
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + CHANNEL_FIELD_NUMBER;
+      hash = (53 * hash) + getChannel();
+      hash = (37 * hash) + DATA_FIELD_NUMBER;
+      hash = (53 * hash) + getData().hashCode();
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static proto.Types.Comm parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static proto.Types.Comm parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static proto.Types.Comm parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static proto.Types.Comm parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static proto.Types.Comm parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static proto.Types.Comm parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static proto.Types.Comm parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static proto.Types.Comm parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static proto.Types.Comm parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static proto.Types.Comm parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static proto.Types.Comm parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static proto.Types.Comm parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(proto.Types.Comm prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code proto.Comm}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:proto.Comm)
+        proto.Types.CommOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return proto.Types.internal_static_proto_Comm_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return proto.Types.internal_static_proto_Comm_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                proto.Types.Comm.class, proto.Types.Comm.Builder.class);
+      }
+
+      // Construct using proto.Types.Comm.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      public Builder clear() {
+        super.clear();
+        channel_ = 0;
+
+        data_ = com.google.protobuf.ByteString.EMPTY;
+
+        return this;
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return proto.Types.internal_static_proto_Comm_descriptor;
+      }
+
+      public proto.Types.Comm getDefaultInstanceForType() {
+        return proto.Types.Comm.getDefaultInstance();
+      }
+
+      public proto.Types.Comm build() {
+        proto.Types.Comm result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public proto.Types.Comm buildPartial() {
+        proto.Types.Comm result = new proto.Types.Comm(this);
+        result.channel_ = channel_;
+        result.data_ = data_;
+        onBuilt();
+        return result;
+      }
+
+      public Builder clone() {
+        return (Builder) super.clone();
+      }
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return (Builder) super.setField(field, value);
+      }
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return (Builder) super.clearField(field);
+      }
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return (Builder) super.clearOneof(oneof);
+      }
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return (Builder) super.setRepeatedField(field, index, value);
+      }
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return (Builder) super.addRepeatedField(field, value);
+      }
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof proto.Types.Comm) {
+          return mergeFrom((proto.Types.Comm)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(proto.Types.Comm other) {
+        if (other == proto.Types.Comm.getDefaultInstance()) return this;
+        if (other.getChannel() != 0) {
+          setChannel(other.getChannel());
+        }
+        if (other.getData() != com.google.protobuf.ByteString.EMPTY) {
+          setData(other.getData());
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        proto.Types.Comm parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (proto.Types.Comm) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      private int channel_ ;
+      /**
+       * <code>int32 channel = 1;</code>
+       */
+      public int getChannel() {
+        return channel_;
+      }
+      /**
+       * <code>int32 channel = 1;</code>
+       */
+      public Builder setChannel(int value) {
+        
+        channel_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int32 channel = 1;</code>
+       */
+      public Builder clearChannel() {
+        
+        channel_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private com.google.protobuf.ByteString data_ = com.google.protobuf.ByteString.EMPTY;
+      /**
+       * <code>bytes data = 2;</code>
+       */
+      public com.google.protobuf.ByteString getData() {
+        return data_;
+      }
+      /**
+       * <code>bytes data = 2;</code>
+       */
+      public Builder setData(com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        data_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>bytes data = 2;</code>
+       */
+      public Builder clearData() {
+        
+        data_ = getDefaultInstance().getData();
+        onChanged();
+        return this;
+      }
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFieldsProto3(unknownFields);
+      }
+
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:proto.Comm)
+    }
+
+    // @@protoc_insertion_point(class_scope:proto.Comm)
+    private static final proto.Types.Comm DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new proto.Types.Comm();
+    }
+
+    public static proto.Types.Comm getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<Comm>
+        PARSER = new com.google.protobuf.AbstractParser<Comm>() {
+      public Comm parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new Comm(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<Comm> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<Comm> getParserForType() {
+      return PARSER;
+    }
+
+    public proto.Types.Comm getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   public interface BbcMsgOrBuilder extends
       // @@protoc_insertion_point(interface_extends:proto.BbcMsg)
       com.google.protobuf.MessageOrBuilder {
@@ -13663,6 +14180,11 @@ public final class Types {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_proto_Meta_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_proto_Comm_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_proto_Comm_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_proto_BbcMsg_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -13758,38 +14280,39 @@ public final class Types {
     java.lang.String[] descriptorData = {
       "\n\013types.proto\022\005proto\"G\n\004Meta\022\017\n\007channel\030" +
       "\001 \001(\005\022\016\n\006sender\030\002 \001(\005\022\013\n\003cid\030\003 \001(\005\022\021\n\tci" +
-      "dSeries\030\004 \001(\005\"J\n\006BbcMsg\022\026\n\001m\030\001 \001(\0132\013.pro" +
-      "to.Meta\022\014\n\004vote\030\002 \001(\010\022\032\n\004next\030\003 \001(\0132\014.pr" +
-      "oto.Block\"7\n\013BbcDecision\022\026\n\001m\030\001 \001(\0132\013.pr" +
-      "oto.Meta\022\020\n\010decosion\030\002 \001(\005\"x\n\013BlockHeade" +
-      "r\022\026\n\001m\030\001 \001(\0132\013.proto.Meta\022\014\n\004prev\030\002 \001(\014\022" +
-      "\016\n\006height\030\003 \001(\005\022\027\n\017transactionHash\030\004 \001(\014" +
-      "\022\r\n\005proof\030\005 \001(\t\022\013\n\003bid\030\006 \001(\005\"x\n\017blockSta" +
-      "tistics\022\014\n\004sign\030\002 \001(\003\022\020\n\010proposed\030\003 \001(\003\022" +
-      "\020\n\010verified\030\004 \001(\003\022\026\n\016channelDecided\030\005 \001(" +
-      "\003\022\n\n\002pd\030\006 \001(\003\022\017\n\007decided\030\007 \001(\003\"q\n\005Block\022" +
-      "\"\n\006header\030\001 \001(\0132\022.proto.BlockHeader\022 \n\004d" +
-      "ata\030\002 \003(\0132\022.proto.Transaction\022\"\n\002st\030\003 \001(" +
-      "\0132\026.proto.blockStatistics\"G\n\004txID\022\022\n\npro" +
-      "poserID\030\001 \001(\005\022\013\n\003bid\030\002 \001(\005\022\r\n\005txNum\030\003 \001(" +
-      "\005\022\017\n\007channel\030\004 \001(\005\"j\n\013Transaction\022\020\n\010cli" +
-      "entID\030\001 \001(\005\022\027\n\002id\030\002 \001(\0132\013.proto.txID\022\014\n\004" +
-      "data\030\003 \001(\014\022\020\n\010clientTs\030\004 \001(\003\022\020\n\010serverTs" +
-      "\030\005 \001(\003\"7\n\010accepted\022\020\n\010accepted\030\001 \001(\010\022\031\n\004" +
-      "txID\030\002 \001(\0132\013.proto.txID\"N\n\010approved\022\036\n\002t" +
-      "x\030\001 \001(\0132\022.proto.Transaction\022\"\n\002st\030\003 \001(\0132" +
-      "\026.proto.blockStatistics\"!\n\004read\022\031\n\004txID\030" +
-      "\001 \001(\0132\013.proto.txID\"S\n\tForkProof\022\016\n\006sende" +
-      "r\030\001 \001(\005\022\032\n\004curr\030\002 \001(\0132\014.proto.Block\022\032\n\004p" +
-      "rev\030\003 \001(\0132\014.proto.Block\";\n\005RBMsg\022\026\n\001m\030\001 " +
-      "\001(\0132\013.proto.Meta\022\014\n\004type\030\002 \001(\005\022\014\n\004data\030\003" +
-      " \001(\014\"\007\n\005Empty\"!\n\003Req\022\032\n\005_meta\030\001 \001(\0132\013.pr" +
-      "oto.Meta\"(\n\nPreConsReq\022\032\n\005_meta\030\001 \001(\0132\013." +
-      "proto.Meta\"9\n\003Res\022\026\n\001m\030\001 \001(\0132\013.proto.Met" +
-      "a\022\032\n\004data\030\002 \001(\0132\014.proto.Block\"`\n\017subChai" +
-      "nVersion\022\021\n\tforkPoint\030\001 \001(\005\022\021\n\tsuggested" +
-      "\030\002 \001(\005\022\027\n\001v\030\003 \003(\0132\014.proto.Block\022\016\n\006sende" +
-      "r\030\004 \001(\005B\007\n\005protob\006proto3"
+      "dSeries\030\004 \001(\005\"%\n\004Comm\022\017\n\007channel\030\001 \001(\005\022\014" +
+      "\n\004data\030\002 \001(\014\"J\n\006BbcMsg\022\026\n\001m\030\001 \001(\0132\013.prot" +
+      "o.Meta\022\014\n\004vote\030\002 \001(\010\022\032\n\004next\030\003 \001(\0132\014.pro" +
+      "to.Block\"7\n\013BbcDecision\022\026\n\001m\030\001 \001(\0132\013.pro" +
+      "to.Meta\022\020\n\010decosion\030\002 \001(\005\"x\n\013BlockHeader" +
+      "\022\026\n\001m\030\001 \001(\0132\013.proto.Meta\022\014\n\004prev\030\002 \001(\014\022\016" +
+      "\n\006height\030\003 \001(\005\022\027\n\017transactionHash\030\004 \001(\014\022" +
+      "\r\n\005proof\030\005 \001(\t\022\013\n\003bid\030\006 \001(\005\"x\n\017blockStat" +
+      "istics\022\014\n\004sign\030\002 \001(\003\022\020\n\010proposed\030\003 \001(\003\022\020" +
+      "\n\010verified\030\004 \001(\003\022\026\n\016channelDecided\030\005 \001(\003" +
+      "\022\n\n\002pd\030\006 \001(\003\022\017\n\007decided\030\007 \001(\003\"q\n\005Block\022\"" +
+      "\n\006header\030\001 \001(\0132\022.proto.BlockHeader\022 \n\004da" +
+      "ta\030\002 \003(\0132\022.proto.Transaction\022\"\n\002st\030\003 \001(\013" +
+      "2\026.proto.blockStatistics\"G\n\004txID\022\022\n\nprop" +
+      "oserID\030\001 \001(\005\022\013\n\003bid\030\002 \001(\005\022\r\n\005txNum\030\003 \001(\005" +
+      "\022\017\n\007channel\030\004 \001(\005\"j\n\013Transaction\022\020\n\010clie" +
+      "ntID\030\001 \001(\005\022\027\n\002id\030\002 \001(\0132\013.proto.txID\022\014\n\004d" +
+      "ata\030\003 \001(\014\022\020\n\010clientTs\030\004 \001(\003\022\020\n\010serverTs\030" +
+      "\005 \001(\003\"7\n\010accepted\022\020\n\010accepted\030\001 \001(\010\022\031\n\004t" +
+      "xID\030\002 \001(\0132\013.proto.txID\"N\n\010approved\022\036\n\002tx" +
+      "\030\001 \001(\0132\022.proto.Transaction\022\"\n\002st\030\003 \001(\0132\026" +
+      ".proto.blockStatistics\"!\n\004read\022\031\n\004txID\030\001" +
+      " \001(\0132\013.proto.txID\"S\n\tForkProof\022\016\n\006sender" +
+      "\030\001 \001(\005\022\032\n\004curr\030\002 \001(\0132\014.proto.Block\022\032\n\004pr" +
+      "ev\030\003 \001(\0132\014.proto.Block\";\n\005RBMsg\022\026\n\001m\030\001 \001" +
+      "(\0132\013.proto.Meta\022\014\n\004type\030\002 \001(\005\022\014\n\004data\030\003 " +
+      "\001(\014\"\007\n\005Empty\"!\n\003Req\022\032\n\005_meta\030\001 \001(\0132\013.pro" +
+      "to.Meta\"(\n\nPreConsReq\022\032\n\005_meta\030\001 \001(\0132\013.p" +
+      "roto.Meta\"9\n\003Res\022\026\n\001m\030\001 \001(\0132\013.proto.Meta" +
+      "\022\032\n\004data\030\002 \001(\0132\014.proto.Block\"`\n\017subChain" +
+      "Version\022\021\n\tforkPoint\030\001 \001(\005\022\021\n\tsuggested\030" +
+      "\002 \001(\005\022\027\n\001v\030\003 \003(\0132\014.proto.Block\022\016\n\006sender" +
+      "\030\004 \001(\005B\007\n\005protob\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -13809,104 +14332,110 @@ public final class Types {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_Meta_descriptor,
         new java.lang.String[] { "Channel", "Sender", "Cid", "CidSeries", });
-    internal_static_proto_BbcMsg_descriptor =
+    internal_static_proto_Comm_descriptor =
       getDescriptor().getMessageTypes().get(1);
+    internal_static_proto_Comm_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_proto_Comm_descriptor,
+        new java.lang.String[] { "Channel", "Data", });
+    internal_static_proto_BbcMsg_descriptor =
+      getDescriptor().getMessageTypes().get(2);
     internal_static_proto_BbcMsg_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_BbcMsg_descriptor,
         new java.lang.String[] { "M", "Vote", "Next", });
     internal_static_proto_BbcDecision_descriptor =
-      getDescriptor().getMessageTypes().get(2);
+      getDescriptor().getMessageTypes().get(3);
     internal_static_proto_BbcDecision_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_BbcDecision_descriptor,
         new java.lang.String[] { "M", "Decosion", });
     internal_static_proto_BlockHeader_descriptor =
-      getDescriptor().getMessageTypes().get(3);
+      getDescriptor().getMessageTypes().get(4);
     internal_static_proto_BlockHeader_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_BlockHeader_descriptor,
         new java.lang.String[] { "M", "Prev", "Height", "TransactionHash", "Proof", "Bid", });
     internal_static_proto_blockStatistics_descriptor =
-      getDescriptor().getMessageTypes().get(4);
+      getDescriptor().getMessageTypes().get(5);
     internal_static_proto_blockStatistics_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_blockStatistics_descriptor,
         new java.lang.String[] { "Sign", "Proposed", "Verified", "ChannelDecided", "Pd", "Decided", });
     internal_static_proto_Block_descriptor =
-      getDescriptor().getMessageTypes().get(5);
+      getDescriptor().getMessageTypes().get(6);
     internal_static_proto_Block_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_Block_descriptor,
         new java.lang.String[] { "Header", "Data", "St", });
     internal_static_proto_txID_descriptor =
-      getDescriptor().getMessageTypes().get(6);
+      getDescriptor().getMessageTypes().get(7);
     internal_static_proto_txID_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_txID_descriptor,
         new java.lang.String[] { "ProposerID", "Bid", "TxNum", "Channel", });
     internal_static_proto_Transaction_descriptor =
-      getDescriptor().getMessageTypes().get(7);
+      getDescriptor().getMessageTypes().get(8);
     internal_static_proto_Transaction_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_Transaction_descriptor,
         new java.lang.String[] { "ClientID", "Id", "Data", "ClientTs", "ServerTs", });
     internal_static_proto_accepted_descriptor =
-      getDescriptor().getMessageTypes().get(8);
+      getDescriptor().getMessageTypes().get(9);
     internal_static_proto_accepted_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_accepted_descriptor,
         new java.lang.String[] { "Accepted", "TxID", });
     internal_static_proto_approved_descriptor =
-      getDescriptor().getMessageTypes().get(9);
+      getDescriptor().getMessageTypes().get(10);
     internal_static_proto_approved_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_approved_descriptor,
         new java.lang.String[] { "Tx", "St", });
     internal_static_proto_read_descriptor =
-      getDescriptor().getMessageTypes().get(10);
+      getDescriptor().getMessageTypes().get(11);
     internal_static_proto_read_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_read_descriptor,
         new java.lang.String[] { "TxID", });
     internal_static_proto_ForkProof_descriptor =
-      getDescriptor().getMessageTypes().get(11);
+      getDescriptor().getMessageTypes().get(12);
     internal_static_proto_ForkProof_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_ForkProof_descriptor,
         new java.lang.String[] { "Sender", "Curr", "Prev", });
     internal_static_proto_RBMsg_descriptor =
-      getDescriptor().getMessageTypes().get(12);
+      getDescriptor().getMessageTypes().get(13);
     internal_static_proto_RBMsg_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_RBMsg_descriptor,
         new java.lang.String[] { "M", "Type", "Data", });
     internal_static_proto_Empty_descriptor =
-      getDescriptor().getMessageTypes().get(13);
+      getDescriptor().getMessageTypes().get(14);
     internal_static_proto_Empty_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_Empty_descriptor,
         new java.lang.String[] { });
     internal_static_proto_Req_descriptor =
-      getDescriptor().getMessageTypes().get(14);
+      getDescriptor().getMessageTypes().get(15);
     internal_static_proto_Req_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_Req_descriptor,
         new java.lang.String[] { "Meta", });
     internal_static_proto_PreConsReq_descriptor =
-      getDescriptor().getMessageTypes().get(15);
+      getDescriptor().getMessageTypes().get(16);
     internal_static_proto_PreConsReq_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_PreConsReq_descriptor,
         new java.lang.String[] { "Meta", });
     internal_static_proto_Res_descriptor =
-      getDescriptor().getMessageTypes().get(16);
+      getDescriptor().getMessageTypes().get(17);
     internal_static_proto_Res_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_Res_descriptor,
         new java.lang.String[] { "M", "Data", });
     internal_static_proto_subChainVersion_descriptor =
-      getDescriptor().getMessageTypes().get(17);
+      getDescriptor().getMessageTypes().get(18);
     internal_static_proto_subChainVersion_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_subChainVersion_descriptor,
