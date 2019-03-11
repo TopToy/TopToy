@@ -1,15 +1,17 @@
 package servers;
 
-import blockchain.BaseBlock;
-import blockchain.BaseBlockchain;
-import blockchain.SBlock;
+import blockchain.Blockchain;
+import blockchain.validation.Tvalidator;
+import blockchain.validation.Validator;
 import com.google.protobuf.ByteString;
+import communication.CommLayer;
+import communication.overlays.Clique;
 import config.Config;
 import config.Node;
 import das.RBroadcast.RBrodcastService;
 import das.data.GlobalData;
 import das.wrb.WrbNode;
-import proto.Types.*;
+import proto.Types;
 import utils.CacheUtils;
 import utils.DBUtils;
 import java.io.IOException;
@@ -22,17 +24,18 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
+import static blockchain.Utils.*;
+import static crypto.blockDigSig.verfiyBlockWRTheader;
 import static java.lang.Math.max;
 import static java.lang.String.format;
+import proto.Types.*;
 
 public abstract class ToyBaseServer extends Node {
 
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ToyBaseServer.class);
     WrbNode rmfServer;
-//    private RBrodcastService panicRB;
-//    private RBrodcastService syncRB;
     private RBrodcastService RBService;
-    final BaseBlockchain bc;
+    final Blockchain bc;
     int currHeight;
     protected int f;
     protected int n;
@@ -42,10 +45,10 @@ public abstract class ToyBaseServer extends Node {
     private int maxTransactionInBlock;
     private Thread mainThread;
     private Thread panicThread;
+    private Thread commSendThread;
     int cid = 0;
     int cidSeries = 0;
     private final HashMap<Integer, Boolean> fp;
-//    private final ConcurrentHashMap<Integer, ArrayList<subChainVersion>> scVersions;
     boolean configuredFastMode;
     boolean fastMode;
     int channel;
@@ -61,26 +64,16 @@ public abstract class ToyBaseServer extends Node {
     private ExecutorService storageWorker = Executors.newSingleThreadExecutor();
     private int syncEvents = 0;
     private int bid = 0;
-    final Queue<BaseBlock> blocksForPropose = new LinkedList<>();
+    final Queue<Block> blocksForPropose = new LinkedList<>();
+    final Queue<Block> proposedBlocks = new LinkedList<>();
+    Block.Builder currBLock;
+    final Object cbl = new Object();
     private CacheUtils txCache = new CacheUtils(0);
     private boolean intCatched = false;
+    private CommLayer comm;
+    private Validator v = new Tvalidator();
 
-    public ToyBaseServer(String addr, int wrbPort, int id, int channel, int f, int maxTx, boolean fastMode,
-                         WrbNode wrb, RBrodcastService rb) {
-        super(addr, wrbPort, id);
-        this.f = f;
-        this.n = 3*f + 1;
-//        this.panicRB = panic;
-//        this.syncRB = sync;
-        this.RBService = rb;
-        sPath = Paths.get("blocks", String.valueOf(channel));
-        bc = initBC(id, channel);
-//        currBlock = null;
-        currHeight = 1; // starts from 1 due to the genesis BaseBlock
-        currLeader = 0;
-        this.maxTransactionInBlock = maxTx;
-        fp = new HashMap<>();
-//        scVersions = new ConcurrentHashMap<>();
+    void initThreads() {
         mainThread = new Thread(this::intMain);
         panicThread = new Thread(() -> {
             try {
@@ -89,6 +82,46 @@ public abstract class ToyBaseServer extends Node {
                 logger.error(format("[#%d-C[%d]]", getID(), channel), e);
             }
         });
+        commSendThread = new Thread(() -> {
+            try {
+                commSendLogic();
+            } catch (InterruptedException e) {
+                logger.error(format("[#%d-C[%d]]", getID(), channel), e);
+            }
+        });
+    }
+
+    void commSendLogic() throws InterruptedException {
+        while (!stopped.get()) {
+            Block b;
+            synchronized (blocksForPropose) {
+                while (blocksForPropose.isEmpty()) {
+                    blocksForPropose.wait();
+                }
+                b = blocksForPropose.poll();
+            }
+            synchronized (proposedBlocks) {
+                comm.broadcast(channel, b);
+                proposedBlocks.add(b);
+
+            }
+        }
+    }
+
+    public ToyBaseServer(String addr, int wrbPort, int id, int channel, int f, int maxTx, boolean fastMode,
+                         WrbNode wrb, CommLayer comm, RBrodcastService rb) {
+        super(addr, wrbPort, id);
+        this.f = f;
+        this.n = 3*f + 1;
+        this.comm = comm;
+        this.RBService = rb;
+        sPath = Paths.get("blocks", String.valueOf(channel));
+        bc = initBC(id, channel);
+        currHeight = 1; // starts from 1 due to the genesis BaseBlock
+        currLeader = 0;
+        this.maxTransactionInBlock = maxTx;
+        fp = new HashMap<>();
+        initThreads();
         this.configuredFastMode = fastMode;
         this.fastMode = fastMode;
         this.channel = channel;
@@ -97,53 +130,51 @@ public abstract class ToyBaseServer extends Node {
         if (testing) {
             txSize = StrictMath.max(0, Config.getTxSize() - bareTxSize);
         }
+        currBLock = configureNewBlock();
     }
 
-    public ToyBaseServer(String addr, int wrbPort, int id, int channel, int f, int tmo, int tmoInterval,
-                         int maxTx, boolean fastMode, ArrayList<Node> cluster,
+    public ToyBaseServer(String addr, int wrbPort, int commPort, int id, int channel, int f, int tmo, int tmoInterval,
+                         int maxTx, boolean fastMode, ArrayList<Node> wrbCluster, ArrayList<Node> commCluster,
                          String bbcConfig, String rbConfigPath, String serverCrt, String serverPrivKey, String caRoot) {
 
         super(addr, wrbPort, id);
         this.f = f;
         this.n = 3*f + 1;
         rmfServer = new WrbNode(1, id, addr, wrbPort, f, tmo, tmoInterval,
-               cluster, bbcConfig, serverCrt, serverPrivKey, caRoot);
-//        panicRB = new RBrodcastService(1, id, panicConfig);
-//        syncRB = new RBrodcastService(1, id, syncConfig);
-        RBService = new RBrodcastService( id, n, f, rbConfigPath);
+                wrbCluster, bbcConfig, serverCrt, serverPrivKey, caRoot);
+        comm = new Clique(id, addr, commPort, 1, commCluster);
+        RBService = new RBrodcastService(id, n, f, rbConfigPath);
         bc = initBC(id, channel);
         currHeight = 1; // starts from 1 due to the genesis BaseBlock
         currLeader = 0;
         this.maxTransactionInBlock = maxTx;
         fp = new HashMap<>();
-//        scVersions = new ConcurrentHashMap<>();
-        mainThread = new Thread(this::intMain);
-        panicThread = new Thread(() -> {
-            try {
-                mainFork();
-            } catch (InterruptedException | IOException e) {
-                logger.error(format("[#%d-C[%d]]", getID(), channel), e);
-            }
-        });
+        initThreads();
         this.configuredFastMode = fastMode;
         this.fastMode = fastMode;
         currLeader = channel % n;
         if (testing) {
             txSize = StrictMath.max(0, Config.getTxSize() - bareTxSize);
         }
+        currBLock = configureNewBlock();
 
+    }
+
+    Block.Builder configureNewBlock() {
+        return Block.newBuilder().setHeader(BlockHeader.newBuilder())
+                .setId(BlockID.newBuilder().setPid(getID()).setBid(++bid).build());
     }
 
     public void start(boolean group) {
         if (!group) {
+            comm.join();
+            logger.debug(format("[#%d-C[%d]] joined to layout", getID(), channel));
             rmfServer.start();
             logger.debug(format("[#%d-C[%d]] wrb server is up", getID(), channel));
-//            syncRB.start();
-//            logger.debug(format("[#%d-C[%d]] sync server is up", getID(), channel));
-//            panicRB.start();
-//            logger.debug(format("[#%d-C[%d]] panic server is up", getID(), channel));
             RBService.start();
             logger.debug(format("[#%d-C[%d]] RB service is up", getID(), channel));
+
+
         }
         new DBUtils();
         try {
@@ -155,66 +186,44 @@ public abstract class ToyBaseServer extends Node {
         logger.info(format("[#%d-C[%d]] is up", getID(), channel));
     }
 
+
     public void serve() {
         panicThread.start();
         logger.debug(format("[#%d-C[%d]] starts panic thread", getID(), channel));
         mainThread.start();
         logger.debug(format("[#%d-C[%d]] starts main thread", getID(), channel));
+        commSendThread.start();
+        logger.debug(format("[#%d-C[%d]] starts commSendThread thread", getID(), channel));
         logger.info(format("[#%d-C[%d]] starts serving", getID(), channel));
     }
 
     public void shutdown(boolean group) {
         stopped.set(true);
         storageWorker.shutdownNow();
-        logger.debug(format("[#%d-C[%d]] interrupt main thread", getID(), channel));
-        AtomicBoolean j = new AtomicBoolean(false);
-        Thread t = new Thread(() -> {
-            while (!j.get()) {
-                mainThread.interrupt();
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    logger.error("", e);
-                }
-            }
-        });
-        t.start();
+
         try {
+            logger.debug(format("[#%d-C[%d]] interrupt main thread", getID(), channel));
+            mainThread.interrupt();
             mainThread.join();
-            j.set(true);
-            t.join();
+            logger.debug(format("[#%d-C[%d]] interrupt panic thread", getID(), channel));
+            panicThread.interrupt();
+            panicThread.join();
+            logger.debug(format("[#%d-C[%d]] interrupt commSendThread thread", getID(), channel));
+            commSendThread.interrupt();
+            commSendThread.join();
         } catch (InterruptedException e) {
             logger.error(format("[#%d-C[%d]]", getID(), channel), e);
+
         }
+
 
         if (!group) {
             if (rmfServer != null) rmfServer.stop();
-//            if (panicRB != null) panicRB.shutdown();
-//            if (syncRB != null) syncRB.shutdown();
+            if (comm != null) comm.leave();
             if (RBService != null) RBService.shutdown();
         }
-        logger.debug(format("[#%d-C[%d]] interrupt panic thread", getID(), channel));
-        j.set(false);
-        t = new Thread(() -> {
-            while (!j.get()) {
-                panicThread.interrupt();
-                try {
-                    Thread.sleep( 1000);
-                } catch (InterruptedException e) {
-                    logger.error("", e);
-                }
-            }
-        });
-        t.start();
 
-        try {
-            panicThread.join();
-            j.set(true);
-            t.join();
-        } catch (InterruptedException e) {
-            logger.error(format("[#%d-C[%d]]", getID(), channel), e);
-        }
-        logger.info(format("[#%d-C[%d]] shutdown bc server", getID(), channel));
+
     }
     private void updateLeaderAndHeight() {
         currHeight = bc.getHeight() + 1;
@@ -260,6 +269,35 @@ public abstract class ToyBaseServer extends Node {
         }
     }
 
+
+    Types.Block getBlockWRTheader(Types.BlockHeader h, int channel) throws InterruptedException {
+        Types.BlockID bid = Types.BlockID.newBuilder().setBid(h.getBid()).setPid(h.getM().getSender()).build();
+        Block b = comm.recMsg(channel, bid);
+        while (!verfiyBlockWRTheader(b, h)) {
+            b = comm.recMsg(channel, bid);
+        }
+        return b;
+    }
+
+    BlockHeader getHeaderForCurrentBlock(Types.BlockHeader prev,
+                                         int height, int cidSeries, int cid) {
+        BlockHeader h;
+        synchronized (cbl) {
+            synchronized (blocksForPropose.element()) {
+                if (blocksForPropose.isEmpty()) {
+                    blocksForPropose.add(currBLock.build());
+                    currBLock = configureNewBlock();
+                }
+                Block b = blocksForPropose.element();
+                h = createBlockHeader(b, prev,getID(), height, cidSeries, cid, channel, b.getId().getBid());
+//                sealedBlock = blocksForPropose
+//                        .element()
+//                        .construct(getID(), currHeight, cidSeries, cid, channel, bc.getBlock(currHeight - 1).getHeader());
+            }
+        }
+        return h;
+    }
+
     private boolean mainLoop() {
         while (!stopped.get()) {
             if (Thread.interrupted()) return true;
@@ -271,7 +309,7 @@ public abstract class ToyBaseServer extends Node {
                 fastMode = false;
                 cid += 2; // I think we have no reason to increase CID.
             }
-            Block next; // = leaderImpl();
+            BlockHeader next; // = leaderImpl();
             try {
                 next = leaderImpl();
             } catch (InterruptedException e) {
@@ -279,15 +317,15 @@ public abstract class ToyBaseServer extends Node {
                         getID(), channel));
                 return true;
             }
-//            long startTime = System.currentTimeMillis();
-            Block recBlock; // = rmfServer.deliver(channel, cidSeries, cid, currHeight, currLeader, next);
-//            logger.debug(format("[#%d-C[%d]] deliver took about [%d] ms [cidSeries=%d ; cid=%d]",
-//                    getID(), channel, System.currentTimeMillis() - startTime, cidSeries, cid));
+
+            BlockHeader recHeader;
+
             try {
                 long startTime = System.currentTimeMillis();
-                recBlock = rmfServer.deliver(channel, cidSeries, cid, currHeight, currLeader, next);
+                recHeader = rmfServer.deliver(channel, cidSeries, cid, currHeight, currLeader, next);
                 logger.debug(format("[#%d-C[%d]] deliver took about [%d] ms [cidSeries=%d ; cid=%d]",
                         getID(), channel, System.currentTimeMillis() - startTime, cidSeries, cid));
+
             } catch (InterruptedException e) {
                 logger.debug(format("[#%d-C[%d]] main thread has been interrupted on wrb deliver " +
                                 "[height=%d, cidSeries=%d ; cid=%d]",
@@ -296,18 +334,29 @@ public abstract class ToyBaseServer extends Node {
             }
 
             fastMode = configuredFastMode;
-            if (recBlock == null) {
+            if (recHeader == null) {
                 currLeader = (currLeader + 1) % n;
                 fastMode = false;
                 cid += 2;
                 continue;
             }
-
+            Block recBlock = null;
+            try {
+                recBlock = getBlockWRTheader(recHeader, channel);
+            } catch (InterruptedException e) {
+                logger.debug(format("[#%d-C[%d]] main thread has been interrupted on block deliver " +
+                                "[height=%d, cidSeries=%d ; cid=%d]",
+                        getID(), channel, currHeight, cidSeries, cid));
+            }
+            recBlock = recBlock.toBuilder().setHeader(recHeader).build();
             if (currLeader == getID()) {
                 logger.debug(format("[#%d-C[%d]] nullifies currBlock [sender=%d] [height=%d] [cidSeries=%d, cid=%d]",
                         getID(), channel, recBlock.getHeader().getM().getSender(), currHeight, cidSeries, cid));
-                synchronized (blocksForPropose) {
-                    blocksForPropose.remove();
+//                synchronized (blocksForPropose) {
+//                    blocksForPropose.remove();
+//                }
+                synchronized (proposedBlocks) {
+                    proposedBlocks.remove();
                 }
             }
             if (!bc.validateBlockHash(recBlock)) {
@@ -338,7 +387,7 @@ public abstract class ToyBaseServer extends Node {
                     }
 
                     int pid = permanent.getHeader().getM().getSender();
-                    int bid = permanent.getHeader().getBid();
+                    int bid = permanent.getId().getBid();
                     int height = permanent.getHeader().getHeight();
                     storageWorker.execute(() ->
                             DBUtils.writeBlockToTable(channel, pid, bid, height));
@@ -351,51 +400,36 @@ public abstract class ToyBaseServer extends Node {
 
 
             }
-
-            // TODO: Improve mechanism
-//              lastReceivedBlock[recBlock.getHeader().getM().getSender()] = recBlock.getHeader().getHeight();
-//              gc();     lastReceivedBlock[recBlock.getHeader().getM().getSender()] = recBlock.getHeader().getHeight();
-//                if (bc.getHeight() - f >= 0) {
-////                    synchronized (approvedTx) {
-////                        addApprovedTransactions(bc.getBlock(bc.getHeight() - f).getDataList());
-////                    }
-//                }
-
             updateLeaderAndHeight();
             storageWorker.execute(bc::writeNextToDisk);
         }
-//        }
         return false;
     }
 
-    abstract Block leaderImpl() throws InterruptedException;
+    abstract BlockHeader leaderImpl() throws InterruptedException;
 
-    abstract public BaseBlockchain initBC(int id, int channel);
+    abstract public Blockchain initBC(int id, int channel);
 
-    abstract public BaseBlockchain getBC(int start, int end);
+    abstract public Blockchain getBC(int start, int end);
 
-    abstract public BaseBlockchain getEmptyBC();
+    abstract public Blockchain getEmptyBC();
 
     public int getTxPoolSize() {
-        if (blocksForPropose.size() == 0) return 0;
-        return ((blocksForPropose.size() - 1) * maxTransactionInBlock) +
-                blocksForPropose.element().getTransactionCount();
+        synchronized (cbl) {
+            synchronized (blocksForPropose) {
+                if (blocksForPropose.size() == 0) return currBLock.getDataCount();
+                return (blocksForPropose.size() * maxTransactionInBlock) +
+                        currBLock.getDataCount();
+            }
+        }
+
     }
 
     public txID addTransaction(Transaction tx) {
-        synchronized (blocksForPropose) {
-            if (getTxPoolSize() > txPoolMax) return null;
-            if (blocksForPropose.size() == 0 ||
-                    blocksForPropose.element().getTransactionCount() >= maxTransactionInBlock) {
-                blocksForPropose.add(new SBlock());
-                blocksForPropose.element().blockBuilder
-                        .setHeader(BlockHeader.newBuilder()
-                                .setBid(++bid));
-            }
-        }
-        synchronized (blocksForPropose.element()) {
-            int cbid = blocksForPropose.element().blockBuilder.getHeader().getBid();
-            int txnum = blocksForPropose.element().getTransactionCount();
+        if (getTxPoolSize() > txPoolMax) return null;
+        synchronized (cbl) {
+            int cbid = currBLock.getId().getBid();
+            int txnum = currBLock.getDataCount();
             Transaction ntx = tx.toBuilder()
                     .setId(txID.newBuilder()
                             .setProposerID(getID())
@@ -404,21 +438,21 @@ public abstract class ToyBaseServer extends Node {
                             .setChannel(channel))
                     .setServerTs(System.currentTimeMillis())
                     .build();
-            blocksForPropose.element().addTransaction(ntx);
+            if (validateTransactionWRTBlock(currBLock, ntx, v)) {
+                currBLock.addData(ntx);
+            }
+            if (currBLock.getDataCount() >= maxTransactionInBlock) {
+                synchronized (blocksForPropose) {
+                    blocksForPropose.add(currBLock.build());
+                    currBLock = configureNewBlock();
+                    blocksForPropose.notifyAll();
+                }
+            }
             return ntx.getId();
         }
 
-//        if (transactionsPool.size() > txPoolMax) return null;
-//        transactionsPool.add(
-//            tx.toBuilder()
-//                    .setId(txID.newBuilder()
-//                            .setProposerID(getID())
-//                            .setTxNum(txNum.getAndIncrement())
-//                            .setChannel(channel))
-//                    .setServerTs(System.currentTimeMillis())
-//                    .build());
-//        return tx.getId();
     }
+
 
     public txID addTransaction(byte[] data, int clientID) {
         Transaction tx = Transaction.newBuilder()
@@ -465,16 +499,17 @@ public abstract class ToyBaseServer extends Node {
     }
 
     void createTxToBlock() {
-        synchronized (blocksForPropose) {
-            if (blocksForPropose.size() == 0) {
-                blocksForPropose.add(new SBlock());
-                blocksForPropose.element().blockBuilder
-                        .setHeader(BlockHeader.newBuilder()
-                                .setBid(++bid));
+        int missingTxs = -1;
+        synchronized (cbl) {
+            synchronized (blocksForPropose) {
+                if (blocksForPropose.isEmpty()) {
+                    missingTxs = maxTransactionInBlock - currBLock.getDataCount();
+                }
             }
         }
-        synchronized (blocksForPropose.element()) {
-            while (blocksForPropose.element().getTransactionCount() < maxTransactionInBlock) {
+
+        if (missingTxs !=  -1) {
+            for (int i = 0 ; i < missingTxs ; i++) {
                 long ts = System.currentTimeMillis();
                 SecureRandom random = new SecureRandom();
                 byte[] tx = new byte[txSize];
@@ -487,6 +522,7 @@ public abstract class ToyBaseServer extends Node {
                         .build());
             }
         }
+
 //        while (currBlock.getTransactionCount() < maxTransactionInBlock) {
 //            long ts = System.currentTimeMillis();
 //            SecureRandom random = new SecureRandom();
@@ -725,7 +761,7 @@ public abstract class ToyBaseServer extends Node {
                         stream().
                         filter(v -> v.getVCount() > 0).
                         filter(v -> v.getV(v.getVCount() - 1).getHeader().getHeight() == max
-                                && BaseBlockchain.validateBlockHash(bc.getBlock(forkPoint - (f + 2)), v.getV(0))).collect(Collectors.toList());
+                                && validateBlockHash(bc.getBlock(forkPoint - (f + 2)), v.getV(0))).collect(Collectors.toList());
                 if (valid.size() == 0) {
                     noMatch.set(true);
                     logger.error(format("No version is valid (might happen due to fast mode) [fp=%d]", forkPoint));

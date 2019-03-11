@@ -104,10 +104,15 @@ public class Config {
         return node.getString("ip");
     }
 
-    public static int getPort( int id) {
+    public static int getWrbPort( int id) {
         Toml t = conf.getTables(tKeys.RMFCLUSTER_KEY).get(0);
         Toml node = t.getTable("s" + id);
-        return Math.toIntExact(node.getLong("port"));
+        return Math.toIntExact(node.getLong("wrbPort"));
+    }
+    public static int getCommPort( int id) {
+        Toml t = conf.getTables(tKeys.RMFCLUSTER_KEY).get(0);
+        Toml node = t.getTable("s" + id);
+        return Math.toIntExact(node.getLong("commPort"));
     }
 
     public static int getC() {
@@ -118,13 +123,25 @@ public class Config {
         return conf.getBoolean(tKeys.SYSTEM_TESTING_KEY);
     }
 
-    public static ArrayList<Node> getCluster() {
+    public static ArrayList<Node> getWrbCluster() {
         Toml t = conf.getTables(tKeys.RMFCLUSTER_KEY).get(0);
         ArrayList<Node> ret = new ArrayList<>();
         for (int i = 0 ; i < getN() ; i++) {
             Toml node = t.getTable("s" + i);
             ret.add(new Node(node.getString("ip"),
-                    Math.toIntExact(node.getLong("port")),
+                    Math.toIntExact(node.getLong("wrbPort")),
+                    Math.toIntExact(node.getLong("id"))));
+        }
+        return ret;
+    }
+
+    public static ArrayList<Node> getCommCluster() {
+        Toml t = conf.getTables(tKeys.RMFCLUSTER_KEY).get(0);
+        ArrayList<Node> ret = new ArrayList<>();
+        for (int i = 0 ; i < getN() ; i++) {
+            Toml node = t.getTable("s" + i);
+            ret.add(new Node(node.getString("ip"),
+                    Math.toIntExact(node.getLong("commPort")),
                     Math.toIntExact(node.getLong("id"))));
         }
         return ret;

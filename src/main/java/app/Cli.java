@@ -1,5 +1,4 @@
 package app;
-import blockchain.BaseBlockchain;
 import com.google.common.primitives.Longs;
 import com.google.protobuf.ByteString;
 import config.Config;
@@ -26,6 +25,7 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static blockchain.Utils.validateBlockHash;
 import static java.lang.Math.min;
 import static java.lang.StrictMath.max;
 import static java.lang.String.format;
@@ -399,7 +399,7 @@ public class Cli {
 
         boolean validateBC() {
             for (int i = 1 ; i < JToy.s.getBCSize() ; i++) {
-                if (!BaseBlockchain.validateBlockHash(JToy.s.nonBlockingDeliver(i - 1),
+                if (!validateBlockHash(JToy.s.nonBlockingDeliver(i - 1),
                         JToy.s.nonBlockingDeliver(i))) {
                     System.out.println(String.format("Invalid Blockchain!! [%d -> %d]", i-1, i));
                     return false;

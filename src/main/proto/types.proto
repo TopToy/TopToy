@@ -10,21 +10,16 @@ message Meta {
     int32 cidSeries = 4;
 }
 
-message Comm {
-    int32 channel = 1;
-    bytes data = 2;
-}
-
-message BbcMsg {
-    Meta m = 1;
-    bool vote = 2;
-    Block next = 3;
-}
 
 
 message BbcDecision {
     Meta m = 1;
     int32 decosion = 2;
+}
+
+message BlockID {
+    int32 pid = 1;
+    int32 bid = 2;
 }
 
 message BlockHeader {
@@ -36,11 +31,11 @@ message BlockHeader {
     int32 bid = 6;
 }
 
-//message BlockFooter {
-////    string rmfProof = 1;
-//    int64 ts = 2;
-////    bytes orig = 3; // Enable to cerate an empty block
-//}
+message BbcMsg {
+    Meta m = 1;
+    bool vote = 2;
+    BlockHeader next = 3;
+}
 
 message blockStatistics {
 //    int64 created = 1; // creation ts
@@ -54,8 +49,14 @@ message blockStatistics {
 
 message Block {
     BlockHeader header = 1;
-    repeated Transaction data = 2;
-    blockStatistics st = 3;
+    BlockID id = 2;
+    repeated Transaction data = 3;
+    blockStatistics st = 4;
+}
+
+message Comm {
+    int32 channel = 1;
+    Block data = 2;
 }
 
 //TODO: Adding: client signature, client public key etc.
@@ -109,44 +110,18 @@ message Empty {
 }
 
 
-
-//message Auth {
-//    Meta m = 1;
-//    bytes hash = 2;
-//}
-
-//message Data {
-//    Meta _meta = 1;
-//    bytes data = 2;
-//    string sig = 3;
-//}
-
-message Req {
+message WrbReq {
     Meta _meta = 1;
 }
 
-message PreConsReq {
+message WrbPreConsReq {
     Meta _meta = 1;
 }
 
-message Res {
+message WrbRes {
     Meta m = 1;
-    Block data = 2;
+    BlockHeader data = 2;
 }
-
-//message RmfResult {
-////    int32 cid = 1;
-////    int32 cidSeries = 2;
-//    bytes data = 1;
-//    string type = 2;
-//}
-
-//message proofedBlock {
-//    Block b = 1;
-////    int32 cid = 2;
-//    string Sig = 3;
-//    //    repeated BbcDecision votes = 4;
-//}
 
 message subChainVersion {
     int32 forkPoint = 1;
@@ -155,9 +130,3 @@ message subChainVersion {
     repeated Block v = 3;
     int32 sender = 4;
 }
-
-//message VpbcMsg {
-//    int32 clientID = 1;
-//    int32 consID = 2;
-//    bytes data = 3;
-//}

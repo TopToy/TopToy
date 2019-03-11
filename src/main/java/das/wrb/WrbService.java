@@ -17,7 +17,8 @@ import io.grpc.stub.StreamObserver;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import proto.Types.*;
-import proto.*;
+import proto.WrbGrpc;
+
 import static io.grpc.Metadata.ASCII_STRING_MARSHALLER;
 import javax.net.ssl.SSLException;
 import java.io.IOException;
@@ -29,7 +30,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static java.lang.Math.max;
 import static java.lang.String.format;
 
-public class WrbService extends RmfGrpc.RmfImplBase {
+public class WrbService extends WrbGrpc.WrbImplBase {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(WrbService.class);
     class authInterceptor implements ServerInterceptor {
         @Override
@@ -79,7 +80,7 @@ public class WrbService extends RmfGrpc.RmfImplBase {
 
     class peer {
         ManagedChannel channel;
-        RmfGrpc.RmfStub stub;
+        WrbGrpc.WrbStub stub;
 
         peer(Node node) {
             try {
@@ -90,7 +91,7 @@ public class WrbService extends RmfGrpc.RmfImplBase {
             } catch (SSLException e) {
                 logger.fatal(format("[#%d]", id), e);
             }
-            stub = RmfGrpc.newStub(channel);
+            stub = WrbGrpc.newStub(channel);
         }
 
         void shutdown() {
@@ -134,11 +135,8 @@ public class WrbService extends RmfGrpc.RmfImplBase {
         this.tmo = tmo;
         this.tmoInterval = tmoInterval;
         this.currentTmo = new int[channels];
-//        this.globalLock = new Object[channels];
         this.bbcConfig = bbcConfig;
         this.fvData = new ConcurrentHashMap[channels];
-//        this.pendingMsg =  new ConcurrentHashMap[channels];
-//        this.recMsg =  new ConcurrentHashMap[channels];
         this.preConsVote = new ConcurrentHashMap[channels];
         this.preConsDone = new ArrayList[channels];
         this.peers = new HashMap<>();
@@ -146,10 +144,6 @@ public class WrbService extends RmfGrpc.RmfImplBase {
         this.n = 3*f +1;
         this.id = id;
         this.nodes = nodes;
-//        this.fastBbcCons = new ConcurrentHashMap[channels];
-//        this.regBbcCons = new ConcurrentHashMap[channels];
-//        this.bbcMissedConsensusThreads = new Thread[channels];
-//        this.aliveLock = new Object[channels];
         this.fastVoteNotifyer = new Object[channels];
         this.msgNotifyer = new Object[channels];
         this.preConsNotifyer = new Object[channels];
@@ -157,15 +151,9 @@ public class WrbService extends RmfGrpc.RmfImplBase {
             fastVoteNotifyer[i] = new Object();
             msgNotifyer[i] = new Object();
             preConsNotifyer[i] = new Object();
-//            recMsg[i] = new ConcurrentHashMap<>();
-//            pendingMsg[i] = new ConcurrentHashMap<>();
-//            fVotes[i] = new ConcurrentHashMap<>();
-//            fastBbcCons[i] = new ConcurrentHashMap<>();
-//            regBbcCons[i] = new ConcurrentHashMap<>();
             fvData[i] = new ConcurrentHashMap<>();
             preConsVote[i] = new ConcurrentHashMap<>();
             preConsDone[i] = new ArrayList<>();
-//            aliveLock[i] = new Object();
             this.currentTmo[i] = tmo;
 
         }
@@ -176,19 +164,9 @@ public class WrbService extends RmfGrpc.RmfImplBase {
 
     private void startGrpcServer(String serverCrt, String serverPrivKey, String caRoot) {
         try {
-//            rmfServer = ServerBuilder.forPort(nodes.get(id).getRmfPort())
-//                    .addService(this)
-//                    .build()
-//                    .start();
-//           executor = new ThreadPoolExecutor(1, // core size
-//                   100, // max size
-//                   10*60, // idle timeout
-//                   TimeUnit.SECONDS,
-//                   new ArrayBlockingQueue<Runnable>(20));
             int cores = Runtime.getRuntime().availableProcessors();
             logger.debug(format("[#%d] There are %d CPU's in the system", id, cores));
             Executor executor = Executors.newFixedThreadPool(channels * n);
-//            beg = new NioEventLoopGroup(cores + 1);
             EventLoopGroup weg = new NioEventLoopGroup(cores);
             rmfServer = NettyServerBuilder.
                     forPort(nodes.get(id).getPort()).
@@ -267,7 +245,7 @@ public class WrbService extends RmfGrpc.RmfImplBase {
         logger.info(format("[#%d] shutting down wrb service", id));
     }
 
-    void sendDataMessage(RmfGrpc.RmfStub stub, Block msg) {
+    void sendDataMessage(WrbGrpc.WrbStub stub, BlockHeader msg) {
         stub.disseminateMessage(msg, new StreamObserver<>() {
             @Override
             public void onNext(Empty ans) {
@@ -286,7 +264,7 @@ public class WrbService extends RmfGrpc.RmfImplBase {
         });
     }
 
-    private void sendFastVoteMessage(RmfGrpc.RmfStub stub, BbcMsg v) {
+    private void sendFastVoteMessage(WrbGrpc.WrbStub stub, BbcMsg v) {
         stub.fastVote(v, new StreamObserver<>() {
             @Override
             public void onNext(Empty empty) {
@@ -304,22 +282,23 @@ public class WrbService extends RmfGrpc.RmfImplBase {
             }
         });
     }
-    private void sendReqMessage(RmfGrpc.RmfStub stub, Req req, int channel, int cidSeries, int cid, int sender) {
+    private void sendReqMessage(WrbGrpc.WrbStub stub, WrbReq req, int channel,
+                                int cidSeries, int cid, int sender) {
         stub.reqMessage(req, new StreamObserver<>() {
             @Override
-            public void onNext(Res res) {
+            public void onNext(WrbRes res) {
                 Meta key = Meta.newBuilder()
                         .setChannel(channel)
                         .setCidSeries(cidSeries)
                         .setCid(cid)
                         .build();
-                if (res.getData().getHeader().getM().getCid() == cid &&
-                        res.getData().getHeader().getM().getCidSeries() == cidSeries
+                if (res.getData().getM().getCid() == cid &&
+                        res.getData().getM().getCidSeries() == cidSeries
                         && res.getM().getChannel() == channel &&
-                        res.getData().getHeader().getM().getChannel() == channel) {
+                        res.getData().getM().getChannel() == channel) {
                     if (GlobalData.received[channel].containsKey(key) ||
                             GlobalData.pending[channel].containsKey(key)) return;
-                    if (!blockDigSig.verify(sender, res.getData())) {
+                    if (!blockDigSig.verifyHeader(sender, res.getData())) {
                         logger.debug(format("[#%d-C[%d]] has received invalid response message from [#%d] for [cidSeries=%d ; cid=%d]",
                                 id, channel, res.getM().getSender(), cidSeries, cid));
                         return;
@@ -345,10 +324,10 @@ public class WrbService extends RmfGrpc.RmfImplBase {
         });
     }
 
-    private void sendPreConsReqMessage(RmfGrpc.RmfStub stub, PreConsReq req, int channel, int cidSeries, int cid, int sender, int height) {
-        stub.preConsReqMessage(req, new StreamObserver<Res>() {
+    private void sendPreConsReqMessage(WrbGrpc.WrbStub stub, WrbPreConsReq req, int channel, int cidSeries, int cid, int sender, int height) {
+        stub.preConsReqMessage(req, new StreamObserver<WrbRes>() {
             @Override
-            public void onNext(Res res) {
+            public void onNext(WrbRes res) {
                 Meta key = Meta.newBuilder()
                         .setChannel(channel)
                         .setCidSeries(cidSeries)
@@ -365,12 +344,12 @@ public class WrbService extends RmfGrpc.RmfImplBase {
                     logger.debug(format("[#%d-C[%d]] received preCons response from [%d] [cidSeries=%d ; cid=%d]",
                             id, channel, res.getM().getSender(), cidSeries, cid));
 
-                    if ((!res.getData().equals(Block.getDefaultInstance()))
-                            && res.getData().getHeader().getM().getCid() == cid
-                            && res.getData().getHeader().getM().getCidSeries() == cidSeries
-                            && res.getData().getHeader().getM().getChannel() == channel
-                            && res.getData().getHeader().getM().getSender() == sender) {
-                        if (!blockDigSig.verify(sender, res.getData())) {
+                    if ((!res.getData().equals(BlockHeader.getDefaultInstance()))
+                            && res.getData().getM().getCid() == cid
+                            && res.getData().getM().getCidSeries() == cidSeries
+                            && res.getData().getM().getChannel() == channel
+                            && res.getData().getM().getSender() == sender) {
+                        if (!blockDigSig.verifyHeader(sender, res.getData())) {
                             logger.debug(format("[#%d-C[%d]] has pre cons received invalid response message from [#%d] for [cidSeries=%d ; cid=%d]",
                                     id, channel, res.getM().getSender(), cidSeries, cid));
                             return val;
@@ -381,7 +360,7 @@ public class WrbService extends RmfGrpc.RmfImplBase {
                                     id, channel, res.getM().getSender(), cidSeries, cid));
                             GlobalData.pending[channel].putIfAbsent(key, res.getData());
                         }
-                    } else if (res.getData().equals(Block.getDefaultInstance())) {
+                    } else if (res.getData().equals(BlockHeader.getDefaultInstance())) {
                         logger.debug(format("[#%d-C[%d]] has pre das received NULL message from [#%d] for [cidSeries=%d ; cid=%d]",
                                 id, channel, res.getM().getSender(), cidSeries,  cid));
                     }
@@ -414,7 +393,7 @@ public class WrbService extends RmfGrpc.RmfImplBase {
         });
     }
 
-    private void broadcastReqMsg(Req req, int channel, int cidSeries, int cid, int sender) {
+    private void broadcastReqMsg(WrbReq req, int channel, int cidSeries, int cid, int sender) {
         logger.debug(format("[#%d-C[%d]] broadcasts request message [cidSeries=%d ; cid=%d]", id,
                 req.getMeta().getChannel(), cidSeries, cid));
         for (int p : peers.keySet()) {
@@ -423,7 +402,7 @@ public class WrbService extends RmfGrpc.RmfImplBase {
         }
     }
 
-    private void broadcastPreConsReqMsg(PreConsReq req, int channel, int cidSeries, int cid, int sender, int height) {
+    private void broadcastPreConsReqMsg(WrbPreConsReq req, int channel, int cidSeries, int cid, int sender, int height) {
         logger.debug(format("[#%d-C[%d]] broadcasts pre cons request message [cidSeries=%d ; cid=%d]", id,
                 req.getMeta().getChannel(), cidSeries, cid));
         for (int p : peers.keySet()) {
@@ -438,28 +417,17 @@ public class WrbService extends RmfGrpc.RmfImplBase {
         }
     }
 
-    void rmfBroadcast(Block msg) {
-        msg = msg
-                .toBuilder()
-                .setSt(msg.getSt()
-                        .toBuilder()
-                        .setProposed(System.currentTimeMillis()))
-                .build();
+    void wrbBroadcast(BlockHeader msg) {
         for (peer p : peers.values()) {
             sendDataMessage(p.stub, msg);
         }
     }
-    private void addToPendings(Block request) {
-        int sender = request.getHeader().getM().getSender();
-        long start = System.currentTimeMillis();
-        if (!blockDigSig.verify(sender, request)) return;
-        request = request.toBuilder()
-                .setSt(request.getSt().toBuilder().setVerified(System.currentTimeMillis() - start)
-                .setProposed(System.currentTimeMillis()))
-                .build();
-        int cid = request.getHeader().getM().getCid();
-        int channel = request.getHeader().getM().getChannel();
-        int cidSeries = request.getHeader().getM().getCidSeries();
+    private void addToPendings(BlockHeader request) {
+        int sender = request.getM().getSender();
+        if (!blockDigSig.verifyHeader(sender, request)) return;
+        int cid = request.getM().getCid();
+        int channel = request.getM().getChannel();
+        int cidSeries = request.getM().getCidSeries();
         Meta key = Meta.newBuilder()
                 .setChannel(channel)
                 .setCidSeries(cidSeries)
@@ -475,7 +443,7 @@ public class WrbService extends RmfGrpc.RmfImplBase {
     }
 
     @Override
-    public void disseminateMessage(Block request, StreamObserver<Empty> responseObserver) {
+    public void disseminateMessage(BlockHeader request, StreamObserver<Empty> responseObserver) {
             addToPendings(request);
     }
 
@@ -493,7 +461,6 @@ public class WrbService extends RmfGrpc.RmfImplBase {
                 .setCid(cid)
                 .build();
         fvData[channel].putIfAbsent(key, new VoteData());
-//        fastVoteV1(request, key, channel, cidSeries, cid);
         fastVoteV2(request, key, channel, cidSeries, cid);
 
 
@@ -571,8 +538,8 @@ public class WrbService extends RmfGrpc.RmfImplBase {
     }
 
     @Override
-    public void reqMessage(Req request,  StreamObserver<Res> responseObserver)  {
-        Block msg;
+    public void reqMessage(WrbReq request,  StreamObserver<WrbRes> responseObserver)  {
+        BlockHeader msg;
         int cid = request.getMeta().getCid();
         int cidSeries = request.getMeta().getCidSeries();
         int channel = request.getMeta().getChannel();
@@ -594,7 +561,7 @@ public class WrbService extends RmfGrpc.RmfImplBase {
                     setCid(cid).
                     setCidSeries(cidSeries).
                     build();
-            responseObserver.onNext(Res.newBuilder().
+            responseObserver.onNext(WrbRes.newBuilder().
                     setData(msg).
                     setM(meta).
                     build());
@@ -605,8 +572,8 @@ public class WrbService extends RmfGrpc.RmfImplBase {
     }
 
     @Override
-    public void preConsReqMessage(PreConsReq request,  StreamObserver<Res> responseObserver)  {
-        Block msg;
+    public void preConsReqMessage(WrbPreConsReq request,  StreamObserver<WrbRes> responseObserver)  {
+        BlockHeader msg;
         int cid = request.getMeta().getCid();
         int cidSeries = request.getMeta().getCidSeries();
         int channel = request.getMeta().getChannel();
@@ -620,7 +587,7 @@ public class WrbService extends RmfGrpc.RmfImplBase {
             msg = GlobalData.pending[channel].get(key);
         }
         if (msg == null) {
-            msg = Block.getDefaultInstance();
+            msg = BlockHeader.getDefaultInstance();
             logger.debug(format("[#%d-C[%d]] has received pre das request message" +
                             " from [#%d] of [cidSeries=%d ; cid=%d] response with NULL",
                     id, channel, request.getMeta().getSender(), cidSeries, cid));
@@ -637,19 +604,19 @@ public class WrbService extends RmfGrpc.RmfImplBase {
                         setCid(cid).
                         setCidSeries(cidSeries).
                         build();
-        responseObserver.onNext(Res.newBuilder().
+        responseObserver.onNext(WrbRes.newBuilder().
                 setData(msg).
                 setM(meta).
                 build());
     }
 
-    private void fastBbcVoteV1(Meta key, int channel, int sender, int cidSeries, int cid, Block next) {
+    private void fastBbcVoteV1(Meta key, int channel, int sender, int cidSeries, int cid, BlockHeader next) {
         GlobalData.pending[channel].computeIfPresent(key, (k, val) -> {
             long start = System.currentTimeMillis();
-            if (val.getHeader().getM().getSender() != sender ||
-                    val.getHeader().getM().getCidSeries() != cidSeries ||
-                    val.getHeader().getM().getCid() != cid ||
-                    val.getHeader().getM().getChannel() != channel) return val;
+            if (val.getM().getSender() != sender ||
+                    val.getM().getCidSeries() != cidSeries ||
+                    val.getM().getCid() != cid ||
+                    val.getM().getChannel() != channel) return val;
             BbcMsg.Builder bv = BbcMsg
                     .newBuilder()
                     .setM(Meta.newBuilder()
@@ -661,11 +628,11 @@ public class WrbService extends RmfGrpc.RmfImplBase {
                     .setVote(true);
             if (next != null) {
                 logger.debug(format("[#%d-C[%d]] broadcasts [cidSeries=%d ; cid=%d] via fast mode",
-                        id, channel, next.getHeader().getM().getCidSeries(), next.getHeader().getM().getCid()));
+                        id, channel, next.getM().getCidSeries(), next.getM().getCid()));
                 long st = System.currentTimeMillis();
                 bv.setNext(setFastModeData(val, next));
                 logger.debug(format("[#%d-C[%d]] creating new block of [cidSeries=%d ; cid=%d] took about [%d] ms",
-                        id, channel, next.getHeader().getM().getCidSeries(), next.getHeader().getM().getCid(),
+                        id, channel, next.getM().getCidSeries(), next.getM().getCid(),
                         System.currentTimeMillis() - st));
             }
             broadcastFastVoteMessage(bv.build());
@@ -676,7 +643,7 @@ public class WrbService extends RmfGrpc.RmfImplBase {
 
     }
 
-    private void fastBbcVoteV2(Meta key, int channel, int sender, int cidSeries, int cid, Block next) {
+    private void fastBbcVoteV2(Meta key, int channel, int sender, int cidSeries, int cid, BlockHeader next) {
         BbcMsg.Builder bv = BbcMsg
                 .newBuilder()
                 .setM(Meta.newBuilder()
@@ -687,14 +654,14 @@ public class WrbService extends RmfGrpc.RmfImplBase {
                         .build())
                 .setVote(false);
         GlobalData.pending[channel].computeIfPresent(key, (k, val) -> {
-            if (val.getHeader().getM().getSender() != sender ||
-                    val.getHeader().getM().getCidSeries() != cidSeries ||
-                    val.getHeader().getM().getCid() != cid ||
-                    val.getHeader().getM().getChannel() != channel) return val;
+            if (val.getM().getSender() != sender ||
+                    val.getM().getCidSeries() != cidSeries ||
+                    val.getM().getCid() != cid ||
+                    val.getM().getChannel() != channel) return val;
                 bv.setVote(true);
             if (next != null) {
                 logger.debug(format("[#%d-C[%d]] broadcasts [cidSeries=%d ; cid=%d] via fast mode",
-                        id, channel, next.getHeader().getM().getCidSeries(), next.getHeader().getM().getCid()));
+                        id, channel, next.getM().getCidSeries(), next.getM().getCid()));
                 bv.setNext(setFastModeData(val, next));
             }
                        return val;
@@ -730,7 +697,7 @@ public class WrbService extends RmfGrpc.RmfImplBase {
         }
     }
 
-    public Block deliver(int channel, int cidSeries, int cid, int sender, int height, Block next)
+    public BlockHeader deliver(int channel, int cidSeries, int cid, int sender, int height, BlockHeader next)
             throws InterruptedException {
         Meta key = Meta.newBuilder()
                 .setChannel(channel)
@@ -739,12 +706,6 @@ public class WrbService extends RmfGrpc.RmfImplBase {
                 .build();
 
         preDeliverLogic(key, channel, cidSeries, cid);
-//        long start = System.currentTimeMillis();
-//        long est = System.currentTimeMillis() - start;
-//        if (!deliverV1(key, channel, cidSeries, cid, sender, height, next, est)) {
-//            return null;
-//        }
-
         if (!deliverV2(key, channel, cidSeries, cid, sender, height, next)) {
             logger.debug(format("[#%d-C[%d]] bbc returned [%d] for [cidSeries=%d ; cid=%d]", id, channel, 0, cidSeries, cid));
             return null;
@@ -757,7 +718,7 @@ public class WrbService extends RmfGrpc.RmfImplBase {
         return postDeliverLogic(key, channel, cidSeries, cid, sender, height);
     }
 
-    private boolean deliverV1(Meta key, int channel, int cidSeries, int cid, int sender, int height, Block next, long estimatedTime)
+    private boolean deliverV1(Meta key, int channel, int cidSeries, int cid, int sender, int height, BlockHeader next, long estimatedTime)
             throws InterruptedException
     {
         totalDeliveredTries.getAndIncrement();
@@ -809,7 +770,7 @@ public class WrbService extends RmfGrpc.RmfImplBase {
     private void preConsReq(Meta key, int channel, int cidSeries, int cid, int sender, int height) throws InterruptedException {
         if (GlobalData.pending[channel].containsKey(key)) return;
         logger.debug(format("[#%d-C[%d]] starts preConsReq", id, channel));
-        PreConsReq req = PreConsReq.newBuilder()
+        WrbPreConsReq req = WrbPreConsReq.newBuilder()
                 .setMeta(Meta.newBuilder()
                         .setChannel(channel)
                         .setCidSeries(cidSeries)
@@ -827,7 +788,7 @@ public class WrbService extends RmfGrpc.RmfImplBase {
         logger.debug(format("[#%d-C[%d]] finishes preConsReq", id, channel));
     }
 
-    private boolean deliverV2(Meta key, int channel, int cidSeries, int cid, int sender, int height, Block next)
+    private boolean deliverV2(Meta key, int channel, int cidSeries, int cid, int sender, int height, BlockHeader next)
             throws InterruptedException
     {
         totalDeliveredTries.getAndIncrement();
@@ -899,9 +860,9 @@ public class WrbService extends RmfGrpc.RmfImplBase {
         logger.debug(format("[#%d-C[%d]] have waited [%d] ms for data msg [cidSeries=%d ; cid=%d]",
                 id, channel, estimatedTime, cidSeries, cid));
     }
-    private Block postDeliverLogic(Meta key, int channel, int cidSeries, int cid, int sender, int height) throws InterruptedException {
+    private BlockHeader postDeliverLogic(Meta key, int channel, int cidSeries, int cid, int sender, int height) throws InterruptedException {
         requestData(channel, cidSeries, cid, sender);
-        Block msg = GlobalData.pending[channel].get(key);
+        BlockHeader msg = GlobalData.pending[channel].get(key);
         GlobalData.pending[channel].remove(key);
         GlobalData.received[channel].put(key, msg);
         return msg;
@@ -921,7 +882,7 @@ public class WrbService extends RmfGrpc.RmfImplBase {
                 setChannel(channel)
                 .setSender(id).
                 build();
-        Req req = Req.newBuilder().setMeta(meta).build();
+        WrbReq req = WrbReq.newBuilder().setMeta(meta).build();
         broadcastReqMsg(req,channel, cidSeries, cid, sender);
         synchronized (msgNotifyer[channel]) {
             while (!GlobalData.pending[channel].containsKey(key)) {
@@ -944,17 +905,15 @@ public class WrbService extends RmfGrpc.RmfImplBase {
 //        bbcService.clearBuffers(key);
 //    }
 
-    private Block setFastModeData(Block curr, Block next) {
-        Block.Builder nextBuilder = next
+    private BlockHeader setFastModeData(BlockHeader curr, BlockHeader next) {
+        BlockHeader.Builder nextBuilder = next
                     .toBuilder()
-                    .setHeader(next.getHeader().toBuilder()
                     .setPrev(ByteString
                             .copyFrom(DigestMethod
-                                    .hash(curr.getHeader().toByteArray())))
-                            .build());
-        String signature = blockDigSig.sign(next.getHeader());
-        return nextBuilder.setHeader(nextBuilder.getHeader().toBuilder()
-                .setProof(signature))
+                                    .hash(curr.toByteArray())));
+        String signature = blockDigSig.sign(next);
+        return nextBuilder
+                .setProof(signature)
                 .build();
     }
     

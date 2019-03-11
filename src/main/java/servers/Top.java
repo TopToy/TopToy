@@ -1,7 +1,9 @@
 package servers;
 
-import blockchain.BaseBlockchain;
+import blockchain.Blockchain;
 import com.google.protobuf.ByteString;
+import communication.CommLayer;
+import communication.overlays.Clique;
 import config.Config;
 import config.Node;
 import das.RBroadcast.RBrodcastService;
@@ -11,11 +13,10 @@ import io.grpc.netty.NettyServerBuilder;
 import io.grpc.stub.StreamObserver;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
-import proto.Types;
 import das.wrb.ByzantineWrbNode;
 import das.wrb.WrbNode;
-import proto.blockchainServiceGrpc.blockchainServiceImplBase;
-import utils.DiskUtils;
+import proto.Types;
+import proto.blockchainServiceGrpc;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -39,13 +40,14 @@ public class Top implements server {
 //    private RBrodcastService deliverFork;
 //    private RBrodcastService sync;
     private RBrodcastService RBservice;
+    private CommLayer comm;
     private int n;
     private int gcCount = 0;
     private int gcLimit = 1;
     private ToyBaseServer[] group;
     private int[][] lastDelivered;
     private int[] lastGCpoint;
-    private final BaseBlockchain bc;
+    private final Blockchain bc;
     private int id;
     private int c;
     private String type;
@@ -72,8 +74,9 @@ public class Top implements server {
     private EventLoopGroup gnio = new NioEventLoopGroup(2);
 
 
-    public Top(String addr, int port, int id, int f, int c, int tmo, int tmoInterval,
-               int maxTx, boolean fastMode, ArrayList<Node> cluster, String bbcConfig, String rbConfig, String type,
+    public Top(String addr, int wrbPort, int commPort, int id, int f, int c, int tmo, int tmoInterval,
+               int maxTx, boolean fastMode, ArrayList<Node> wrbCluster, ArrayList<Node> commCluster,
+               String bbcConfig, String rbConfig, String type,
                String serverCrt, String serverPrivKey, String caRoot) {
         n = 3 *f +1;
         this.maxTx = maxTx;
@@ -90,11 +93,12 @@ public class Top implements server {
         this.c = c;
         this.group = new ToyBaseServer[c];
         this.id = id;
+        this.comm = new Clique(id, addr, commPort, c, commCluster);
         if (type.equals("r") || type.equals("a")) {
-            wrb = new WrbNode(c, id, addr, port, f, tmo, tmoInterval, cluster, bbcConfig, serverCrt, serverPrivKey, caRoot);
+            wrb = new WrbNode(c, id, addr, wrbPort, f, tmo, tmoInterval, wrbCluster, bbcConfig, serverCrt, serverPrivKey, caRoot);
         }
         if (type.equals("b")) {
-            wrb = new ByzantineWrbNode(c, id, addr, port, f, tmo, tmoInterval, cluster, bbcConfig, serverCrt, serverPrivKey, caRoot);
+            wrb = new ByzantineWrbNode(c, id, addr, wrbPort, f, tmo, tmoInterval, wrbCluster, bbcConfig, serverCrt, serverPrivKey, caRoot);
         }
 //        deliverFork = new RBrodcastService(c, id, panicConfig);
 //        sync = new RBrodcastService(c, id, syncConfig);
@@ -103,17 +107,17 @@ public class Top implements server {
         // TODO: Apply to more types
         if (type.equals("r")) {
             for (int i = 0 ; i < c ; i++) {
-                group[i] = new ToyServer(addr, port, id, i, f, maxTx, fastMode, wrb, RBservice);
+                group[i] = new ToyServer(addr, wrbPort, id, i, f, maxTx, fastMode, wrb, comm, RBservice);
             }
         }
         if (type.equals("b")) {
             for (int i = 0 ; i < c ; i++) {
-                group[i] = new ByzToyServer(addr, port, id, i, f, maxTx, fastMode, wrb, RBservice);
+                group[i] = new ByzToyServer(addr, wrbPort, id, i, f, maxTx, fastMode, wrb, comm, RBservice);
             }
         }
         if (type.equals("a")) {
             for (int i = 0 ; i < c ; i++) {
-                group[i] = new AsyncToyServer(addr, port, id, i, f, maxTx, fastMode, wrb, RBservice);
+                group[i] = new AsyncToyServer(addr, wrbPort, id, i, f, maxTx, fastMode, wrb, comm, RBservice);
             }
         }
         bc = group[0].initBC(id, -1);
@@ -228,31 +232,13 @@ public class Top implements server {
 
     }
     public void start() {
-
-        CountDownLatch latch = new CountDownLatch(2);
-        new Thread(() -> {
-            this.wrb.start();
-            latch.countDown();
-        }).run();
-//        new Thread(() -> {
-//            this.deliverFork.start();
-//            latch.countDown();
-//        }).run();
-//        new Thread(() -> {
-//            this.sync.start();
-//            latch.countDown();
-//        }).run();
-        new Thread(() -> {
-            this.RBservice.start();
-            latch.countDown();
-        }).run();
-        try {
-            latch.await();
-        } catch (InterruptedException e) {
-            logger.error("", e);
-            shutdown();
-            return;
-        }
+        logger.debug(format("G-%d joining to communication layer" ,id));
+        comm.join();
+        logger.debug(format("G-%d starting wrb" ,id));
+        wrb.start();
+        logger.debug(format("G-%d starting RB" ,id));
+        RBservice.start();
+        logger.debug(format("G-%d starting [%d] Toys" ,id, c));
         for (int i = 0 ; i < c ; i++) {
             group[i].start(true);
         }
@@ -262,6 +248,7 @@ public class Top implements server {
 
     public void shutdown() {
         stopped.set(true);
+        logger.debug(format("G-%d shutdown deliverThread", id));
         deliverThread.interrupt();
         try {
             deliverThread.join();
@@ -272,19 +259,13 @@ public class Top implements server {
             group[i].shutdown(true);
             logger.debug(format("G-%d shutdown channel %d", id, i));
         }
-        logger.debug(format("G-%d shutdown deliverThread", id));
+        comm.leave();
+        logger.debug(format("G-%d leaves communication layer", id));
         wrb.stop();
-//        sts.totalDec = wrb.getTotolDec();
-//        sts.optemisticDec = wrb.getOptemisticDec();
         logger.debug(format("G-%d shutdown wrb Service", id));
-//        deliverFork.shutdown();
-//        logger.debug(format("G-%d shutdown panic service", id));
-//        sync.shutdown();
-//        logger.debug(format("G-%d shutdown sync service", id));
         RBservice.shutdown();
         logger.debug(format("G-%d shutdown sync service", id));
         txsServer.shutdown();
-//        chainCutterExecutor.shutdown();
 
     }
 
@@ -432,7 +413,7 @@ public class Top implements server {
     }
 
 }
-class TxServer extends blockchainServiceImplBase {
+class TxServer extends blockchainServiceGrpc.blockchainServiceImplBase {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(TxServer.class);
     Top server;
 

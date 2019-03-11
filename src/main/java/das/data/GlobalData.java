@@ -1,14 +1,12 @@
 package das.data;
 
-import blockchain.BaseBlockchain;
-import blockchain.SBlockchain;
 import crypto.blockDigSig;
 import proto.Types;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static blockchain.BaseBlockchain.validateBlockHash;
+import static blockchain.Utils.validateBlockHash;
 import static java.lang.String.format;
 
 public class GlobalData {
@@ -21,8 +19,8 @@ public class GlobalData {
     };
 
     public static ConcurrentHashMap<Types.Meta, BbcDecData>[] bbcDec;
-    public static ConcurrentHashMap<Types.Meta, Types.Block>[] pending;
-    public static ConcurrentHashMap<Types.Meta, Types.Block>[] received;
+    public static ConcurrentHashMap<Types.Meta, Types.BlockHeader>[] pending;
+    public static ConcurrentHashMap<Types.Meta, Types.BlockHeader>[] received;
     public static ConcurrentHashMap<Types.Meta, VoteData>[] votes;
     public static Queue<Types.ForkProof>[] forksRBData;
     public static HashMap<Integer, List<Types.subChainVersion>>[] syncRBData;
@@ -57,11 +55,11 @@ public class GlobalData {
         logger.debug(format("starts validating fp"));
         Types.Block curr = p.getCurr();
         Types.Block prev = p.getPrev();
-        if (!blockDigSig.verify(curr.getHeader().getM().getSender(), curr)) {
+        if (!blockDigSig.verifyBlock(curr)) {
             logger.debug(format("invalid fork proof #3"));
             return false;
         }
-        if (!blockDigSig.verify(prev.getHeader().getM().getSender(), prev)) {
+        if (!blockDigSig.verifyBlock(prev)) {
             logger.debug(format("invalid fork proof #4"));
             return false;
         }
@@ -76,7 +74,7 @@ public class GlobalData {
         leaders.add(v.getV(0).getHeader().getM().getSender());
         for (int i = 1 ; i < v.getVList().size() ; i++ ) {
             Types.Block pb = v.getV(i);
-            if (!blockDigSig.verify(pb.getHeader().getM().getSender(), pb)) {
+            if (!blockDigSig.verifyBlock(pb)) {
                 logger.debug(format("invalid sub chain version, block [height=%d] digital signature is invalid " +
                         "[sender=%d]", pb.getHeader().getHeight(),  v.getSender()));
                 return false;

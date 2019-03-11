@@ -40,7 +40,8 @@ for i in `seq 0 ${n}`; do
     echo "      [cluster.s${i}]
             id = ${i}
             ip = \"172.18.0.$((${i} + 3))\"
-            port = 30000
+            wrbPort = 30000
+            commPort = 30010
             publicKey =\"\"\"MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
                            N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg==\"\"\"
     " >> ${1}/config.toml

@@ -1,8 +1,8 @@
 package das.wrb;
 
 import config.Node;
+import proto.Types;
 
-import proto.Types.*;
 import java.util.*;
 
 public class ByzantineWrbNode extends WrbNode {
@@ -14,7 +14,7 @@ public class ByzantineWrbNode extends WrbNode {
         super(channels, id, addr, rmfPort, f, tmo, tmoInterval, nodes, bbcConfig, serverCrt, serverPrivKey, caRoot);
     }
 
-    public void selectiveBroadcast(Block msg, List<Integer> ids) {
+    public void selectiveBroadcast(Types.BlockHeader msg, List<Integer> ids) {
         for (Map.Entry<Integer, WrbService.peer>  p: wrbService.peers.entrySet()) {
             if (ids.contains(p.getKey())) {
                 wrbService.sendDataMessage(p.getValue().stub, msg);
@@ -25,7 +25,7 @@ public class ByzantineWrbNode extends WrbNode {
     /*
         This should used outside the wrb protocol (Note that the wrb protocol does not handle such failures)
      */
-    public void devidedBroadcast(List<Block> msgs, List<List<Integer>> ids) {
+    public void devidedBroadcast(List<Types.BlockHeader> msgs, List<List<Integer>> ids) {
         for (int i = 0 ; i < msgs.size() ; i++) {
             selectiveBroadcast(msgs.get(i), ids.get(i));
         }

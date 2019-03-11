@@ -1,7 +1,7 @@
 package communication.overlays;
 
-import com.google.protobuf.ByteString;
 import communication.CommLayer;
+import communication.data.GlobalData;
 import config.Node;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -13,7 +13,6 @@ import proto.Types;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import static java.lang.String.format;
 
@@ -45,7 +44,6 @@ public class Clique extends CommunicationGrpc.CommunicationImplBase implements C
     private String addr;
     private int port;
     private int channels;
-    private Queue<Types.Comm>[] msgsQueus;
 
     public Clique(int id, String addr, int port, int channels, ArrayList<Node> nodes) {
         this.id = id;
@@ -53,11 +51,7 @@ public class Clique extends CommunicationGrpc.CommunicationImplBase implements C
         this.port = port;
         this.addr = addr;
         this.channels = channels;
-        this.msgsQueus = new Queue[channels];
-        for (int i = 0 ; i < channels ; i++) {
-            this.msgsQueus[i] = new LinkedList<>();
-        }
-
+        new GlobalData(channels);
     }
 
     @Override
@@ -86,11 +80,12 @@ public class Clique extends CommunicationGrpc.CommunicationImplBase implements C
     }
 
     @Override
-    public void broadcast(int channel, byte[] data) {
+    public void broadcast(int channel, Types.Block data) {
+        logger.debug(format("[%d-%d] broadcast block data [bid=%d]", id, channel, data.getId().getBid()));
         for (Cpeer p : peers.values()) {
             p.stub.dsm(Types.Comm.newBuilder()
                     .setChannel(channel)
-                    .setData(ByteString.copyFrom(data))
+                    .setData(data)
                     .build(), new StreamObserver<Types.Empty>() {
                 @Override
                 public void onNext(Types.Empty empty) {
@@ -112,21 +107,27 @@ public class Clique extends CommunicationGrpc.CommunicationImplBase implements C
     }
 
     @Override
-    public byte[] recMsg(int channel) throws InterruptedException {
-        synchronized (msgsQueus[channel]) {
-            while (msgsQueus[channel].isEmpty()) {
-                msgsQueus[channel].wait();
+    public Types.Block recMsg(int channel, Types.BlockID bid) throws InterruptedException {
+        synchronized (GlobalData.blocks[channel]) {
+            while (!GlobalData.blocks[channel].containsKey(bid) || GlobalData.blocks[channel].get(bid).isEmpty()) {
+                GlobalData.blocks[channel].wait();
             }
-            return Objects.requireNonNull(msgsQueus[channel].poll()).getData().toByteArray();
+            return Objects.requireNonNull(GlobalData.blocks[channel].get(bid).poll());
         }
     }
 
     @Override
     public void dsm(Types.Comm request, StreamObserver<proto.Types.Empty> responseObserver) {
         int c = request.getChannel();
-        synchronized (msgsQueus[c]) {
-            msgsQueus[c].add(request);
-            msgsQueus[c].notifyAll();
+        synchronized (GlobalData.blocks[c]) {
+            GlobalData.blocks[c].putIfAbsent(request.getData().getId(), new LinkedList<Types.Block>());
+            GlobalData.blocks[c].computeIfPresent(request.getData().getId(), (k, v) -> {
+                Types.BlockID bid = request.getData().getId();
+                logger.debug(format("[%d-%d] received block [pid=%d ; bid=%d]", id, c, bid.getPid(), bid.getBid()));
+                v.add(request.getData());
+                return v;
+            });
+            GlobalData.blocks[c].notifyAll();
         }
 
     }

@@ -3,13 +3,8 @@ package clients;
 import com.google.protobuf.ByteString;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
-import io.grpc.stub.StreamObserver;
 import proto.Types;
 import proto.blockchainServiceGrpc;
-
-import java.util.concurrent.TimeUnit;
-
-import static java.lang.String.format;
 
 public class TxClient {
     blockchainServiceGrpc.blockchainServiceBlockingStub stub;

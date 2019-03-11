@@ -1,27 +1,27 @@
 package blockchain;
 
-import crypto.DigestMethod;
-import proto.Types.*;
+import blockchain.genesis.GenCreator;
 import utils.DiskUtils;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import static java.util.Collections.max;
+import proto.Types.*;
 
-public abstract class BaseBlockchain {
-    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(BaseBlockchain.class);
+public class Blockchain {
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Blockchain.class);
     private final int creatorID;
     private int swapSize = 0;
     private Path swapPath;
     private int maxCacheSize = 100;
     private boolean swapAble = false;
     private final ConcurrentHashMap<Integer, Block> blocks = new ConcurrentHashMap<>();
+
 //    int size = 0;
 
-    public BaseBlockchain(int creatorID, int channel, int maxCacheSize, Path swapPath) {
+    public Blockchain(int creatorID,  int maxCacheSize, GenCreator gcreator, Path swapPath) {
         this.creatorID = creatorID;
         if (maxCacheSize > 0) {
             this.maxCacheSize = maxCacheSize;
@@ -29,29 +29,28 @@ public abstract class BaseBlockchain {
         this.swapPath = swapPath;
         DiskUtils.createStorageDir(swapPath);
         this.swapAble = true;
-        createGenesis(channel);
+        addBlock(gcreator.createGenesisBlock());
     }
 
-    public BaseBlockchain(int creatorID) {
+    public Blockchain(int creatorID) {
         this.creatorID = creatorID;
     }
 
-    public BaseBlockchain(BaseBlockchain orig, int start, int end) {
+    public Blockchain(Blockchain orig, int start, int end) {
         this.creatorID = orig.creatorID;
         for (int i = start ; i < end ; i++) {
             addBlock(orig.getBlock(i));
         }
     }
 
-    public abstract BaseBlock createNewBLock();
-
-    abstract void createGenesis(int channel);
+//    public abstract BaseBlock createNewBLock();
+//
+//    abstract void createGenesis(int channel);
 
     // We assume now that all the validated blocks are in memory
     public boolean validateCurrentLeader(int leader, int f) {
         int last =  getHeight();
         for (int i = last ; i > Math.max(0, last - f) ; i--) {
-//            System.out.println("---- " + i);
             if (getBlock(i).getHeader().getM().getSender() == leader) return false;
         }
         return true;
@@ -81,14 +80,10 @@ public abstract class BaseBlockchain {
         int index = b.getHeader().getHeight() - 1;
         if (getHeight() < index) return false;
         Block prev = getBlock(index);
-        return validateBlockHash(prev, b);
+        return Utils.validateBlockHash(prev, b);
     }
 
-    static public boolean validateBlockHash(Block prev, Block b) {
-        byte[] d = DigestMethod.hash(prev.getHeader().toByteArray());
-        return DigestMethod.validate(b.getHeader().getPrev().toByteArray(),
-                Objects.requireNonNull(d));
-    }
+
 
     public void addBlock(Block b) {
         blocks.putIfAbsent(b.getHeader().getHeight(), b);

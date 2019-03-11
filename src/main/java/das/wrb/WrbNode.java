@@ -1,11 +1,13 @@
 package das.wrb;
 
+import communication.data.GlobalData;
 import config.Node;
+import proto.Types;
 //import crypto.rmfDigSig;
 
-import proto.Types.*;
 import java.util.ArrayList;
 
+import static crypto.blockDigSig.verfiyBlockWRTheader;
 import static java.lang.String.format;
 
 public class WrbNode extends Node{
@@ -32,24 +34,26 @@ public class WrbNode extends Node{
         wrbService.start();
     }
 
-    public void broadcast(Block data) {
-        logger.debug(format("[#%d] broadcasts data message with [height=%d]", getID(), data.getHeader().getHeight()));
+    public void broadcast(Types.BlockHeader data) {
+        logger.debug(format("[#%d] broadcasts data message with [height=%d]", getID(), data.getHeight()));
 
-        wrbService.rmfBroadcast(data);
+        wrbService.wrbBroadcast(data);
     }
 
-    public Block deliver(int channel, int cidSeries, int cid, int height, int sender, Block msg)
+    public Types.BlockHeader deliver(int channel, int cidSeries, int cid, int height, int sender, Types.BlockHeader msg)
             throws InterruptedException {
         long start = System.currentTimeMillis();
-        Block m = wrbService.deliver(channel, cidSeries, cid, sender, height, msg);
+        Types.BlockHeader h = wrbService.deliver(channel, cidSeries, cid, sender, height, msg);
         logger.debug(format("[#%d-C[%d]] Deliver on wrb node took about [%d] ms [cidSeries=%d ; cid=%d]", getID(), channel,
                 System.currentTimeMillis() - start, cidSeries, cid));
-        return m;
+        return h;
+//        Types.Block b;
+//        b = getBlockWRTheader(h, channel);
+//        while (!verfiyBlockWRTheader(b, h)) {
+//            b = getBlockWRTheader(h, channel);
+//        }
+//        return b;
     }
-
-//    public void clearBuffers(Meta key) {
-//        wrbService.clearBuffers(key);
-//    }
 
     public long getTotolDec() {
         return wrbService.getTotalDeliveredTries();

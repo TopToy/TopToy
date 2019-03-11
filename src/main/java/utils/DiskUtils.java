@@ -1,11 +1,10 @@
 package utils;
-import blockchain.BaseBlockchain;
 import org.apache.commons.io.FileUtils;
 import proto.Types;
+
 import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 
 public class DiskUtils {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(DiskUtils.class);
@@ -34,7 +33,7 @@ public class DiskUtils {
             logger.error("", e);
         }
     }
-//    public static void cut(BaseBlockchain bc, int start, int end, Path path) throws IOException {
+//    public static void cut(Blockchain bc, int start, int end, Path path) throws IOException {
 //        for (Types.Block b : new ArrayList<>(bc.getBlocksCopy(start, end))) {
 //            cutBlock(b, path);
 //            bc.setBlock(b.getHeader().getHeight(), Types.Block.newBuilder()

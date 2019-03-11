@@ -3,7 +3,7 @@ package app;
 import config.Config;
 import servers.server;
 import servers.Top;
-//import utils.derbyUtils;
+//import Utils.derbyUtils;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -35,9 +35,6 @@ public class JToy {
     }
 
     static void mainImpl(String argv[]) {
-//        try {
-//            Config.setConfig(null, 0);
-//        Top.createTxTable();
             Path config = null;
             if (argv.length == 3) {
                 config = Paths.get(argv[2]);
@@ -49,18 +46,11 @@ public class JToy {
             type = argv[1];
             logger.debug("type is " + type);
             switch (type) {
-//                case "smr":
-//                    s = new bftsmartBCserver(serverID, Config.getF(),
-//                            Config.getMaxTransactionsInBlock(), Config.getSyncRBConfigHome());
-//                    break;
-//                case "hlf":
-//                    s = new hlfBCserver(serverID, Config.getF(),
-//                            Config.getMaxTransactionsInBlock(), Config.getSyncRBConfigHome());
-//                    break;
                 default:
-                    s = new Top(Config.getAddress(serverID), Config.getPort(serverID), serverID, Config.getF(), Config.getC(),
-                            Config.getTMO(), Config.getTMOInterval(), Config.getMaxTransactionsInBlock(), Config.getFastMode(),
-                            Config.getCluster(), Config.getRMFbbcConfigHome(), Config.getRBConfigHome(), type,
+                    s = new Top(Config.getAddress(serverID), Config.getWrbPort(serverID), Config.getCommPort(serverID),
+                            serverID, Config.getF(), Config.getC(), Config.getTMO(), Config.getTMOInterval(),
+                            Config.getMaxTransactionsInBlock(), Config.getFastMode(), Config.getWrbCluster(),
+                            Config.getCommCluster(), Config.getRMFbbcConfigHome(), Config.getRBConfigHome(), type,
                             Config.getServerCrtPath(), Config.getServerTlsPrivKeyPath(), Config.getCaRootPath());
                     break;
             }
