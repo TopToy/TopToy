@@ -14,6 +14,7 @@ import proto.Types;
 import java.io.IOException;
 import java.util.*;
 
+import static crypto.blockDigSig.verfiyBlockWRTheader;
 import static java.lang.String.format;
 
 public class Clique extends CommunicationGrpc.CommunicationImplBase implements CommLayer {
@@ -114,6 +115,12 @@ public class Clique extends CommunicationGrpc.CommunicationImplBase implements C
             }
             return Objects.requireNonNull(GlobalData.blocks[channel].get(bid).poll());
         }
+    }
+
+    @Override
+    public boolean contains(int channel, Types.BlockID bid, Types.BlockHeader proof) {
+        return GlobalData.blocks[channel].containsKey(bid)
+                && GlobalData.blocks[channel].get(bid).stream().filter(b -> verfiyBlockWRTheader(b, proof)).count() > 0;
     }
 
     @Override

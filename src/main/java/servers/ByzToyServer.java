@@ -27,20 +27,20 @@ public class ByzToyServer extends ToyBaseServer {
         super(addr, wrbPort, id, channel, f, maxTx, fastMode, wrb, comm, rb);
     }
 
-    public ByzToyServer(String addr, int wrbPort, int commPort, int id, int channel, int f, int tmo, int tmoInterval,
-                          int maxTx, boolean fastMode, ArrayList<Node> wrbCluster, ArrayList<Node> commCluster,
-                          String bbcConfig, String rbConfigPath, String serverCrt, String serverPrivKey, String caRoot) {
-
-        super(addr, wrbPort, commPort, id, channel, f, tmo, tmoInterval, maxTx, fastMode, wrbCluster, commCluster,
-                bbcConfig, rbConfigPath, serverCrt, serverPrivKey, caRoot);
-        rmfServer.stop();
-        rmfServer = new ByzantineWrbNode(1, id, addr, wrbPort, f, tmo, tmoInterval,
-                wrbCluster, bbcConfig, serverCrt, serverPrivKey, caRoot);
-        groups.add(new ArrayList<>());
-        for (int i = 0 ; i < n ; i++) {
-            groups.get(0).add(i); // At the beginning there is no byzantine behaviour
-        }
-    }
+//    public ByzToyServer(String addr, int wrbPort, int commPort, int id, int channel, int f, int tmo, int tmoInterval,
+//                          int maxTx, boolean fastMode, ArrayList<Node> wrbCluster, ArrayList<Node> commCluster,
+//                          String bbcConfig, String rbConfigPath, String serverCrt, String serverPrivKey, String caRoot) {
+//
+//        super(addr, wrbPort, commPort, id, channel, f, tmo, tmoInterval, maxTx, fastMode, wrbCluster, commCluster,
+//                bbcConfig, rbConfigPath, serverCrt, serverPrivKey, caRoot);
+//        rmfServer.stop();
+//        rmfServer = new ByzantineWrbNode(1, id, addr, wrbPort, f, tmo, tmoInterval,
+//                wrbCluster, bbcConfig, serverCrt, serverPrivKey, caRoot);
+//        groups.add(new ArrayList<>());
+//        for (int i = 0 ; i < n ; i++) {
+//            groups.get(0).add(i); // At the beginning there is no byzantine behaviour
+//        }
+//    }
 
     Types.BlockHeader leaderImpl() {
         addTransactionsToCurrBlock();

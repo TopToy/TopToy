@@ -95,10 +95,12 @@ public class Top implements server {
         this.id = id;
         this.comm = new Clique(id, addr, commPort, c, commCluster);
         if (type.equals("r") || type.equals("a")) {
-            wrb = new WrbNode(c, id, addr, wrbPort, f, tmo, tmoInterval, wrbCluster, bbcConfig, serverCrt, serverPrivKey, caRoot);
+            wrb = new WrbNode(c, id, addr, wrbPort, f, tmo, tmoInterval,
+                    wrbCluster, bbcConfig, serverCrt, serverPrivKey, caRoot, comm);
         }
         if (type.equals("b")) {
-            wrb = new ByzantineWrbNode(c, id, addr, wrbPort, f, tmo, tmoInterval, wrbCluster, bbcConfig, serverCrt, serverPrivKey, caRoot);
+            wrb = new ByzantineWrbNode(c, id, addr, wrbPort, f, tmo, tmoInterval,
+                    wrbCluster, bbcConfig, serverCrt, serverPrivKey, caRoot, comm);
         }
 //        deliverFork = new RBrodcastService(c, id, panicConfig);
 //        sync = new RBrodcastService(c, id, syncConfig);

@@ -1,6 +1,7 @@
 package das.wrb;
 
 import com.google.protobuf.ByteString;
+import communication.CommLayer;
 import config.Config;
 import config.Node;
 import das.bbc.BbcService;
@@ -127,10 +128,11 @@ public class WrbService extends WrbGrpc.WrbImplBase {
     private int[] currentTmo;
     private AtomicInteger totalDeliveredTries = new AtomicInteger(0);
     private AtomicInteger optimialDec = new AtomicInteger(0);
+    CommLayer comm;
 
 
     public WrbService(int channels, int id, int f, int tmo, int tmoInterval, ArrayList<Node> nodes, String bbcConfig,
-                      String serverCrt, String serverPrivKey, String caRoot) {
+                      String serverCrt, String serverPrivKey, String caRoot, CommLayer comm) {
         this.channels = channels;
         this.tmo = tmo;
         this.tmoInterval = tmoInterval;
@@ -147,6 +149,7 @@ public class WrbService extends WrbGrpc.WrbImplBase {
         this.fastVoteNotifyer = new Object[channels];
         this.msgNotifyer = new Object[channels];
         this.preConsNotifyer = new Object[channels];
+        this.comm = comm;
         for (int i = 0 ; i < channels ; i++) {
             fastVoteNotifyer[i] = new Object();
             msgNotifyer[i] = new Object();
@@ -653,18 +656,21 @@ public class WrbService extends WrbGrpc.WrbImplBase {
                         .setSender(id)
                         .build())
                 .setVote(false);
+
         GlobalData.pending[channel].computeIfPresent(key, (k, val) -> {
             if (val.getM().getSender() != sender ||
                     val.getM().getCidSeries() != cidSeries ||
                     val.getM().getCid() != cid ||
                     val.getM().getChannel() != channel) return val;
+            BlockID bid = BlockID.newBuilder().setPid(val.getM().getSender()).setBid(val.getBid()).build();
+            if (!comm.contains(channel, bid, val)) return val;
                 bv.setVote(true);
             if (next != null) {
                 logger.debug(format("[#%d-C[%d]] broadcasts [cidSeries=%d ; cid=%d] via fast mode",
                         id, channel, next.getM().getCidSeries(), next.getM().getCid()));
                 bv.setNext(setFastModeData(val, next));
             }
-                       return val;
+               return val;
         });
         broadcastFastVoteMessage(bv.build());
         logger.debug(format("[#%d-C[%d]] sending fast vote [cidSeries=%d ; cid=%d ; val=%b]",
@@ -830,11 +836,19 @@ public class WrbService extends WrbGrpc.WrbImplBase {
             return null;
         });
 
+
         GlobalData.pending[channel].computeIfPresent(key, (k, v) -> {
             if (prop.get()) return v;
             currentTmo[channel] = tmo;
-            logger.debug(format("[#%d-C[%d]] Initiates full bbc instance [cidSeries=%d ; cid=%d], [vote:%d]", id, channel, cidSeries, cid, 1));
-            bbcService.propose(1, channel, cidSeries, cid);
+            int vote = 1;
+            BlockID bid = BlockID.newBuilder().setPid(v.getM().getSender()).setBid(v.getBid()).build();
+            if (!comm.contains(channel, bid, v)) {
+                logger.debug(format("[#%d-C[%d]] Has a header but not the block itself [cidSeries=%d ; cid=%d, pid=%d, bid=%d]",
+                        id, channel, cidSeries, cid, bid.getPid(), bid.getBid()));
+                vote = 0;
+            }
+            logger.debug(format("[#%d-C[%d]] Initiates full bbc instance [cidSeries=%d ; cid=%d], [vote:%d]", id, channel, cidSeries, cid, vote));
+            bbcService.propose(vote, channel, cidSeries, cid);
             return v;
         });
 
@@ -860,6 +874,7 @@ public class WrbService extends WrbGrpc.WrbImplBase {
         logger.debug(format("[#%d-C[%d]] have waited [%d] ms for data msg [cidSeries=%d ; cid=%d]",
                 id, channel, estimatedTime, cidSeries, cid));
     }
+
     private BlockHeader postDeliverLogic(Meta key, int channel, int cidSeries, int cid, int sender, int height) throws InterruptedException {
         requestData(channel, cidSeries, cid, sender);
         BlockHeader msg = GlobalData.pending[channel].get(key);

@@ -140,9 +140,9 @@ public abstract class ToyBaseServer extends Node {
         super(addr, wrbPort, id);
         this.f = f;
         this.n = 3*f + 1;
-        rmfServer = new WrbNode(1, id, addr, wrbPort, f, tmo, tmoInterval,
-                wrbCluster, bbcConfig, serverCrt, serverPrivKey, caRoot);
         comm = new Clique(id, addr, commPort, 1, commCluster);
+        rmfServer = new WrbNode(1, id, addr, wrbPort, f, tmo, tmoInterval,
+                wrbCluster, bbcConfig, serverCrt, serverPrivKey, caRoot, comm);
         RBService = new RBrodcastService(id, n, f, rbConfigPath);
         bc = initBC(id, channel);
         currHeight = 1; // starts from 1 due to the genesis BaseBlock

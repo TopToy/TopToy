@@ -1,5 +1,6 @@
 package das.wrb;
 
+import communication.CommLayer;
 import communication.data.GlobalData;
 import config.Node;
 import proto.Types;
@@ -17,9 +18,9 @@ public class WrbNode extends Node{
     WrbService wrbService;
 
     public WrbNode(int channels, int id, String addr, int rmfPort, int f , int tmo, int tmoInterval, ArrayList<Node> nodes, String bbcConfig,
-                   String serverCrt, String serverPrivKey, String caRoot) {
+                   String serverCrt, String serverPrivKey, String caRoot, CommLayer comm) {
         super(addr, rmfPort,  id);
-        wrbService = new WrbService(channels, id, f, tmo, tmoInterval, nodes, bbcConfig, serverCrt, serverPrivKey, caRoot);
+        wrbService = new WrbService(channels, id, f, tmo, tmoInterval, nodes, bbcConfig, serverCrt, serverPrivKey, caRoot, comm);
     }
 
 
