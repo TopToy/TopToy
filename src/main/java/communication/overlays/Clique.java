@@ -13,6 +13,7 @@ import proto.Types;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static crypto.blockDigSig.verfiyBlockWRTheader;
 import static java.lang.String.format;
@@ -108,26 +109,97 @@ public class Clique extends CommunicationGrpc.CommunicationImplBase implements C
     }
 
     @Override
-    public Types.Block recMsg(int channel, Types.BlockID bid) throws InterruptedException {
-        synchronized (GlobalData.blocks[channel]) {
-            while (!GlobalData.blocks[channel].containsKey(bid) || GlobalData.blocks[channel].get(bid).isEmpty()) {
-                GlobalData.blocks[channel].wait();
+    public void reqBlock(proto.Types.commReq request,
+                         io.grpc.stub.StreamObserver<proto.Types.commRes> responseObserver) {
+        Types.BlockID bid = Types.BlockID.newBuilder().setBid(request.getProof().getBid())
+                .setPid(request.getProof().getM().getSender())
+                .build();
+        int channel = request.getProof().getM().getChannel();
+        GlobalData.blocks[channel].computeIfPresent(bid, (k, v) -> {
+            Types.Block res = null;
+            LinkedList<Types.Block> ll = v.stream().filter(b -> verfiyBlockWRTheader(b, request.getProof()))
+                    .collect(Collectors.toCollection(LinkedList::new));
+
+            res = ll.peek();
+            if (res != null) {
+                Types.commRes cr = Types.commRes.newBuilder().setB(res).build();
+                responseObserver.onNext(cr);
             }
-            return Objects.requireNonNull(GlobalData.blocks[channel].get(bid).poll());
+            return v;
+        });
+
+    }
+
+    Types.Block getBlockFromData(int channel, Types.BlockID bid, Types.BlockHeader proof) {
+        final Types.Block[] res = {null};
+        GlobalData.blocks[channel].computeIfPresent(bid, (k, v) -> {
+            v = v.stream()
+                    .filter(b -> verfiyBlockWRTheader(b, proof)).collect(Collectors.toCollection(LinkedList::new));
+            res[0] = v.poll();
+            return v;
+        });
+        return res[0];
+    }
+
+    @Override
+    public Types.Block recBlock(int channel, Types.BlockID bid, Types.BlockHeader proof) throws InterruptedException {
+        Types.Block res = getBlockFromData(channel, bid, proof);
+        if (res != null) return res;
+        broadcastCommReq(Types.commReq.newBuilder().setProof(proof).build());
+        synchronized (GlobalData.blocks[channel]) {
+            while (res == null) {
+                GlobalData.blocks[channel].wait();
+                res = getBlockFromData(channel, bid, proof);
+            }
+        }
+        return res;
+    }
+
+    void broadcastCommReq(Types.commReq request) {
+        for (Cpeer p : peers.values()) {
+            p.stub.reqBlock(request, new StreamObserver<Types.commRes>() {
+                @Override
+                public void onNext(Types.commRes commRes) {
+                    int channel = request.getProof().getM().getChannel();
+                    Types.BlockID bid = Types.BlockID.newBuilder().setPid(request.getProof().getM().getSender())
+                            .setBid(request.getProof().getBid()).build();
+                    if (verfiyBlockWRTheader(commRes.getB(), request.getProof())) {
+                        synchronized (GlobalData.blocks[channel]) {
+                            GlobalData.blocks[channel].putIfAbsent(bid, new LinkedList<>());
+                            GlobalData.blocks[channel].computeIfPresent(bid, (k, v) -> {
+                                v.add(commRes.getB());
+                                return v;
+                            });
+                            GlobalData.blocks[channel].notifyAll();
+                        }
+                    }
+                }
+
+                @Override
+                public void onError(Throwable throwable) {
+
+                }
+
+                @Override
+                public void onCompleted() {
+
+                }
+            });
         }
     }
 
     @Override
     public boolean contains(int channel, Types.BlockID bid, Types.BlockHeader proof) {
-        return GlobalData.blocks[channel].containsKey(bid)
-                && GlobalData.blocks[channel].get(bid).stream().filter(b -> verfiyBlockWRTheader(b, proof)).count() > 0;
+        GlobalData.blocks[channel].computeIfPresent(bid, (k, v) -> v.stream().filter(b -> verfiyBlockWRTheader(b, proof))
+                .collect(Collectors.toCollection(LinkedList::new)));
+        return GlobalData.blocks[channel].get(bid).size() > 0;
     }
 
     @Override
     public void dsm(Types.Comm request, StreamObserver<proto.Types.Empty> responseObserver) {
         int c = request.getChannel();
+        GlobalData.blocks[c].putIfAbsent(request.getData().getId(), new LinkedList<Types.Block>());
         synchronized (GlobalData.blocks[c]) {
-            GlobalData.blocks[c].putIfAbsent(request.getData().getId(), new LinkedList<Types.Block>());
             GlobalData.blocks[c].computeIfPresent(request.getData().getId(), (k, v) -> {
                 Types.BlockID bid = request.getData().getId();
                 logger.debug(format("[%d-%d] received block [pid=%d ; bid=%d]", id, c, bid.getPid(), bid.getBid()));
@@ -136,6 +208,7 @@ public class Clique extends CommunicationGrpc.CommunicationImplBase implements C
             });
             GlobalData.blocks[c].notifyAll();
         }
+
 
     }
 

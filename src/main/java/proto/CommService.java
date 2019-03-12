@@ -24,8 +24,9 @@ public final class CommService {
   static {
     java.lang.String[] descriptorData = {
       "\n\021commService.proto\022\005proto\032\013types.proto2" +
-      "3\n\rCommunication\022\"\n\003dsm\022\013.proto.Comm\032\014.p" +
-      "roto.Empty\"\000B\007\n\005protob\006proto3"
+      "a\n\rCommunication\022\"\n\003dsm\022\013.proto.Comm\032\014.p" +
+      "roto.Empty\"\000\022,\n\010reqBlock\022\016.proto.commReq" +
+      "\032\016.proto.commRes\"\000B\007\n\005protob\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

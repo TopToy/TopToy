@@ -126,7 +126,14 @@ message WrbRes {
 message subChainVersion {
     int32 forkPoint = 1;
     int32 suggested = 2;
-    //    repeated frontSupport fp = 3;
     repeated Block v = 3;
     int32 sender = 4;
+}
+
+message commReq {
+    BlockHeader proof = 1;
+}
+
+message commRes {
+    Block b = 1;
 }

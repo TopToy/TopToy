@@ -54,6 +54,33 @@ public final class CommunicationGrpc {
      return getDsmMethod;
   }
 
+  private static volatile io.grpc.MethodDescriptor<proto.Types.commReq,
+      proto.Types.commRes> getReqBlockMethod;
+
+  public static io.grpc.MethodDescriptor<proto.Types.commReq,
+      proto.Types.commRes> getReqBlockMethod() {
+    io.grpc.MethodDescriptor<proto.Types.commReq, proto.Types.commRes> getReqBlockMethod;
+    if ((getReqBlockMethod = CommunicationGrpc.getReqBlockMethod) == null) {
+      synchronized (CommunicationGrpc.class) {
+        if ((getReqBlockMethod = CommunicationGrpc.getReqBlockMethod) == null) {
+          CommunicationGrpc.getReqBlockMethod = getReqBlockMethod = 
+              io.grpc.MethodDescriptor.<proto.Types.commReq, proto.Types.commRes>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+              .setFullMethodName(generateFullMethodName(
+                  "proto.Communication", "reqBlock"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  proto.Types.commReq.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  proto.Types.commRes.getDefaultInstance()))
+                  .setSchemaDescriptor(new CommunicationMethodDescriptorSupplier("reqBlock"))
+                  .build();
+          }
+        }
+     }
+     return getReqBlockMethod;
+  }
+
   /**
    * Creates a new async stub that supports all call types for the service
    */
@@ -88,6 +115,13 @@ public final class CommunicationGrpc {
       asyncUnimplementedUnaryCall(getDsmMethod(), responseObserver);
     }
 
+    /**
+     */
+    public void reqBlock(proto.Types.commReq request,
+        io.grpc.stub.StreamObserver<proto.Types.commRes> responseObserver) {
+      asyncUnimplementedUnaryCall(getReqBlockMethod(), responseObserver);
+    }
+
     @java.lang.Override public final io.grpc.ServerServiceDefinition bindService() {
       return io.grpc.ServerServiceDefinition.builder(getServiceDescriptor())
           .addMethod(
@@ -97,6 +131,13 @@ public final class CommunicationGrpc {
                 proto.Types.Comm,
                 proto.Types.Empty>(
                   this, METHODID_DSM)))
+          .addMethod(
+            getReqBlockMethod(),
+            asyncUnaryCall(
+              new MethodHandlers<
+                proto.Types.commReq,
+                proto.Types.commRes>(
+                  this, METHODID_REQ_BLOCK)))
           .build();
     }
   }
@@ -126,6 +167,14 @@ public final class CommunicationGrpc {
       asyncUnaryCall(
           getChannel().newCall(getDsmMethod(), getCallOptions()), request, responseObserver);
     }
+
+    /**
+     */
+    public void reqBlock(proto.Types.commReq request,
+        io.grpc.stub.StreamObserver<proto.Types.commRes> responseObserver) {
+      asyncUnaryCall(
+          getChannel().newCall(getReqBlockMethod(), getCallOptions()), request, responseObserver);
+    }
   }
 
   /**
@@ -151,6 +200,13 @@ public final class CommunicationGrpc {
     public proto.Types.Empty dsm(proto.Types.Comm request) {
       return blockingUnaryCall(
           getChannel(), getDsmMethod(), getCallOptions(), request);
+    }
+
+    /**
+     */
+    public proto.Types.commRes reqBlock(proto.Types.commReq request) {
+      return blockingUnaryCall(
+          getChannel(), getReqBlockMethod(), getCallOptions(), request);
     }
   }
 
@@ -179,9 +235,18 @@ public final class CommunicationGrpc {
       return futureUnaryCall(
           getChannel().newCall(getDsmMethod(), getCallOptions()), request);
     }
+
+    /**
+     */
+    public com.google.common.util.concurrent.ListenableFuture<proto.Types.commRes> reqBlock(
+        proto.Types.commReq request) {
+      return futureUnaryCall(
+          getChannel().newCall(getReqBlockMethod(), getCallOptions()), request);
+    }
   }
 
   private static final int METHODID_DSM = 0;
+  private static final int METHODID_REQ_BLOCK = 1;
 
   private static final class MethodHandlers<Req, Resp> implements
       io.grpc.stub.ServerCalls.UnaryMethod<Req, Resp>,
@@ -203,6 +268,10 @@ public final class CommunicationGrpc {
         case METHODID_DSM:
           serviceImpl.dsm((proto.Types.Comm) request,
               (io.grpc.stub.StreamObserver<proto.Types.Empty>) responseObserver);
+          break;
+        case METHODID_REQ_BLOCK:
+          serviceImpl.reqBlock((proto.Types.commReq) request,
+              (io.grpc.stub.StreamObserver<proto.Types.commRes>) responseObserver);
           break;
         default:
           throw new AssertionError();
@@ -266,6 +335,7 @@ public final class CommunicationGrpc {
           serviceDescriptor = result = io.grpc.ServiceDescriptor.newBuilder(SERVICE_NAME)
               .setSchemaDescriptor(new CommunicationFileDescriptorSupplier())
               .addMethod(getDsmMethod())
+              .addMethod(getReqBlockMethod())
               .build();
         }
       }

@@ -7,4 +7,5 @@ import "types.proto";
 
 service Communication {
     rpc dsm(Comm) returns (Empty) {};
+    rpc reqBlock(commReq) returns (commRes) {};
 }

@@ -272,11 +272,7 @@ public abstract class ToyBaseServer extends Node {
 
     Types.Block getBlockWRTheader(Types.BlockHeader h, int channel) throws InterruptedException {
         Types.BlockID bid = Types.BlockID.newBuilder().setBid(h.getBid()).setPid(h.getM().getSender()).build();
-        Block b = comm.recMsg(channel, bid);
-        while (!verfiyBlockWRTheader(b, h)) {
-            b = comm.recMsg(channel, bid);
-        }
-        return b;
+        return comm.recBlock(channel, bid, h);
     }
 
     BlockHeader getHeaderForCurrentBlock(Types.BlockHeader prev,
