@@ -1859,6 +1859,11 @@ public final class Types {
      * <code>int32 bid = 6;</code>
      */
     int getBid();
+
+    /**
+     * <code>bool empty = 7;</code>
+     */
+    boolean getEmpty();
   }
   /**
    * Protobuf type {@code proto.BlockHeader}
@@ -1878,6 +1883,7 @@ public final class Types {
       transactionHash_ = com.google.protobuf.ByteString.EMPTY;
       proof_ = "";
       bid_ = 0;
+      empty_ = false;
     }
 
     @java.lang.Override
@@ -1948,6 +1954,11 @@ public final class Types {
             case 48: {
 
               bid_ = input.readInt32();
+              break;
+            }
+            case 56: {
+
+              empty_ = input.readBool();
               break;
             }
           }
@@ -2065,6 +2076,15 @@ public final class Types {
       return bid_;
     }
 
+    public static final int EMPTY_FIELD_NUMBER = 7;
+    private boolean empty_;
+    /**
+     * <code>bool empty = 7;</code>
+     */
+    public boolean getEmpty() {
+      return empty_;
+    }
+
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -2094,6 +2114,9 @@ public final class Types {
       }
       if (bid_ != 0) {
         output.writeInt32(6, bid_);
+      }
+      if (empty_ != false) {
+        output.writeBool(7, empty_);
       }
       unknownFields.writeTo(output);
     }
@@ -2126,6 +2149,10 @@ public final class Types {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(6, bid_);
       }
+      if (empty_ != false) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(7, empty_);
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -2157,6 +2184,8 @@ public final class Types {
           .equals(other.getProof());
       result = result && (getBid()
           == other.getBid());
+      result = result && (getEmpty()
+          == other.getEmpty());
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -2182,6 +2211,9 @@ public final class Types {
       hash = (53 * hash) + getProof().hashCode();
       hash = (37 * hash) + BID_FIELD_NUMBER;
       hash = (53 * hash) + getBid();
+      hash = (37 * hash) + EMPTY_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+          getEmpty());
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -2327,6 +2359,8 @@ public final class Types {
 
         bid_ = 0;
 
+        empty_ = false;
+
         return this;
       }
 
@@ -2359,6 +2393,7 @@ public final class Types {
         result.transactionHash_ = transactionHash_;
         result.proof_ = proof_;
         result.bid_ = bid_;
+        result.empty_ = empty_;
         onBuilt();
         return result;
       }
@@ -2418,6 +2453,9 @@ public final class Types {
         }
         if (other.getBid() != 0) {
           setBid(other.getBid());
+        }
+        if (other.getEmpty() != false) {
+          setEmpty(other.getEmpty());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -2738,6 +2776,32 @@ public final class Types {
       public Builder clearBid() {
         
         bid_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private boolean empty_ ;
+      /**
+       * <code>bool empty = 7;</code>
+       */
+      public boolean getEmpty() {
+        return empty_;
+      }
+      /**
+       * <code>bool empty = 7;</code>
+       */
+      public Builder setEmpty(boolean value) {
+        
+        empty_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>bool empty = 7;</code>
+       */
+      public Builder clearEmpty() {
+        
+        empty_ = false;
         onChanged();
         return this;
       }
@@ -16185,42 +16249,42 @@ public final class Types {
       "\001 \001(\005\022\016\n\006sender\030\002 \001(\005\022\013\n\003cid\030\003 \001(\005\022\021\n\tci" +
       "dSeries\030\004 \001(\005\"7\n\013BbcDecision\022\026\n\001m\030\001 \001(\0132" +
       "\013.proto.Meta\022\020\n\010decosion\030\002 \001(\005\"#\n\007BlockI" +
-      "D\022\013\n\003pid\030\001 \001(\005\022\013\n\003bid\030\002 \001(\005\"x\n\013BlockHead" +
-      "er\022\026\n\001m\030\001 \001(\0132\013.proto.Meta\022\014\n\004prev\030\002 \001(\014" +
-      "\022\016\n\006height\030\003 \001(\005\022\027\n\017transactionHash\030\004 \001(" +
-      "\014\022\r\n\005proof\030\005 \001(\t\022\013\n\003bid\030\006 \001(\005\"P\n\006BbcMsg\022" +
-      "\026\n\001m\030\001 \001(\0132\013.proto.Meta\022\014\n\004vote\030\002 \001(\010\022 \n" +
-      "\004next\030\003 \001(\0132\022.proto.BlockHeader\"x\n\017block" +
-      "Statistics\022\014\n\004sign\030\002 \001(\003\022\020\n\010proposed\030\003 \001" +
-      "(\003\022\020\n\010verified\030\004 \001(\003\022\026\n\016channelDecided\030\005" +
-      " \001(\003\022\n\n\002pd\030\006 \001(\003\022\017\n\007decided\030\007 \001(\003\"\215\001\n\005Bl" +
-      "ock\022\"\n\006header\030\001 \001(\0132\022.proto.BlockHeader\022" +
-      "\032\n\002id\030\002 \001(\0132\016.proto.BlockID\022 \n\004data\030\003 \003(" +
-      "\0132\022.proto.Transaction\022\"\n\002st\030\004 \001(\0132\026.prot" +
-      "o.blockStatistics\"3\n\004Comm\022\017\n\007channel\030\001 \001" +
-      "(\005\022\032\n\004data\030\002 \001(\0132\014.proto.Block\"G\n\004txID\022\022" +
-      "\n\nproposerID\030\001 \001(\005\022\013\n\003bid\030\002 \001(\005\022\r\n\005txNum" +
-      "\030\003 \001(\005\022\017\n\007channel\030\004 \001(\005\"j\n\013Transaction\022\020" +
-      "\n\010clientID\030\001 \001(\005\022\027\n\002id\030\002 \001(\0132\013.proto.txI" +
-      "D\022\014\n\004data\030\003 \001(\014\022\020\n\010clientTs\030\004 \001(\003\022\020\n\010ser" +
-      "verTs\030\005 \001(\003\"7\n\010accepted\022\020\n\010accepted\030\001 \001(" +
-      "\010\022\031\n\004txID\030\002 \001(\0132\013.proto.txID\"N\n\010approved" +
-      "\022\036\n\002tx\030\001 \001(\0132\022.proto.Transaction\022\"\n\002st\030\003" +
-      " \001(\0132\026.proto.blockStatistics\"!\n\004read\022\031\n\004" +
-      "txID\030\001 \001(\0132\013.proto.txID\"S\n\tForkProof\022\016\n\006" +
-      "sender\030\001 \001(\005\022\032\n\004curr\030\002 \001(\0132\014.proto.Block" +
-      "\022\032\n\004prev\030\003 \001(\0132\014.proto.Block\";\n\005RBMsg\022\026\n" +
-      "\001m\030\001 \001(\0132\013.proto.Meta\022\014\n\004type\030\002 \001(\005\022\014\n\004d" +
-      "ata\030\003 \001(\014\"\007\n\005Empty\"$\n\006WrbReq\022\032\n\005_meta\030\001 " +
-      "\001(\0132\013.proto.Meta\"+\n\rWrbPreConsReq\022\032\n\005_me" +
-      "ta\030\001 \001(\0132\013.proto.Meta\"B\n\006WrbRes\022\026\n\001m\030\001 \001" +
-      "(\0132\013.proto.Meta\022 \n\004data\030\002 \001(\0132\022.proto.Bl" +
-      "ockHeader\"`\n\017subChainVersion\022\021\n\tforkPoin" +
-      "t\030\001 \001(\005\022\021\n\tsuggested\030\002 \001(\005\022\027\n\001v\030\003 \003(\0132\014." +
-      "proto.Block\022\016\n\006sender\030\004 \001(\005\",\n\007commReq\022!" +
-      "\n\005proof\030\001 \001(\0132\022.proto.BlockHeader\"\"\n\007com" +
-      "mRes\022\027\n\001b\030\001 \001(\0132\014.proto.BlockB\007\n\005protob\006" +
-      "proto3"
+      "D\022\013\n\003pid\030\001 \001(\005\022\013\n\003bid\030\002 \001(\005\"\207\001\n\013BlockHea" +
+      "der\022\026\n\001m\030\001 \001(\0132\013.proto.Meta\022\014\n\004prev\030\002 \001(" +
+      "\014\022\016\n\006height\030\003 \001(\005\022\027\n\017transactionHash\030\004 \001" +
+      "(\014\022\r\n\005proof\030\005 \001(\t\022\013\n\003bid\030\006 \001(\005\022\r\n\005empty\030" +
+      "\007 \001(\010\"P\n\006BbcMsg\022\026\n\001m\030\001 \001(\0132\013.proto.Meta\022" +
+      "\014\n\004vote\030\002 \001(\010\022 \n\004next\030\003 \001(\0132\022.proto.Bloc" +
+      "kHeader\"x\n\017blockStatistics\022\014\n\004sign\030\002 \001(\003" +
+      "\022\020\n\010proposed\030\003 \001(\003\022\020\n\010verified\030\004 \001(\003\022\026\n\016" +
+      "channelDecided\030\005 \001(\003\022\n\n\002pd\030\006 \001(\003\022\017\n\007deci" +
+      "ded\030\007 \001(\003\"\215\001\n\005Block\022\"\n\006header\030\001 \001(\0132\022.pr" +
+      "oto.BlockHeader\022\032\n\002id\030\002 \001(\0132\016.proto.Bloc" +
+      "kID\022 \n\004data\030\003 \003(\0132\022.proto.Transaction\022\"\n" +
+      "\002st\030\004 \001(\0132\026.proto.blockStatistics\"3\n\004Com" +
+      "m\022\017\n\007channel\030\001 \001(\005\022\032\n\004data\030\002 \001(\0132\014.proto" +
+      ".Block\"G\n\004txID\022\022\n\nproposerID\030\001 \001(\005\022\013\n\003bi" +
+      "d\030\002 \001(\005\022\r\n\005txNum\030\003 \001(\005\022\017\n\007channel\030\004 \001(\005\"" +
+      "j\n\013Transaction\022\020\n\010clientID\030\001 \001(\005\022\027\n\002id\030\002" +
+      " \001(\0132\013.proto.txID\022\014\n\004data\030\003 \001(\014\022\020\n\010clien" +
+      "tTs\030\004 \001(\003\022\020\n\010serverTs\030\005 \001(\003\"7\n\010accepted\022" +
+      "\020\n\010accepted\030\001 \001(\010\022\031\n\004txID\030\002 \001(\0132\013.proto." +
+      "txID\"N\n\010approved\022\036\n\002tx\030\001 \001(\0132\022.proto.Tra" +
+      "nsaction\022\"\n\002st\030\003 \001(\0132\026.proto.blockStatis" +
+      "tics\"!\n\004read\022\031\n\004txID\030\001 \001(\0132\013.proto.txID\"" +
+      "S\n\tForkProof\022\016\n\006sender\030\001 \001(\005\022\032\n\004curr\030\002 \001" +
+      "(\0132\014.proto.Block\022\032\n\004prev\030\003 \001(\0132\014.proto.B" +
+      "lock\";\n\005RBMsg\022\026\n\001m\030\001 \001(\0132\013.proto.Meta\022\014\n" +
+      "\004type\030\002 \001(\005\022\014\n\004data\030\003 \001(\014\"\007\n\005Empty\"$\n\006Wr" +
+      "bReq\022\032\n\005_meta\030\001 \001(\0132\013.proto.Meta\"+\n\rWrbP" +
+      "reConsReq\022\032\n\005_meta\030\001 \001(\0132\013.proto.Meta\"B\n" +
+      "\006WrbRes\022\026\n\001m\030\001 \001(\0132\013.proto.Meta\022 \n\004data\030" +
+      "\002 \001(\0132\022.proto.BlockHeader\"`\n\017subChainVer" +
+      "sion\022\021\n\tforkPoint\030\001 \001(\005\022\021\n\tsuggested\030\002 \001" +
+      "(\005\022\027\n\001v\030\003 \003(\0132\014.proto.Block\022\016\n\006sender\030\004 " +
+      "\001(\005\",\n\007commReq\022!\n\005proof\030\001 \001(\0132\022.proto.Bl" +
+      "ockHeader\"\"\n\007commRes\022\027\n\001b\030\001 \001(\0132\014.proto." +
+      "BlockB\007\n\005protob\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -16257,7 +16321,7 @@ public final class Types {
     internal_static_proto_BlockHeader_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_BlockHeader_descriptor,
-        new java.lang.String[] { "M", "Prev", "Height", "TransactionHash", "Proof", "Bid", });
+        new java.lang.String[] { "M", "Prev", "Height", "TransactionHash", "Proof", "Bid", "Empty", });
     internal_static_proto_BbcMsg_descriptor =
       getDescriptor().getMessageTypes().get(4);
     internal_static_proto_BbcMsg_fieldAccessorTable = new

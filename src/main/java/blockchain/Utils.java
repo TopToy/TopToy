@@ -12,6 +12,8 @@ import java.nio.file.Path;
 import java.util.Objects;
 
 public class Utils {
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Utils.class);
+
     public enum BCT {
         SGC,
     }
@@ -25,10 +27,13 @@ public class Utils {
     static public Types.BlockHeader createBlockHeader(Types.Block b, Types.BlockHeader header,
                                                          int creatorID, int height, int cidSeries, int cid,
                                                          int channel, int bid) {
+
         byte[] tHash = new byte[0];
         for (Types.Transaction t : b.getDataList()) {
             tHash = DigestMethod.hash(ArrayUtils.addAll(tHash, t.toByteArray()));
         }
+
+
         byte[] headerArray = new byte[0];
         if (header != null) {
             headerArray = header.toByteArray();
@@ -43,17 +48,17 @@ public class Utils {
                 .setBid(bid)
                 .setTransactionHash(ByteString.copyFrom(tHash))
                 .setPrev(ByteString.copyFrom(DigestMethod.hash(headerArray)))
+                .setEmpty(b.getDataCount() == 0)
                 .build();
 
-        if (creatorID == -1) {
-            return h;
-        }
+//        if (creatorID == -1) {
+//            return h;
+//        }
 
         String signature = blockDigSig.sign(h);
-        h.toBuilder()
+        return h.toBuilder()
                 .setProof(signature)
         .build();
-        return h;
     }
 
     static public boolean validateTransactionWRTBlock(Types.Block.Builder b, Types.Transaction tx, Validator v) {

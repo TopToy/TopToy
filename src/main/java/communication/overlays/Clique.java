@@ -143,6 +143,7 @@ public class Clique extends CommunicationGrpc.CommunicationImplBase implements C
 
     @Override
     public Types.Block recBlock(int channel, Types.BlockID bid, Types.BlockHeader proof) throws InterruptedException {
+        if (proof.getEmpty()) return Types.Block.getDefaultInstance();
         Types.Block res = getBlockFromData(channel, bid, proof);
         if (res != null) return res;
         broadcastCommReq(Types.commReq.newBuilder().setProof(proof).build());
@@ -190,9 +191,16 @@ public class Clique extends CommunicationGrpc.CommunicationImplBase implements C
 
     @Override
     public boolean contains(int channel, Types.BlockID bid, Types.BlockHeader proof) {
-        GlobalData.blocks[channel].computeIfPresent(bid, (k, v) -> v.stream().filter(b -> verfiyBlockWRTheader(b, proof))
-                .collect(Collectors.toCollection(LinkedList::new)));
-        return GlobalData.blocks[channel].get(bid).size() > 0;
+        if (proof.getEmpty()) return true;
+        GlobalData.blocks[channel].computeIfPresent(bid, (k, v) -> {
+            int bef = v.size();
+            v = v.stream().filter(b -> verfiyBlockWRTheader(b, proof))
+                    .collect(Collectors.toCollection(LinkedList::new));
+            logger.debug(format("[%d-%d] invalidate %d records [pid=%d ; bid=%d]", id, channel, bef - v.size(),
+                    bid.getPid(), bid.getBid()));
+            return v;
+        });
+        return GlobalData.blocks[channel].containsKey(bid) && GlobalData.blocks[channel].get(bid).size() > 0;
     }
 
     @Override

@@ -2,7 +2,6 @@ package servers;
 
 import blockchain.Blockchain;
 import blockchain.Utils;
-import blockchain.genesis.SGC;
 import communication.CommLayer;
 import config.Node;
 import das.RBroadcast.RBrodcastService;
@@ -10,7 +9,6 @@ import das.wrb.WrbNode;
 import java.util.ArrayList;
 import proto.Types.*;
 
-import static blockchain.Utils.createBlockHeader;
 import static blockchain.Utils.createBlockchain;
 import static java.lang.String.format;
 

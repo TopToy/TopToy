@@ -124,7 +124,7 @@ public class DBUtils {
     static public int getBlockRecord(int channel, int pid, int bid) {
         createReadConn(channel);
         try {
-            Statement stmt = wc.get(channel).createStatement();
+            Statement stmt = rc.get(channel).createStatement();
             ResultSet rs = stmt.executeQuery(format("SELECT height FROM %s WHERE pid=%d AND bid=%d",
                     getTableName(channel), pid, bid));
             if (!rs.next()) return -1;

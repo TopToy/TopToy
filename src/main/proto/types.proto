@@ -29,6 +29,7 @@ message BlockHeader {
     bytes transactionHash = 4;
     string proof = 5;
     int32 bid = 6;
+    bool empty = 7;
 }
 
 message BbcMsg {

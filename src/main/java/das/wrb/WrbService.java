@@ -663,7 +663,11 @@ public class WrbService extends WrbGrpc.WrbImplBase {
                     val.getM().getCid() != cid ||
                     val.getM().getChannel() != channel) return val;
             BlockID bid = BlockID.newBuilder().setPid(val.getM().getSender()).setBid(val.getBid()).build();
-            if (!comm.contains(channel, bid, val)) return val;
+            if (!comm.contains(channel, bid, val)) {
+                logger.debug(format("[#%d-C[%d]] comm does not contains the block itself (or it is invalid) [cidSeries=%d ; cid=%d ; bid=%d ; empty=%b]",
+                        id, channel, val.getM().getCidSeries(), val.getM().getCid(), bid.getBid(), val.getEmpty()));
+                return val;
+            }
                 bv.setVote(true);
             if (next != null) {
                 logger.debug(format("[#%d-C[%d]] broadcasts [cidSeries=%d ; cid=%d] via fast mode",

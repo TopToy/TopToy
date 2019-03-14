@@ -99,12 +99,13 @@ public abstract class ToyBaseServer extends Node {
                     blocksForPropose.wait();
                 }
                 b = blocksForPropose.poll();
-            }
-            synchronized (proposedBlocks) {
-                comm.broadcast(channel, b);
-                proposedBlocks.add(b);
+                synchronized (proposedBlocks) {
+                    comm.broadcast(channel, b);
+                    proposedBlocks.add(b);
 
+                }
             }
+
         }
     }
 
@@ -122,7 +123,7 @@ public abstract class ToyBaseServer extends Node {
         this.maxTransactionInBlock = maxTx;
         fp = new HashMap<>();
         initThreads();
-        this.configuredFastMode = fastMode;
+        this.configuredFastMode = n != 1 && fastMode;
         this.fastMode = fastMode;
         this.channel = channel;
         rmfServer = wrb;
@@ -150,7 +151,7 @@ public abstract class ToyBaseServer extends Node {
         this.maxTransactionInBlock = maxTx;
         fp = new HashMap<>();
         initThreads();
-        this.configuredFastMode = fastMode;
+        this.configuredFastMode = n != 1 && fastMode;
         this.fastMode = fastMode;
         currLeader = channel % n;
         if (testing) {
@@ -277,21 +278,19 @@ public abstract class ToyBaseServer extends Node {
 
     BlockHeader getHeaderForCurrentBlock(Types.BlockHeader prev,
                                          int height, int cidSeries, int cid) {
-        BlockHeader h;
-        synchronized (cbl) {
-            synchronized (blocksForPropose.element()) {
-                if (blocksForPropose.isEmpty()) {
-                    blocksForPropose.add(currBLock.build());
-                    currBLock = configureNewBlock();
-                }
-                Block b = blocksForPropose.element();
-                h = createBlockHeader(b, prev,getID(), height, cidSeries, cid, channel, b.getId().getBid());
-//                sealedBlock = blocksForPropose
-//                        .element()
-//                        .construct(getID(), currHeight, cidSeries, cid, channel, bc.getBlock(currHeight - 1).getHeader());
+        synchronized (proposedBlocks) {
+            if (proposedBlocks.isEmpty()) {
+                logger.debug(format("[#%d-C[%d]] header for an empty block [height=%d ; cidSeries=%d ; cid=%d] has been created",
+                        getID(), channel, height, cidSeries, cid));
+                return createBlockHeader(Block.getDefaultInstance(),
+                        prev, getID(), height, cidSeries, cid, channel, -1);
             }
+
+            Block b = proposedBlocks.element();
+            logger.debug(format("[#%d-C[%d]] header for [height=%d ; cidSeries=%d ; cid=%d ; bid=%d] has been created",
+                    getID(), channel, height, cidSeries, cid, b.getId().getBid()));
+            return createBlockHeader(b, prev, getID(), height, cidSeries, cid, channel, b.getId().getBid());
         }
-        return h;
     }
 
     private boolean mainLoop() {
@@ -345,7 +344,7 @@ public abstract class ToyBaseServer extends Node {
                         getID(), channel, currHeight, cidSeries, cid));
             }
             recBlock = recBlock.toBuilder().setHeader(recHeader).build();
-            if (currLeader == getID()) {
+            if (currLeader == getID() && !recHeader.getEmpty()) {
                 logger.debug(format("[#%d-C[%d]] nullifies currBlock [sender=%d] [height=%d] [cidSeries=%d, cid=%d]",
                         getID(), channel, recBlock.getHeader().getM().getSender(), currHeight, cidSeries, cid));
 //                synchronized (blocksForPropose) {
