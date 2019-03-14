@@ -294,6 +294,11 @@ public abstract class ToyBaseServer extends Node {
     }
 
     private boolean mainLoop() {
+        if (testing) {
+            for (int i = 0 ; i < 10 ; i++) {
+                addTransactionsToCurrBlock();
+            }
+        }
         while (!stopped.get()) {
             if (Thread.interrupted()) return true;
             checkSyncEvent();
