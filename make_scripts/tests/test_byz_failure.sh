@@ -56,4 +56,4 @@ run_channels2() {
 # run_channels 1 1 1 0 1000 1000 60 30
 # run_channels 1 1 1 0 1000 1000 60
 run_channels2 1 2 1 0 1000 1000 120 0
-run_channels2 1 2 1 0 1000 1000 120 5
+run_channels2 1 1 1 0 1000 1000 120 5

@@ -20,7 +20,7 @@ public class GlobalData {
 
     public static ConcurrentHashMap<Types.Meta, BbcDecData>[] bbcDec;
     public static ConcurrentHashMap<Types.Meta, Types.BlockHeader>[] pending;
-    public static ConcurrentHashMap<Types.Meta, Types.BlockHeader>[] received;
+//    public static ConcurrentHashMap<Types.Meta, Types.BlockHeader>[] received;
     public static ConcurrentHashMap<Types.Meta, VoteData>[] votes;
     public static Queue<Types.ForkProof>[] forksRBData;
     public static HashMap<Integer, List<Types.subChainVersion>>[] syncRBData;
@@ -28,17 +28,47 @@ public class GlobalData {
     public GlobalData(int channels) {
         bbcDec = new ConcurrentHashMap[channels];
         pending = new ConcurrentHashMap[channels];
-        received = new ConcurrentHashMap[channels];
+//        received = new ConcurrentHashMap[channels];
         votes = new ConcurrentHashMap[channels];
         forksRBData = new Queue[channels];
         syncRBData = new HashMap[channels];
         for (int i = 0 ; i < channels ; i++) {
             bbcDec[i] = new ConcurrentHashMap<>();
             pending[i] = new ConcurrentHashMap<>();
-            received[i] = new ConcurrentHashMap<>();
+//            received[i] = new ConcurrentHashMap<>();
             votes[i] = new ConcurrentHashMap<>();
             forksRBData[i] = new LinkedList<>();
             syncRBData[i] = new HashMap<>();
+        }
+    }
+
+    static public void evacuateOldData(int channel, Types.Meta key) {
+        bbcDec[channel].remove(key);
+        pending[channel].remove(key);
+        votes[channel].remove(key);
+    }
+
+    static public void evacuateOldData(int channel, int cidSeries, int cid) {
+        for (Types.Meta key : bbcDec[channel].keySet()) {
+            if (key.getCidSeries() < cidSeries)  {
+                bbcDec[channel].remove(key);
+                continue;
+            }
+            if (key.getCidSeries() == cidSeries && key.getCid() < cid) bbcDec[channel].remove(key);
+        }
+        for (Types.Meta key : pending[channel].keySet()) {
+            if (key.getCidSeries() < cidSeries)  {
+                pending[channel].remove(key);
+                continue;
+            }
+            if (key.getCidSeries() == cidSeries && key.getCid() < cid) pending[channel].remove(key);
+        }
+        for (Types.Meta key : votes[channel].keySet()) {
+            if (key.getCidSeries() < cidSeries)  {
+                votes[channel].remove(key);
+                continue;
+            }
+            if (key.getCidSeries() == cidSeries && key.getCid() < cid) votes[channel].remove(key);
         }
     }
 

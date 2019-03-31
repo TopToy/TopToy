@@ -10,8 +10,11 @@ import das.RBroadcast.RBrodcastService;
 import das.wrb.ByzantineWrbNode;
 import das.wrb.WrbNode;
 import proto.Types;
+
+import java.security.SecureRandom;
 import java.util.*;
 
+import static blockchain.Utils.createBlockHeader;
 import static blockchain.Utils.createBlockchain;
 import static java.lang.String.format;
 
@@ -21,10 +24,15 @@ public class ByzToyServer extends ToyBaseServer {
     private boolean fullByz = false;
     List<List<Integer>> groups = new ArrayList<>();
     private int delayTime;
+    final Queue<List<Types.Block>> byzProposed = new LinkedList<>();
 
     public ByzToyServer(String addr, int wrbPort, int id, int channel, int f, int maxTx, boolean fastMode,
                           WrbNode wrb, CommLayer comm, RBrodcastService rb) {
         super(addr, wrbPort, id, channel, f, maxTx, fastMode, wrb, comm, rb);
+        groups.add(new ArrayList<>());
+        for (int i = 0 ; i < n ; i++) {
+            groups.get(0).add(i); // At the beginning there is no byzantine behaviour
+        }
     }
 
 //    public ByzToyServer(String addr, int wrbPort, int commPort, int id, int channel, int f, int tmo, int tmoInterval,
@@ -42,144 +50,115 @@ public class ByzToyServer extends ToyBaseServer {
 //        }
 //    }
 
-    Types.BlockHeader leaderImpl() {
-        addTransactionsToCurrBlock();
-        if (!configuredFastMode) {
-            return normalLeaderPhase();
+    @Override
+    void commSendLogic() throws InterruptedException {
+        while (!stopped.get()) {
+            Thread.sleep(100);
+            synchronized (byzProposed) {
+                sendByzLogic();
+            }
+
+
         }
-        if (currHeight == 1 || !fastMode) {
-            normalLeaderPhase();
-        }
-        return fastModePhase();
     }
 
+    void sendByzLogic() {
+        ArrayList<Types.Block> byzs = new ArrayList<>();
+        for (List<Integer> g : groups) {
+            Types.Block byz = getByzBlock();
+            comm.send(channel, byz, g.stream().mapToInt(i->i).toArray());
+            byzs.add(byz);
+        }
+        byzProposed.add(byzs);
+    }
 
-    private Types.BlockHeader normalLeaderPhase() {
+//    Types.BlockHeader leaderImpl() {
+//        addTransactionsToCurrBlock();
+//        if (!configuredFastMode) {
+//            return normalLeaderPhase();
+//        }
+//        if (currHeight == 1 || !fastMode) {
+//            normalLeaderPhase();
+//        }
+//        return fastModePhase();
+//    }
+
+    Types.BlockHeader leaderImpl() throws InterruptedException {
         if (currLeader != getID()) {
             return null;
         }
-        logger.debug(format("[#%d -C[%d]] prepare to disseminate a new block header for [height=%d] [cidSeries=%d ; cid=%d]",
-                getID(), channel, currHeight, cidSeries, cid));
+        if (delayTime > 0) {
+            Random rand = new Random();
+            int x = rand.nextInt(delayTime);
+//            int x = maxTime;
+            logger.info(format("[#%d] sleeps for %d ms", getID(), x));
+            Thread.sleep(x);
+        }
+        synchronized (byzProposed) {
+            if (byzProposed.isEmpty()) {
+                sendByzLogic();
+            }
+            int i = 0;
+            for (List<Integer> g : groups) {
+                Types.Block byz = byzProposed.element().get(i);
+                i++;
+                wrbServer.sned(createBlockHeader(byz, bc.getBlock(currHeight - 1).getHeader(), getID(), currHeight,
+                        cidSeries, cid, channel, byz.getId().getBid()),  g.stream().mapToInt(j->j).toArray());
+            }
+        }
 
-        rmfServer.broadcast(getHeaderForCurrentBlock(bc.getBlock(currHeight - 1).getHeader(),
-                currHeight, cidSeries, cid));
         return null;
     }
 
-    Types.BlockHeader fastModePhase() {
-        if ((currLeader + 1) % n != getID()) {
-            return null;
+    @Override
+    void removeFromPendings(Types.BlockHeader recHeader, Types.Block recBlock) {
+        if (currLeader == getID() && !recHeader.getEmpty()) {
+            logger.debug(format("[#%d-C[%d]] nullifies currBlock [sender=%d] [height=%d] [cidSeries=%d, cid=%d]",
+                    getID(), channel, recBlock.getHeader().getM().getSender(), currHeight, cidSeries, cid));
+            synchronized (byzProposed) {
+                byzProposed.remove();
+            }
         }
-        logger.debug(format("[#%d-C[%d]] prepare fast mode phase for [height=%d] [cidSeries=%d ; cid=%d]",
-                getID(), channel, currHeight + 1, cidSeries, cid + 1));
-        return getHeaderForCurrentBlock(null, currHeight + 1, cidSeries, cid + 1);
     }
 
-    public void setByzSetting(boolean fullByz, List<List<Integer>> groups) {
-        if (!fullByz && groups.size() > 2) {
-            logger.debug("On non full byzantine behavior there is at most two send groups");
-            return;
-        }
-        this.fullByz = fullByz;
-        this.groups = groups;
 
+    public void setByzSetting(boolean fullByz, List<List<Integer>> groups) {
+        synchronized (byzProposed) {
+            if (!fullByz && groups.size() > 2) {
+                logger.debug("On non full byzantine behavior there is at most two send groups");
+                return;
+            }
+            this.fullByz = fullByz;
+            this.groups = groups;
+            while (byzProposed.poll() != null);
+        }
     }
 
     public void setAsyncParam(int maxTime) {
         this.delayTime = maxTime;
 
     }
-//
-//    private void addByzData() {
-//        SecureRandom random = new SecureRandom();
-//        byte[] byzTx = new byte[40];
-//        random.nextBytes(byzTx);
-//
-//        synchronized (blocksForPropose.element()) {
-//            int cbid = blocksForPropose.element().blockBuilder.getId().getBid();
-//            int txNum = blocksForPropose.element().getTransactionCount();
-//            Transaction t = Transaction.newBuilder()
-//                    .setClientID(-1)
-//                    .setId(Types.txID.newBuilder()
-//                            .setTxNum(txNum)
-//                            .setBid(cbid)
-//                            .setProposerID(getID())
-//                            .build())
-//                    .setData(ByteString.copyFrom(byzTx))
-//                    .build();
-//            blocksForPropose.element().addTransaction(t);
-//            if(blocksForPropose.element().getTransactionCount() > 1) {
-//                blocksForPropose.element().removeTransaction(0);
-//            }
-//        }
-////        Transaction t = Transaction.newBuilder()
-////                .setClientID(-1)
-////                .setId(Types.txID.newBuilder()
-////                        .setTxNum(txNum.getAndIncrement())
-////                        .setProposerID(getID())
-////                        .build())
-////                .setData(ByteString.copyFrom(byzTx))
-////                .build();
-////        currBlock.addTransaction(t);
-////        if (currBlock.getTransactionCount() > 1) {
-////            currBlock.removeTransaction(0);
-////        }
-//    }
-//
-//    Block leaderImpl() throws InterruptedException {
-//        if (currLeader != getID()) {
-//            return null;
-//        }
-//        if (delayTime > 0) {
-//            Random rand = new Random();
-//            int x = rand.nextInt(delayTime);
-////            int x = maxTime;
-//            logger.info(format("[#%d] sleeps for %d ms", getID(), x));
-//            Thread.sleep(x);
-//        }
-//        logger.debug(format("[#%d] prepare to disseminate a new block of [height=%d]", getID(), currHeight));
-//
-//    //        synchronized (blockLock) {
-//        addTransactionsToCurrBlock();
-//        Block sealedBlock1;
-//        Block byzBlock;
-//        List<Block> msgs = new ArrayList<>();
-////        List<Integer> heights = new ArrayList<>();
-//        synchronized (blocksForPropose.element()) {
-//            sealedBlock1 = blocksForPropose.element().construct(getID(), currHeight, cidSeries, cid,
-//                    channel, bc.getBlock(currHeight - 1).getHeader());
-//
-//            for (int i = 0 ; i < groups.size() ; i++) {
-//                addByzData();
-//                byzBlock = blocksForPropose.element()
-//                        .construct(getID(), currHeight, cidSeries, cid,
-//                        channel, bc.getBlock(currHeight - 1).getHeader());
-//                msgs.add(byzBlock);
-////                heights.add(currHeight);
-//            }
-//        }
-////        Block sealedBlock1 = currBlock.construct(getID(), currHeight, cidSeries, cid,
-////                channel, bc.getBlock(currHeight - 1).getHeader());
-////
-////        List<Block> msgs = new ArrayList<>();
-////        List<Integer> heights = new ArrayList<>();
-////        for (int i = 0 ; i < groups.size() ; i++) {
-////            addByzData();
-////            Block byzBlock = currBlock.construct(getID(), currHeight, cidSeries, cid,
-////                    channel, bc.getBlock(currHeight - 1).getHeader());
-////            msgs.add(byzBlock);
-////            heights.add(currHeight);
-////        }
-//
-//        if (fullByz) {
-//            ((ByzantineWrbNode)rmfServer).devidedBroadcast(msgs, groups);
-//
-//        } else {
-//            ((ByzantineWrbNode)rmfServer).broadcast(sealedBlock1);
-//        }
-//    //        }
-//     return null;
-//    }
+
+    Types.Block getByzBlock() {
+        SecureRandom random = new SecureRandom();
+        byte[] byzTx = new byte[40];
+        int bid = random.nextInt();
+        random.nextBytes(byzTx);
+        return Types.Block.newBuilder()
+                .setId(Types.BlockID.newBuilder()
+                        .setBid(bid)
+                        .setPid(getID())
+                        .build())
+                .addData(Types.Transaction.newBuilder()
+                        .setId(Types.txID.newBuilder()
+                                .setProposerID(getID())
+                                .setBid(bid)
+                                .setTxNum(1)
+                                .setChannel(channel))
+                        .setServerTs(System.currentTimeMillis())
+                        .build())
+                .build();
+    }
 
     @Override
     public Blockchain initBC(int id, int channel) {

@@ -12089,6 +12089,11 @@ public final class Types {
      * <code>.proto.Meta _meta = 1;</code>
      */
     proto.Types.MetaOrBuilder getMetaOrBuilder();
+
+    /**
+     * <code>int32 height = 2;</code>
+     */
+    int getHeight();
   }
   /**
    * Protobuf type {@code proto.WrbReq}
@@ -12103,6 +12108,7 @@ public final class Types {
       super(builder);
     }
     private WrbReq() {
+      height_ = 0;
     }
 
     @java.lang.Override
@@ -12147,6 +12153,11 @@ public final class Types {
                 Meta_ = subBuilder.buildPartial();
               }
 
+              break;
+            }
+            case 16: {
+
+              height_ = input.readInt32();
               break;
             }
           }
@@ -12194,6 +12205,15 @@ public final class Types {
       return getMeta();
     }
 
+    public static final int HEIGHT_FIELD_NUMBER = 2;
+    private int height_;
+    /**
+     * <code>int32 height = 2;</code>
+     */
+    public int getHeight() {
+      return height_;
+    }
+
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -12209,6 +12229,9 @@ public final class Types {
       if (Meta_ != null) {
         output.writeMessage(1, getMeta());
       }
+      if (height_ != 0) {
+        output.writeInt32(2, height_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -12220,6 +12243,10 @@ public final class Types {
       if (Meta_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(1, getMeta());
+      }
+      if (height_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(2, height_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -12242,6 +12269,8 @@ public final class Types {
         result = result && getMeta()
             .equals(other.getMeta());
       }
+      result = result && (getHeight()
+          == other.getHeight());
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -12257,6 +12286,8 @@ public final class Types {
         hash = (37 * hash) + _META_FIELD_NUMBER;
         hash = (53 * hash) + getMeta().hashCode();
       }
+      hash = (37 * hash) + HEIGHT_FIELD_NUMBER;
+      hash = (53 * hash) + getHeight();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -12392,6 +12423,8 @@ public final class Types {
           Meta_ = null;
           MetaBuilder_ = null;
         }
+        height_ = 0;
+
         return this;
       }
 
@@ -12419,6 +12452,7 @@ public final class Types {
         } else {
           result.Meta_ = MetaBuilder_.build();
         }
+        result.height_ = height_;
         onBuilt();
         return result;
       }
@@ -12462,6 +12496,9 @@ public final class Types {
         if (other == proto.Types.WrbReq.getDefaultInstance()) return this;
         if (other.hasMeta()) {
           mergeMeta(other.getMeta());
+        }
+        if (other.getHeight() != 0) {
+          setHeight(other.getHeight());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -12606,6 +12643,32 @@ public final class Types {
         }
         return MetaBuilder_;
       }
+
+      private int height_ ;
+      /**
+       * <code>int32 height = 2;</code>
+       */
+      public int getHeight() {
+        return height_;
+      }
+      /**
+       * <code>int32 height = 2;</code>
+       */
+      public Builder setHeight(int value) {
+        
+        height_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int32 height = 2;</code>
+       */
+      public Builder clearHeight() {
+        
+        height_ = 0;
+        onChanged();
+        return this;
+      }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFieldsProto3(unknownFields);
@@ -12671,6 +12734,11 @@ public final class Types {
      * <code>.proto.Meta _meta = 1;</code>
      */
     proto.Types.MetaOrBuilder getMetaOrBuilder();
+
+    /**
+     * <code>int32 height = 2;</code>
+     */
+    int getHeight();
   }
   /**
    * Protobuf type {@code proto.WrbPreConsReq}
@@ -12685,6 +12753,7 @@ public final class Types {
       super(builder);
     }
     private WrbPreConsReq() {
+      height_ = 0;
     }
 
     @java.lang.Override
@@ -12729,6 +12798,11 @@ public final class Types {
                 Meta_ = subBuilder.buildPartial();
               }
 
+              break;
+            }
+            case 16: {
+
+              height_ = input.readInt32();
               break;
             }
           }
@@ -12776,6 +12850,15 @@ public final class Types {
       return getMeta();
     }
 
+    public static final int HEIGHT_FIELD_NUMBER = 2;
+    private int height_;
+    /**
+     * <code>int32 height = 2;</code>
+     */
+    public int getHeight() {
+      return height_;
+    }
+
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -12791,6 +12874,9 @@ public final class Types {
       if (Meta_ != null) {
         output.writeMessage(1, getMeta());
       }
+      if (height_ != 0) {
+        output.writeInt32(2, height_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -12802,6 +12888,10 @@ public final class Types {
       if (Meta_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(1, getMeta());
+      }
+      if (height_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(2, height_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -12824,6 +12914,8 @@ public final class Types {
         result = result && getMeta()
             .equals(other.getMeta());
       }
+      result = result && (getHeight()
+          == other.getHeight());
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -12839,6 +12931,8 @@ public final class Types {
         hash = (37 * hash) + _META_FIELD_NUMBER;
         hash = (53 * hash) + getMeta().hashCode();
       }
+      hash = (37 * hash) + HEIGHT_FIELD_NUMBER;
+      hash = (53 * hash) + getHeight();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -12974,6 +13068,8 @@ public final class Types {
           Meta_ = null;
           MetaBuilder_ = null;
         }
+        height_ = 0;
+
         return this;
       }
 
@@ -13001,6 +13097,7 @@ public final class Types {
         } else {
           result.Meta_ = MetaBuilder_.build();
         }
+        result.height_ = height_;
         onBuilt();
         return result;
       }
@@ -13044,6 +13141,9 @@ public final class Types {
         if (other == proto.Types.WrbPreConsReq.getDefaultInstance()) return this;
         if (other.hasMeta()) {
           mergeMeta(other.getMeta());
+        }
+        if (other.getHeight() != 0) {
+          setHeight(other.getHeight());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -13187,6 +13287,32 @@ public final class Types {
           Meta_ = null;
         }
         return MetaBuilder_;
+      }
+
+      private int height_ ;
+      /**
+       * <code>int32 height = 2;</code>
+       */
+      public int getHeight() {
+        return height_;
+      }
+      /**
+       * <code>int32 height = 2;</code>
+       */
+      public Builder setHeight(int value) {
+        
+        height_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int32 height = 2;</code>
+       */
+      public Builder clearHeight() {
+        
+        height_ = 0;
+        onChanged();
+        return this;
       }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -16275,16 +16401,17 @@ public final class Types {
       "S\n\tForkProof\022\016\n\006sender\030\001 \001(\005\022\032\n\004curr\030\002 \001" +
       "(\0132\014.proto.Block\022\032\n\004prev\030\003 \001(\0132\014.proto.B" +
       "lock\";\n\005RBMsg\022\026\n\001m\030\001 \001(\0132\013.proto.Meta\022\014\n" +
-      "\004type\030\002 \001(\005\022\014\n\004data\030\003 \001(\014\"\007\n\005Empty\"$\n\006Wr" +
-      "bReq\022\032\n\005_meta\030\001 \001(\0132\013.proto.Meta\"+\n\rWrbP" +
-      "reConsReq\022\032\n\005_meta\030\001 \001(\0132\013.proto.Meta\"B\n" +
-      "\006WrbRes\022\026\n\001m\030\001 \001(\0132\013.proto.Meta\022 \n\004data\030" +
-      "\002 \001(\0132\022.proto.BlockHeader\"`\n\017subChainVer" +
-      "sion\022\021\n\tforkPoint\030\001 \001(\005\022\021\n\tsuggested\030\002 \001" +
-      "(\005\022\027\n\001v\030\003 \003(\0132\014.proto.Block\022\016\n\006sender\030\004 " +
-      "\001(\005\",\n\007commReq\022!\n\005proof\030\001 \001(\0132\022.proto.Bl" +
-      "ockHeader\"\"\n\007commRes\022\027\n\001b\030\001 \001(\0132\014.proto." +
-      "BlockB\007\n\005protob\006proto3"
+      "\004type\030\002 \001(\005\022\014\n\004data\030\003 \001(\014\"\007\n\005Empty\"4\n\006Wr" +
+      "bReq\022\032\n\005_meta\030\001 \001(\0132\013.proto.Meta\022\016\n\006heig" +
+      "ht\030\002 \001(\005\";\n\rWrbPreConsReq\022\032\n\005_meta\030\001 \001(\013" +
+      "2\013.proto.Meta\022\016\n\006height\030\002 \001(\005\"B\n\006WrbRes\022" +
+      "\026\n\001m\030\001 \001(\0132\013.proto.Meta\022 \n\004data\030\002 \001(\0132\022." +
+      "proto.BlockHeader\"`\n\017subChainVersion\022\021\n\t" +
+      "forkPoint\030\001 \001(\005\022\021\n\tsuggested\030\002 \001(\005\022\027\n\001v\030" +
+      "\003 \003(\0132\014.proto.Block\022\016\n\006sender\030\004 \001(\005\",\n\007c" +
+      "ommReq\022!\n\005proof\030\001 \001(\0132\022.proto.BlockHeade" +
+      "r\"\"\n\007commRes\022\027\n\001b\030\001 \001(\0132\014.proto.BlockB\007\n" +
+      "\005protob\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -16399,13 +16526,13 @@ public final class Types {
     internal_static_proto_WrbReq_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_WrbReq_descriptor,
-        new java.lang.String[] { "Meta", });
+        new java.lang.String[] { "Meta", "Height", });
     internal_static_proto_WrbPreConsReq_descriptor =
       getDescriptor().getMessageTypes().get(17);
     internal_static_proto_WrbPreConsReq_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_WrbPreConsReq_descriptor,
-        new java.lang.String[] { "Meta", });
+        new java.lang.String[] { "Meta", "Height", });
     internal_static_proto_WrbRes_descriptor =
       getDescriptor().getMessageTypes().get(18);
     internal_static_proto_WrbRes_fieldAccessorTable = new

@@ -1,5 +1,6 @@
 package das.wrb;
 
+import blockchain.Blockchain;
 import communication.CommLayer;
 import communication.data.GlobalData;
 import config.Node;
@@ -7,6 +8,7 @@ import proto.Types;
 //import crypto.rmfDigSig;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import static crypto.blockDigSig.verfiyBlockWRTheader;
 import static java.lang.String.format;
@@ -17,13 +19,17 @@ public class WrbNode extends Node{
 //    protected AtomicBoolean stopped = new AtomicBoolean(false);
     WrbService wrbService;
 
-    public WrbNode(int channels, int id, String addr, int rmfPort, int f , int tmo, int tmoInterval, ArrayList<Node> nodes, String bbcConfig,
-                   String serverCrt, String serverPrivKey, String caRoot, CommLayer comm) {
+    public WrbNode(int channels, int id, String addr, int rmfPort, int f , int tmo, int tmoInterval,
+                   ArrayList<Node> nodes, String bbcConfig, String serverCrt, String serverPrivKey,
+                   String caRoot, CommLayer comm) {
         super(addr, rmfPort,  id);
-        wrbService = new WrbService(channels, id, f, tmo, tmoInterval, nodes, bbcConfig, serverCrt, serverPrivKey, caRoot, comm);
+        wrbService = new WrbService(channels, id, f, tmo, tmoInterval, nodes,
+                bbcConfig, serverCrt, serverPrivKey, caRoot, comm);
     }
 
-
+    public void setBcForChannel(int channel, Blockchain bc) {
+        wrbService.setBcForChannel(channel, bc);
+    }
     public void stop() {
         if (wrbService != null)
             wrbService.shutdown();
@@ -39,6 +45,14 @@ public class WrbNode extends Node{
         logger.debug(format("[#%d] broadcasts data message with [height=%d]", getID(), data.getHeight()));
 
         wrbService.wrbBroadcast(data);
+    }
+
+    // meant for Byzantine activity tests
+    public void sned(Types.BlockHeader data, int[] recipients) {
+        logger.debug(format("[#%d] send data message with [height=%d] to [%s]",
+                getID(), data.getHeight(), Arrays.toString(recipients)));
+
+        wrbService.wrbSend(data, recipients);
     }
 
     public Types.BlockHeader deliver(int channel, int cidSeries, int cid, int height, int sender, Types.BlockHeader msg)

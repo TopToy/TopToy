@@ -136,4 +136,8 @@ public class Blockchain {
 
     }
 
+    public boolean contains(int height) {
+        return height <= getHeight();
+    }
+
 }

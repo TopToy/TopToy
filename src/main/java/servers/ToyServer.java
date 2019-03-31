@@ -49,7 +49,7 @@ public class ToyServer extends ToyBaseServer {
         logger.debug(format("[#%d -C[%d]] prepare to disseminate a new block header for [height=%d] [cidSeries=%d ; cid=%d]",
                 getID(), channel, currHeight, cidSeries, cid));
 
-        rmfServer.broadcast(getHeaderForCurrentBlock(bc.getBlock(currHeight - 1).getHeader(),
+        wrbServer.broadcast(getHeaderForCurrentBlock(bc.getBlock(currHeight - 1).getHeader(),
                 currHeight, cidSeries, cid));
         return null;
     }

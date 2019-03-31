@@ -1,5 +1,6 @@
 package das.wrb;
 
+import blockchain.Blockchain;
 import communication.CommLayer;
 import config.Node;
 import proto.Types;
@@ -10,9 +11,11 @@ public class ByzantineWrbNode extends WrbNode {
 //    private boolean stopped = false;
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ByzantineWrbNode.class);
 
-    public ByzantineWrbNode(int channels, int id, String addr, int rmfPort, int f, int tmo, int tmoInterval, ArrayList<Node> nodes,
-                            String bbcConfig, String serverCrt, String serverPrivKey, String caRoot, CommLayer comm) {
-        super(channels, id, addr, rmfPort, f, tmo, tmoInterval, nodes, bbcConfig, serverCrt, serverPrivKey, caRoot, comm);
+    public ByzantineWrbNode(int channels, int id, String addr, int rmfPort, int f, int tmo, int tmoInterval,
+                            ArrayList<Node> nodes, String bbcConfig, String serverCrt,
+                            String serverPrivKey, String caRoot, CommLayer comm) {
+        super(channels, id, addr, rmfPort, f, tmo, tmoInterval, nodes,
+                bbcConfig, serverCrt, serverPrivKey, caRoot, comm);
     }
 
     public void selectiveBroadcast(Types.BlockHeader msg, List<Integer> ids) {

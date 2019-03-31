@@ -108,6 +108,35 @@ public class Clique extends CommunicationGrpc.CommunicationImplBase implements C
 
     }
 
+
+
+    // Meant to test Byzantine activity
+
+    @Override
+    public void send(int channel, Types.Block data, int[] recipients) {
+        for (int i : recipients) {
+            peers.get(i).stub.dsm(Types.Comm.newBuilder()
+                    .setChannel(channel)
+                    .setData(data)
+                    .build(), new StreamObserver<Types.Empty>() {
+                @Override
+                public void onNext(Types.Empty empty) {
+
+                }
+
+                @Override
+                public void onError(Throwable throwable) {
+
+                }
+
+                @Override
+                public void onCompleted() {
+
+                }
+            });
+        }
+    }
+
     @Override
     public void reqBlock(proto.Types.commReq request,
                          io.grpc.stub.StreamObserver<proto.Types.commRes> responseObserver) {

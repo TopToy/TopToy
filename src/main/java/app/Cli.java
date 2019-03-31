@@ -572,51 +572,7 @@ public class Cli {
                 e.printStackTrace();
             }
         }
-//        private void runBenchMark(int tSize, int tNumber, String csvPath) throws InterruptedException {
-//
-//            Thread.sleep(15 * 1000);
-//            logger.info(format("[#%d] start serving...", JToy.s.getID()));
-//            serve();
-////            Thread.sleep(10 * 1000);
-////            loadServer(tSize);
-//            Thread.sleep(60 * 1 * 1000);
-//            JToy.s.shutdown();
-////            writeToScv(csvPath);
-//            writeSummery(csvPath);
-//
-////            System.exit(0);
-//        }
-//        private void loadServer(int tSize) throws InterruptedException {
-//            Random rand = new Random();
-//            long tts = System.currentTimeMillis();
-//            int bareTxSize = Types.Transaction.newBuilder()
-//                    .setClientID(0)
-//                    .setId(Types.txID.newBuilder().setTxID(UUID.randomUUID().toString()).build())
-//                    .setClientTs(tts)
-//                    .setServerTs(tts)
-//                    .build().getSerializedSize();
-//            int txSize = max(0, tSize - bareTxSize);
-//            AtomicBoolean stopped = new AtomicBoolean(false);
-//            int clients = 2;
-//            ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(clients);
-//            for (int i = 0 ; i < clients ;i++) {
-//                int finalI = i;
-//                executor.submit( () -> {
-//                    while (!stopped.get()) {
-//                        int cID = rand.nextInt(finalI);
-////                        byte[] ts = Longs.toByteArray(System.currentTimeMillis());
-//                        SecureRandom random = new SecureRandom();
-//                        byte[] tx = new byte[txSize];
-//                        random.nextBytes(tx);
-//                        JToy.s.addTransaction(tx, cID);
-//                    }
-//                });
-//            }
-//            Thread.sleep(60 * 1* 1000);
-//            stopped.set(true);
-//            Thread.sleep(2* 1000);
-//            executor.shutdownNow();
-//        }
+
         private void setByzSetting(String[] args) {
             System.out.println("Setting byz");
             boolean fullByz = Integer.parseInt(args[1]) == 1;

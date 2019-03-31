@@ -33,7 +33,7 @@ import proto.Types.*;
 public abstract class ToyBaseServer extends Node {
 
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ToyBaseServer.class);
-    WrbNode rmfServer;
+    WrbNode wrbServer;
     private RBrodcastService RBService;
     final Blockchain bc;
     int currHeight;
@@ -70,7 +70,7 @@ public abstract class ToyBaseServer extends Node {
     final Object cbl = new Object();
     private CacheUtils txCache = new CacheUtils(0);
     private boolean intCatched = false;
-    private CommLayer comm;
+    CommLayer comm;
     private Validator v = new Tvalidator();
 
     void initThreads() {
@@ -126,12 +126,13 @@ public abstract class ToyBaseServer extends Node {
         this.configuredFastMode = n != 1 && fastMode;
         this.fastMode = fastMode;
         this.channel = channel;
-        rmfServer = wrb;
+        wrbServer = wrb;
         currLeader = channel % n;
         if (testing) {
             txSize = StrictMath.max(0, Config.getTxSize() - bareTxSize);
         }
         currBLock = configureNewBlock();
+        wrbServer.setBcForChannel(channel, bc);
     }
 
     public ToyBaseServer(String addr, int wrbPort, int commPort, int id, int channel, int f, int tmo, int tmoInterval,
@@ -142,8 +143,7 @@ public abstract class ToyBaseServer extends Node {
         this.f = f;
         this.n = 3*f + 1;
         comm = new Clique(id, addr, commPort, 1, commCluster);
-        rmfServer = new WrbNode(1, id, addr, wrbPort, f, tmo, tmoInterval,
-                wrbCluster, bbcConfig, serverCrt, serverPrivKey, caRoot, comm);
+
         RBService = new RBrodcastService(id, n, f, rbConfigPath);
         bc = initBC(id, channel);
         currHeight = 1; // starts from 1 due to the genesis BaseBlock
@@ -157,7 +157,11 @@ public abstract class ToyBaseServer extends Node {
         if (testing) {
             txSize = StrictMath.max(0, Config.getTxSize() - bareTxSize);
         }
+
+        wrbServer = new WrbNode(1, id, addr, wrbPort, f, tmo, tmoInterval,
+                wrbCluster, bbcConfig, serverCrt, serverPrivKey, caRoot, comm);
         currBLock = configureNewBlock();
+        wrbServer.setBcForChannel(channel, bc);
 
     }
 
@@ -170,7 +174,7 @@ public abstract class ToyBaseServer extends Node {
         if (!group) {
             comm.join();
             logger.debug(format("[#%d-C[%d]] joined to layout", getID(), channel));
-            rmfServer.start();
+            wrbServer.start();
             logger.debug(format("[#%d-C[%d]] wrb server is up", getID(), channel));
             RBService.start();
             logger.debug(format("[#%d-C[%d]] RB service is up", getID(), channel));
@@ -219,7 +223,7 @@ public abstract class ToyBaseServer extends Node {
 
 
         if (!group) {
-            if (rmfServer != null) rmfServer.stop();
+            if (wrbServer != null) wrbServer.stop();
             if (comm != null) comm.leave();
             if (RBService != null) RBService.shutdown();
         }
@@ -322,7 +326,7 @@ public abstract class ToyBaseServer extends Node {
 
             try {
                 long startTime = System.currentTimeMillis();
-                recHeader = rmfServer.deliver(channel, cidSeries, cid, currHeight, currLeader, next);
+                recHeader = wrbServer.deliver(channel, cidSeries, cid, currHeight, currLeader, next);
                 logger.debug(format("[#%d-C[%d]] deliver took about [%d] ms [cidSeries=%d ; cid=%d]",
                         getID(), channel, System.currentTimeMillis() - startTime, cidSeries, cid));
 
@@ -349,16 +353,17 @@ public abstract class ToyBaseServer extends Node {
                         getID(), channel, currHeight, cidSeries, cid));
             }
             recBlock = recBlock.toBuilder().setHeader(recHeader).build();
-            if (currLeader == getID() && !recHeader.getEmpty()) {
-                logger.debug(format("[#%d-C[%d]] nullifies currBlock [sender=%d] [height=%d] [cidSeries=%d, cid=%d]",
-                        getID(), channel, recBlock.getHeader().getM().getSender(), currHeight, cidSeries, cid));
-//                synchronized (blocksForPropose) {
-//                    blocksForPropose.remove();
+            removeFromPendings(recHeader, recBlock);
+//            if (currLeader == getID() && !recHeader.getEmpty()) {
+//                logger.debug(format("[#%d-C[%d]] nullifies currBlock [sender=%d] [height=%d] [cidSeries=%d, cid=%d]",
+//                        getID(), channel, recBlock.getHeader().getM().getSender(), currHeight, cidSeries, cid));
+////                synchronized (blocksForPropose) {
+////                    blocksForPropose.remove();
+////                }
+//                synchronized (proposedBlocks) {
+//                    proposedBlocks.remove();
 //                }
-                synchronized (proposedBlocks) {
-                    proposedBlocks.remove();
-                }
-            }
+//            }
             if (!bc.validateBlockHash(recBlock)) {
                 announceFork(recBlock);
                 fastMode = false;
@@ -375,7 +380,10 @@ public abstract class ToyBaseServer extends Node {
 
                 bc.addBlock(recBlock);
 
-
+                GlobalData.evacuateOldData(channel, recBlock.getHeader().getM());
+                if (currHeight % 1000 == 0) {
+                    GlobalData.evacuateOldData(channel, cidSeries, cid);
+                }
                 if (recBlock.getHeader().getHeight() - (f + 2) > 0) {
                     Block permanent = bc.getBlock(recBlock.getHeader().getHeight() - (f + 2));
                     permanent = permanent.toBuilder().setSt(permanent.getSt().toBuilder().setPd(System.currentTimeMillis())).build();
@@ -404,6 +412,19 @@ public abstract class ToyBaseServer extends Node {
             storageWorker.execute(bc::writeNextToDisk);
         }
         return false;
+    }
+
+    void removeFromPendings(BlockHeader recHeader, Block recBlock) {
+        if (currLeader == getID() && !recHeader.getEmpty()) {
+            logger.debug(format("[#%d-C[%d]] nullifies currBlock [sender=%d] [height=%d] [cidSeries=%d, cid=%d]",
+                    getID(), channel, recBlock.getHeader().getM().getSender(), currHeight, cidSeries, cid));
+//                synchronized (blocksForPropose) {
+//                    blocksForPropose.remove();
+//                }
+            synchronized (proposedBlocks) {
+                proposedBlocks.remove();
+            }
+        }
     }
 
     abstract BlockHeader leaderImpl() throws InterruptedException;

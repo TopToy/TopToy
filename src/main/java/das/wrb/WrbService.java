@@ -1,5 +1,6 @@
 package das.wrb;
 
+import blockchain.Blockchain;
 import com.google.protobuf.ByteString;
 import communication.CommLayer;
 import config.Config;
@@ -129,10 +130,11 @@ public class WrbService extends WrbGrpc.WrbImplBase {
     private AtomicInteger totalDeliveredTries = new AtomicInteger(0);
     private AtomicInteger optimialDec = new AtomicInteger(0);
     CommLayer comm;
+    Blockchain[] bcs;
 
 
-    public WrbService(int channels, int id, int f, int tmo, int tmoInterval, ArrayList<Node> nodes, String bbcConfig,
-                      String serverCrt, String serverPrivKey, String caRoot, CommLayer comm) {
+    public WrbService(int channels, int id, int f, int tmo, int tmoInterval, ArrayList<Node> nodes,
+                      String bbcConfig, String serverCrt, String serverPrivKey, String caRoot, CommLayer comm) {
         this.channels = channels;
         this.tmo = tmo;
         this.tmoInterval = tmoInterval;
@@ -150,6 +152,7 @@ public class WrbService extends WrbGrpc.WrbImplBase {
         this.msgNotifyer = new Object[channels];
         this.preConsNotifyer = new Object[channels];
         this.comm = comm;
+        this.bcs = new Blockchain[channels];
         for (int i = 0 ; i < channels ; i++) {
             fastVoteNotifyer[i] = new Object();
             msgNotifyer[i] = new Object();
@@ -158,10 +161,13 @@ public class WrbService extends WrbGrpc.WrbImplBase {
             preConsVote[i] = new ConcurrentHashMap<>();
             preConsDone[i] = new ArrayList<>();
             this.currentTmo[i] = tmo;
-
         }
         new GlobalData(channels);
         startGrpcServer(serverCrt, serverPrivKey, caRoot);
+    }
+
+    public void setBcForChannel(int channel, Blockchain bc) {
+        this.bcs[channel] = bc;
     }
 
 
@@ -299,8 +305,7 @@ public class WrbService extends WrbGrpc.WrbImplBase {
                         res.getData().getM().getCidSeries() == cidSeries
                         && res.getM().getChannel() == channel &&
                         res.getData().getM().getChannel() == channel) {
-                    if (GlobalData.received[channel].containsKey(key) ||
-                            GlobalData.pending[channel].containsKey(key)) return;
+                    if (GlobalData.pending[channel].containsKey(key) || bcs[channel].contains(req.getHeight())) return;
                     if (!blockDigSig.verifyHeader(sender, res.getData())) {
                         logger.debug(format("[#%d-C[%d]] has received invalid response message from [#%d] for [cidSeries=%d ; cid=%d]",
                                 id, channel, res.getM().getSender(), cidSeries, cid));
@@ -327,7 +332,7 @@ public class WrbService extends WrbGrpc.WrbImplBase {
         });
     }
 
-    private void sendPreConsReqMessage(WrbGrpc.WrbStub stub, WrbPreConsReq req, int channel, int cidSeries, int cid, int sender, int height) {
+    private void sendPreConsReqMessage(WrbGrpc.WrbStub stub, WrbPreConsReq req, int channel, int cidSeries, int cid, int sender) {
         stub.preConsReqMessage(req, new StreamObserver<WrbRes>() {
             @Override
             public void onNext(WrbRes res) {
@@ -358,7 +363,7 @@ public class WrbService extends WrbGrpc.WrbImplBase {
                             return val;
                         }
                         if (!GlobalData.pending[channel].containsKey(key) &&
-                                !GlobalData.received[channel].containsKey(key)) {
+                                !bcs[channel].contains(req.getHeight())) {
                             logger.debug(format("[#%d-C[%d]] has pre das received message from [#%d] for [cidSeries=%d ; cid=%d]",
                                     id, channel, res.getM().getSender(), cidSeries, cid));
                             GlobalData.pending[channel].putIfAbsent(key, res.getData());
@@ -397,20 +402,20 @@ public class WrbService extends WrbGrpc.WrbImplBase {
     }
 
     private void broadcastReqMsg(WrbReq req, int channel, int cidSeries, int cid, int sender) {
-        logger.debug(format("[#%d-C[%d]] broadcasts request message [cidSeries=%d ; cid=%d]", id,
-                req.getMeta().getChannel(), cidSeries, cid));
+        logger.debug(format("[#%d-C[%d]] broadcasts request message [cidSeries=%d ; cid=%d; height=%d]", id,
+                req.getMeta().getChannel(), cidSeries, cid, req.getHeight()));
         for (int p : peers.keySet()) {
             if (p == id) continue;
             sendReqMessage(peers.get(p).stub, req, channel, cidSeries, cid, sender);
         }
     }
 
-    private void broadcastPreConsReqMsg(WrbPreConsReq req, int channel, int cidSeries, int cid, int sender, int height) {
-        logger.debug(format("[#%d-C[%d]] broadcasts pre cons request message [cidSeries=%d ; cid=%d]", id,
-                req.getMeta().getChannel(), cidSeries, cid));
+    private void broadcastPreConsReqMsg(WrbPreConsReq req, int channel, int cidSeries, int cid, int sender) {
+        logger.debug(format("[#%d-C[%d]] broadcasts pre cons request message [cidSeries=%d ; cid=%d ; height=%d]", id,
+                req.getMeta().getChannel(), cidSeries, cid, req.getHeight()));
         for (int p : peers.keySet()) {
 //            if (p == id) continue;
-            sendPreConsReqMessage(peers.get(p).stub, req, channel, cidSeries, cid, sender, height);
+            sendPreConsReqMessage(peers.get(p).stub, req, channel, cidSeries, cid, sender);
         }
     }
 
@@ -420,6 +425,12 @@ public class WrbService extends WrbGrpc.WrbImplBase {
         }
     }
 
+    void wrbSend(BlockHeader msg, int[] recipients) {
+        for (int i : recipients) {
+            sendDataMessage(peers.get(i).stub, msg);
+        }
+
+    }
     void wrbBroadcast(BlockHeader msg) {
         for (peer p : peers.values()) {
             sendDataMessage(p.stub, msg);
@@ -436,7 +447,7 @@ public class WrbService extends WrbGrpc.WrbImplBase {
                 .setCidSeries(cidSeries)
                 .setCid(cid)
                 .build();
-        if (GlobalData.received[channel].containsKey(key)) return;
+        if (bcs[channel].contains(request.getHeight())) return;
         synchronized (msgNotifyer[channel]) {
             GlobalData.pending[channel].putIfAbsent(key, request);
             msgNotifyer[channel].notify();
@@ -551,9 +562,9 @@ public class WrbService extends WrbGrpc.WrbImplBase {
                 .setCidSeries(cidSeries)
                 .setCid(cid)
                 .build();
-        msg = GlobalData.received[channel].get(key);
-        if (msg == null) {
-            msg = GlobalData.pending[channel].get(key);
+        msg = GlobalData.pending[channel].get(key);
+        if (msg == null && bcs[channel].contains(request.getHeight())) {
+            msg = bcs[channel].getBlock(request.getHeight()).getHeader();
         }
         if (msg != null) {
             logger.debug(format("[#%d-C[%d]] has received request message from [#%d] of [cidSeries=%d ; cid=%d]",
@@ -585,9 +596,9 @@ public class WrbService extends WrbGrpc.WrbImplBase {
                 .setCidSeries(cidSeries)
                 .setCid(cid)
                 .build();
-        msg = GlobalData.received[channel].get(key);
-        if (msg == null) {
-            msg = GlobalData.pending[channel].get(key);
+        msg = GlobalData.pending[channel].get(key);
+        if (msg == null && bcs[channel].contains(request.getHeight())) {
+            msg = bcs[channel].getBlock(request.getHeight()).getHeader();
         }
         if (msg == null) {
             msg = BlockHeader.getDefaultInstance();
@@ -787,8 +798,9 @@ public class WrbService extends WrbGrpc.WrbImplBase {
                         .setCid(cid)
                         .setSender(id)
                         .build())
+                .setHeight(height)
                 .build();
-        broadcastPreConsReqMsg(req, channel, cidSeries, cid, sender, height);
+        broadcastPreConsReqMsg(req, channel, cidSeries, cid, sender);
         synchronized (preConsNotifyer[channel]) {
             while (!preConsDone[channel].contains(key)) {
                 preConsNotifyer[channel].wait();
@@ -880,14 +892,14 @@ public class WrbService extends WrbGrpc.WrbImplBase {
     }
 
     private BlockHeader postDeliverLogic(Meta key, int channel, int cidSeries, int cid, int sender, int height) throws InterruptedException {
-        requestData(channel, cidSeries, cid, sender);
+        requestData(channel, cidSeries, cid, sender, height);
         BlockHeader msg = GlobalData.pending[channel].get(key);
-        GlobalData.pending[channel].remove(key);
-        GlobalData.received[channel].put(key, msg);
+//        GlobalData.pending[channel].remove(key);
+//        GlobalData.received[channel].put(key, msg);
         return msg;
     }
 
-    private void requestData(int channel, int cidSeries, int cid, int sender) throws InterruptedException {
+    private void requestData(int channel, int cidSeries, int cid, int sender, int height) throws InterruptedException {
         Meta key = Meta.newBuilder()
                 .setChannel(channel)
                 .setCidSeries(cidSeries)
@@ -901,7 +913,10 @@ public class WrbService extends WrbGrpc.WrbImplBase {
                 setChannel(channel)
                 .setSender(id).
                 build();
-        WrbReq req = WrbReq.newBuilder().setMeta(meta).build();
+        WrbReq req = WrbReq.newBuilder()
+                .setMeta(meta)
+                .setHeight(height)
+                .build();
         broadcastReqMsg(req,channel, cidSeries, cid, sender);
         synchronized (msgNotifyer[channel]) {
             while (!GlobalData.pending[channel].containsKey(key)) {
