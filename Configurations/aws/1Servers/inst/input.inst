@@ -1,1 +1,5 @@
-sigTest -p /tmp/JToy/res/
+init
+serve
+wait 60
+stop
+quit

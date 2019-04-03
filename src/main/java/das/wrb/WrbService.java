@@ -438,6 +438,7 @@ public class WrbService extends WrbGrpc.WrbImplBase {
     }
     private void addToPendings(BlockHeader request) {
         int sender = request.getM().getSender();
+        // I think we don't need to verify the block (if we use reliable channels)
         if (!blockDigSig.verifyHeader(sender, request)) return;
         int cid = request.getM().getCid();
         int channel = request.getM().getChannel();
