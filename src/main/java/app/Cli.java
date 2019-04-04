@@ -11,6 +11,7 @@ import proto.Types;
 import servers.Statistics;
 import utils.CSVUtils;
 import utils.DBUtils;
+import utils.DiskUtils;
 
 import java.io.FileWriter;
 import java.io.File;
@@ -75,6 +76,7 @@ public class Cli {
 ////                writeBlocksStatistics(outPath);
                     writeBlocksStatisticsSummery(outPath);
                     DBUtils.shutdown();
+                    DiskUtils.shutdown();
                 }
 //
             }));
@@ -116,6 +118,7 @@ public class Cli {
                     writeSummery(outPath);
                     writeBlocksStatisticsSummery(outPath);
                     DBUtils.shutdown();
+                    DiskUtils.shutdown();
                     recorded.set(true);
                     System.out.println("Goodbye :)");
                     System.exit(0);

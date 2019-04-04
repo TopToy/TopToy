@@ -61,7 +61,7 @@ public abstract class ToyBaseServer extends Node {
     private int txSize = 0;
     private int cID = new Random().nextInt(10000);
     Path sPath;
-    private ExecutorService storageWorker = Executors.newSingleThreadExecutor();
+//    private ExecutorService storageWorker = Executors.newSingleThreadExecutor();
     private int syncEvents = 0;
     private int bid = 0;
     final Queue<Block> blocksForPropose = new LinkedList<>();
@@ -204,7 +204,7 @@ public abstract class ToyBaseServer extends Node {
 
     public void shutdown(boolean group) {
         stopped.set(true);
-        storageWorker.shutdownNow();
+//        storageWorker.shutdownNow();
 
         try {
             logger.debug(format("[#%d-C[%d]] interrupt main thread", getID(), channel));
@@ -393,12 +393,12 @@ public abstract class ToyBaseServer extends Node {
                         logger.error(String.format("[#%d-C[%d]] unable to record permanent time for block [height=%d] [cidSeries=%d ; cid=%d] [size=%d]",
                                 getID(), channel, recBlock.getHeader().getHeight(), cidSeries, cid, recBlock.getDataCount()));
                     }
-
-                    int pid = permanent.getHeader().getM().getSender();
-                    int bid = permanent.getId().getBid();
-                    int height = permanent.getHeader().getHeight();
-                    storageWorker.execute(() ->
-                            DBUtils.writeBlockToTable(channel, pid, bid, height));
+                    DBUtils.writeBlockToTable(permanent);
+//                    int pid = permanent.getHeader().getM().getSender();
+//                    int bid = permanent.getId().getBid();
+//                    int height = permanent.getHeader().getHeight();
+//                    storageWorker.execute(() ->
+//                            DBUtils.writeBlockToTable(channel, pid, bid, height));
                 }
 
                 logger.debug(String.format("[#%d-C[%d]] adds new Block with [height=%d] [cidSeries=%d ; cid=%d] [size=%d]",
@@ -409,7 +409,8 @@ public abstract class ToyBaseServer extends Node {
 
             }
             updateLeaderAndHeight();
-            storageWorker.execute(bc::writeNextToDisk);
+            bc.writeNextToDisk();
+//            storageWorker.execute(bc::writeNextToDisk);
         }
         return false;
     }

@@ -1,14 +1,20 @@
 package utils;
 
 import org.h2.jdbcx.JdbcDataSource;
+import proto.Types;
+
 import java.sql.*;
 import java.util.HashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import static java.lang.String.format;
 
 public class DBUtils {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(DBUtils.class);
     static JdbcDataSource eds = null;
     static String txTableName = "BLOCKSMAP";
+    static private ExecutorService worker = Executors.newSingleThreadExecutor();
     private static HashMap<Integer, Connection> rc = new HashMap<>();
     private static HashMap<Integer, Connection> wc = new HashMap<>();
     public DBUtils() {
@@ -31,6 +37,7 @@ public class DBUtils {
         } catch (SQLException e) {
             logger.error(format("unable shutdown connection [channel=%d]", channel));
         }
+        worker.shutdownNow();
     }
 
     static public void shutdown() {
@@ -44,6 +51,9 @@ public class DBUtils {
             }
         } catch (SQLException e) {
             logger.error(format("unable shutdown connection"));
+        }
+        if (rc.size() == 0 && wc.size() == 0) {
+            worker.shutdownNow();
         }
     }
 
@@ -93,7 +103,7 @@ public class DBUtils {
         }
     }
 
-    static public void writeBlockToTable(int channel, int pid, int bid, int height) {
+    static private void writeBlockToTable(int channel, int pid, int bid, int height) {
         createWriteConn(channel);
         try {
             Statement stmt = wc.get(channel).createStatement();
@@ -104,6 +114,17 @@ public class DBUtils {
         } catch (SQLException e) {
             logger.error(format("unable to create statement for tx [channel=%d]", channel), e);
         }
+    }
+
+    static public void writeBlockToTable(Types.Block b) {
+        int pid = b.getHeader().getM().getSender();
+        int bid = b.getId().getBid();
+        int height = b.getHeader().getHeight();
+        int channel = b.getHeader().getM().getChannel();
+        worker.execute(() -> {
+            writeBlockToTable(channel, pid, bid, height);
+            logger.debug(format("have write to DB [c=%d, h=%d, pid=%d, bid=%d", channel, height, pid, bid));
+        });
     }
 
 //    static public void writeBlockToTable(int channel, int height, Types.Block b) {
