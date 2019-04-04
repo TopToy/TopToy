@@ -117,7 +117,7 @@ public class Cli {
                 }
                 if (args[0].equals("quit")) {
                     writeSummery(outPath);
-                    writeBlocksStatisticsSummery(outPath);
+//                    writeBlocksStatisticsSummery(outPath);
                     DBUtils.shutdown();
                     DiskUtils.shutdown();
                     recorded.set(true);
@@ -450,7 +450,10 @@ public class Cli {
 //                int thrp = ((int) (txCount / time));
                 double opRate = ((double) st.optemisticDec) / ((double) st.totalDec);
                 long delaysAvgMs = 0; //st.delaysSum / st.txCount;
-                int avgTxInBlock = st.txCount / nob;
+                int avgTxInBlock = 0;
+                if (nob > 0) {
+                    avgTxInBlock = st.txCount / nob;
+                }
                 double eRate = ((double)st.eb) / ((double) st.all);
                 double dRate = ((double)st.deliveredTime) / ((double) st.all);
                 DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy-HH:mm:ss");

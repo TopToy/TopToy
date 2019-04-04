@@ -1,5 +1,6 @@
 package communication.overlays;
 
+import blockchain.Blockchain;
 import communication.CommLayer;
 import communication.data.GlobalData;
 import config.Node;
@@ -47,6 +48,7 @@ public class Clique extends CommunicationGrpc.CommunicationImplBase implements C
     private String addr;
     private int port;
     private int channels;
+    private Blockchain[] bcs;
 
     public Clique(int id, String addr, int port, int channels, ArrayList<Node> nodes) {
         this.id = id;
@@ -55,6 +57,7 @@ public class Clique extends CommunicationGrpc.CommunicationImplBase implements C
         this.addr = addr;
         this.channels = channels;
         new GlobalData(channels);
+        this.bcs = new Blockchain[channels];
     }
 
     @Override
@@ -81,6 +84,11 @@ public class Clique extends CommunicationGrpc.CommunicationImplBase implements C
         for (Cpeer p : peers.values()) {
             p.shutdown();
         }
+    }
+
+    @Override
+    public void registerBC(int channel, Blockchain bc) {
+        bcs[channel] = bc;
     }
 
     @Override
@@ -145,19 +153,26 @@ public class Clique extends CommunicationGrpc.CommunicationImplBase implements C
         Types.BlockID bid = Types.BlockID.newBuilder().setBid(request.getProof().getBid())
                 .setPid(request.getProof().getM().getSender())
                 .build();
+        int height = request.getProof().getHeight();
         int channel = request.getProof().getM().getChannel();
+        logger.debug(format("[%d-C[%d]] received commReq [height=%d]", id, channel, height));
+        Types.Block res[] = {null};
         GlobalData.blocks[channel].computeIfPresent(bid, (k, v) -> {
-            Types.Block res = null;
+
             LinkedList<Types.Block> ll = v.stream().filter(b -> verfiyBlockWRTheader(b, request.getProof()))
                     .collect(Collectors.toCollection(LinkedList::new));
 
-            res = ll.peek();
-            if (res != null) {
-                Types.commRes cr = Types.commRes.newBuilder().setB(res).build();
-                responseObserver.onNext(cr);
-            }
+            res[0] = ll.peek();
             return v;
         });
+        if (res[0] == null) {
+            res[0] = bcs[channel].getBlock(height);
+        }
+        if (res[0] != null) {
+            logger.debug(format("[%d-C[%d]] received commReq and has a match [height=%d]", id, channel, height));
+            Types.commRes cr = Types.commRes.newBuilder().setB(res[0]).build();
+            responseObserver.onNext(cr);
+        }
 
     }
 
@@ -196,6 +211,8 @@ public class Clique extends CommunicationGrpc.CommunicationImplBase implements C
                     Types.BlockID bid = Types.BlockID.newBuilder().setPid(request.getProof().getM().getSender())
                             .setBid(request.getProof().getBid()).build();
                     if (verfiyBlockWRTheader(commRes.getB(), request.getProof())) {
+                        logger.debug(format("[%d-C[%d]] received valid commRes [height=%d]", id, channel,
+                                request.getProof().getHeight()));
                         synchronized (GlobalData.blocks[channel]) {
                             GlobalData.blocks[channel].putIfAbsent(bid, new LinkedList<>());
                             GlobalData.blocks[channel].computeIfPresent(bid, (k, v) -> {

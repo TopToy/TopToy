@@ -133,6 +133,7 @@ public abstract class ToyBaseServer extends Node {
         }
         currBLock = configureNewBlock();
         wrbServer.setBcForChannel(channel, bc);
+        this.comm.registerBC(channel, bc);
     }
 
     public ToyBaseServer(String addr, int wrbPort, int commPort, int id, int channel, int f, int tmo, int tmoInterval,
@@ -162,6 +163,7 @@ public abstract class ToyBaseServer extends Node {
                 wrbCluster, bbcConfig, serverCrt, serverPrivKey, caRoot, comm);
         currBLock = configureNewBlock();
         wrbServer.setBcForChannel(channel, bc);
+        this.comm.registerBC(0, bc);
 
     }
 
@@ -389,6 +391,10 @@ public abstract class ToyBaseServer extends Node {
                     permanent = permanent.toBuilder().setSt(permanent.getSt().toBuilder().setPd(System.currentTimeMillis())).build();
                     try {
                         bc.setBlock(recBlock.getHeader().getHeight() - (f + 2), permanent);
+                        logger.info(format("Deliverd [[height=%d], [sender=%d], [channel=%d], [size=%d]]",
+                            permanent.getHeader().getHeight(), permanent.getHeader().getM().getSender(),
+                                permanent.getHeader().getM().getChannel(),
+                                permanent.getDataCount()));
                     } catch (IOException e) {
                         logger.error(String.format("[#%d-C[%d]] unable to record permanent time for block [height=%d] [cidSeries=%d ; cid=%d] [size=%d]",
                                 getID(), channel, recBlock.getHeader().getHeight(), cidSeries, cid, recBlock.getDataCount()));
