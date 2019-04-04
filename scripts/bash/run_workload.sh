@@ -420,9 +420,13 @@ run_latency_test() {
 # ${1} - transaction size
 # ${2} - max transactions in block
 # ${3} - tmo
-# ${4} - channels
-# ${5} - output directory
-# ${6} - f
+# ${4} - channels to start
+# ${5} - channels to end
+# ${6} - interval
+# ${7} - output directory
+# ${8} - f
+# ${9} - correct time
+# ${10} - test time
 
 run_bengin_test() {
     for i in `seq 0 $((${#servers[@]} - 1))`; do
@@ -430,14 +434,14 @@ run_bengin_test() {
         configure_max_tx_in_block ${2}
         configure_tmo ${3}
         configure_channels ${4}
-        if (( i < ${6} )); then
-            configure_servers 30
+        if (( i < ${8} )); then
+            configure_servers ${9}
         else
-            configure_servers 60
+            configure_servers ${10}
         fi
         install_server ${i}
     done
-    run_servers_channels ${4} ${4} 1 ${5}
+    run_servers_channels ${4} ${5} ${6} ${7}
 
 }
 
@@ -608,8 +612,12 @@ main_run_sig_test() {
 # ${1} - transaction size
 # ${2} - max transactions in block
 # ${3} - tmo
-# ${4} - channels
-# ${5} - f
+# ${4} - channels to start
+# ${5} - channels to end
+# ${6} - interval
+# ${7} - f
+# ${8} - correct time
+# ${9} - test time
 
 main_bengin() {
    local outputDir=${tDir}/out/$(date '+%F-%H:%M:%S')
@@ -619,7 +627,7 @@ main_bengin() {
    mkdir -p $currOut/servers/logs
    mkdir -p $currOut/servers/res
    echo ${currOut}
-   run_bengin_test ${1} ${2} ${3} ${4} ${currOut} ${5}
+   run_bengin_test ${1} ${2} ${3} ${4} ${5} ${6} ${currOut} ${7} ${8} ${9}
 }
 
 # ${1} - transaction size
@@ -659,12 +667,14 @@ main_byz() {
    run_byz_test ${1} ${2} ${3} ${4} ${currOut} ${5}
 }
 
+main_bengin 500 1000 400 15 20 1 1 1 60
+
 #for i in `seq 0 2`; do
 #    main_no_failures 0 10 1 1 1 2000
 #    main_no_failures 0 100 1 1 1 2000
 #    main_no_failures 0 1000 1 1 1 2000
 #done
-main_no_failures 506 10000 5 5 1 1000
+#main_no_failures 500 1000 1 10 1 1000
 #for i in `seq 0 0`; do
 #    main_no_failures 0 10 2 20 2 2000
 #    main_no_failures 0 100 2 20 2 2000
@@ -723,9 +733,17 @@ main_no_failures 506 10000 5 5 1 1000
 #    main_byz 500 1000 900 10 1
 #done
 
+# ${1} - transaction size
+# ${2} - max transactions in block
+# ${3} - tmo
+# ${4} - channels to start
+# ${5} - channels to end
+# ${6} - interval
+# ${7} - f
+# ${8} - correct time
+# ${9} - test time
 
 
-#main_bengin 500 100 200 1 1
 #main_bengin 500 100 400 5 1
 #main_bengin 500 100 500 10 1
 

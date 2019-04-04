@@ -401,14 +401,15 @@ public class Cli {
         }
 
         boolean validateBC() {
-            for (int i = 1 ; i < JToy.s.getBCSize() ; i++) {
-                if (!validateBlockHash(JToy.s.nonBlockingDeliver(i - 1),
-                        JToy.s.nonBlockingDeliver(i))) {
-                    System.out.println(String.format("Invalid Blockchain!! [%d -> %d]", i-1, i));
-                    return false;
-                }
-            }
-            return true;
+            return JToy.s.isValid();
+//            for (int i = 1 ; i < JToy.s.getBCSize() ; i++) {
+//                if (!validateBlockHash(JToy.s.nonBlockingDeliver(i - 1),
+//                        JToy.s.nonBlockingDeliver(i))) {
+//                    System.out.println(String.format("Invalid Blockchain!! [%d -> %d]", i-1, i));
+//                    return false;
+//                }
+//            }
+//            return true;
         }
         void writeSummery(String pathString) {
             long avgWt = 0;

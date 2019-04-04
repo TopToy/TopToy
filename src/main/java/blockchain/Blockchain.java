@@ -83,13 +83,22 @@ public class Blockchain {
     }
 
     public boolean validateBlockHash(Block b) {
+        if (b.getHeader().getHeight() == 0) return true;
         int index = b.getHeader().getHeight() - 1;
         if (getHeight() < index) return false;
         Block prev = getBlock(index);
         return Utils.validateBlockHash(prev, b);
     }
 
-
+    public boolean isValid() {
+        for (int i = 1 ; i < getHeight() + 1 ; i++) {
+            if (!validateBlockHash(getBlock(i - 1))) {
+                System.out.println(String.format("Invalid Blockchain!! [%d -> %d]", i-1, i));
+                return false;
+            }
+        }
+        return true;
+    }
 
     public void addBlock(Block b) {
         blocks.putIfAbsent(b.getHeader().getHeight(), b);

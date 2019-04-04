@@ -47,24 +47,24 @@ public class Top implements server {
     private ToyBaseServer[] group;
     private int[][] lastDelivered;
     private int[] lastGCpoint;
-    private final Blockchain bc;
+//    private final Blockchain bc;
     private int id;
     private int c;
     private String type;
     int lastChannel = 0;
     private AtomicBoolean stopped = new AtomicBoolean(false);
     private Statistics sts = new Statistics();
-    private Thread deliverThread = new Thread(() -> {
-        try {
-            Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
-            deliverFromGroup();
-        } catch (InterruptedException e) {
-            logger.debug(format("G-%d interrupted while delivering from group", id));
-        } catch (IOException e) {
-            logger.error(format("G-%d IO error occurred, exiting", id), e);
-            shutdown();
-        }
-    });
+//    private Thread deliverThread = new Thread(() -> {
+//        try {
+//            Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
+//            deliverFromGroup();
+//        } catch (InterruptedException e) {
+//            logger.debug(format("G-%d interrupted while delivering from group", id));
+//        } catch (IOException e) {
+//            logger.error(format("G-%d IO error occurred, exiting", id), e);
+//            shutdown();
+//        }
+//    });
     private int maxTx;
     private int cutterBatch = Config.getCutterBatch();
     Path cutterDirName = Paths.get(System.getProperty("user.dir"), "blocks");
@@ -122,63 +122,63 @@ public class Top implements server {
                 group[i] = new AsyncToyServer(addr, wrbPort, id, i, f, maxTx, fastMode, wrb, comm, RBservice);
             }
         }
-        bc = group[0].initBC(id, -1);
+//        bc = group[0].initBC(id, -1);
 
 //        new DiskUtils(cutterDirName);
         logger.info(format("cutter batch is %d", cutterBatch));
     }
 
-    private void deliverFromGroup() throws InterruptedException, IOException {
-        int currChannel = 0;
-        int currBlock = 0;
-        while (!stopped.get()) {
-            for (currChannel = 0 ; currChannel < c ; currChannel++) {
-                long start = System.currentTimeMillis();
-                logger.debug(format("Trying to deliver from [channel=%d, channelBlock=%d]", currChannel, currBlock));
-//                Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-                Types.Block cBlock = group[currChannel].deliver(currBlock);
-                sts.all++;
-                sts.deliveredTime += System.currentTimeMillis() - start;
-                gc(cBlock.getHeader().getHeight(), cBlock.getHeader().getM().getSender(), currChannel);
-                if (cBlock.getDataCount() == 0) {
-                    sts.eb++;
-                    logger.info(format("E - [[time=%d], [height=%d], [sender=%d], [channel=%d], [size=0]]",
-                            System.currentTimeMillis() - start, cBlock.getHeader().getHeight(),
-                            cBlock.getHeader().getM().getSender(), cBlock.getHeader().getM().getChannel()));
-                    continue;
-                }
-                cBlock = cBlock.toBuilder()
-                        .setHeader(cBlock.getHeader().toBuilder()
-                            .setHeight(bc.getHeight() + 1)
-                            .setPrev(ByteString.copyFrom(
-                                DigestMethod.hash(bc.getBlock(bc.getHeight()).getHeader().toByteArray())))
-//                                .setPresent(true)
-                            .build())
-                            .setSt(cBlock.getSt().toBuilder().setDecided(System.currentTimeMillis()))
-                        .build();
-                synchronized (bc) {
-                    bc.addBlock(cBlock);
-                    bc.notify();
-                }
-                updateStat(cBlock);
-//                if (bc.getHeight() % cutterBatch == 0) {
-//                    chainCutterExecutor.execute(() -> {
-//                        try {
-////                            logger.info("Writing blocks...");
-//                            DiskUtils.cut(bc, bc.getHeight() - cutterBatch, bc.getHeight());
-//                        } catch (IOException e) {
-//                            logger.error("", e);
-//                        }
-//                    });
+//    private void deliverFromGroup() throws InterruptedException, IOException {
+//        int currChannel = 0;
+//        int currBlock = 1;
+//        while (!stopped.get()) {
+//            for (currChannel = 0 ; currChannel < c ; currChannel++) {
+//                long start = System.currentTimeMillis();
+//                logger.debug(format("Trying to deliver from [channel=%d, channelBlock=%d]", currChannel, currBlock));
+////                Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+//                Types.Block cBlock = group[currChannel].deliver(currBlock);
+//                sts.all++;
+//                sts.deliveredTime += System.currentTimeMillis() - start;
+////                gc(cBlock.getHeader().getHeight(), cBlock.getHeader().getM().getSender(), currChannel);
+//                if (cBlock.getDataCount() == 0) {
+//                    sts.eb++;
+//                    logger.info(format("E - [[time=%d], [height=%d], [sender=%d], [channel=%d], [size=0]]",
+//                            System.currentTimeMillis() - start, cBlock.getHeader().getHeight(),
+//                            cBlock.getHeader().getM().getSender(), cBlock.getHeader().getM().getChannel()));
+//                    continue;
 //                }
-                logger.info(format("F - [[time=%d], [height=%d], [sender=%d], [channel=%d], [size=%d]]",
-                        System.currentTimeMillis() - start, cBlock.getHeader().getHeight(),
-                        cBlock.getHeader().getM().getSender(), cBlock.getHeader().getM().getChannel(), cBlock.getDataCount()));
-            }
-
-            currBlock++;
-        }
-    }
+//                cBlock = cBlock.toBuilder()
+//                        .setHeader(cBlock.getHeader().toBuilder()
+//                            .setHeight(bc.getHeight() + 1)
+//                            .setPrev(ByteString.copyFrom(
+//                                DigestMethod.hash(bc.getBlock(bc.getHeight()).getHeader().toByteArray())))
+////                                .setPresent(true)
+//                            .build())
+//                            .setSt(cBlock.getSt().toBuilder().setDecided(System.currentTimeMillis()))
+//                        .build();
+//                synchronized (bc) {
+//                    bc.addBlock(cBlock);
+//                    bc.notify();
+//                }
+//                updateStat(cBlock);
+////                if (bc.getHeight() % cutterBatch == 0) {
+////                    chainCutterExecutor.execute(() -> {
+////                        try {
+//////                            logger.info("Writing blocks...");
+////                            DiskUtils.cut(bc, bc.getHeight() - cutterBatch, bc.getHeight());
+////                        } catch (IOException e) {
+////                            logger.error("", e);
+////                        }
+////                    });
+////                }
+//                logger.info(format("F - [[time=%d], [height=%d], [sender=%d], [channel=%d], [size=%d]]",
+//                        System.currentTimeMillis() - start, cBlock.getHeader().getHeight(),
+//                        cBlock.getHeader().getM().getSender(), cBlock.getHeader().getM().getChannel(), cBlock.getDataCount()));
+//            }
+//
+//            currBlock++;
+//        }
+//    }
 
     void updateStat(Types.Block b) {
         if (b.getHeader().getHeight() == 1) {
@@ -251,12 +251,12 @@ public class Top implements server {
     public void shutdown() {
         stopped.set(true);
         logger.debug(format("G-%d shutdown deliverThread", id));
-        deliverThread.interrupt();
-        try {
-            deliverThread.join();
-        } catch (InterruptedException e) {
-            logger.error(format("G-%d", id), e);
-        }
+//        deliverThread.interrupt();
+//        try {
+//            deliverThread.join();
+//        } catch (InterruptedException e) {
+//            logger.error(format("G-%d", id), e);
+//        }
         for (int i = 0 ; i < c ; i++) {
             group[i].shutdown(true);
             logger.debug(format("G-%d shutdown channel %d", id, i));
@@ -275,7 +275,7 @@ public class Top implements server {
         for (int i = 0 ; i < c ; i++) {
             group[i].serve();
         }
-        deliverThread.start();
+//        deliverThread.start();
         try {
             txsServer = NettyServerBuilder
                     .forPort(9876)
@@ -364,17 +364,23 @@ public class Top implements server {
     }
 
     public Types.Block deliver(int index) throws InterruptedException {
-        synchronized (bc) {
-            while (bc.getHeight() < index) {
-                bc.wait();
-            }
-            return bc.getBlock(index);
-        }
+        int channel_num = index % c;
+        int block_num = index / c;
+        return group[channel_num].deliver(block_num);
+//        synchronized (bc) {
+//            while (bc.getHeight() < index) {
+//                bc.wait();
+//            }
+//            return bc.getBlock(index);
+//        }
     }
 
     public Types.Block nonBlockingDeliver(int index) {
-        if (bc.getHeight() < index) return null;
-        return bc.getBlock(index);
+        int channel_num = index % c;
+        int block_num = index / c;
+        return group[channel_num].nonBlockingdeliver(block_num);
+//        if (bc.getHeight() < index) return null;
+//        return bc.getBlock(index);
     }
 
     public int getID() {
@@ -411,7 +417,20 @@ public class Top implements server {
     }
 
     public int getBCSize() {
-        return bc.getHeight() + 1;
+        int size = 0;
+        for (int i = 0 ; i < c ; i++) {
+            size += group[i].bcSize();
+        }
+        return size;
+//        return bc.getHeight() + 1;
+    }
+    
+    @Override
+    public boolean isValid() {
+        for (int i = 0 ; i < c ; i++) {
+            if (!group[i].isBcValid()) return false;
+        }
+        return true;
     }
 
 }

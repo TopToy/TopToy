@@ -16,5 +16,6 @@ public interface server {
     void setByzSetting(boolean fullByz, List<List<Integer>> groups);
     void setAsyncParam(int time);
     Statistics getStatistics();
+    boolean isValid();
 
 }

@@ -833,4 +833,12 @@ public abstract class ToyBaseServer extends Node {
 
     }
 
+    boolean isBcValid() {
+        return bc.isValid();
+    }
+
+//    public int bcSize() {
+//        return bc.getHeight() + 1;
+//    }
+
 }
