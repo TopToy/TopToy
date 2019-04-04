@@ -2,8 +2,8 @@ package servers;
 
 public class Statistics {
     public int txCount;
-    public long firstTxTs;
-    public long lastTxTs;
+    public long start;
+    public long stop;
     public long delaysSum;
     public int txSize;
     public long totalDec;
@@ -15,8 +15,8 @@ public class Statistics {
 
     public Statistics() {
         txCount = 0;
-        firstTxTs = 0;
-        lastTxTs = 0;
+        start = 0;
+        stop = 0;
         delaysSum = 0;
         totalDec = 0;
         optemisticDec = 0;

@@ -144,14 +144,15 @@ public class Blockchain {
 //        logger.debug(format("BD(0), [%d ; %d]", blocks.size(), maxCacheSize));
         if (blocks.size() < maxCacheSize) return;
 //        logger.debug("BD(1)");
-        finishedTasks.add(DiskUtils.cutBlockAsync(blocks.get(swapSize), swapPath));
+        int currBlockIndex = swapSize;
+        finishedTasks.add(DiskUtils.cutBlockAsync(blocks.get(currBlockIndex), swapPath));
+        swapSize++;
         assert finishedTasks.peek() != null;
         boolean task_done = finishedTasks.peek().isDone();
 //        logger.debug("BD(2)");
         while (task_done) {
 //            logger.debug("BD(3)");
-            blocks.remove(swapSize);
-            swapSize++;
+            blocks.remove(currBlockIndex);
             finishedTasks.remove();
             if (finishedTasks.isEmpty()) break;
             task_done = finishedTasks.peek().isDone();

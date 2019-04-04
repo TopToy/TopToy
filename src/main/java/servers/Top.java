@@ -36,7 +36,7 @@ public class Top implements server {
 
     private WrbNode wrb;
     boolean up = false;
-    final HashMap<Types.txID, Integer> txMap = new HashMap<>();
+//    final HashMap<Types.txID, Integer> txMap = new HashMap<>();
 //    private RBrodcastService deliverFork;
 //    private RBrodcastService sync;
     private RBrodcastService RBservice;
@@ -180,22 +180,22 @@ public class Top implements server {
 //        }
 //    }
 
-    void updateStat(Types.Block b) {
-        if (b.getHeader().getHeight() == 1) {
-            sts.firstTxTs = b.getSt().getDecided();
-            sts.txSize = b.getData(0).getSerializedSize();
-        }
-        sts.lastTxTs = max(sts.lastTxTs, b.getSt().getDecided());
-        sts.txCount += b.getDataCount();
-//        logger.info(format("data count is %d, bc size is: %d, total: %d", b.getDataCount(), bc.getHeight(), sts.txCount));
-//        long bTs = b.getSt().getDecided();
-//        for (Types.Transaction t : b.getDataList()) {
-//            txMap.put(t.getId(), b.getHeader().getHeight());
+//    void updateStat(Types.Block b) {
+//        if (b.getHeader().getHeight() == 1) {
+//            sts.firstTxTs = b.getSt().getDecided();
+//            sts.txSize = b.getData(0).getSerializedSize();
 //        }
-        synchronized (txMap) {
-            txMap.notifyAll();
-        }
-    }
+//        sts.lastTxTs = max(sts.lastTxTs, b.getSt().getDecided());
+//        sts.txCount += b.getDataCount();
+////        logger.info(format("data count is %d, bc size is: %d, total: %d", b.getDataCount(), bc.getHeight(), sts.txCount));
+////        long bTs = b.getSt().getDecided();
+////        for (Types.Transaction t : b.getDataList()) {
+////            txMap.put(t.getId(), b.getHeader().getHeight());
+////        }
+//        synchronized (txMap) {
+//            txMap.notifyAll();
+//        }
+//    }
 
     public Statistics getStatistics() {
         sts.totalDec = wrb.getTotolDec();
@@ -203,36 +203,39 @@ public class Top implements server {
         for (int i = 0 ; i < c ; i++) {
             sts.syncEvents += group[i].getSyncEvents();
         }
+        for (int i = 0 ; i < getBCSize() ; i++) {
+            sts.txCount += nonBlockingDeliver(i).getDataCount();
+        }
         return sts;
     }
 
-    void gc(int origHeight, int sender, int channel) throws IOException {
-        if (sender < 0 || sender > n - 1 || channel < 0 || channel > c -1 || origHeight < 0) {
-            logger.debug(format("G-%d GC invalid argument [OrigHeight=%d ; sender=%d ; channel=%d]"
-                    ,id, origHeight, sender, channel));
-            return;
-        }
-        lastDelivered[channel][sender] = origHeight;
-        gcCount++;
-        if (gcCount < gcLimit) return;
-        gcCount = 0;
-        for (int i = 0 ; i < c ; i++) {
-            gcForChannel(i);
-        }
-    }
-    void gcForChannel(int channel) throws IOException {
-//        int minHeight = lastDelivered[channel][0];
-//        for (int i = 0 ; i < n ; i++) {
-//            minHeight = min(minHeight, lastDelivered[channel][i]);
+//    void gc(int origHeight, int sender, int channel) throws IOException {
+//        if (sender < 0 || sender > n - 1 || channel < 0 || channel > c -1 || origHeight < 0) {
+//            logger.debug(format("G-%d GC invalid argument [OrigHeight=%d ; sender=%d ; channel=%d]"
+//                    ,id, origHeight, sender, channel));
+//            return;
 //        }
-//        logger.debug(format("G-%d starting GC [OrigHeight=%d ; lastGCPoint=%d ;" +
-//                " channel=%d]",id, minHeight, lastGCpoint[channel], channel));
-//        for (int i = lastGCpoint[channel] ; i < minHeight ; i++) {
-//            group[channel].gc(i);
+//        lastDelivered[channel][sender] = origHeight;
+//        gcCount++;
+//        if (gcCount < gcLimit) return;
+//        gcCount = 0;
+//        for (int i = 0 ; i < c ; i++) {
+//            gcForChannel(i);
 //        }
-//        lastGCpoint[channel] = minHeight;
-
-    }
+//    }
+//    void gcForChannel(int channel) throws IOException {
+////        int minHeight = lastDelivered[channel][0];
+////        for (int i = 0 ; i < n ; i++) {
+////            minHeight = min(minHeight, lastDelivered[channel][i]);
+////        }
+////        logger.debug(format("G-%d starting GC [OrigHeight=%d ; lastGCPoint=%d ;" +
+////                " channel=%d]",id, minHeight, lastGCpoint[channel], channel));
+////        for (int i = lastGCpoint[channel] ; i < minHeight ; i++) {
+////            group[channel].gc(i);
+////        }
+////        lastGCpoint[channel] = minHeight;
+//
+//    }
     public void start() {
         logger.debug(format("G-%d joining to communication layer" ,id));
         comm.join();
@@ -244,12 +247,14 @@ public class Top implements server {
         for (int i = 0 ; i < c ; i++) {
             group[i].start(true);
         }
+        sts.start = System.currentTimeMillis();
 
 
     }
 
     public void shutdown() {
         stopped.set(true);
+        sts.stop = System.currentTimeMillis();
         logger.debug(format("G-%d shutdown deliverThread", id));
 //        deliverThread.interrupt();
 //        try {
@@ -345,27 +350,28 @@ public class Top implements server {
     }
 
     Types.approved getTransaction(Types.txID txID) throws InterruptedException {
-        Types.Block b = null;
-        synchronized (txMap) {
-            while (!txMap.containsKey(txID)) {
-                txMap.wait();
-            }
-        }
-        if (txMap.containsKey(txID)) {
-            b = nonBlockingDeliver(txMap.get(txID));
-        }
-        if (b == null) return Types.approved.getDefaultInstance();
-        for (Types.Transaction t : b.getDataList()) {
-            if (t.getId().equals(txID)) {
-                return Types.approved.newBuilder().setSt(b.getSt()).setTx(t).build();
-            }
-        }
+//        Types.Block b = null;
+//        synchronized (txMap) {
+//            while (!txMap.containsKey(txID)) {
+//                txMap.wait();
+//            }
+//        }
+//        if (txMap.containsKey(txID)) {
+//            b = nonBlockingDeliver(txMap.get(txID));
+//        }
+//        if (b == null) return Types.approved.getDefaultInstance();
+//        for (Types.Transaction t : b.getDataList()) {
+//            if (t.getId().equals(txID)) {
+//                return Types.approved.newBuilder().setSt(b.getSt()).setTx(t).build();
+//            }
+//        }
         return Types.approved.getDefaultInstance();
     }
 
     public Types.Block deliver(int index) throws InterruptedException {
         int channel_num = index % c;
         int block_num = index / c;
+//        System.out.println(format("[i=%d ; c=%d ; b=%d, size=%d]", index, channel_num, block_num, group[channel_num].bcSize()));
         return group[channel_num].deliver(block_num);
 //        synchronized (bc) {
 //            while (bc.getHeight() < index) {
@@ -378,6 +384,8 @@ public class Top implements server {
     public Types.Block nonBlockingDeliver(int index) {
         int channel_num = index % c;
         int block_num = index / c;
+//        if (block_num > minBcSize()) return null;
+//        System.out.println(format("[i=%d, c=%d ; b=%d ; size=%d]", index, channel_num, block_num, group[channel_num].bcSize()));
         return group[channel_num].nonBlockingdeliver(block_num);
 //        if (bc.getHeight() < index) return null;
 //        return bc.getBlock(index);
@@ -417,12 +425,13 @@ public class Top implements server {
     }
 
     public int getBCSize() {
-        int size = 0;
-        for (int i = 0 ; i < c ; i++) {
-            size += group[i].bcSize();
-        }
-        return size;
+//        int size = 0;
+//        for (int i = 0 ; i < c ; i++) {
+//            size += group[i].bcSize();
+//        }
+//        return size;
 //        return bc.getHeight() + 1;
+        return minBcSize() * c;
     }
     
     @Override
@@ -433,6 +442,13 @@ public class Top implements server {
         return true;
     }
 
+    int minBcSize() {
+        int min = group[0].bcSize();
+        for (int i = 1; i < c ; i++) {
+            min = min(min, group[i].bcSize());
+        }
+        return min;
+    }
 }
 class TxServer extends blockchainServiceGrpc.blockchainServiceImplBase {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(TxServer.class);

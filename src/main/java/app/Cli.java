@@ -105,12 +105,13 @@ public class Cli {
 
                 if (args[0].equals("serve")) {
                     serve();
+                    totalRT = System.currentTimeMillis();
                     System.out.println("Serving... [OK]");
                     return;
                 }
                 if (args[0].equals("stop")) {
                     stop();
-                    totalRT = System.currentTimeMillis();
+                    totalRT = System.currentTimeMillis() - totalRT;
                     System.out.println("stop server... [OK]");
                     return;
                 }
@@ -412,15 +413,20 @@ public class Cli {
 //            return true;
         }
         void writeSummery(String pathString) {
-            long avgWt = 0;
-            int newTxCount = 0;
+//            long avgWt = 0;
+//            int txCount = 0;
             int nob = JToy.s.getBCSize();
-            for (int i = 0 ; i < nob ; i++) {
-                Types.Block b = JToy.s.nonBlockingDeliver(i);
-                for (Types.Transaction t : b.getDataList()) {
-                    avgWt += b.getSt().getDecided() - Longs.fromByteArray(Arrays.copyOfRange(t.getData().toByteArray(), 0, 8));
-                }
-            }
+//            for (int i = 0 ; i < nob ; i++) {
+//                Types.Block b = JToy.s.nonBlockingDeliver(i);
+////                if (b == null) {
+////                    System.out.println(format("[i=%d] and NULL!!!!!", i));
+////                    continue;
+////                }
+////                for (Types.Transaction t : b.getDataList()) {
+////                    avgWt += b.getSt().getDecided() - Longs.fromByteArray(Arrays.copyOfRange(t.getData().toByteArray(), 0, 8));
+////                }
+////                txCount += b.getDataCount();
+//            }
             Path path = Paths.get(pathString,   String.valueOf(JToy.s.getID()), "summery.csv");
             File f = new File(path.toString());
 
@@ -437,9 +443,11 @@ public class Cli {
 //                CSVUtils.writeLine(writer, head);
                 Statistics st = JToy.s.getStatistics();
 
-                double time = ((double) st.lastTxTs - st.firstTxTs) / 1000;
-//                double time = ((double) totalRT - st.firstTxTs) / 1000;
+//                double time = ((double) st.lastTxTs - st.firstTxTs) / 1000;
+//                double time = ((double) totalRT / 1000);
+                double time = ((double) st.stop - st.start) / 1000;
                 int thrp = ((int) (st.txCount / time)); // / 1000;
+//                int thrp = ((int) (txCount / time));
                 double opRate = ((double) st.optemisticDec) / ((double) st.totalDec);
                 long delaysAvgMs = 0; //st.delaysSum / st.txCount;
                 int avgTxInBlock = st.txCount / nob;
@@ -486,6 +494,10 @@ public class Cli {
             long propose2decide = 0;
             for (int i = 1 ; i < nob ; i++) {
                 Types.Block b = JToy.s.nonBlockingDeliver(i);
+                if (b == null) {
+                    System.out.println(format("[i=%d] and NULL!!!!!", i));
+                    continue;
+                }
                 Types.blockStatistics bst = b.getSt();
                 signaturePeriod += bst.getSign();
 //                create2propose += bst.getProposed() - bst.getCreated();
