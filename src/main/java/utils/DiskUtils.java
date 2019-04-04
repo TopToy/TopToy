@@ -5,10 +5,19 @@ import proto.Types;
 import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.SQLException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
+import static java.lang.String.format;
 
 public class DiskUtils {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(DiskUtils.class);
-//    static Path path;
+    static private ExecutorService worker = Executors.newSingleThreadExecutor();
+
+
+    //    static Path path;
 //    public DiskUtils(Path pathToDir) {
 //        path = pathToDir;
 //        File dir = new File(pathToDir.toString());
@@ -22,6 +31,12 @@ public class DiskUtils {
 //        }
 //
 //    }
+
+    static public void shutdown() {
+        if (worker.isShutdown()) return;
+        worker.shutdownNow();
+    }
+
     public static void createStorageDir(Path pathToDir) {
         File dir = new File(pathToDir.toString());
         try {
@@ -65,5 +80,21 @@ public class DiskUtils {
         if (f.exists()) {
             FileUtils.forceDelete(f);
         }
+
+    }
+    public static Future cutBlockAsync(Types.Block b, Path path) {
+        return worker.submit(() -> {
+            try {
+//                logger.debug(format("have write to Disk (1) [c=%d, h=%d, pid=%d, bid=%d",
+//                        b.getHeader().getM().getChannel(), b.getHeader().getHeight(), b.getHeader().getM().getSender(),
+//                        b.getHeader().getBid()));
+                cutBlock(b, path);
+                logger.debug(format("have write to Disk (2) [c=%d, h=%d, pid=%d, bid=%d",
+                        b.getHeader().getM().getChannel(), b.getHeader().getHeight(), b.getHeader().getM().getSender(),
+                        b.getHeader().getBid()));
+            } catch (IOException e) {
+                logger.error("", e);
+            }
+        });
     }
 }

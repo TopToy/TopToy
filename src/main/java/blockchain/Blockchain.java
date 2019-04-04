@@ -5,8 +5,13 @@ import utils.DiskUtils;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Future;
+
+import static java.lang.String.format;
 import static java.util.Collections.max;
 import proto.Types.*;
 
@@ -18,6 +23,7 @@ public class Blockchain {
     private int maxCacheSize = 100;
     private boolean swapAble = false;
     private final ConcurrentHashMap<Integer, Block> blocks = new ConcurrentHashMap<>();
+    private Queue<Future> finishedTasks = new LinkedList<>();
 
 //    int size = 0;
 
@@ -124,16 +130,23 @@ public class Blockchain {
     }
 
     public void writeNextToDisk() {
+//        logger.debug("BD(-1)");
         if (!swapAble) return;
+//        logger.debug(format("BD(0), [%d ; %d]", blocks.size(), maxCacheSize));
         if (blocks.size() < maxCacheSize) return;
-        try {
-            DiskUtils.cutBlock(blocks.get(swapSize), swapPath);
+//        logger.debug("BD(1)");
+        finishedTasks.add(DiskUtils.cutBlockAsync(blocks.get(swapSize), swapPath));
+        assert finishedTasks.peek() != null;
+        boolean task_done = finishedTasks.peek().isDone();
+//        logger.debug("BD(2)");
+        while (task_done) {
+//            logger.debug("BD(3)");
             blocks.remove(swapSize);
             swapSize++;
-            } catch (IOException e) {
-                logger.error("Unable to remove block", e);
-            }
-
+            finishedTasks.remove();
+            if (finishedTasks.isEmpty()) break;
+            task_done = finishedTasks.peek().isDone();
+        }
     }
 
     public boolean contains(int height) {
