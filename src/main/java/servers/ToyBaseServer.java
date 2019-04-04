@@ -521,6 +521,11 @@ public abstract class ToyBaseServer extends Node {
 
     void createTxToBlock() {
         int missingTxs = -1;
+        synchronized (proposedBlocks) {
+            if (proposedBlocks.size() > 5) {
+                return;
+            }
+        }
         synchronized (cbl) {
             synchronized (blocksForPropose) {
                 if (blocksForPropose.isEmpty()) {

@@ -28,6 +28,7 @@ public class Clique extends CommunicationGrpc.CommunicationImplBase implements C
             channel = ManagedChannelBuilder
                     .forAddress(addr, port)
                     .usePlaintext()
+                    .maxInboundMessageSize(16 * 1024 * 1024)
                     .build();
 
             stub = CommunicationGrpc.newStub(channel);
@@ -61,6 +62,7 @@ public class Clique extends CommunicationGrpc.CommunicationImplBase implements C
         CServer = ServerBuilder
                 .forPort(port)
                 .addService(this)
+                .maxInboundMessageSize(16 * 1024 * 1024)
                 .build();
         try {
             CServer.start();

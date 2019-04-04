@@ -1,11 +1,10 @@
 #!/usr/bin/env bash
 
 echo "title = \"configuration\"
-
 [system]
     n = ${2}
     f = ${3}
-    c = 20
+    c = 1
     testing = true
     txSize = 0
     cutterBatch = 1
@@ -14,8 +13,7 @@ echo "title = \"configuration\"
     tmo = 1000
     tmoInterval = 100
     rmfBbcConfigPath = \"src/main/resources/bbcConfig\"
-    panicRBroadcastConfigPath = \"src/main/resources/panicRBConfig\"
-    syncRBroadcastConfigPath = \"src/main/resources/syncRBConfig\"
+    RBConfigPath = \"src/main/resources/RBConfig\"
     maxTransactionInBlock = 1000
     caRootPath = \"\"
     fastMode = true
@@ -31,6 +29,7 @@ echo "title = \"configuration\"
     TlsPrivKeyPath = \"src/main/resources/sslConfig/server.pem\"
     TlsCertPath = \"src/main/resources/sslConfig/server.crt\"
 
+
 [[cluster]]" > config.txt
 
 inputIpsPath=${1}
@@ -40,7 +39,8 @@ do
 echo "      [cluster.s${i}]
             id = ${i}
             ip = \"${line}\"
-            port = 30000
+            wrbPort = 30000
+            commPort = 30010
             publicKey =\"\"\"MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
                            N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg==\"\"\"
 " >> config.txt

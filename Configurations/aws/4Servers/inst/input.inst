@@ -1,0 +1,5 @@
+init
+serve
+wait 60
+stop
+quit

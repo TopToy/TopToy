@@ -73,7 +73,7 @@ public class Cli {
                     writeSummery(outPath);
 ////                writeToScv(outPath);
 ////                writeBlocksStatistics(outPath);
-                    writeBlocksStatisticsSummery(outPath);
+//                    writeBlocksStatisticsSummery(outPath);
                     DBUtils.shutdown();
                 }
 //

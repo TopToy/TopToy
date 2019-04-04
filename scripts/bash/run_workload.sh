@@ -12,12 +12,14 @@ clientBinDir=${tDir}/bin_client
 inst=${configDir}/inst/input.inst
 config_toml=${configDir}/config.toml
 config_bbc=${configDir}/bbcConfig/hosts.config
-config_panic=${configDir}/panicRBConfig/hosts.config
-config_sync=${configDir}/syncRBConfig/hosts.config
+#config_panic=${configDir}/panicRBConfig/hosts.config
+#config_sync=${configDir}/syncRBConfig/hosts.config
+config_rb=${configDir}/RBConfig/hosts.config
 
 tconfig_bbc=${configDir}/bbcConfig/hosts.config.tmp
-tconfig_panic=${configDir}/panicRBConfig/hosts.config.tmp
-tconfig_sync=${configDir}/syncRBConfig/hosts.config.tmp
+#tconfig_panic=${configDir}/panicRBConfig/hosts.config.tmp
+#tconfig_sync=${configDir}/syncRBConfig/hosts.config.tmp
+tconfig_rb=${configDir}/RBConfig/hosts.config.tmp
 tconfig=${config_toml}.tmp
 
 user="toy"
@@ -187,8 +189,9 @@ configure_server_files() {
     local public_ip=`echo "${servers[${id}]}" | sed 's/'${user}'\@//g'`
     local private_ip=${servers_p[${id}]}
     sed -i 's/'"${public_ip}"'/'"${private_ip}"'/g' ${config_bbc}
-    sed -i 's/'"${public_ip}"'/'"${private_ip}"'/g' ${config_panic}
-    sed -i 's/'"${public_ip}"'/'"${private_ip}"'/g' ${config_sync}
+    sed -i 's/'"${public_ip}"'/'"${private_ip}"'/g' ${config_rb}
+#    sed -i 's/'"${public_ip}"'/'"${private_ip}"'/g' ${config_panic}
+#    sed -i 's/'"${public_ip}"'/'"${private_ip}"'/g' ${config_sync}
 
 }
 
@@ -214,7 +217,7 @@ run_servers_instance_with_tmo() {
 
 print_headers() {
     local currOut=${1}
-    echo "ts,id,type,channels,tmo,fm,txSize,txInBlock,txTotal,duration,txPsec,blocksNum,avgTxInBlock,avgDelay,opRate,eRate,dRate" >> $currOut/servers/res/summery.csv
+    echo "valid,ts,id,type,channels,tmo,fm,txSize,txInBlock,txTotal,duration,txPsec,blocksNum,avgTxInBlock,avgDelay,opRate,eRate,dRate,syncEvents" >> $currOut/servers/res/summery.csv
     echo "id,type,channels,txSize,maxTxInBlock,signaturePeriod,verificationPeriod,propose2tentative,tentative2permanent,channelPermanent2decide,propose2permanentchannel,propose2decide" >> $currOut/servers/res/blocksStatSummery.csv
     echo "channels,txInBlock,ts,id,txSize,txCount,clientLatency,serverLatency,clientOnly" >> ${currOut}/clients/res/summery.csv
 }
@@ -322,7 +325,7 @@ collect_res_from_servers() {
         echo "collecting results summery from server ${servers[$i]}"
         cat $currOut/servers/res/${i}/summery.csv >> $currOut/servers/res/summery.csv
         cat $currOut/servers/res/${i}/sig_summery.csv >> $currOut/servers/res/sig_summery.csv
-        tail -n -10 $currOut/servers/res/${i}/blocksStat.csv >> $currOut/servers/res/blocksStat_${channels}.csv
+        cat $currOut/servers/res/${i}/blocksStat.csv >> $currOut/servers/res/blocksStat_${channels}.csv
         cat $currOut/servers/res/${i}/blocksStatSummery.csv >> $currOut/servers/res/blocksStatSummery.csv
         rm -f $currOut/servers/res/${i}/summery.csv
         rm -f $currOut/servers/res/${i}/sig_summery.csv
@@ -394,8 +397,9 @@ run_async_test() {
 run_latency_test() {
     for i in `seq 0 $((${#servers[@]} - 1))`; do
         cat ${config_bbc} > ${tconfig_bbc}
-        cat ${config_panic} > ${tconfig_panic}
-        cat ${config_sync} > ${tconfig_sync}
+        cat ${config_rb} > ${tconfig_rb}
+#        cat ${config_panic} > ${tconfig_panic}
+#        cat ${config_sync} > ${tconfig_sync}
         configure_tx_size ${1}
         configure_max_tx_in_block ${2}
         configure_tmo ${7}
@@ -403,8 +407,9 @@ run_latency_test() {
         configure_server_files ${i}
         install_server ${i}
         cat ${tconfig_bbc} > ${config_bbc}
-        cat ${tconfig_panic} > ${config_panic}
-        cat ${tconfig_sync} > ${config_sync}
+        cat ${tconfig_rb} > ${config_rb}
+#        cat ${tconfig_panic} > ${config_panic}
+#        cat ${tconfig_sync} > ${config_sync}
     done
     load_clients
     run_servers_channels ${3} ${4} ${5} ${6} &
@@ -471,8 +476,9 @@ run_byz_test() {
 run_no_failures_test() {
     for i in `seq 0 $((${#servers[@]} - 1))`; do
         cat ${config_bbc} > ${tconfig_bbc}
-        cat ${config_panic} > ${tconfig_panic}
-        cat ${config_sync} > ${tconfig_sync}
+        cat ${config_rb} > ${tconfig_rb}
+#        cat ${config_panic} > ${tconfig_panic}
+#        cat ${config_sync} > ${tconfig_sync}
         configure_tx_size ${1}
         configure_max_tx_in_block ${2}
         configure_tmo ${7}
@@ -480,8 +486,9 @@ run_no_failures_test() {
         configure_server_files ${i}
         install_server ${i}
         cat ${tconfig_bbc} > ${config_bbc}
-        cat ${tconfig_panic} > ${config_panic}
-        cat ${tconfig_sync} > ${config_sync}
+        cat ${tconfig_rb} > ${config_rb}
+#        cat ${tconfig_panic} > ${config_panic}
+#        cat ${tconfig_sync} > ${config_sync}
     done
     run_servers_channels ${3} ${4} ${5} ${6}
 }
@@ -657,7 +664,7 @@ main_byz() {
 #    main_no_failures 0 100 1 1 1 2000
 #    main_no_failures 0 1000 1 1 1 2000
 #done
-
+main_no_failures 506 10000 5 5 1 1000
 #for i in `seq 0 0`; do
 #    main_no_failures 0 10 2 20 2 2000
 #    main_no_failures 0 100 2 20 2 2000
@@ -704,17 +711,17 @@ main_byz() {
 #    main_no_failures 1012 1000 16 16 1 2000
 #    main_no_failures 4084 1000 12 12 1 2000
 
-for i in `seq 0 2`; do
-    main_byz 500 100 200 1 1
-    main_byz 500 100 400 5 1
-    main_byz 500 100 600 10 1
-done
-
-for i in `seq 0 2`; do
-    main_byz 500 1000 200 1 1
-    main_byz 500 1000 500 5 1
-    main_byz 500 1000 900 10 1
-done
+#for i in `seq 0 2`; do
+#    main_byz 500 100 200 1 1
+#    main_byz 500 100 400 5 1
+#    main_byz 500 100 600 10 1
+#done
+#
+#for i in `seq 0 2`; do
+#    main_byz 500 1000 200 1 1
+#    main_byz 500 1000 500 5 1
+#    main_byz 500 1000 900 10 1
+#done
 
 
 
@@ -794,4 +801,4 @@ done
 
 
 
-shutdown
+#shutdown
