@@ -391,8 +391,8 @@ public abstract class ToyBaseServer extends Node {
                     permanent = permanent.toBuilder().setSt(permanent.getSt().toBuilder().setPd(System.currentTimeMillis())).build();
                     try {
                         bc.setBlock(recBlock.getHeader().getHeight() - (f + 2), permanent);
-                        logger.debug(format("Deliverd [[height=%d], [sender=%d], [channel=%d], [size=%d]]",
-                            permanent.getHeader().getHeight(), permanent.getHeader().getM().getSender(),
+                        logger.info(format("[#%d-C[%d]] Deliverd [[height=%d], [sender=%d], [channel=%d], [size=%d]]",
+                            getID(), channel, permanent.getHeader().getHeight(), permanent.getHeader().getM().getSender(),
                                 permanent.getHeader().getM().getChannel(),
                                 permanent.getDataCount()));
                     } catch (IOException e) {
