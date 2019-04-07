@@ -56,6 +56,7 @@ public class AsyncToyServer extends ToyBaseServer {
         if (currLeader != getID()) {
             return null;
         }
+        broadcastEmptyIfNeeded();
         logger.debug(format("[#%d -C[%d]] prepare to disseminate a new block header for [height=%d] [cidSeries=%d ; cid=%d]",
                 getID(), channel, currHeight, cidSeries, cid));
 
@@ -68,6 +69,7 @@ public class AsyncToyServer extends ToyBaseServer {
         if ((currLeader + 1) % n != getID()) {
             return null;
         }
+        broadcastEmptyIfNeeded();
         logger.debug(format("[#%d-C[%d]] prepare fast mode phase for [height=%d] [cidSeries=%d ; cid=%d]",
                 getID(), channel, currHeight + 1, cidSeries, cid + 1));
         return getHeaderForCurrentBlock(null, currHeight + 1, cidSeries, cid + 1);

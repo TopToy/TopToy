@@ -416,8 +416,12 @@ public class Cli {
 //            long avgWt = 0;
 //            int txCount = 0;
             int nob = JToy.s.getBCSize();
+//            int txSize = 0;
 //            for (int i = 0 ; i < nob ; i++) {
 //                Types.Block b = JToy.s.nonBlockingDeliver(i);
+//                for (Types.Transaction t : b.getDataList()) {
+//                    txSize += t.getData().size();
+//                }
 ////                if (b == null) {
 ////                    System.out.println(format("[i=%d] and NULL!!!!!", i));
 ////                    continue;
@@ -447,6 +451,7 @@ public class Cli {
 //                double time = ((double) totalRT / 1000);
                 double time = ((double) st.stop - st.start) / 1000;
                 int thrp = ((int) (st.txCount / time)); // / 1000;
+                int bps = (int) (nob / time);
 //                int thrp = ((int) (txCount / time));
                 double opRate = ((double) st.optemisticDec) / ((double) st.totalDec);
                 long delaysAvgMs = 0; //st.delaysSum / st.txCount;
@@ -456,13 +461,15 @@ public class Cli {
                 }
                 double eRate = ((double)st.eb) / ((double) st.all);
                 double dRate = ((double)st.deliveredTime) / ((double) st.all);
+
+
                 DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy-HH:mm:ss");
                 List<String> row = Arrays.asList(String.valueOf(validateBC()), dateFormat.format(new Date()), String.valueOf(JToy.s.getID()),
                         JToy.type, String.valueOf(Config.getC()), String.valueOf(Config.getTMO()), String.valueOf(Config.getFastMode()),
                         String.valueOf(st.txSize), String.valueOf(Config.getMaxTransactionsInBlock()),
                         String.valueOf(st.txCount), String.valueOf(time), String.valueOf(thrp),
 //                        String.valueOf(st.totalDec), String.valueOf(st.optemisticDec), String.valueOf(opRate),
-                        String.valueOf(nob), String.valueOf(avgTxInBlock),String.valueOf(delaysAvgMs), String.valueOf(opRate),
+                        String.valueOf(nob), String.valueOf(bps), String.valueOf(avgTxInBlock),String.valueOf(delaysAvgMs), String.valueOf(opRate),
                         String.valueOf(eRate), String.valueOf(dRate), String.valueOf(st.syncEvents));
                 CSVUtils.writeLine(writer, row);
                 writer.flush();

@@ -391,7 +391,7 @@ public abstract class ToyBaseServer extends Node {
                     permanent = permanent.toBuilder().setSt(permanent.getSt().toBuilder().setPd(System.currentTimeMillis())).build();
                     try {
                         bc.setBlock(recBlock.getHeader().getHeight() - (f + 2), permanent);
-                        logger.info(format("Deliverd [[height=%d], [sender=%d], [channel=%d], [size=%d]]",
+                        logger.debug(format("Deliverd [[height=%d], [sender=%d], [channel=%d], [size=%d]]",
                             permanent.getHeader().getHeight(), permanent.getHeader().getM().getSender(),
                                 permanent.getHeader().getM().getChannel(),
                                 permanent.getDataCount()));
@@ -540,7 +540,6 @@ public abstract class ToyBaseServer extends Node {
                 }
             }
         }
-
         if (missingTxs !=  -1) {
             for (int i = 0 ; i < missingTxs ; i++) {
                 long ts = System.currentTimeMillis();
@@ -600,6 +599,24 @@ public abstract class ToyBaseServer extends Node {
             }
     }
 
+    void broadcastEmptyIfNeeded() {
+        synchronized (cbl) {
+            synchronized (blocksForPropose) {
+                synchronized (proposedBlocks) {
+                    if (blocksForPropose.size() == 0 && proposedBlocks.size() == 0) {
+                        logger.debug(format("[#%d-C[%d]] broadcast empty block"
+                                , getID(),channel));
+                        blocksForPropose.add(currBLock.build());
+                        currBLock = configureNewBlock();
+                    }
+
+                }
+            }
+        }
+
+
+    }
+
 
 //    private boolean validateForkProof(ForkProof p)  {
 //        logger.debug(format("[#%d-C[%d]] starts validating fp", getID(), channel));
@@ -645,7 +662,7 @@ public abstract class ToyBaseServer extends Node {
                 logger.debug(format("[#%d-C[%d]] interrupting main thread [r=%d]"
                         , getID(),channel, forkPoint));
                 mainThread.interrupt();
-                while (!intCatched) {
+                while (!intCatched) { // TODO: deadlock alert!!
                     fp.wait();
                 }
                 mainThread.join();

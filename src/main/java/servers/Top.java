@@ -203,9 +203,25 @@ public class Top implements server {
         for (int i = 0 ; i < c ; i++) {
             sts.syncEvents += group[i].getSyncEvents();
         }
+        long txAll = 0;
         for (int i = 0 ; i < getBCSize() ; i++) {
-            sts.txCount += nonBlockingDeliver(i).getDataCount();
+            Types.Block b = nonBlockingDeliver(i);
+            sts.txCount += b.getDataCount();
+            for (Types.Transaction t : b.getDataList()) {
+//                if (t.getData().size() < 0) {
+//                    logger.info(format("---------->[%d]", t.getData().size()));
+//                }
+                txAll += t.getData().size();
+
+            }
         }
+//        logger.info(format("--[%d ; %d]", txAll, sts.txCount));
+        if (sts.txCount > 0) {
+            sts.txSize = (int) (txAll / (long) sts.txCount);
+        }
+//        if (sts.txSize != Config.getTxSize()) {
+//            logger.info(format("[%d ; %d]", sts.txSize, Config.getTxSize()));
+//        }
         return sts;
     }
 
