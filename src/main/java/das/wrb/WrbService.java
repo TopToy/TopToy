@@ -21,9 +21,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import proto.Types.*;
 import proto.WrbGrpc;
 
-import static das.data.Data.fvData;
-import static das.data.Data.preConsDone;
-import static das.data.Data.preConsVote;
+import static das.data.Data.*;
 import static io.grpc.Metadata.ASCII_STRING_MARSHALLER;
 import javax.net.ssl.SSLException;
 import java.io.IOException;
@@ -118,7 +116,6 @@ public class WrbService extends WrbGrpc.WrbImplBase {
 //    private final ConcurrentHashMap<Meta, BbcDecision>[] regBbcCons;
     private Object[] fastVoteNotifyer;
     private Object[] msgNotifyer;
-    private final Object[] preConsNotifyer;
     Map<Integer, peer> peers;
     private List<Node> nodes;
     private Thread bbcServiceThread;
@@ -153,13 +150,13 @@ public class WrbService extends WrbGrpc.WrbImplBase {
         this.nodes = nodes;
         this.fastVoteNotifyer = new Object[channels];
         this.msgNotifyer = new Object[channels];
-        this.preConsNotifyer = new Object[channels];
+//        this.preConsNotifyer = new Object[channels];
         this.comm = comm;
         this.bcs = new Blockchain[channels];
         for (int i = 0 ; i < channels ; i++) {
             fastVoteNotifyer[i] = new Object();
             msgNotifyer[i] = new Object();
-            preConsNotifyer[i] = new Object();
+//            preConsNotifyer[i] = new Object();
 //            fvData[i] = new ConcurrentHashMap<>();
 //            preConsVote[i] = new ConcurrentHashMap<>();
 //            preConsDone[i] = new ArrayList<>();

@@ -27,6 +27,7 @@ public class Data {
     public static ConcurrentHashMap<Types.Meta, List<Integer>>[] preConsVote;
     public static ConcurrentHashMap<Types.Meta, VoteData>[] fvData;
     public static ArrayList<Types.Meta>[] preConsDone;
+    static public Object[] preConsNotifyer;
 
     public Data(int channels) {
         bbcDec = new ConcurrentHashMap[channels];
@@ -38,6 +39,7 @@ public class Data {
         fvData = new ConcurrentHashMap[channels];
         preConsVote = new ConcurrentHashMap[channels];
         preConsDone = new ArrayList[channels];
+        this.preConsNotifyer = new Object[channels];
         for (int i = 0 ; i < channels ; i++) {
             bbcDec[i] = new ConcurrentHashMap<>();
             pending[i] = new ConcurrentHashMap<>();
@@ -48,6 +50,7 @@ public class Data {
             fvData[i] = new ConcurrentHashMap<>();
             preConsVote[i] = new ConcurrentHashMap<>();
             preConsDone[i] = new ArrayList<>();
+            preConsNotifyer[i] = new Object();
         }
     }
 
@@ -100,14 +103,16 @@ public class Data {
             }
             if (key.getCidSeries() == cidSeries && key.getCid() < cid) fvData[channel].remove(key);
         }
-
-        for (Types.Meta key : preConsDone[channel]) {
-            if (key.getCidSeries() < cidSeries)  {
-                preConsDone[channel].remove(key);
-                continue;
+        synchronized (preConsNotifyer[channel]) {
+            for (Types.Meta key : preConsDone[channel]) {
+                if (key.getCidSeries() < cidSeries)  {
+                    preConsDone[channel].remove(key);
+                    continue;
+                }
+                if (key.getCidSeries() == cidSeries && key.getCid() < cid) preConsDone[channel].remove(key);
             }
-            if (key.getCidSeries() == cidSeries && key.getCid() < cid) preConsDone[channel].remove(key);
         }
+
 
     }
 
