@@ -197,9 +197,10 @@ public class Clique extends CommunicationGrpc.CommunicationImplBase implements C
         Types.Block res = getBlockFromData(channel, bid, proof);
         if (res != null) return res;
         broadcastCommReq(Types.commReq.newBuilder().setProof(proof).build());
-        synchronized (Data.blocks[channel]) {
+        int pid = bid.getPid();
+        synchronized (Data.blocks[pid][channel]) {
             while (res == null) {
-                Data.blocks[channel].wait();
+                Data.blocks[pid][channel].wait();
                 res = getBlockFromData(channel, bid, proof);
             }
         }
@@ -218,13 +219,13 @@ public class Clique extends CommunicationGrpc.CommunicationImplBase implements C
                     if (verfiyBlockWRTheader(commRes.getB(), request.getProof())) {
                         logger.debug(format("[%d-C[%d]] received valid commRes [height=%d]", id, channel,
                                 request.getProof().getHeight()));
-                        synchronized (Data.blocks[channel]) {
+                        synchronized (Data.blocks[pid][channel]) {
                             Data.blocks[pid][channel].putIfAbsent(bid, new LinkedList<>());
                             Data.blocks[pid][channel].computeIfPresent(bid, (k, v) -> {
                                 v.add(commRes.getB());
                                 return v;
                             });
-                            Data.blocks[channel].notifyAll();
+                            Data.blocks[pid][channel].notifyAll();
                         }
                     }
                 }
@@ -262,14 +263,14 @@ public class Clique extends CommunicationGrpc.CommunicationImplBase implements C
         int c = request.getChannel();
         int pid = request.getData().getId().getPid();
         Data.blocks[pid][c].putIfAbsent(request.getData().getId(), new LinkedList<Types.Block>());
-        synchronized (Data.blocks[c]) {
+        synchronized (Data.blocks[pid][c]) {
             Data.blocks[pid][c].computeIfPresent(request.getData().getId(), (k, v) -> {
                 Types.BlockID bid = request.getData().getId();
                 logger.debug(format("[%d-%d] received block [pid=%d ; bid=%d]", id, c, bid.getPid(), bid.getBid()));
                 v.add(request.getData());
                 return v;
             });
-            Data.blocks[c].notifyAll();
+            Data.blocks[pid][c].notifyAll();
         }
 
 

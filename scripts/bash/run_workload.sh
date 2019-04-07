@@ -737,47 +737,47 @@ main_byz() {
 #
 
 
-#for i in `seq 0 2`; do
-#    main_no_failures 0 0 1 10 1 1000 120
-#done
-#
+for i in `seq 0 4`; do
+    main_no_failures 0 0 1 10 1 1000 120
+done
+
 #for i in `seq 0 2`; do
 #    main_no_failures 512 10 1 10 1 1000 120
 #done
-#
+
 #for i in `seq 0 2`; do
 #    main_no_failures 512 100 1 10 1 1000 120
 #done
-#
+
 #for i in `seq 0 2`; do
 #    main_no_failures 512 1000 1 10 1 1000 120
 #done
-#
+
 #for i in `seq 0 2`; do
 #    main_no_failures 1024 10 1 10 1 1000 120
 #done
-#
+
 #for i in `seq 0 2`; do
 #    main_no_failures 1024 100 1 10 1 1000 120
 #done
-#
+
 #for i in `seq 0 2`; do
 #    main_no_failures 1024 1000 1 10 1 1000 120
 #done
-#
+
 #for i in `seq 0 2`; do
 #    main_no_failures 4096 10 1 10 1 1000 120
 #done
-#
+
 #for i in `seq 0 2`; do
 #    main_no_failures 4096 100 1 10 1 1000 120
 #done
-#
+
 #for i in `seq 0 2`; do
 #    main_no_failures 4096 1000 1 10 1 1000 120
 #done
 
-main_no_failures 4096 1000 10 10 1 1000 120
+#main_no_failures 4096 1000 10 10 1 1000 120
 
 
 #for i in `seq 0 2`; do
@@ -930,4 +930,4 @@ main_no_failures 4096 1000 10 10 1 1000 120
 
 
 
-#shutdown
+shutdown

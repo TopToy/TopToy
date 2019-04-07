@@ -8,7 +8,7 @@ import proto.Types;
 import static java.lang.String.format;
 
 public class CacheUtils {
-    private int maxCacheSize = 100000;
+    private int maxCacheSize = 1000;
     private @NonNull
     Cache<Object, Object> cache;
 

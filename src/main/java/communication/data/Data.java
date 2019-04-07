@@ -20,16 +20,22 @@ public class Data {
 
     static public void evacuateOldData(int channel, Types.BlockID bid) {
         int pid = bid.getPid();
-        blocks[pid][channel].remove(bid);
+        synchronized (blocks[pid][channel]) {
+            blocks[pid][channel].remove(bid);
+        }
+
     }
 
     static public void evacuateAllOldData(int channel, Types.BlockID bid) {
         int pid = bid.getPid();
-        for (Types.BlockID id : blocks[pid][channel].keySet()) {
-            if (id.getBid() < bid.getBid()) {
-                blocks[pid][channel].remove(bid);
+        synchronized (blocks[pid][channel]) {
+            for (Types.BlockID id : blocks[pid][channel].keySet()) {
+                if (id.getBid() < bid.getBid()) {
+                    blocks[pid][channel].remove(bid);
+                }
             }
         }
+
     }
 
 
