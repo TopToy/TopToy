@@ -11,7 +11,7 @@ import bftsmart.tom.server.defaultservices.DefaultSingleRecoverable;
 import com.google.protobuf.ByteString;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import das.data.GlobalData;
+import das.data.Data;
 import proto.Types.*;
 
 import java.util.ArrayList;
@@ -85,7 +85,7 @@ public class RBrodcastService extends DefaultSingleRecoverable {
                 return new byte[0];
             }
 
-            switch (GlobalData.getRBType(msg.getType())) {
+            switch (Data.getRBType(msg.getType())) {
                 case FORK: addForkProof(msg, msg.getM().getChannel());
                     break;
                 case SYNC: addToSyncData(msg, msg.getM().getChannel());
@@ -104,10 +104,10 @@ public class RBrodcastService extends DefaultSingleRecoverable {
     private void addForkProof(RBMsg msg, int channel) throws InvalidProtocolBufferException {
         logger.debug(format("received FORK message on channel [%d]", channel));
         ForkProof p = ForkProof.parseFrom(msg.getData());
-        if (!GlobalData.validateForkProof(p)) return;
-        synchronized (GlobalData.forksRBData[channel]) {
-            GlobalData.forksRBData[channel].add(p);
-            GlobalData.forksRBData[channel].notifyAll();
+        if (!Data.validateForkProof(p)) return;
+        synchronized (Data.forksRBData[channel]) {
+            Data.forksRBData[channel].add(p);
+            Data.forksRBData[channel].notifyAll();
         }
     }
 
@@ -115,20 +115,20 @@ public class RBrodcastService extends DefaultSingleRecoverable {
         logger.debug(format("received SYNC message on channel [%d]", channel));
         subChainVersion sbv = subChainVersion.parseFrom(msg.getData());
         int fp = sbv.getForkPoint();
-        synchronized (GlobalData.syncRBData[channel]) {
-            if (GlobalData.syncRBData[channel].containsKey(fp)
-                    && GlobalData.syncRBData[channel].get(fp).size() == n - f) return;
+        synchronized (Data.syncRBData[channel]) {
+            if (Data.syncRBData[channel].containsKey(fp)
+                    && Data.syncRBData[channel].get(fp).size() == n - f) return;
         }
 
-        synchronized (GlobalData.syncRBData[channel]) {
-            if (!GlobalData.validateSubChainVersion(sbv, f)) return;
-            GlobalData.syncRBData[channel].computeIfAbsent(fp, k -> new ArrayList<>());
-            GlobalData.syncRBData[channel].computeIfPresent(fp, (k, v) -> {
+        synchronized (Data.syncRBData[channel]) {
+            if (!Data.validateSubChainVersion(sbv, f)) return;
+            Data.syncRBData[channel].computeIfAbsent(fp, k -> new ArrayList<>());
+            Data.syncRBData[channel].computeIfPresent(fp, (k, v) -> {
                 v.add(sbv);
                 return v;
             });
-            if (GlobalData.syncRBData[channel].get(fp).size() == n - f) {
-                GlobalData.syncRBData[channel].notifyAll();
+            if (Data.syncRBData[channel].get(fp).size() == n - f) {
+                Data.syncRBData[channel].notifyAll();
             }
         }
     }
@@ -138,7 +138,7 @@ public class RBrodcastService extends DefaultSingleRecoverable {
         return new byte[1];
     }
 
-    public void broadcast(byte[] m, Meta key, GlobalData.RBTypes t) {
+    public void broadcast(byte[] m, Meta key, Data.RBTypes t) {
         RBMsg msg = RBMsg.
                 newBuilder().
                 setM(key).

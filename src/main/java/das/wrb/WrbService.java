@@ -10,7 +10,7 @@ import crypto.DigestMethod;
 import crypto.blockDigSig;
 import crypto.sslUtils;
 import das.data.BbcDecData;
-import das.data.GlobalData;
+import das.data.Data;
 import das.data.VoteData;
 import io.grpc.*;
 import io.grpc.netty.NettyServerBuilder;
@@ -21,6 +21,9 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import proto.Types.*;
 import proto.WrbGrpc;
 
+import static das.data.Data.fvData;
+import static das.data.Data.preConsDone;
+import static das.data.Data.preConsVote;
 import static io.grpc.Metadata.ASCII_STRING_MARSHALLER;
 import javax.net.ssl.SSLException;
 import java.io.IOException;
@@ -107,9 +110,9 @@ public class WrbService extends WrbGrpc.WrbImplBase {
 //    private final Object globalLock = new Object();
 
 //    private final ConcurrentHashMap<Meta, Block>[] recMsg;
-    private final ConcurrentHashMap<Meta, List<Integer>>[] preConsVote;
-    private final ConcurrentHashMap<Meta, VoteData>[] fvData;
-    private final ArrayList<Meta>[] preConsDone;
+//    private final ConcurrentHashMap<Meta, List<Integer>>[] preConsVote;
+//    private final ConcurrentHashMap<Meta, VoteData>[] fvData;
+//    private final ArrayList<Meta>[] preConsDone;
 //    private final ConcurrentHashMap<Meta, Block>[] pendingMsg;
 //    private final ConcurrentHashMap<Meta, BbcDecision>[] fastBbcCons;
 //    private final ConcurrentHashMap<Meta, BbcDecision>[] regBbcCons;
@@ -140,9 +143,9 @@ public class WrbService extends WrbGrpc.WrbImplBase {
         this.tmoInterval = tmoInterval;
         this.currentTmo = new int[channels];
         this.bbcConfig = bbcConfig;
-        this.fvData = new ConcurrentHashMap[channels];
-        this.preConsVote = new ConcurrentHashMap[channels];
-        this.preConsDone = new ArrayList[channels];
+//        this.fvData = new ConcurrentHashMap[channels];
+//        this.preConsVote = new ConcurrentHashMap[channels];
+//        this.preConsDone = new ArrayList[channels];
         this.peers = new HashMap<>();
         this.f = f;
         this.n = 3*f +1;
@@ -157,12 +160,12 @@ public class WrbService extends WrbGrpc.WrbImplBase {
             fastVoteNotifyer[i] = new Object();
             msgNotifyer[i] = new Object();
             preConsNotifyer[i] = new Object();
-            fvData[i] = new ConcurrentHashMap<>();
-            preConsVote[i] = new ConcurrentHashMap<>();
-            preConsDone[i] = new ArrayList<>();
+//            fvData[i] = new ConcurrentHashMap<>();
+//            preConsVote[i] = new ConcurrentHashMap<>();
+//            preConsDone[i] = new ArrayList<>();
             this.currentTmo[i] = tmo;
         }
-        new GlobalData(channels);
+        new Data(channels);
         startGrpcServer(serverCrt, serverPrivKey, caRoot);
     }
 
@@ -305,7 +308,7 @@ public class WrbService extends WrbGrpc.WrbImplBase {
                         res.getData().getM().getCidSeries() == cidSeries
                         && res.getM().getChannel() == channel &&
                         res.getData().getM().getChannel() == channel) {
-                    if (GlobalData.pending[channel].containsKey(key) || bcs[channel].contains(req.getHeight())) return;
+                    if (Data.pending[channel].containsKey(key) || bcs[channel].contains(req.getHeight())) return;
                     if (!blockDigSig.verifyHeader(sender, res.getData())) {
                         logger.debug(format("[#%d-C[%d]] has received invalid response message from [#%d] for [cidSeries=%d ; cid=%d]",
                                 id, channel, res.getM().getSender(), cidSeries, cid));
@@ -314,7 +317,7 @@ public class WrbService extends WrbGrpc.WrbImplBase {
                     logger.debug(format("[#%d-C[%d]] has received response message from [#%d] for [cidSeries=%d ; cid=%d]",
                             id, channel, res.getM().getSender(), cidSeries, cid));
                     synchronized (msgNotifyer[channel]) {
-                        GlobalData.pending[channel].putIfAbsent(key, res.getData());
+                        Data.pending[channel].putIfAbsent(key, res.getData());
                         msgNotifyer[channel].notify();
                     }
                 }
@@ -362,11 +365,11 @@ public class WrbService extends WrbGrpc.WrbImplBase {
                                     id, channel, res.getM().getSender(), cidSeries, cid));
                             return val;
                         }
-                        if (!GlobalData.pending[channel].containsKey(key) &&
+                        if (!Data.pending[channel].containsKey(key) &&
                                 !bcs[channel].contains(req.getHeight())) {
                             logger.debug(format("[#%d-C[%d]] has pre das received message from [#%d] for [cidSeries=%d ; cid=%d]",
                                     id, channel, res.getM().getSender(), cidSeries, cid));
-                            GlobalData.pending[channel].putIfAbsent(key, res.getData());
+                            Data.pending[channel].putIfAbsent(key, res.getData());
                         }
                     } else if (res.getData().equals(BlockHeader.getDefaultInstance())) {
                         logger.debug(format("[#%d-C[%d]] has pre das received NULL message from [#%d] for [cidSeries=%d ; cid=%d]",
@@ -450,7 +453,7 @@ public class WrbService extends WrbGrpc.WrbImplBase {
                 .build();
         if (bcs[channel].contains(request.getHeight())) return;
         synchronized (msgNotifyer[channel]) {
-            GlobalData.pending[channel].putIfAbsent(key, request);
+            Data.pending[channel].putIfAbsent(key, request);
             msgNotifyer[channel].notify();
         }
         logger.debug(format("[#%d-C[%d]] has received data message from [%d], [cidSeries=%d ; cid=%d]"
@@ -487,15 +490,15 @@ public class WrbService extends WrbGrpc.WrbImplBase {
             if (!v.addVote(request.getM().getSender(), request.getVote())) return v;
             if (v.getVotersNum() == n) {
                 synchronized (fastVoteNotifyer[channel]) {
-                    GlobalData.votes[channel].computeIfAbsent(k, k1 -> {
-                        GlobalData.bbcDec[channel].computeIfAbsent(k1, k2 -> {
+                    Data.votes[channel].computeIfAbsent(k, k1 -> {
+                        Data.bbcDec[channel].computeIfAbsent(k1, k2 -> {
                             fastVoteNotifyer[channel].notifyAll();
                             return new BbcDecData(v.getVoteReasult(), true);
                         });
                         return null;
                     });
-                    GlobalData.votes[channel].computeIfPresent(k, (k1, v1) -> {
-                        GlobalData.bbcDec[channel].computeIfAbsent(k1, k2 -> {
+                    Data.votes[channel].computeIfPresent(k, (k1, v1) -> {
+                        Data.bbcDec[channel].computeIfAbsent(k1, k2 -> {
                             if (v.isPosRes(n)) {
                                 logger.debug(format("[#%d-C[%d]] decides fast, but re-participate consensus " +
                                                 "[channel=%d ; cidSeries=%d ; cid=%d]",
@@ -525,16 +528,16 @@ public class WrbService extends WrbGrpc.WrbImplBase {
                     id, channel, cidSeries, cid, request.getM().getSender(), request.getVote()));
             if (v.getVotersNum() == n - f) {
                 synchronized (fastVoteNotifyer[channel]) {
-                    GlobalData.votes[channel].computeIfAbsent(k, k1 -> {
-                        GlobalData.bbcDec[channel].computeIfAbsent(k1, k2 -> {
+                    Data.votes[channel].computeIfAbsent(k, k1 -> {
+                        Data.bbcDec[channel].computeIfAbsent(k1, k2 -> {
                             fastVoteNotifyer[channel].notifyAll();
                             return new BbcDecData(v.getVoteReasult(), true);
                         });
                         return null;
                     });
 
-                    GlobalData.votes[channel].computeIfPresent(k, (k1, v1) -> {
-                        GlobalData.bbcDec[channel].computeIfAbsent(k1, k2 -> {
+                    Data.votes[channel].computeIfPresent(k, (k1, v1) -> {
+                        Data.bbcDec[channel].computeIfAbsent(k1, k2 -> {
                             if (v.isPosRes(n - f)) {
                                 logger.debug(format("[#%d-C[%d]] decides fast, but re-participate consensus [channel=%d ; cidSeries=%d ; cid=%d]",
                                         id, channel, channel, cidSeries, cid));
@@ -563,7 +566,7 @@ public class WrbService extends WrbGrpc.WrbImplBase {
                 .setCidSeries(cidSeries)
                 .setCid(cid)
                 .build();
-        msg = GlobalData.pending[channel].get(key);
+        msg = Data.pending[channel].get(key);
         if (msg == null && bcs[channel].contains(request.getHeight())) {
             msg = bcs[channel].getBlock(request.getHeight()).getHeader();
         }
@@ -597,7 +600,7 @@ public class WrbService extends WrbGrpc.WrbImplBase {
                 .setCidSeries(cidSeries)
                 .setCid(cid)
                 .build();
-        msg = GlobalData.pending[channel].get(key);
+        msg = Data.pending[channel].get(key);
         if (msg == null && bcs[channel].contains(request.getHeight())) {
             msg = bcs[channel].getBlock(request.getHeight()).getHeader();
         }
@@ -626,7 +629,7 @@ public class WrbService extends WrbGrpc.WrbImplBase {
     }
 
     private void fastBbcVoteV1(Meta key, int channel, int sender, int cidSeries, int cid, BlockHeader next) {
-        GlobalData.pending[channel].computeIfPresent(key, (k, val) -> {
+        Data.pending[channel].computeIfPresent(key, (k, val) -> {
             long start = System.currentTimeMillis();
             if (val.getM().getSender() != sender ||
                     val.getM().getCidSeries() != cidSeries ||
@@ -669,7 +672,7 @@ public class WrbService extends WrbGrpc.WrbImplBase {
                         .build())
                 .setVote(false);
 
-        GlobalData.pending[channel].computeIfPresent(key, (k, val) -> {
+        Data.pending[channel].computeIfPresent(key, (k, val) -> {
             if (val.getM().getSender() != sender ||
                     val.getM().getCidSeries() != cidSeries ||
                     val.getM().getCid() != cid ||
@@ -697,7 +700,7 @@ public class WrbService extends WrbGrpc.WrbImplBase {
         long startTime = System.currentTimeMillis();
         synchronized (fastVoteNotifyer[channel]) {
             while (currentTmo[channel] - estimatedTime > 0 &&
-                    !GlobalData.bbcDec[channel].containsKey(key)) {
+                    !Data.bbcDec[channel].containsKey(key)) {
                 logger.debug(format("[#%d-C[%d]] will wait at most [%d] ms for fast bbc", id, channel,
                         max(currentTmo[channel] - estimatedTime, 1)));
                 fastVoteNotifyer[channel].wait(currentTmo[channel] - estimatedTime);
@@ -711,7 +714,7 @@ public class WrbService extends WrbGrpc.WrbImplBase {
         long startTime = System.currentTimeMillis();
         synchronized (fastVoteNotifyer[channel]) {
             // Now we assume that a process always gets n-f messages!
-            while (!GlobalData.bbcDec[channel].containsKey(key)) {
+            while (!Data.bbcDec[channel].containsKey(key)) {
                 fastVoteNotifyer[channel].wait();
             }
             logger.debug(format("[#%d-C[%d]] have waited for more [%d] ms for fast bbc", id, channel,
@@ -733,7 +736,7 @@ public class WrbService extends WrbGrpc.WrbImplBase {
             return null;
         }
         logger.debug(format("[#%d-C[%d]] bbc returned [%d] for [cidSeries=%d ; cid=%d]", id, channel, 1, cidSeries, cid));
-        if (GlobalData.bbcDec[channel].get(key).fv) {
+        if (Data.bbcDec[channel].get(key).fv) {
             optimialDec.getAndIncrement();
         }
 
@@ -748,9 +751,9 @@ public class WrbService extends WrbGrpc.WrbImplBase {
 
         fastBbcVoteV1(key, channel, sender, cidSeries, cid, next);
 
-        if (GlobalData.bbcDec[channel].containsKey(key)
-                && GlobalData.bbcDec[channel].get(key).getDec() != -1) {
-            int dec = GlobalData.bbcDec[channel].get(key).getDec();
+        if (Data.bbcDec[channel].containsKey(key)
+                && Data.bbcDec[channel].get(key).getDec() != -1) {
+            int dec = Data.bbcDec[channel].get(key).getDec();
             logger.debug(format("[#%d-C[%d]] already has a decision!" +
                     " bbc returned [%d] for [cidSeries=%d ; cid=%d]", id, channel, dec, cidSeries, cid));
             if (dec == 1) currentTmo[channel] = tmo;
@@ -761,9 +764,9 @@ public class WrbService extends WrbGrpc.WrbImplBase {
 
 
 
-        if (GlobalData.bbcDec[channel].containsKey(key)
-                && GlobalData.bbcDec[channel].get(key).getDec() != -1) {
-            int dec = GlobalData.bbcDec[channel].get(key).getDec();
+        if (Data.bbcDec[channel].containsKey(key)
+                && Data.bbcDec[channel].get(key).getDec() != -1) {
+            int dec = Data.bbcDec[channel].get(key).getDec();
             logger.debug(format("[#%d-C[%d]] deliver probably by fast vote" +
                     " bbc returned [%d] for [cidSeries=%d ; cid=%d]", id, channel, dec, cidSeries, cid));
             if (dec == 1) currentTmo[channel] = tmo;
@@ -771,7 +774,7 @@ public class WrbService extends WrbGrpc.WrbImplBase {
         }
         AtomicBoolean prop = new AtomicBoolean(false);
 
-        GlobalData.pending[channel].computeIfAbsent(key, k -> {
+        Data.pending[channel].computeIfAbsent(key, k -> {
             currentTmo[channel] += tmoInterval;
             logger.debug(format("[#%d-C[%d]] Initiates full bbc instance [cidSeries=%d ; cid=%d], [vote:%d]", id, channel, cidSeries, cid, 0));
             bbcService.propose(0, channel, cidSeries, cid);
@@ -779,7 +782,7 @@ public class WrbService extends WrbGrpc.WrbImplBase {
             return null;
         });
 
-        GlobalData.pending[channel].computeIfPresent(key, (k, v) -> {
+        Data.pending[channel].computeIfPresent(key, (k, v) -> {
             if (prop.get()) return v;
             logger.debug(format("[#%d-C[%d]] Initiates full bbc instance [cidSeries=%d ; cid=%d], [vote:%d]", id, channel, cidSeries, cid, 1));
             bbcService.propose(1, channel, cidSeries, cid);
@@ -790,7 +793,7 @@ public class WrbService extends WrbGrpc.WrbImplBase {
     }
 
     private void preConsReq(Meta key, int channel, int cidSeries, int cid, int sender, int height) throws InterruptedException {
-        if (GlobalData.pending[channel].containsKey(key)) return;
+        if (Data.pending[channel].containsKey(key)) return;
         logger.debug(format("[#%d-C[%d]] starts preConsReq", id, channel));
         WrbPreConsReq req = WrbPreConsReq.newBuilder()
                 .setMeta(Meta.newBuilder()
@@ -818,10 +821,10 @@ public class WrbService extends WrbGrpc.WrbImplBase {
 
         fastBbcVoteV2(key, channel, sender, cidSeries, cid, next);
 
-        if (GlobalData.bbcDec[channel].containsKey(key)
-                && GlobalData.bbcDec[channel].get(key).getDec() != -1) {
+        if (Data.bbcDec[channel].containsKey(key)
+                && Data.bbcDec[channel].get(key).getDec() != -1) {
 
-            int dec = GlobalData.bbcDec[channel].get(key).getDec();
+            int dec = Data.bbcDec[channel].get(key).getDec();
             logger.debug(format("[#%d-C[%d]] already has a decision!" +
                     " bbc returned [%d] for [cidSeries=%d ; cid=%d]", id, channel, dec, cidSeries, cid));
             if (dec == 1) currentTmo[channel] = tmo;
@@ -832,9 +835,9 @@ public class WrbService extends WrbGrpc.WrbImplBase {
 
 
 
-        if (GlobalData.bbcDec[channel].containsKey(key)
-                && GlobalData.bbcDec[channel].get(key).getDec() != -1) {
-            int dec = GlobalData.bbcDec[channel].get(key).getDec();
+        if (Data.bbcDec[channel].containsKey(key)
+                && Data.bbcDec[channel].get(key).getDec() != -1) {
+            int dec = Data.bbcDec[channel].get(key).getDec();
             logger.debug(format("[#%d-C[%d]] deliver probably by fast vote" +
                     " bbc returned [%d] for [cidSeries=%d ; cid=%d]", id, channel, dec, cidSeries, cid));
             if (dec == 1) currentTmo[channel] = tmo;
@@ -845,7 +848,7 @@ public class WrbService extends WrbGrpc.WrbImplBase {
 
         AtomicBoolean prop = new AtomicBoolean(false);
 
-        GlobalData.pending[channel].computeIfAbsent(key, k -> {
+        Data.pending[channel].computeIfAbsent(key, k -> {
             currentTmo[channel] += tmoInterval;
             logger.debug(format("[#%d-C[%d]] Initiates full bbc instance [cidSeries=%d ; cid=%d], [vote:%d]", id, channel, cidSeries, cid, 0));
             bbcService.propose(0, channel, cidSeries, cid);
@@ -854,7 +857,7 @@ public class WrbService extends WrbGrpc.WrbImplBase {
         });
 
 
-        GlobalData.pending[channel].computeIfPresent(key, (k, v) -> {
+        Data.pending[channel].computeIfPresent(key, (k, v) -> {
             if (prop.get()) return v;
             currentTmo[channel] = tmo;
             int vote = 1;
@@ -876,7 +879,7 @@ public class WrbService extends WrbGrpc.WrbImplBase {
         int realTmo = currentTmo[channel];
         long startTime = System.currentTimeMillis();
         synchronized (msgNotifyer[channel]) {
-            while (realTmo > 0 && !GlobalData.pending[channel].containsKey(key)) {
+            while (realTmo > 0 && !Data.pending[channel].containsKey(key)) {
                 logger.debug(format("[#%d-C[%d]] going to sleep for at most [%d] ms for data msg [cidSeries=%d ; cid=%d]",
                         id, channel, realTmo, cidSeries, cid));
                 msgNotifyer[channel].wait(realTmo);
@@ -894,7 +897,7 @@ public class WrbService extends WrbGrpc.WrbImplBase {
 
     private BlockHeader postDeliverLogic(Meta key, int channel, int cidSeries, int cid, int sender, int height) throws InterruptedException {
         requestData(channel, cidSeries, cid, sender, height);
-        BlockHeader msg = GlobalData.pending[channel].get(key);
+        BlockHeader msg = Data.pending[channel].get(key);
 //        GlobalData.pending[channel].remove(key);
 //        GlobalData.received[channel].put(key, msg);
         return msg;
@@ -906,7 +909,7 @@ public class WrbService extends WrbGrpc.WrbImplBase {
                 .setCidSeries(cidSeries)
                 .setCid(cid)
                 .build();
-        if (GlobalData.pending[channel].containsKey(key)) return;
+        if (Data.pending[channel].containsKey(key)) return;
         Meta meta = Meta.
                 newBuilder().
                 setCid(cid).
@@ -920,7 +923,7 @@ public class WrbService extends WrbGrpc.WrbImplBase {
                 .build();
         broadcastReqMsg(req,channel, cidSeries, cid, sender);
         synchronized (msgNotifyer[channel]) {
-            while (!GlobalData.pending[channel].containsKey(key)) {
+            while (!Data.pending[channel].containsKey(key)) {
                 msgNotifyer[channel].wait();
             }
         }

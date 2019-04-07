@@ -9,7 +9,7 @@ import communication.overlays.Clique;
 import config.Config;
 import config.Node;
 import das.RBroadcast.RBrodcastService;
-import das.data.GlobalData;
+import das.data.Data;
 import das.wrb.WrbNode;
 import proto.Types;
 import utils.CacheUtils;
@@ -20,12 +20,10 @@ import java.nio.file.Paths;
 import java.security.SecureRandom;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import static blockchain.Utils.*;
-import static crypto.blockDigSig.verfiyBlockWRTheader;
 import static java.lang.Math.max;
 import static java.lang.String.format;
 import proto.Types.*;
@@ -143,7 +141,7 @@ public abstract class ToyBaseServer extends Node {
         super(addr, wrbPort, id);
         this.f = f;
         this.n = 3*f + 1;
-        comm = new Clique(id, addr, commPort, 1, commCluster);
+        comm = new Clique(id, addr, commPort, 1, this.n, commCluster);
 
         RBService = new RBrodcastService(id, n, f, rbConfigPath);
         bc = initBC(id, channel);
@@ -382,9 +380,11 @@ public abstract class ToyBaseServer extends Node {
 
                 bc.addBlock(recBlock);
 
-                GlobalData.evacuateOldData(channel, recBlock.getHeader().getM());
+                Data.evacuateOldData(channel, recBlock.getHeader().getM());
+                communication.data.Data.evacuateOldData(channel, recBlock.getId());
                 if (currHeight % 1000 == 0) {
-                    GlobalData.evacuateOldData(channel, cidSeries, cid);
+                    Data.evacuateAllOldData(channel, recBlock.getHeader().getM());
+                    communication.data.Data.evacuateAllOldData(channel, recBlock.getId());
                 }
                 if (recBlock.getHeader().getHeight() - (f + 2) > 0) {
                     Block permanent = bc.getBlock(recBlock.getHeader().getHeight() - (f + 2));
@@ -638,11 +638,11 @@ public abstract class ToyBaseServer extends Node {
     private void mainFork() throws InterruptedException, IOException {
         while (!stopped.get()) {
             int forkPoint;
-            synchronized (GlobalData.forksRBData[channel]) {
-                while (GlobalData.forksRBData[channel].isEmpty()) {
-                    GlobalData.forksRBData[channel].wait();
+            synchronized (Data.forksRBData[channel]) {
+                while (Data.forksRBData[channel].isEmpty()) {
+                    Data.forksRBData[channel].wait();
                 }
-                forkPoint = Objects.requireNonNull(GlobalData.forksRBData[channel].poll())
+                forkPoint = Objects.requireNonNull(Data.forksRBData[channel].poll())
                         .getCurr().getHeader().getHeight();
             }
             handleFork(forkPoint);
@@ -693,7 +693,7 @@ public abstract class ToyBaseServer extends Node {
                 .setCid(cid)
                 .setSender(getID())
                 .build();
-        RBService.broadcast(p.toByteArray(), key, GlobalData.RBTypes.FORK);
+        RBService.broadcast(p.toByteArray(), key, Data.RBTypes.FORK);
 //        handleFork(p.getCurr().getHeader().getHeight());
     }
 
@@ -750,7 +750,7 @@ public abstract class ToyBaseServer extends Node {
                 .setCid(cid)
                 .setSender(getID())
                 .build();
-        RBService.broadcast(sv.build().toByteArray(), key, GlobalData.RBTypes.SYNC);
+        RBService.broadcast(sv.build().toByteArray(), key, Data.RBTypes.SYNC);
     }
 
     abstract void potentialBehaviourForSync() throws InterruptedException;
@@ -761,19 +761,19 @@ public abstract class ToyBaseServer extends Node {
 
         logger.debug(format("[#%d-C[%d]] proposeVersion for [r=%d]"
                 , getID(), channel, forkPoint));
-        synchronized (GlobalData.syncRBData[channel]) {
-            if ((!GlobalData.syncRBData[channel].containsKey(forkPoint))
-                    || GlobalData.syncRBData[channel].get(forkPoint).size() < n - f) {
+        synchronized (Data.syncRBData[channel]) {
+            if ((!Data.syncRBData[channel].containsKey(forkPoint))
+                    || Data.syncRBData[channel].get(forkPoint).size() < n - f) {
                 disseminateChainVersion(forkPoint);
 
             }
         }
 
 
-        synchronized (GlobalData.syncRBData[channel]) {
-            while (!GlobalData.syncRBData[channel].containsKey(forkPoint) ||
-                    GlobalData.syncRBData[channel].get(forkPoint).size() < n - f) {
-                GlobalData.syncRBData[channel].wait();
+        synchronized (Data.syncRBData[channel]) {
+            while (!Data.syncRBData[channel].containsKey(forkPoint) ||
+                    Data.syncRBData[channel].get(forkPoint).size() < n - f) {
+                Data.syncRBData[channel].wait();
             }
         }
 
@@ -793,8 +793,8 @@ public abstract class ToyBaseServer extends Node {
         final subChainVersion[] choosen = new subChainVersion[1];
         final int[] sPoint = {0};
         AtomicBoolean noMatch = new AtomicBoolean(false);
-        synchronized (GlobalData.syncRBData[channel]) {
-            GlobalData.syncRBData[channel].computeIfPresent(forkPoint, (k, v1)-> {
+        synchronized (Data.syncRBData[channel]) {
+            Data.syncRBData[channel].computeIfPresent(forkPoint, (k, v1)-> {
                 ArrayList<subChainVersion> ret = new ArrayList<>();
                 ret.add(subChainVersion.getDefaultInstance());
                 if (v1.stream().noneMatch(v -> v.getVCount() > 0)) {

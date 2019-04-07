@@ -9,8 +9,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import static blockchain.Utils.validateBlockHash;
 import static java.lang.String.format;
 
-public class GlobalData {
-    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(GlobalData.class);
+public class Data {
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Data.class);
     public enum RBTypes {
         FORK,
         SYNC,
@@ -24,14 +24,20 @@ public class GlobalData {
     public static ConcurrentHashMap<Types.Meta, VoteData>[] votes;
     public static Queue<Types.ForkProof>[] forksRBData;
     public static HashMap<Integer, List<Types.subChainVersion>>[] syncRBData;
+    public static ConcurrentHashMap<Types.Meta, List<Integer>>[] preConsVote;
+    public static ConcurrentHashMap<Types.Meta, VoteData>[] fvData;
+    public static ArrayList<Types.Meta>[] preConsDone;
 
-    public GlobalData(int channels) {
+    public Data(int channels) {
         bbcDec = new ConcurrentHashMap[channels];
         pending = new ConcurrentHashMap[channels];
 //        received = new ConcurrentHashMap[channels];
         votes = new ConcurrentHashMap[channels];
         forksRBData = new Queue[channels];
         syncRBData = new HashMap[channels];
+        fvData = new ConcurrentHashMap[channels];
+        preConsVote = new ConcurrentHashMap[channels];
+        preConsDone = new ArrayList[channels];
         for (int i = 0 ; i < channels ; i++) {
             bbcDec[i] = new ConcurrentHashMap<>();
             pending[i] = new ConcurrentHashMap<>();
@@ -39,6 +45,9 @@ public class GlobalData {
             votes[i] = new ConcurrentHashMap<>();
             forksRBData[i] = new LinkedList<>();
             syncRBData[i] = new HashMap<>();
+            fvData[i] = new ConcurrentHashMap<>();
+            preConsVote[i] = new ConcurrentHashMap<>();
+            preConsDone[i] = new ArrayList<>();
         }
     }
 
@@ -46,9 +55,14 @@ public class GlobalData {
         bbcDec[channel].remove(key);
         pending[channel].remove(key);
         votes[channel].remove(key);
+        preConsVote[channel].remove(key);
+        preConsDone[channel].remove(key);
+        fvData[channel].remove(key);
     }
 
-    static public void evacuateOldData(int channel, int cidSeries, int cid) {
+    static public void evacuateAllOldData(int channel, Types.Meta mKey) {
+        int cidSeries = mKey.getCidSeries();
+        int cid = mKey.getCid();
         for (Types.Meta key : bbcDec[channel].keySet()) {
             if (key.getCidSeries() < cidSeries)  {
                 bbcDec[channel].remove(key);
@@ -70,6 +84,31 @@ public class GlobalData {
             }
             if (key.getCidSeries() == cidSeries && key.getCid() < cid) votes[channel].remove(key);
         }
+
+        for (Types.Meta key : preConsVote[channel].keySet()) {
+            if (key.getCidSeries() < cidSeries)  {
+                preConsVote[channel].remove(key);
+                continue;
+            }
+            if (key.getCidSeries() == cidSeries && key.getCid() < cid) preConsVote[channel].remove(key);
+        }
+
+        for (Types.Meta key : fvData[channel].keySet()) {
+            if (key.getCidSeries() < cidSeries)  {
+                fvData[channel].remove(key);
+                continue;
+            }
+            if (key.getCidSeries() == cidSeries && key.getCid() < cid) fvData[channel].remove(key);
+        }
+
+        for (Types.Meta key : preConsDone[channel]) {
+            if (key.getCidSeries() < cidSeries)  {
+                preConsDone[channel].remove(key);
+                continue;
+            }
+            if (key.getCidSeries() == cidSeries && key.getCid() < cid) preConsDone[channel].remove(key);
+        }
+
     }
 
     static public RBTypes getRBType(int type) {

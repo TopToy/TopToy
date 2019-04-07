@@ -93,7 +93,7 @@ public class Top implements server {
         this.c = c;
         this.group = new ToyBaseServer[c];
         this.id = id;
-        this.comm = new Clique(id, addr, commPort, c, commCluster);
+        this.comm = new Clique(id, addr, commPort, c, this.n, commCluster);
         if (type.equals("r") || type.equals("a")) {
             wrb = new WrbNode(c, id, addr, wrbPort, f, tmo, tmoInterval,
                     wrbCluster, bbcConfig, serverCrt, serverPrivKey, caRoot, comm);

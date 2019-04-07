@@ -2,7 +2,7 @@ package communication.overlays;
 
 import blockchain.Blockchain;
 import communication.CommLayer;
-import communication.data.GlobalData;
+import communication.data.Data;
 import config.Node;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -49,14 +49,16 @@ public class Clique extends CommunicationGrpc.CommunicationImplBase implements C
     private int port;
     private int channels;
     private Blockchain[] bcs;
+    int n;
 
-    public Clique(int id, String addr, int port, int channels, ArrayList<Node> nodes) {
+    public Clique(int id, String addr, int port, int channels, int n,  ArrayList<Node> nodes) {
         this.id = id;
         this.nodes = nodes;
         this.port = port;
         this.addr = addr;
         this.channels = channels;
-        new GlobalData(channels);
+        this.n = n;
+        new Data(n, channels);
         this.bcs = new Blockchain[channels];
     }
 
@@ -155,9 +157,10 @@ public class Clique extends CommunicationGrpc.CommunicationImplBase implements C
                 .build();
         int height = request.getProof().getHeight();
         int channel = request.getProof().getM().getChannel();
+        int pid = request.getProof().getM().getSender();
         logger.debug(format("[%d-C[%d]] received commReq [height=%d]", id, channel, height));
         Types.Block res[] = {null};
-        GlobalData.blocks[channel].computeIfPresent(bid, (k, v) -> {
+        Data.blocks[pid][channel].computeIfPresent(bid, (k, v) -> {
 
             LinkedList<Types.Block> ll = v.stream().filter(b -> verfiyBlockWRTheader(b, request.getProof()))
                     .collect(Collectors.toCollection(LinkedList::new));
@@ -178,7 +181,8 @@ public class Clique extends CommunicationGrpc.CommunicationImplBase implements C
 
     Types.Block getBlockFromData(int channel, Types.BlockID bid, Types.BlockHeader proof) {
         final Types.Block[] res = {null};
-        GlobalData.blocks[channel].computeIfPresent(bid, (k, v) -> {
+        int pid = bid.getPid();
+        Data.blocks[pid][channel].computeIfPresent(bid, (k, v) -> {
             v = v.stream()
                     .filter(b -> verfiyBlockWRTheader(b, proof)).collect(Collectors.toCollection(LinkedList::new));
             res[0] = v.poll();
@@ -193,9 +197,9 @@ public class Clique extends CommunicationGrpc.CommunicationImplBase implements C
         Types.Block res = getBlockFromData(channel, bid, proof);
         if (res != null) return res;
         broadcastCommReq(Types.commReq.newBuilder().setProof(proof).build());
-        synchronized (GlobalData.blocks[channel]) {
+        synchronized (Data.blocks[channel]) {
             while (res == null) {
-                GlobalData.blocks[channel].wait();
+                Data.blocks[channel].wait();
                 res = getBlockFromData(channel, bid, proof);
             }
         }
@@ -208,18 +212,19 @@ public class Clique extends CommunicationGrpc.CommunicationImplBase implements C
                 @Override
                 public void onNext(Types.commRes commRes) {
                     int channel = request.getProof().getM().getChannel();
-                    Types.BlockID bid = Types.BlockID.newBuilder().setPid(request.getProof().getM().getSender())
+                    int pid = request.getProof().getM().getSender();
+                    Types.BlockID bid = Types.BlockID.newBuilder().setPid(pid)
                             .setBid(request.getProof().getBid()).build();
                     if (verfiyBlockWRTheader(commRes.getB(), request.getProof())) {
                         logger.debug(format("[%d-C[%d]] received valid commRes [height=%d]", id, channel,
                                 request.getProof().getHeight()));
-                        synchronized (GlobalData.blocks[channel]) {
-                            GlobalData.blocks[channel].putIfAbsent(bid, new LinkedList<>());
-                            GlobalData.blocks[channel].computeIfPresent(bid, (k, v) -> {
+                        synchronized (Data.blocks[channel]) {
+                            Data.blocks[pid][channel].putIfAbsent(bid, new LinkedList<>());
+                            Data.blocks[pid][channel].computeIfPresent(bid, (k, v) -> {
                                 v.add(commRes.getB());
                                 return v;
                             });
-                            GlobalData.blocks[channel].notifyAll();
+                            Data.blocks[channel].notifyAll();
                         }
                     }
                 }
@@ -240,7 +245,8 @@ public class Clique extends CommunicationGrpc.CommunicationImplBase implements C
     @Override
     public boolean contains(int channel, Types.BlockID bid, Types.BlockHeader proof) {
         if (proof.getEmpty()) return true;
-        GlobalData.blocks[channel].computeIfPresent(bid, (k, v) -> {
+        int pid = bid.getPid();
+        Data.blocks[pid][channel].computeIfPresent(bid, (k, v) -> {
             int bef = v.size();
             v = v.stream().filter(b -> verfiyBlockWRTheader(b, proof))
                     .collect(Collectors.toCollection(LinkedList::new));
@@ -248,21 +254,22 @@ public class Clique extends CommunicationGrpc.CommunicationImplBase implements C
                     bid.getPid(), bid.getBid()));
             return v;
         });
-        return GlobalData.blocks[channel].containsKey(bid) && GlobalData.blocks[channel].get(bid).size() > 0;
+        return Data.blocks[pid][channel].containsKey(bid) && Data.blocks[pid][channel].get(bid).size() > 0;
     }
 
     @Override
     public void dsm(Types.Comm request, StreamObserver<proto.Types.Empty> responseObserver) {
         int c = request.getChannel();
-        GlobalData.blocks[c].putIfAbsent(request.getData().getId(), new LinkedList<Types.Block>());
-        synchronized (GlobalData.blocks[c]) {
-            GlobalData.blocks[c].computeIfPresent(request.getData().getId(), (k, v) -> {
+        int pid = request.getData().getId().getPid();
+        Data.blocks[pid][c].putIfAbsent(request.getData().getId(), new LinkedList<Types.Block>());
+        synchronized (Data.blocks[c]) {
+            Data.blocks[pid][c].computeIfPresent(request.getData().getId(), (k, v) -> {
                 Types.BlockID bid = request.getData().getId();
                 logger.debug(format("[%d-%d] received block [pid=%d ; bid=%d]", id, c, bid.getPid(), bid.getBid()));
                 v.add(request.getData());
                 return v;
             });
-            GlobalData.blocks[c].notifyAll();
+            Data.blocks[c].notifyAll();
         }
 
 

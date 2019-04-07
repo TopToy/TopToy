@@ -2,7 +2,6 @@ package das.wrb;
 
 import blockchain.Blockchain;
 import communication.CommLayer;
-import communication.data.GlobalData;
 import config.Node;
 import proto.Types;
 //import crypto.rmfDigSig;
@@ -10,7 +9,6 @@ import proto.Types;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import static crypto.blockDigSig.verfiyBlockWRTheader;
 import static java.lang.String.format;
 
 public class WrbNode extends Node{

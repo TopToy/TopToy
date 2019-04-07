@@ -9,7 +9,7 @@ import bftsmart.tom.core.messages.TOMMessage;
 import bftsmart.tom.core.messages.TOMMessageType;
 import bftsmart.tom.server.defaultservices.DefaultSingleRecoverable;
 import das.data.BbcDecData;
-import das.data.GlobalData;
+import das.data.Data;
 import das.data.VoteData;
 import proto.Types.*;
 
@@ -89,8 +89,8 @@ public class BbcService extends DefaultSingleRecoverable {
             logger.debug(format("[#%d] has received bbc message from [sender=%d ; channel=%d ; cidSeries=%d ; cid=%d]",
                     id, msg.getM().getSender(), channel, cidSeries, cid));
 
-            GlobalData.votes[channel].computeIfAbsent(key, k -> {
-                GlobalData.bbcDec[channel].computeIfPresent(k, (k1, v1) -> {
+            Data.votes[channel].computeIfAbsent(key, k -> {
+                Data.bbcDec[channel].computeIfPresent(k, (k1, v1) -> {
                     if (v1.getDec() != -1) {
                         logger.debug(format("[#%d] already has a decision, re-participating consensus" +
                                 "[channel=%d ; cidSeries=%d ; cid=%d]", id, channel, cidSeries, cid));
@@ -102,14 +102,14 @@ public class BbcService extends DefaultSingleRecoverable {
                 return new VoteData();
             });
 
-            GlobalData.votes[channel].computeIfPresent(key, (k, v) -> {
+            Data.votes[channel].computeIfPresent(key, (k, v) -> {
                 if (v.getVotersNum() == quorumSize) return v;
                 if (!v.addVote(msg.getM().getSender(), msg.getVote())) return v;
                 if (v.getVotersNum() == quorumSize) {
                     synchronized (notes[channel]) {
-                        GlobalData.bbcDec[channel].computeIfPresent(key, (k1, v1)
+                        Data.bbcDec[channel].computeIfPresent(key, (k1, v1)
                                 -> new BbcDecData(v.getVoteReasult(), false));
-                        GlobalData.bbcDec[channel].computeIfAbsent(key, k1 ->
+                        Data.bbcDec[channel].computeIfAbsent(key, k1 ->
                                 new BbcDecData(v.getVoteReasult(), false));
                         logger.debug(format("[#%d] notifies on  [channel=%d ; cidSeries=%d ; cid=%d]", id, channel, cidSeries, cid));
                         notes[channel].notifyAll();
@@ -137,12 +137,12 @@ public class BbcService extends DefaultSingleRecoverable {
                 .setChannel(channel)
                 .build();
         synchronized (notes[channel]) {
-            while (!GlobalData.bbcDec[channel].containsKey(key)
-                    || GlobalData.bbcDec[channel].get(key).getDec() == -1) {
+            while (!Data.bbcDec[channel].containsKey(key)
+                    || Data.bbcDec[channel].get(key).getDec() == -1) {
                 notes[channel].wait();
             }
         }
-        return GlobalData.bbcDec[channel].get(key).getDec() == 1;
+        return Data.bbcDec[channel].get(key).getDec() == 1;
     }
 
     public int propose(int vote, int channel, int cidSeries, int cid) {
