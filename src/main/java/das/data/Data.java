@@ -59,8 +59,11 @@ public class Data {
         pending[channel].remove(key);
         votes[channel].remove(key);
         preConsVote[channel].remove(key);
-        preConsDone[channel].remove(key);
         fvData[channel].remove(key);
+        synchronized (preConsNotifyer[channel]) {
+            preConsDone[channel].remove(key);
+        }
+
     }
 
     static public void evacuateAllOldData(int channel, Types.Meta mKey) {
