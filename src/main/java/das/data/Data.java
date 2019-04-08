@@ -55,9 +55,9 @@ public class Data {
     }
 
     static public void evacuateOldData(int channel, Types.Meta key) {
-        bbcDec[channel].remove(key);
+//        bbcDec[channel].remove(key);
         pending[channel].remove(key);
-        votes[channel].remove(key);
+//        votes[channel].remove(key);
         preConsVote[channel].remove(key);
         fvData[channel].remove(key);
         synchronized (preConsNotifyer[channel]) {
@@ -69,13 +69,14 @@ public class Data {
     static public void evacuateAllOldData(int channel, Types.Meta mKey) {
         int cidSeries = mKey.getCidSeries();
         int cid = mKey.getCid();
-        for (Types.Meta key : bbcDec[channel].keySet()) {
-            if (key.getCidSeries() < cidSeries)  {
-                bbcDec[channel].remove(key);
-                continue;
-            }
-            if (key.getCidSeries() == cidSeries && key.getCid() < cid) bbcDec[channel].remove(key);
-        }
+//        for (Types.Meta key : bbcDec[channel].keySet()) {
+//            if (key.getCidSeries() < cidSeries)  {
+//                bbcDec[channel].remove(key);
+//                continue;
+//            }
+//            if (key.getCidSeries() == cidSeries && key.getCid() < cid) bbcDec[channel].remove(key);
+//        }
+        
         for (Types.Meta key : pending[channel].keySet()) {
             if (key.getCidSeries() < cidSeries)  {
                 pending[channel].remove(key);
@@ -83,13 +84,13 @@ public class Data {
             }
             if (key.getCidSeries() == cidSeries && key.getCid() < cid) pending[channel].remove(key);
         }
-        for (Types.Meta key : votes[channel].keySet()) {
-            if (key.getCidSeries() < cidSeries)  {
-                votes[channel].remove(key);
-                continue;
-            }
-            if (key.getCidSeries() == cidSeries && key.getCid() < cid) votes[channel].remove(key);
-        }
+//        for (Types.Meta key : votes[channel].keySet()) {
+//            if (key.getCidSeries() < cidSeries)  {
+//                votes[channel].remove(key);
+//                continue;
+//            }
+//            if (key.getCidSeries() == cidSeries && key.getCid() < cid) votes[channel].remove(key);
+//        }
 
         for (Types.Meta key : preConsVote[channel].keySet()) {
             if (key.getCidSeries() < cidSeries)  {
