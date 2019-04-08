@@ -27,7 +27,7 @@ public class Data {
     public static ConcurrentHashMap<Types.Meta, List<Integer>>[] preConsVote;
     public static ConcurrentHashMap<Types.Meta, VoteData>[] fvData;
     public static ArrayList<Types.Meta>[] preConsDone;
-    static public Object[] preConsNotifyer;
+//    static public Object[] preConsNotifyer;
 
     public Data(int channels) {
         bbcDec = new ConcurrentHashMap[channels];
@@ -39,7 +39,7 @@ public class Data {
         fvData = new ConcurrentHashMap[channels];
         preConsVote = new ConcurrentHashMap[channels];
         preConsDone = new ArrayList[channels];
-        this.preConsNotifyer = new Object[channels];
+//        this.preConsNotifyer = new Object[channels];
         for (int i = 0 ; i < channels ; i++) {
             bbcDec[i] = new ConcurrentHashMap<>();
             pending[i] = new ConcurrentHashMap<>();
@@ -50,7 +50,7 @@ public class Data {
             fvData[i] = new ConcurrentHashMap<>();
             preConsVote[i] = new ConcurrentHashMap<>();
             preConsDone[i] = new ArrayList<>();
-            preConsNotifyer[i] = new Object();
+//            preConsNotifyer[i] = new Object();
         }
     }
 
@@ -60,7 +60,7 @@ public class Data {
 //        votes[channel].remove(key);
         preConsVote[channel].remove(key);
         fvData[channel].remove(key);
-        synchronized (preConsNotifyer[channel]) {
+        synchronized (preConsDone[channel]) {
             preConsDone[channel].remove(key);
         }
 
@@ -107,13 +107,14 @@ public class Data {
             }
             if (key.getCidSeries() == cidSeries && key.getCid() < cid) fvData[channel].remove(key);
         }
-        synchronized (preConsNotifyer[channel]) {
-            for (Types.Meta key : preConsDone[channel]) {
+        synchronized (preConsDone[channel]) {
+            for (Iterator<Types.Meta> itKey = preConsDone[channel].iterator() ; itKey.hasNext() ; ) {
+                Types.Meta key = itKey.next();
                 if (key.getCidSeries() < cidSeries)  {
-                    preConsDone[channel].remove(key);
+                    itKey.remove();
                     continue;
                 }
-                if (key.getCidSeries() == cidSeries && key.getCid() < cid) preConsDone[channel].remove(key);
+                if (key.getCidSeries() == cidSeries && key.getCid() < cid) itKey.remove();
             }
         }
 

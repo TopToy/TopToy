@@ -374,11 +374,11 @@ public class WrbService extends WrbGrpc.WrbImplBase {
                     }
 
                     if (val.size() == n - f) {
-                        synchronized (preConsNotifyer[channel]) {
+                        synchronized (preConsDone[channel]) {
                             preConsDone[channel].add(key);
                             logger.debug(format("[#%d-C[%d]] notify on preCons for [cidSeries=%d ; cid=%d]",
                                     id, channel, cidSeries,  cid));
-                            preConsNotifyer[channel].notify();
+                            preConsDone[channel].notify();
                         }
                     }
                     return val;
@@ -802,9 +802,9 @@ public class WrbService extends WrbGrpc.WrbImplBase {
                 .setHeight(height)
                 .build();
         broadcastPreConsReqMsg(req, channel, cidSeries, cid, sender);
-        synchronized (preConsNotifyer[channel]) {
+        synchronized (preConsDone[channel]) {
             while (!preConsDone[channel].contains(key)) {
-                preConsNotifyer[channel].wait();
+                preConsDone[channel].wait();
             }
         }
 
