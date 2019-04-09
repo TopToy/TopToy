@@ -15,33 +15,22 @@ import java.util.HashMap;
 
 public class Config {
     static class tomlKeys {
-        String SYSTEM_KEY = "system";
         String SYSTEM_N_KEY = "system.n";
         String SYSTEM_F_KEY = "system.f";
         String SYSTEM_C_KEY = "system.c";
         String SYSTEM_TESTING_KEY = "system.testing";
         String SYSTEM_TX_SIZE = "system.txSize";
-        String SYSTEM_CUTTER_BATCH = "system.cutterBatch";
-        String SERVER_KEY = "server";
-        String SERVER_ID_KEY = "server.id";
-        String SERVER_IP_KEY = "server.ip";
-//        String SERVER_RMFPORT_KEY = "server.rmfPort";
+        String SYSTEM_CUTTER_BATCH = "system.cutterBatch";;
         String SERVER_CRT_PATH = "server.TlsCertPath";
-        String SERVER_TLS_PRIV_KEY_PATH = "server.TlsPrivKeyPath";
-        String RMFCLUSTER_KEY = "cluster";
-        String RMFCLUSTER_SERVER_KEY = "cluster.s";
-        String SETTING_KEY = "setting";
+        String CLUSTER_KEY = "cluster";
         String SETTING_TMO_KEY = "setting.tmo";
         String SETTING_TMO_INTERVAL_KEY = "setting.tmoInterval";
-        String SETTING_RMFBBCCONFIG_KEY = "setting.rmfBbcConfigPath";
-        String SETTING_PAINCRBCONFIG_PATH = "setting.panicRBroadcastConfigPath";
-        String SETTING_SYNCRBCONFIG_PATH = "setting.syncRBroadcastConfigPath";
-        String SETTING_RBCONFIG_PATH = "setting.RBConfigPath";
+        String SETTING_ABCONFIG_KEY = "setting.ABConfigPath";
         String SETTING_MAXTRANSACTIONSINBLOCK_KEY = "setting.maxTransactionInBlock";
         String SETTING_CA_ROOT_PATH = "setting.caRootPath";
         String SETTING_FAST_MODE = "setting.fastMode";
         String SERVER_PRIVKEY = "server.privateKey";
-        String SERVER_PUBKEY = "server.publicKey";
+        String SERVER_PRIVKET_PATH = "server.TlsPrivKeyPath";
     }
 
     private static tomlKeys tKeys;
@@ -98,23 +87,6 @@ public class Config {
         return Math.toIntExact(conf.getLong(tKeys.SETTING_TMO_INTERVAL_KEY));
     }
 
-    public static String getAddress(int id) {
-        Toml t = conf.getTables(tKeys.RMFCLUSTER_KEY).get(0);
-        Toml node = t.getTable("s" + id);
-        return node.getString("ip");
-    }
-
-    public static int getWrbPort( int id) {
-        Toml t = conf.getTables(tKeys.RMFCLUSTER_KEY).get(0);
-        Toml node = t.getTable("s" + id);
-        return Math.toIntExact(node.getLong("wrbPort"));
-    }
-    public static int getCommPort( int id) {
-        Toml t = conf.getTables(tKeys.RMFCLUSTER_KEY).get(0);
-        Toml node = t.getTable("s" + id);
-        return Math.toIntExact(node.getLong("commPort"));
-    }
-
     public static int getC() {
         return Math.toIntExact(conf.getLong(tKeys.SYSTEM_C_KEY));
     }
@@ -124,7 +96,7 @@ public class Config {
     }
 
     public static ArrayList<Node> getWrbCluster() {
-        Toml t = conf.getTables(tKeys.RMFCLUSTER_KEY).get(0);
+        Toml t = conf.getTables(tKeys.CLUSTER_KEY).get(0);
         ArrayList<Node> ret = new ArrayList<>();
         for (int i = 0 ; i < getN() ; i++) {
             Toml node = t.getTable("s" + i);
@@ -136,7 +108,7 @@ public class Config {
     }
 
     public static ArrayList<Node> getCommCluster() {
-        Toml t = conf.getTables(tKeys.RMFCLUSTER_KEY).get(0);
+        Toml t = conf.getTables(tKeys.CLUSTER_KEY).get(0);
         ArrayList<Node> ret = new ArrayList<>();
         for (int i = 0 ; i < getN() ; i++) {
             Toml node = t.getTable("s" + i);
@@ -147,8 +119,20 @@ public class Config {
         return ret;
     }
 
+    public static ArrayList<Node> getObbcCluster() {
+        Toml t = conf.getTables(tKeys.CLUSTER_KEY).get(0);
+        ArrayList<Node> ret = new ArrayList<>();
+        for (int i = 0 ; i < getN() ; i++) {
+            Toml node = t.getTable("s" + i);
+            ret.add(new Node(node.getString("ip"),
+                    Math.toIntExact(node.getLong("obbcPort")),
+                    Math.toIntExact(node.getLong("id"))));
+        }
+        return ret;
+    }
+
     public static HashMap<Integer, String> getClusterPubKeys() {
-        Toml t = conf.getTables(tKeys.RMFCLUSTER_KEY).get(0);
+        Toml t = conf.getTables(tKeys.CLUSTER_KEY).get(0);
         HashMap<Integer, String> ret = new HashMap<>();
         for (int i = 0 ; i < getN() ; i++) {
             Toml node = t.getTable("s" + i);
@@ -160,31 +144,21 @@ public class Config {
         return Math.toIntExact(conf.getLong(tKeys.SETTING_MAXTRANSACTIONSINBLOCK_KEY));
     }
 
-    public static String getRMFbbcConfigHome() {
-        return conf.getString(tKeys.SETTING_RMFBBCCONFIG_KEY);
-    }
-
-//    public static String getPanicRBConfigHome() {
-//        return conf.getString(tKeys.SETTING_PAINCRBCONFIG_PATH);
-//    }
-//
-//    public static String getSyncRBConfigHome() {
-//        return conf.getString(tKeys.SETTING_SYNCRBCONFIG_PATH);
-//    }
-
-    public static String getRBConfigHome() {
-        return conf.getString(tKeys.SETTING_RBCONFIG_PATH);
+    public static String getABConfigHome() {
+        return conf.getString(tKeys.SETTING_ABCONFIG_KEY);
     }
 
     public static String getPrivateKey() {
         return conf.getString(tKeys.SERVER_PRIVKEY);
     }
 
+    public static String getServerPrivKeyPath() {
+        return conf.getString(tKeys.SERVER_PRIVKET_PATH);
+    }
+
     public static String getCaRootPath() {return conf.getString(tKeys.SETTING_CA_ROOT_PATH); }
 
     public static String getServerCrtPath() { return conf.getString(tKeys.SERVER_CRT_PATH); }
-
-    public static String getServerTlsPrivKeyPath() { return conf.getString(tKeys.SERVER_TLS_PRIV_KEY_PATH); }
 
     public static boolean getFastMode() { return conf.getBoolean(tKeys.SETTING_FAST_MODE); }
 

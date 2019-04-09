@@ -11,6 +11,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentNavigableMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -47,11 +49,11 @@ public class JToy {
             logger.debug("type is " + type);
             switch (type) {
                 default:
-                    s = new Top(Config.getAddress(serverID), Config.getWrbPort(serverID), Config.getCommPort(serverID),
-                            serverID, Config.getF(), Config.getC(), Config.getTMO(), Config.getTMOInterval(),
-                            Config.getMaxTransactionsInBlock(), Config.getFastMode(), Config.getWrbCluster(),
-                            Config.getCommCluster(), Config.getRMFbbcConfigHome(), Config.getRBConfigHome(), type,
-                            Config.getServerCrtPath(), Config.getServerTlsPrivKeyPath(), Config.getCaRootPath());
+                    s = new Top(serverID, Config.getN(), Config.getF(), Config.getC(), Config.getTMO(),
+                            Config.getTMOInterval(), Config.getMaxTransactionsInBlock(), Config.getFastMode(),
+                            Config.getObbcCluster(), Config.getWrbCluster(), Config.getCommCluster(),
+                            Config.getABConfigHome(), type, Config.getServerCrtPath(), Config.getServerPrivKeyPath(),
+                            Config.getCaRootPath());
                     break;
             }
 

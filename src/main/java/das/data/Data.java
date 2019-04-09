@@ -7,6 +7,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static blockchain.Utils.validateBlockHash;
+import static blockchain.data.BCS.bcs;
 import static java.lang.String.format;
 
 public class Data {
@@ -14,26 +15,30 @@ public class Data {
     public enum RBTypes {
         FORK,
         SYNC,
+        BBC,
         NOT_MAPPED
 
     };
 
-    public static ConcurrentHashMap<Types.Meta, BbcDecData>[] bbcDec;
+    public static ConcurrentHashMap<Types.Meta, BbcDecData>[] bbcFastDec;
+    public static ConcurrentHashMap<Types.Meta, BbcDecData>[] bbcRegDec;
     public static ConcurrentHashMap<Types.Meta, Types.BlockHeader>[] pending;
 //    public static ConcurrentHashMap<Types.Meta, Types.BlockHeader>[] received;
-    public static ConcurrentHashMap<Types.Meta, VoteData>[] votes;
+    public static ConcurrentHashMap<Types.Meta, VoteData>[] bbcVotes;
     public static Queue<Types.ForkProof>[] forksRBData;
     public static HashMap<Integer, List<Types.subChainVersion>>[] syncRBData;
     public static ConcurrentHashMap<Types.Meta, List<Integer>>[] preConsVote;
     public static ConcurrentHashMap<Types.Meta, VoteData>[] fvData;
     public static ArrayList<Types.Meta>[] preConsDone;
+
 //    static public Object[] preConsNotifyer;
 
     public Data(int channels) {
-        bbcDec = new ConcurrentHashMap[channels];
+        bbcFastDec = new ConcurrentHashMap[channels];
+        bbcRegDec = new ConcurrentHashMap[channels];
         pending = new ConcurrentHashMap[channels];
 //        received = new ConcurrentHashMap[channels];
-        votes = new ConcurrentHashMap[channels];
+        bbcVotes = new ConcurrentHashMap[channels];
         forksRBData = new Queue[channels];
         syncRBData = new HashMap[channels];
         fvData = new ConcurrentHashMap[channels];
@@ -41,10 +46,11 @@ public class Data {
         preConsDone = new ArrayList[channels];
 //        this.preConsNotifyer = new Object[channels];
         for (int i = 0 ; i < channels ; i++) {
-            bbcDec[i] = new ConcurrentHashMap<>();
+            bbcFastDec[i] = new ConcurrentHashMap<>();
+            bbcRegDec[i] = new ConcurrentHashMap<>();
             pending[i] = new ConcurrentHashMap<>();
 //            received[i] = new ConcurrentHashMap<>();
-            votes[i] = new ConcurrentHashMap<>();
+            bbcVotes[i] = new ConcurrentHashMap<>();
             forksRBData[i] = new LinkedList<>();
             syncRBData[i] = new HashMap<>();
             fvData[i] = new ConcurrentHashMap<>();
@@ -54,77 +60,86 @@ public class Data {
         }
     }
 
-    static public void evacuateOldData(int channel, Types.Meta key) {
-//        bbcDec[channel].remove(key);
-        pending[channel].remove(key);
-//        votes[channel].remove(key);
-        preConsVote[channel].remove(key);
-        fvData[channel].remove(key);
-        synchronized (preConsDone[channel]) {
-            preConsDone[channel].remove(key);
+//    static public void evacuateOldData(int channel, Types.Meta key) {
+////        bbcDec[channel].remove(key);
+//        pending[channel].remove(key);
+////        votes[channel].remove(key);
+//        preConsVote[channel].remove(key);
+//        fvData[channel].remove(key);
+//        synchronized (preConsDone[channel]) {
+//            preConsDone[channel].remove(key);
+//        }
+//
+//    }
+    static public void addToPendings(Types.BlockHeader request, Types.Meta key) {
+        int channel = key.getChannel();
+        int height = request.getHeight();
+        if (bcs[channel].contains(height)) return;
+        synchronized (pending[channel]) {
+            pending[channel].putIfAbsent(key, request);
+            pending[channel].notify();
         }
-
     }
-
-    static public void evacuateAllOldData(int channel, Types.Meta mKey) {
-        int cidSeries = mKey.getCidSeries();
-        int cid = mKey.getCid();
-//        for (Types.Meta key : bbcDec[channel].keySet()) {
+//    static public void evacuateAllOldData(int channel, Types.Meta mKey) {
+//        int cidSeries = mKey.getCidSeries();
+//        int cid = mKey.getCid();
+////        for (Types.Meta key : bbcDec[channel].keySet()) {
+////            if (key.getCidSeries() < cidSeries)  {
+////                bbcDec[channel].remove(key);
+////                continue;
+////            }
+////            if (key.getCidSeries() == cidSeries && key.getCid() < cid) bbcDec[channel].remove(key);
+////        }
+//
+//        for (Types.Meta key : pending[channel].keySet()) {
 //            if (key.getCidSeries() < cidSeries)  {
-//                bbcDec[channel].remove(key);
+//                pending[channel].remove(key);
 //                continue;
 //            }
-//            if (key.getCidSeries() == cidSeries && key.getCid() < cid) bbcDec[channel].remove(key);
+//            if (key.getCidSeries() == cidSeries && key.getCid() < cid) pending[channel].remove(key);
 //        }
-        
-        for (Types.Meta key : pending[channel].keySet()) {
-            if (key.getCidSeries() < cidSeries)  {
-                pending[channel].remove(key);
-                continue;
-            }
-            if (key.getCidSeries() == cidSeries && key.getCid() < cid) pending[channel].remove(key);
-        }
-//        for (Types.Meta key : votes[channel].keySet()) {
+////        for (Types.Meta key : votes[channel].keySet()) {
+////            if (key.getCidSeries() < cidSeries)  {
+////                votes[channel].remove(key);
+////                continue;
+////            }
+////            if (key.getCidSeries() == cidSeries && key.getCid() < cid) votes[channel].remove(key);
+////        }
+//
+//        for (Types.Meta key : preConsVote[channel].keySet()) {
 //            if (key.getCidSeries() < cidSeries)  {
-//                votes[channel].remove(key);
+//                preConsVote[channel].remove(key);
 //                continue;
 //            }
-//            if (key.getCidSeries() == cidSeries && key.getCid() < cid) votes[channel].remove(key);
+//            if (key.getCidSeries() == cidSeries && key.getCid() < cid) preConsVote[channel].remove(key);
 //        }
-
-        for (Types.Meta key : preConsVote[channel].keySet()) {
-            if (key.getCidSeries() < cidSeries)  {
-                preConsVote[channel].remove(key);
-                continue;
-            }
-            if (key.getCidSeries() == cidSeries && key.getCid() < cid) preConsVote[channel].remove(key);
-        }
-
-        for (Types.Meta key : fvData[channel].keySet()) {
-            if (key.getCidSeries() < cidSeries)  {
-                fvData[channel].remove(key);
-                continue;
-            }
-            if (key.getCidSeries() == cidSeries && key.getCid() < cid) fvData[channel].remove(key);
-        }
-        synchronized (preConsDone[channel]) {
-            for (Iterator<Types.Meta> itKey = preConsDone[channel].iterator() ; itKey.hasNext() ; ) {
-                Types.Meta key = itKey.next();
-                if (key.getCidSeries() < cidSeries)  {
-                    itKey.remove();
-                    continue;
-                }
-                if (key.getCidSeries() == cidSeries && key.getCid() < cid) itKey.remove();
-            }
-        }
-
-
-    }
+//
+//        for (Types.Meta key : fvData[channel].keySet()) {
+//            if (key.getCidSeries() < cidSeries)  {
+//                fvData[channel].remove(key);
+//                continue;
+//            }
+//            if (key.getCidSeries() == cidSeries && key.getCid() < cid) fvData[channel].remove(key);
+//        }
+//        synchronized (preConsDone[channel]) {
+//            for (Iterator<Types.Meta> itKey = preConsDone[channel].iterator() ; itKey.hasNext() ; ) {
+//                Types.Meta key = itKey.next();
+//                if (key.getCidSeries() < cidSeries)  {
+//                    itKey.remove();
+//                    continue;
+//                }
+//                if (key.getCidSeries() == cidSeries && key.getCid() < cid) itKey.remove();
+//            }
+//        }
+//
+//
+//    }
 
     static public RBTypes getRBType(int type) {
         switch (type) {
             case 0: return RBTypes.FORK;
             case 1: return RBTypes.SYNC;
+            case 2: return RBTypes.BBC;
         }
         return RBTypes.NOT_MAPPED;
     }

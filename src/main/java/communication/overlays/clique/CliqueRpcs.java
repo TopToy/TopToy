@@ -1,7 +1,5 @@
-package communication.overlays;
+package communication.overlays.clique;
 
-import blockchain.Blockchain;
-import communication.CommLayer;
 import communication.data.Data;
 import config.Node;
 import io.grpc.ManagedChannel;
@@ -9,23 +7,29 @@ import io.grpc.ManagedChannelBuilder;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
 import proto.CommunicationGrpc;
 import proto.Types;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
+import static blockchain.data.BCS.bcs;
 import static crypto.blockDigSig.verfiyBlockWRTheader;
 import static java.lang.String.format;
 
-public class Clique extends CommunicationGrpc.CommunicationImplBase implements CommLayer {
-    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Clique.class);
-    class Cpeer {
+public class CliqueRpcs  extends CommunicationGrpc.CommunicationImplBase {
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(CliqueRpcs.class);
+
+    class Peer {
         ManagedChannel channel;
         CommunicationGrpc.CommunicationStub stub;
 
-        public Cpeer(String addr, int port) {
+        Peer(String addr, int port) {
             channel = ManagedChannelBuilder
                     .forAddress(addr, port)
                     .usePlaintext()
@@ -41,64 +45,51 @@ public class Clique extends CommunicationGrpc.CommunicationImplBase implements C
 
     }
 
-    private Server CServer;
-    private Map<Integer, Cpeer> peers = new HashMap<>();
+    private Server rpcServer;
+    private Map<Integer, Peer> peers = new HashMap<>();
     private List<Node> nodes;
-    private int id;
-    private String addr;
-    private int port;
-    private int channels;
-    private Blockchain[] bcs;
+    int id;
     int n;
 
-    public Clique(int id, String addr, int port, int channels, int n,  ArrayList<Node> nodes) {
+    public CliqueRpcs(int id, ArrayList<Node> commCluster, int n) {
         this.id = id;
-        this.nodes = nodes;
-        this.port = port;
-        this.addr = addr;
-        this.channels = channels;
+        this.nodes = commCluster;
         this.n = n;
-        new Data(n, channels);
-        this.bcs = new Blockchain[channels];
-    }
 
-    @Override
-    public void join() {
-        CServer = ServerBuilder
-                .forPort(port)
+    }
+    // TODO: Re configure grpc server so it would be anble to handle mass of messages.
+    public void start() {
+        Executor executor = Executors.newFixedThreadPool(n);
+        rpcServer = ServerBuilder
+                .forPort(nodes.get(id).getPort())
                 .addService(this)
                 .maxInboundMessageSize(16 * 1024 * 1024)
+                .executor(executor)
                 .build();
         try {
-            CServer.start();
+            rpcServer.start();
         } catch (IOException e) {
             logger.error(format("[%d] error while starting server", id), e);
         }
-        for (Node n : nodes) {
-            peers.put(n.getID(), new Cpeer(n.getAddr(), n.getPort()));
-        }
 
+        for (Node n : nodes) {
+            peers.put(n.getID(), new Peer(n.getAddr(), n.getPort()));
+        }
+        logger.debug("starting clique rpc server");
     }
 
-    @Override
-    public void leave() {
-        CServer.shutdown();
-        for (Cpeer p : peers.values()) {
+    public void shutdown() {
+        rpcServer.shutdown();
+        for (Peer p : peers.values()) {
             p.shutdown();
         }
+        logger.debug("Shutting down clique rpc server");
     }
 
-    @Override
-    public void registerBC(int channel, Blockchain bc) {
-        bcs[channel] = bc;
-    }
-
-    @Override
-    public void broadcast(int channel, Types.Block data) {
-        logger.debug(format("[%d-%d] broadcast block data [bid=%d]", id, channel, data.getId().getBid()));
-        for (Cpeer p : peers.values()) {
+    public void broadcast(int worker, Types.Block data) {
+        for (Peer p : peers.values()) {
             p.stub.dsm(Types.Comm.newBuilder()
-                    .setChannel(channel)
+                    .setChannel(worker)
                     .setData(data)
                     .build(), new StreamObserver<Types.Empty>() {
                 @Override
@@ -120,11 +111,6 @@ public class Clique extends CommunicationGrpc.CommunicationImplBase implements C
 
     }
 
-
-
-    // Meant to test Byzantine activity
-
-    @Override
     public void send(int channel, Types.Block data, int[] recipients) {
         for (int i : recipients) {
             peers.get(i).stub.dsm(Types.Comm.newBuilder()
@@ -179,36 +165,8 @@ public class Clique extends CommunicationGrpc.CommunicationImplBase implements C
 
     }
 
-    Types.Block getBlockFromData(int channel, Types.BlockID bid, Types.BlockHeader proof) {
-        final Types.Block[] res = {null};
-        int pid = bid.getPid();
-        Data.blocks[pid][channel].computeIfPresent(bid, (k, v) -> {
-            v = v.stream()
-                    .filter(b -> verfiyBlockWRTheader(b, proof)).collect(Collectors.toCollection(LinkedList::new));
-            res[0] = v.poll();
-            return v;
-        });
-        return res[0];
-    }
-
-    @Override
-    public Types.Block recBlock(int channel, Types.BlockID bid, Types.BlockHeader proof) throws InterruptedException {
-        if (proof.getEmpty()) return Types.Block.getDefaultInstance();
-        Types.Block res = getBlockFromData(channel, bid, proof);
-        if (res != null) return res;
-        broadcastCommReq(Types.commReq.newBuilder().setProof(proof).build());
-        int pid = bid.getPid();
-        synchronized (Data.blocks[pid][channel]) {
-            while (res == null) {
-                Data.blocks[pid][channel].wait();
-                res = getBlockFromData(channel, bid, proof);
-            }
-        }
-        return res;
-    }
-
     void broadcastCommReq(Types.commReq request) {
-        for (Cpeer p : peers.values()) {
+        for (Peer p : peers.values()) {
             p.stub.reqBlock(request, new StreamObserver<Types.commRes>() {
                 @Override
                 public void onNext(Types.commRes commRes) {
@@ -244,21 +202,6 @@ public class Clique extends CommunicationGrpc.CommunicationImplBase implements C
     }
 
     @Override
-    public boolean contains(int channel, Types.BlockID bid, Types.BlockHeader proof) {
-        if (proof.getEmpty()) return true;
-        int pid = bid.getPid();
-        Data.blocks[pid][channel].computeIfPresent(bid, (k, v) -> {
-            int bef = v.size();
-            v = v.stream().filter(b -> verfiyBlockWRTheader(b, proof))
-                    .collect(Collectors.toCollection(LinkedList::new));
-            logger.debug(format("[%d-%d] invalidate %d records [pid=%d ; bid=%d]", id, channel, bef - v.size(),
-                    bid.getPid(), bid.getBid()));
-            return v;
-        });
-        return Data.blocks[pid][channel].containsKey(bid) && Data.blocks[pid][channel].get(bid).size() > 0;
-    }
-
-    @Override
     public void dsm(Types.Comm request, StreamObserver<proto.Types.Empty> responseObserver) {
         int c = request.getChannel();
         int pid = request.getData().getId().getPid();
@@ -275,5 +218,6 @@ public class Clique extends CommunicationGrpc.CommunicationImplBase implements C
 
 
     }
+
 
 }

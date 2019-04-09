@@ -1,302 +1,171 @@
 package servers;
 
-import blockchain.Blockchain;
-import com.google.protobuf.ByteString;
+import blockchain.data.BCS;
 import communication.CommLayer;
-import communication.overlays.Clique;
+import communication.overlays.clique.Clique;
 import config.Config;
 import config.Node;
-import das.RBroadcast.RBrodcastService;
-import crypto.DigestMethod;
+import das.ab.ABService;
+import das.bbc.BBC;
+import das.bbc.OBBC;
+import das.wrb.WRB;
 import io.grpc.Server;
 import io.grpc.netty.NettyServerBuilder;
 import io.grpc.stub.StreamObserver;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
-import das.wrb.ByzantineWrbNode;
-import das.wrb.WrbNode;
 import proto.Types;
 import proto.blockchainServiceGrpc;
 
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.String.format;
 
 public class Top implements server {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Top.class);
-
-    private WrbNode wrb;
     boolean up = false;
-//    final HashMap<Types.txID, Integer> txMap = new HashMap<>();
-//    private RBrodcastService deliverFork;
-//    private RBrodcastService sync;
-    private RBrodcastService RBservice;
+
     private CommLayer comm;
     private int n;
-    private int gcCount = 0;
-    private int gcLimit = 1;
-    private ToyBaseServer[] group;
-    private int[][] lastDelivered;
-    private int[] lastGCpoint;
-//    private final Blockchain bc;
+    private int f;
+    private ToyBaseServer[] toys;
     private int id;
-    private int c;
+    private int workers;
     private String type;
-    int lastChannel = 0;
     private AtomicBoolean stopped = new AtomicBoolean(false);
     private Statistics sts = new Statistics();
-//    private Thread deliverThread = new Thread(() -> {
-//        try {
-//            Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
-//            deliverFromGroup();
-//        } catch (InterruptedException e) {
-//            logger.debug(format("G-%d interrupted while delivering from group", id));
-//        } catch (IOException e) {
-//            logger.error(format("G-%d IO error occurred, exiting", id), e);
-//            shutdown();
-//        }
-//    });
     private int maxTx;
-    private int cutterBatch = Config.getCutterBatch();
-    Path cutterDirName = Paths.get(System.getProperty("user.dir"), "blocks");
     private Server txsServer;
-//    private ExecutorService chainCutterExecutor =  Executors.newSingleThreadExecutor();
     private ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(1);
     private EventLoopGroup gnio = new NioEventLoopGroup(2);
 
 
-    public Top(String addr, int wrbPort, int commPort, int id, int f, int c, int tmo, int tmoInterval,
-               int maxTx, boolean fastMode, ArrayList<Node> wrbCluster, ArrayList<Node> commCluster,
-               String bbcConfig, String rbConfig, String type,
-               String serverCrt, String serverPrivKey, String caRoot) {
-        n = 3 *f +1;
+    public Top(int id, int n, int f, int workers, int tmo, int tmoInterval,
+               int maxTx, boolean fastMode, ArrayList<Node> obbcCluster,
+               ArrayList<Node> wrbCluster, ArrayList<Node> commCluster,
+               String abConfig, String type, String serverCrt, String serverPrivKey, String caRoot) {
+        this.n = n;
+        this.f = f;
         this.maxTx = maxTx;
-        lastDelivered = new int[c][];
-        lastGCpoint = new int[c];
-        for (int i = 0 ; i < c ; i++) {
-            lastDelivered[i] = new int[n];
-            lastGCpoint[i] = 1;
-            for (int j = 0 ; j < n ; j++) {
-                lastDelivered[i][j] = 0;
-
-            }
-        }
-        this.c = c;
-        this.group = new ToyBaseServer[c];
+//        lastDelivered = new int[c][];
+//        lastGCpoint = new int[c];
+//        for (int i = 0 ; i < c ; i++) {
+//            lastDelivered[i] = new int[n];
+//            lastGCpoint[i] = 1;
+//            for (int j = 0 ; j < n ; j++) {
+//                lastDelivered[i][j] = 0;
+//
+//            }
+//        }
+        this.workers = workers;
+        this.toys = new ToyBaseServer[workers];
         this.id = id;
-        this.comm = new Clique(id, addr, commPort, c, this.n, commCluster);
-        if (type.equals("r") || type.equals("a")) {
-            wrb = new WrbNode(c, id, addr, wrbPort, f, tmo, tmoInterval,
-                    wrbCluster, bbcConfig, serverCrt, serverPrivKey, caRoot, comm);
-        }
-        if (type.equals("b")) {
-            wrb = new ByzantineWrbNode(c, id, addr, wrbPort, f, tmo, tmoInterval,
-                    wrbCluster, bbcConfig, serverCrt, serverPrivKey, caRoot, comm);
-        }
-//        deliverFork = new RBrodcastService(c, id, panicConfig);
-//        sync = new RBrodcastService(c, id, syncConfig);
-        RBservice = new RBrodcastService(id, n, f, rbConfig);
+        new BCS(workers);
+        initProtocols(obbcCluster, wrbCluster, tmo, tmoInterval, serverCrt,
+                serverPrivKey, caRoot, commCluster, abConfig);
+
         this.type = type;
         // TODO: Apply to more types
         if (type.equals("r")) {
-            for (int i = 0 ; i < c ; i++) {
-                group[i] = new ToyServer(addr, wrbPort, id, i, f, maxTx, fastMode, wrb, comm, RBservice);
+            for (int i = 0 ; i < workers ; i++) {
+                toys[i] = new ToyServer(id, i, n, f, maxTx, fastMode, comm);
             }
         }
         if (type.equals("b")) {
-            for (int i = 0 ; i < c ; i++) {
-                group[i] = new ByzToyServer(addr, wrbPort, id, i, f, maxTx, fastMode, wrb, comm, RBservice);
+            for (int i = 0 ; i < workers ; i++) {
+                toys[i] = new ByzToyServer(id, i, n, f, maxTx, fastMode, comm);
             }
         }
         if (type.equals("a")) {
-            for (int i = 0 ; i < c ; i++) {
-                group[i] = new AsyncToyServer(addr, wrbPort, id, i, f, maxTx, fastMode, wrb, comm, RBservice);
+            for (int i = 0 ; i < workers ; i++) {
+                toys[i] = new AsyncToyServer(id, i, n, f, maxTx, fastMode, comm);
             }
         }
-//        bc = group[0].initBC(id, -1);
-
-//        new DiskUtils(cutterDirName);
-        logger.info(format("cutter batch is %d", cutterBatch));
     }
 
-//    private void deliverFromGroup() throws InterruptedException, IOException {
-//        int currChannel = 0;
-//        int currBlock = 1;
-//        while (!stopped.get()) {
-//            for (currChannel = 0 ; currChannel < c ; currChannel++) {
-//                long start = System.currentTimeMillis();
-//                logger.debug(format("Trying to deliver from [channel=%d, channelBlock=%d]", currChannel, currBlock));
-////                Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-//                Types.Block cBlock = group[currChannel].deliver(currBlock);
-//                sts.all++;
-//                sts.deliveredTime += System.currentTimeMillis() - start;
-////                gc(cBlock.getHeader().getHeight(), cBlock.getHeader().getM().getSender(), currChannel);
-//                if (cBlock.getDataCount() == 0) {
-//                    sts.eb++;
-//                    logger.info(format("E - [[time=%d], [height=%d], [sender=%d], [channel=%d], [size=0]]",
-//                            System.currentTimeMillis() - start, cBlock.getHeader().getHeight(),
-//                            cBlock.getHeader().getM().getSender(), cBlock.getHeader().getM().getChannel()));
-//                    continue;
-//                }
-//                cBlock = cBlock.toBuilder()
-//                        .setHeader(cBlock.getHeader().toBuilder()
-//                            .setHeight(bc.getHeight() + 1)
-//                            .setPrev(ByteString.copyFrom(
-//                                DigestMethod.hash(bc.getBlock(bc.getHeight()).getHeader().toByteArray())))
-////                                .setPresent(true)
-//                            .build())
-//                            .setSt(cBlock.getSt().toBuilder().setDecided(System.currentTimeMillis()))
-//                        .build();
-//                synchronized (bc) {
-//                    bc.addBlock(cBlock);
-//                    bc.notify();
-//                }
-//                updateStat(cBlock);
-////                if (bc.getHeight() % cutterBatch == 0) {
-////                    chainCutterExecutor.execute(() -> {
-////                        try {
-//////                            logger.info("Writing blocks...");
-////                            DiskUtils.cut(bc, bc.getHeight() - cutterBatch, bc.getHeight());
-////                        } catch (IOException e) {
-////                            logger.error("", e);
-////                        }
-////                    });
-////                }
-//                logger.info(format("F - [[time=%d], [height=%d], [sender=%d], [channel=%d], [size=%d]]",
-//                        System.currentTimeMillis() - start, cBlock.getHeader().getHeight(),
-//                        cBlock.getHeader().getM().getSender(), cBlock.getHeader().getM().getChannel(), cBlock.getDataCount()));
-//            }
-//
-//            currBlock++;
-//        }
-//    }
-
-//    void updateStat(Types.Block b) {
-//        if (b.getHeader().getHeight() == 1) {
-//            sts.firstTxTs = b.getSt().getDecided();
-//            sts.txSize = b.getData(0).getSerializedSize();
-//        }
-//        sts.lastTxTs = max(sts.lastTxTs, b.getSt().getDecided());
-//        sts.txCount += b.getDataCount();
-////        logger.info(format("data count is %d, bc size is: %d, total: %d", b.getDataCount(), bc.getHeight(), sts.txCount));
-////        long bTs = b.getSt().getDecided();
-////        for (Types.Transaction t : b.getDataList()) {
-////            txMap.put(t.getId(), b.getHeader().getHeight());
-////        }
-//        synchronized (txMap) {
-//            txMap.notifyAll();
-//        }
-//    }
+    void initProtocols(ArrayList<Node> obbcCluster, ArrayList<Node> wrbCluster, int tmo, int tmoInterval,
+                       String serverCrt, String serverPrivKey, String caRoot,
+                       ArrayList<Node> commCluster, String abConfigHome) {
+        new ABService(id, n, f, abConfigHome);
+        logger.info(format("[%d] has initiated ab service", id));
+        new BBC(id, n, f, n - f);
+        logger.info(format("[%d] has initiated BBC", id));
+        new OBBC(id, n, f, n - f, obbcCluster, caRoot, serverCrt, serverPrivKey);
+        logger.info(format("[%d] has initiated OBBC service", id));
+        comm = new Clique(id, workers, this.n, commCluster);
+        logger.info(format("[%d] has initiated communication layer", id));
+        new WRB(id, workers, n, f, tmo, tmoInterval, wrbCluster, serverCrt, serverPrivKey, caRoot, comm);
+        logger.info(format("[%d] has initiated WRB", id));
+    }
 
     public Statistics getStatistics() {
-        sts.totalDec = wrb.getTotolDec();
-        sts.optemisticDec = wrb.getOptemisticDec();
-        for (int i = 0 ; i < c ; i++) {
-            sts.syncEvents += group[i].getSyncEvents();
+        sts.totalDec = WRB.getTotalDeliveredTries();
+        sts.optemisticDec = WRB.getOptimialDec();
+        for (int i = 0 ; i < workers ; i++) {
+            sts.syncEvents += toys[i].getSyncEvents();
         }
         long txAll = 0;
         for (int i = 0 ; i < getBCSize() ; i++) {
             Types.Block b = nonBlockingDeliver(i);
             sts.txCount += b.getDataCount();
             for (Types.Transaction t : b.getDataList()) {
-//                if (t.getData().size() < 0) {
-//                    logger.info(format("---------->[%d]", t.getData().size()));
-//                }
                 txAll += t.getData().size();
 
             }
         }
-//        logger.info(format("--[%d ; %d]", txAll, sts.txCount));
         if (sts.txCount > 0) {
             sts.txSize = (int) (txAll / (long) sts.txCount);
         }
-//        if (sts.txSize != Config.getTxSize()) {
-//            logger.info(format("[%d ; %d]", sts.txSize, Config.getTxSize()));
-//        }
         return sts;
     }
 
-//    void gc(int origHeight, int sender, int channel) throws IOException {
-//        if (sender < 0 || sender > n - 1 || channel < 0 || channel > c -1 || origHeight < 0) {
-//            logger.debug(format("G-%d GC invalid argument [OrigHeight=%d ; sender=%d ; channel=%d]"
-//                    ,id, origHeight, sender, channel));
-//            return;
-//        }
-//        lastDelivered[channel][sender] = origHeight;
-//        gcCount++;
-//        if (gcCount < gcLimit) return;
-//        gcCount = 0;
-//        for (int i = 0 ; i < c ; i++) {
-//            gcForChannel(i);
-//        }
-//    }
-//    void gcForChannel(int channel) throws IOException {
-////        int minHeight = lastDelivered[channel][0];
-////        for (int i = 0 ; i < n ; i++) {
-////            minHeight = min(minHeight, lastDelivered[channel][i]);
-////        }
-////        logger.debug(format("G-%d starting GC [OrigHeight=%d ; lastGCPoint=%d ;" +
-////                " channel=%d]",id, minHeight, lastGCpoint[channel], channel));
-////        for (int i = lastGCpoint[channel] ; i < minHeight ; i++) {
-////            group[channel].gc(i);
-////        }
-////        lastGCpoint[channel] = minHeight;
-//
-//    }
     public void start() {
-        logger.debug(format("G-%d joining to communication layer" ,id));
+        logger.info("Joining to communication layer");
         comm.join();
-        logger.debug(format("G-%d starting wrb" ,id));
-        wrb.start();
-        logger.debug(format("G-%d starting RB" ,id));
-        RBservice.start();
-        logger.debug(format("G-%d starting [%d] Toys" ,id, c));
-        for (int i = 0 ; i < c ; i++) {
-            group[i].start(true);
+        logger.info("Starting AB");
+        ABService.start();
+        logger.info("Starting OBBC");
+        OBBC.start();
+        logger.info("Starting wrb");
+        WRB.start();
+
+        logger.info(format("Starting [%d] Toys" , workers));
+        for (int i = 0 ; i < workers ; i++) {
+            toys[i].start();
         }
         sts.start = System.currentTimeMillis();
-
+        logger.info("Everything is up and good");
 
     }
 
     public void shutdown() {
-        stopped.set(true);
         sts.stop = System.currentTimeMillis();
-        logger.debug(format("G-%d shutdown deliverThread", id));
-//        deliverThread.interrupt();
-//        try {
-//            deliverThread.join();
-//        } catch (InterruptedException e) {
-//            logger.error(format("G-%d", id), e);
-//        }
-        for (int i = 0 ; i < c ; i++) {
-            group[i].shutdown(true);
-            logger.debug(format("G-%d shutdown channel %d", id, i));
-        }
-        comm.leave();
-        logger.debug(format("G-%d leaves communication layer", id));
-        wrb.stop();
-        logger.debug(format("G-%d shutdown wrb Service", id));
-        RBservice.shutdown();
-        logger.debug(format("G-%d shutdown sync service", id));
         txsServer.shutdown();
-
+        logger.info("shutdown txsServer");
+        WRB.shutdown();
+        logger.info("shutdown WRB");
+        OBBC.shutdown();
+        logger.info("shutdown OBBC");
+        ABService.shutdown();
+        logger.info("shutdown AB");
+        comm.leave();
+        logger.info("leaving communication layer");
+        for (int i = 0 ; i < workers ; i++) {
+            toys[i].shutdown();
+            logger.info(format("shutdown worker [%d]", i));
+        }
+        logger.info("ByeBye");
     }
 
     public void serve() {
-        for (int i = 0 ; i < c ; i++) {
-            group[i].serve();
+        for (int i = 0 ; i < workers ; i++) {
+            toys[i].serve();
         }
-//        deliverThread.start();
+
         try {
             txsServer = NettyServerBuilder
                     .forPort(9876)
@@ -313,56 +182,34 @@ public class Top implements server {
         up = true;
     }
 
-//    public String addTransaction(byte[] data, int clientID) {
-//        String ret = null;
-////        for (int i = 0 ; i < c ; i++) {
-//            try {
-//                ret = group[lastChannel].addTransaction(data, clientID);
-//                lastChannel = (lastChannel + 1) % c;
-////                if (!ret.equals("")) {
-////                    return ret;
-////                }
-//            } catch (InterruptedException e) {
-//                logger.error("", e);
-//                return ret;
-//            }
-//
-////        }
-//        return ret;
-//    }
-
-
     public Types.txID addTransaction(Types.Transaction tx) {
-//        if (!up) return "";
-        int ps = group[0].getTxPoolSize();
-        int chan = 0;
-        for (int i = 1 ; i < c ; i++) {
-            int cps = group[i].getTxPoolSize();
+        int ps = toys[0].getTxPoolSize();
+        int worker = 0;
+        for (int i = 1 ; i < workers ; i++) {
+            int cps = toys[i].getTxPoolSize();
             if (ps > cps) {
                 ps = cps;
-                chan = i;
+                worker = i;
             }
         }
-        return group[chan].addTransaction(tx);
+        return toys[worker].addTransaction(tx);
     }
 
     public Types.txID addTransaction(byte[] data, int clientID) {
-//        if (!up) return "";
-       int ps = group[0].getTxPoolSize();
-       int chan = 0;
-       for (int i = 1 ; i < c ; i++) {
-           int cps = group[i].getTxPoolSize();
+       int ps = toys[0].getTxPoolSize();
+       int worker = 0;
+       for (int i = 1 ; i < workers ; i++) {
+           int cps = toys[i].getTxPoolSize();
            if (ps > cps) {
                ps = cps;
-               chan = i;
+               worker = i;
            }
        }
-        return group[chan].addTransaction(data, clientID);
+        return toys[worker].addTransaction(data, clientID);
     }
 
     public int isTxPresent(Types.txID tid) {
-        System.out.println(format("direct request to [%d]", tid.getChannel()));
-        return group[tid.getChannel()].isTxPresent(tid);
+        return toys[tid.getChannel()].isTxPresent(tid);
     }
 
     Types.approved getTransaction(Types.txID txID) throws InterruptedException {
@@ -385,26 +232,15 @@ public class Top implements server {
     }
 
     public Types.Block deliver(int index) throws InterruptedException {
-        int channel_num = index % c;
-        int block_num = index / c;
-//        System.out.println(format("[i=%d ; c=%d ; b=%d, size=%d]", index, channel_num, block_num, group[channel_num].bcSize()));
-        return group[channel_num].deliver(block_num);
-//        synchronized (bc) {
-//            while (bc.getHeight() < index) {
-//                bc.wait();
-//            }
-//            return bc.getBlock(index);
-//        }
+        int channel_num = index % workers;
+        int block_num = index / workers;
+        return toys[channel_num].deliver(block_num);
     }
 
     public Types.Block nonBlockingDeliver(int index) {
-        int channel_num = index % c;
-        int block_num = index / c;
-//        if (block_num > minBcSize()) return null;
-//        System.out.println(format("[i=%d, c=%d ; b=%d ; size=%d]", index, channel_num, block_num, group[channel_num].bcSize()));
-        return group[channel_num].nonBlockingdeliver(block_num);
-//        if (bc.getHeight() < index) return null;
-//        return bc.getBlock(index);
+        int channel_num = index % workers;
+        int block_num = index / workers;
+        return toys[channel_num].nonBlockingdeliver(block_num);
     }
 
     public int getID() {
@@ -413,55 +249,49 @@ public class Top implements server {
 
     public void setByzSetting(boolean fullByz, List<List<Integer>> groups) {
         if (!type.equals("b")) {
-            logger.debug(format("G-%d Unable to set byzantine behaviour to non byzantine node", id));
+            logger.debug("Unable to set byzantine behaviour to non byzantine node");
             return;
         }
-        for (int i = 0 ; i < c ; i++) {
-            ((ByzToyServer) group[i]).setByzSetting(fullByz, groups);
+        for (int i = 0 ; i < workers ; i++) {
+            ((ByzToyServer) toys[i]).setByzSetting(fullByz, groups);
         }
     }
 
     public void setAsyncParam(int maxTime) {
         if (!type.equals("a") && !type.equals("b")) {
-            logger.debug(format("G-%d Unable to set async behaviour to non async node", id));
+            logger.debug("Unable to set async behaviour to non async node");
             return;
         }
         if (type.equals("a")) {
-            for (int i = 0 ; i < c ; i++) {
-                ((AsyncToyServer) group[i]).setAsyncParam(maxTime);
+            for (int i = 0 ; i < workers ; i++) {
+                ((AsyncToyServer) toys[i]).setAsyncParam(maxTime);
             }
         }
 
         if (type.equals("b")) {
-            for (int i = 0 ; i < c ; i++) {
-                ((ByzToyServer) group[i]).setAsyncParam(maxTime);
+            for (int i = 0 ; i < workers ; i++) {
+                ((ByzToyServer) toys[i]).setAsyncParam(maxTime);
             }
         }
 
     }
 
     public int getBCSize() {
-//        int size = 0;
-//        for (int i = 0 ; i < c ; i++) {
-//            size += group[i].bcSize();
-//        }
-//        return size;
-//        return bc.getHeight() + 1;
-        return minBcSize() * c;
+        return minBcSize() * workers;
     }
     
     @Override
     public boolean isValid() {
-        for (int i = 0 ; i < c ; i++) {
-            if (!group[i].isBcValid()) return false;
+        for (int i = 0 ; i < workers ; i++) {
+            if (!toys[i].isBcValid()) return false;
         }
         return true;
     }
 
     int minBcSize() {
-        int min = group[0].bcSize();
-        for (int i = 1; i < c ; i++) {
-            min = min(min, group[i].bcSize());
+        int min = toys[0].bcSize();
+        for (int i = 1; i < workers ; i++) {
+            min = min(min, toys[i].bcSize());
         }
         return min;
     }

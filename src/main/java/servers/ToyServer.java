@@ -2,11 +2,14 @@ package servers;
 
 import blockchain.Blockchain;
 import blockchain.Utils;
+import com.google.protobuf.InvalidProtocolBufferException;
 import communication.CommLayer;
 import config.Node;
-import das.RBroadcast.RBrodcastService;
-import das.wrb.WrbNode;
+import das.ab.ABService;
 import java.util.ArrayList;
+
+import das.data.Data;
+import das.wrb.WRB;
 import proto.Types.*;
 
 import static blockchain.Utils.createBlockchain;
@@ -15,18 +18,18 @@ import static java.lang.String.format;
 public class ToyServer extends ToyBaseServer {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ToyServer.class);
 
-    public ToyServer(String addr, int wrbPort, int id, int channel, int f, int maxTx, boolean fastMode,
-                     WrbNode wrb, CommLayer comm, RBrodcastService rb) {
-        super(addr, wrbPort, id, channel, f, maxTx, fastMode, wrb, comm, rb);
+    public ToyServer(int id, int worker, int n, int f, int maxTx, boolean fastMode,
+                      CommLayer comm) {
+        super(id, worker, n, f, maxTx, fastMode, comm);
     }
 
-    public ToyServer(String addr, int wrbPort, int commPort, int id, int channel, int f, int tmo, int tmoInterval,
-                     int maxTx, boolean fastMode, ArrayList<Node> wrbCluster, ArrayList<Node> commCluster,
-                     String bbcConfig, String rbConfigPath, String serverCrt, String serverPrivKey, String caRoot) {
-
-        super(addr, wrbPort, commPort, id, channel, f, tmo, tmoInterval, maxTx, fastMode, wrbCluster, commCluster,
-                bbcConfig, rbConfigPath, serverCrt, serverPrivKey, caRoot);
-    }
+//    public ToyServer(String addr, int wrbPort, int commPort, int id, int channel, int f, int tmo, int tmoInterval,
+//                     int maxTx, boolean fastMode, ArrayList<Node> wrbCluster, ArrayList<Node> commCluster,
+//                     String bbcConfig, String rbConfigPath, String serverCrt, String serverPrivKey, String caRoot) {
+//
+//        super(addr, wrbPort, commPort, id, channel, f, tmo, tmoInterval, maxTx, fastMode, wrbCluster, commCluster,
+//                bbcConfig, rbConfigPath, serverCrt, serverPrivKey, caRoot);
+//    }
 
 
 
@@ -47,9 +50,9 @@ public class ToyServer extends ToyBaseServer {
             return null;
         }
         logger.debug(format("[#%d -C[%d]] prepare to disseminate a new block header for [height=%d] [cidSeries=%d ; cid=%d]",
-                getID(), channel, currHeight, cidSeries, cid));
+                getID(), worker, currHeight, cidSeries, cid));
         broadcastEmptyIfNeeded();
-        wrbServer.broadcast(getHeaderForCurrentBlock(bc.getBlock(currHeight - 1).getHeader(),
+        WRB.WRBBroadcast(getHeaderForCurrentBlock(bc.getBlock(currHeight - 1).getHeader(),
                 currHeight, cidSeries, cid));
         return null;
     }
@@ -60,7 +63,7 @@ public class ToyServer extends ToyBaseServer {
         }
         broadcastEmptyIfNeeded();
         logger.debug(format("[#%d-C[%d]] prepare fast mode phase for [height=%d] [cidSeries=%d ; cid=%d]",
-                getID(), channel, currHeight + 1, cidSeries, cid + 1));
+                getID(), worker, currHeight + 1, cidSeries, cid + 1));
         return getHeaderForCurrentBlock(null, currHeight + 1, cidSeries, cid + 1);
     }
 
@@ -83,5 +86,6 @@ public class ToyServer extends ToyBaseServer {
     void potentialBehaviourForSync() throws InterruptedException {
 
     }
+
 
 }

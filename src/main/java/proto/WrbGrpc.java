@@ -54,33 +54,6 @@ public final class WrbGrpc {
      return getDisseminateMessageMethod;
   }
 
-  private static volatile io.grpc.MethodDescriptor<proto.Types.BbcMsg,
-      proto.Types.Empty> getFastVoteMethod;
-
-  public static io.grpc.MethodDescriptor<proto.Types.BbcMsg,
-      proto.Types.Empty> getFastVoteMethod() {
-    io.grpc.MethodDescriptor<proto.Types.BbcMsg, proto.Types.Empty> getFastVoteMethod;
-    if ((getFastVoteMethod = WrbGrpc.getFastVoteMethod) == null) {
-      synchronized (WrbGrpc.class) {
-        if ((getFastVoteMethod = WrbGrpc.getFastVoteMethod) == null) {
-          WrbGrpc.getFastVoteMethod = getFastVoteMethod = 
-              io.grpc.MethodDescriptor.<proto.Types.BbcMsg, proto.Types.Empty>newBuilder()
-              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
-              .setFullMethodName(generateFullMethodName(
-                  "proto.Wrb", "FastVote"))
-              .setSampledToLocalTracing(true)
-              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
-                  proto.Types.BbcMsg.getDefaultInstance()))
-              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
-                  proto.Types.Empty.getDefaultInstance()))
-                  .setSchemaDescriptor(new WrbMethodDescriptorSupplier("FastVote"))
-                  .build();
-          }
-        }
-     }
-     return getFastVoteMethod;
-  }
-
   private static volatile io.grpc.MethodDescriptor<proto.Types.WrbReq,
       proto.Types.WrbRes> getReqMessageMethod;
 
@@ -106,33 +79,6 @@ public final class WrbGrpc {
         }
      }
      return getReqMessageMethod;
-  }
-
-  private static volatile io.grpc.MethodDescriptor<proto.Types.WrbPreConsReq,
-      proto.Types.WrbRes> getPreConsReqMessageMethod;
-
-  public static io.grpc.MethodDescriptor<proto.Types.WrbPreConsReq,
-      proto.Types.WrbRes> getPreConsReqMessageMethod() {
-    io.grpc.MethodDescriptor<proto.Types.WrbPreConsReq, proto.Types.WrbRes> getPreConsReqMessageMethod;
-    if ((getPreConsReqMessageMethod = WrbGrpc.getPreConsReqMessageMethod) == null) {
-      synchronized (WrbGrpc.class) {
-        if ((getPreConsReqMessageMethod = WrbGrpc.getPreConsReqMessageMethod) == null) {
-          WrbGrpc.getPreConsReqMessageMethod = getPreConsReqMessageMethod = 
-              io.grpc.MethodDescriptor.<proto.Types.WrbPreConsReq, proto.Types.WrbRes>newBuilder()
-              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
-              .setFullMethodName(generateFullMethodName(
-                  "proto.Wrb", "PreConsReqMessage"))
-              .setSampledToLocalTracing(true)
-              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
-                  proto.Types.WrbPreConsReq.getDefaultInstance()))
-              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
-                  proto.Types.WrbRes.getDefaultInstance()))
-                  .setSchemaDescriptor(new WrbMethodDescriptorSupplier("PreConsReqMessage"))
-                  .build();
-          }
-        }
-     }
-     return getPreConsReqMessageMethod;
   }
 
   /**
@@ -170,24 +116,13 @@ public final class WrbGrpc {
     }
 
     /**
-     */
-    public void fastVote(proto.Types.BbcMsg request,
-        io.grpc.stub.StreamObserver<proto.Types.Empty> responseObserver) {
-      asyncUnimplementedUnaryCall(getFastVoteMethod(), responseObserver);
-    }
-
-    /**
+     * <pre>
+     *    rpc FastVote(BbcMsg) returns (Empty) {};
+     * </pre>
      */
     public void reqMessage(proto.Types.WrbReq request,
         io.grpc.stub.StreamObserver<proto.Types.WrbRes> responseObserver) {
       asyncUnimplementedUnaryCall(getReqMessageMethod(), responseObserver);
-    }
-
-    /**
-     */
-    public void preConsReqMessage(proto.Types.WrbPreConsReq request,
-        io.grpc.stub.StreamObserver<proto.Types.WrbRes> responseObserver) {
-      asyncUnimplementedUnaryCall(getPreConsReqMessageMethod(), responseObserver);
     }
 
     @java.lang.Override public final io.grpc.ServerServiceDefinition bindService() {
@@ -200,26 +135,12 @@ public final class WrbGrpc {
                 proto.Types.Empty>(
                   this, METHODID_DISSEMINATE_MESSAGE)))
           .addMethod(
-            getFastVoteMethod(),
-            asyncUnaryCall(
-              new MethodHandlers<
-                proto.Types.BbcMsg,
-                proto.Types.Empty>(
-                  this, METHODID_FAST_VOTE)))
-          .addMethod(
             getReqMessageMethod(),
             asyncUnaryCall(
               new MethodHandlers<
                 proto.Types.WrbReq,
                 proto.Types.WrbRes>(
                   this, METHODID_REQ_MESSAGE)))
-          .addMethod(
-            getPreConsReqMessageMethod(),
-            asyncUnaryCall(
-              new MethodHandlers<
-                proto.Types.WrbPreConsReq,
-                proto.Types.WrbRes>(
-                  this, METHODID_PRE_CONS_REQ_MESSAGE)))
           .build();
     }
   }
@@ -251,27 +172,14 @@ public final class WrbGrpc {
     }
 
     /**
-     */
-    public void fastVote(proto.Types.BbcMsg request,
-        io.grpc.stub.StreamObserver<proto.Types.Empty> responseObserver) {
-      asyncUnaryCall(
-          getChannel().newCall(getFastVoteMethod(), getCallOptions()), request, responseObserver);
-    }
-
-    /**
+     * <pre>
+     *    rpc FastVote(BbcMsg) returns (Empty) {};
+     * </pre>
      */
     public void reqMessage(proto.Types.WrbReq request,
         io.grpc.stub.StreamObserver<proto.Types.WrbRes> responseObserver) {
       asyncUnaryCall(
           getChannel().newCall(getReqMessageMethod(), getCallOptions()), request, responseObserver);
-    }
-
-    /**
-     */
-    public void preConsReqMessage(proto.Types.WrbPreConsReq request,
-        io.grpc.stub.StreamObserver<proto.Types.WrbRes> responseObserver) {
-      asyncUnaryCall(
-          getChannel().newCall(getPreConsReqMessageMethod(), getCallOptions()), request, responseObserver);
     }
   }
 
@@ -301,24 +209,13 @@ public final class WrbGrpc {
     }
 
     /**
-     */
-    public proto.Types.Empty fastVote(proto.Types.BbcMsg request) {
-      return blockingUnaryCall(
-          getChannel(), getFastVoteMethod(), getCallOptions(), request);
-    }
-
-    /**
+     * <pre>
+     *    rpc FastVote(BbcMsg) returns (Empty) {};
+     * </pre>
      */
     public proto.Types.WrbRes reqMessage(proto.Types.WrbReq request) {
       return blockingUnaryCall(
           getChannel(), getReqMessageMethod(), getCallOptions(), request);
-    }
-
-    /**
-     */
-    public proto.Types.WrbRes preConsReqMessage(proto.Types.WrbPreConsReq request) {
-      return blockingUnaryCall(
-          getChannel(), getPreConsReqMessageMethod(), getCallOptions(), request);
     }
   }
 
@@ -349,34 +246,19 @@ public final class WrbGrpc {
     }
 
     /**
-     */
-    public com.google.common.util.concurrent.ListenableFuture<proto.Types.Empty> fastVote(
-        proto.Types.BbcMsg request) {
-      return futureUnaryCall(
-          getChannel().newCall(getFastVoteMethod(), getCallOptions()), request);
-    }
-
-    /**
+     * <pre>
+     *    rpc FastVote(BbcMsg) returns (Empty) {};
+     * </pre>
      */
     public com.google.common.util.concurrent.ListenableFuture<proto.Types.WrbRes> reqMessage(
         proto.Types.WrbReq request) {
       return futureUnaryCall(
           getChannel().newCall(getReqMessageMethod(), getCallOptions()), request);
     }
-
-    /**
-     */
-    public com.google.common.util.concurrent.ListenableFuture<proto.Types.WrbRes> preConsReqMessage(
-        proto.Types.WrbPreConsReq request) {
-      return futureUnaryCall(
-          getChannel().newCall(getPreConsReqMessageMethod(), getCallOptions()), request);
-    }
   }
 
   private static final int METHODID_DISSEMINATE_MESSAGE = 0;
-  private static final int METHODID_FAST_VOTE = 1;
-  private static final int METHODID_REQ_MESSAGE = 2;
-  private static final int METHODID_PRE_CONS_REQ_MESSAGE = 3;
+  private static final int METHODID_REQ_MESSAGE = 1;
 
   private static final class MethodHandlers<Req, Resp> implements
       io.grpc.stub.ServerCalls.UnaryMethod<Req, Resp>,
@@ -399,16 +281,8 @@ public final class WrbGrpc {
           serviceImpl.disseminateMessage((proto.Types.BlockHeader) request,
               (io.grpc.stub.StreamObserver<proto.Types.Empty>) responseObserver);
           break;
-        case METHODID_FAST_VOTE:
-          serviceImpl.fastVote((proto.Types.BbcMsg) request,
-              (io.grpc.stub.StreamObserver<proto.Types.Empty>) responseObserver);
-          break;
         case METHODID_REQ_MESSAGE:
           serviceImpl.reqMessage((proto.Types.WrbReq) request,
-              (io.grpc.stub.StreamObserver<proto.Types.WrbRes>) responseObserver);
-          break;
-        case METHODID_PRE_CONS_REQ_MESSAGE:
-          serviceImpl.preConsReqMessage((proto.Types.WrbPreConsReq) request,
               (io.grpc.stub.StreamObserver<proto.Types.WrbRes>) responseObserver);
           break;
         default:
@@ -473,9 +347,7 @@ public final class WrbGrpc {
           serviceDescriptor = result = io.grpc.ServiceDescriptor.newBuilder(SERVICE_NAME)
               .setSchemaDescriptor(new WrbFileDescriptorSupplier())
               .addMethod(getDisseminateMessageMethod())
-              .addMethod(getFastVoteMethod())
               .addMethod(getReqMessageMethod())
-              .addMethod(getPreConsReqMessageMethod())
               .build();
         }
       }

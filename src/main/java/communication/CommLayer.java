@@ -10,5 +10,4 @@ public interface CommLayer {
     boolean contains(int channel, Types.BlockID bid, Types.BlockHeader proof);
     void join();
     void leave();
-    void registerBC(int channel, Blockchain bc);
 }

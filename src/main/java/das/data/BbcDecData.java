@@ -8,8 +8,7 @@ public class BbcDecData {
         this.dec = dec;
         this.fv = fv;
     }
-    public int getDec() {
-        if (fv) return dec ? 1 : -1;
-        return dec ? 1 : 0;
+    public boolean getDec() {
+        return dec;
     }
 }

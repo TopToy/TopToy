@@ -4,11 +4,9 @@ import blockchain.Blockchain;
 
 import blockchain.Utils;
 import communication.CommLayer;
-import config.Node;
-import das.RBroadcast.RBrodcastService;
+import das.ab.ABService;
 
-import das.wrb.ByzantineWrbNode;
-import das.wrb.WrbNode;
+import das.wrb.WRB;
 import proto.Types;
 
 import java.security.SecureRandom;
@@ -26,29 +24,14 @@ public class ByzToyServer extends ToyBaseServer {
     private int delayTime;
     final Queue<List<Types.Block>> byzProposed = new LinkedList<>();
 
-    public ByzToyServer(String addr, int wrbPort, int id, int channel, int f, int maxTx, boolean fastMode,
-                          WrbNode wrb, CommLayer comm, RBrodcastService rb) {
-        super(addr, wrbPort, id, channel, f, maxTx, fastMode, wrb, comm, rb);
+    public ByzToyServer(int id, int worker, int n, int f, int maxTx, boolean fastMode,
+                          CommLayer comm) {
+        super(id, worker, n, f, maxTx, fastMode, comm);
         groups.add(new ArrayList<>());
         for (int i = 0 ; i < n ; i++) {
             groups.get(0).add(i); // At the beginning there is no byzantine behaviour
         }
     }
-
-//    public ByzToyServer(String addr, int wrbPort, int commPort, int id, int channel, int f, int tmo, int tmoInterval,
-//                          int maxTx, boolean fastMode, ArrayList<Node> wrbCluster, ArrayList<Node> commCluster,
-//                          String bbcConfig, String rbConfigPath, String serverCrt, String serverPrivKey, String caRoot) {
-//
-//        super(addr, wrbPort, commPort, id, channel, f, tmo, tmoInterval, maxTx, fastMode, wrbCluster, commCluster,
-//                bbcConfig, rbConfigPath, serverCrt, serverPrivKey, caRoot);
-//        rmfServer.stop();
-//        rmfServer = new ByzantineWrbNode(1, id, addr, wrbPort, f, tmo, tmoInterval,
-//                wrbCluster, bbcConfig, serverCrt, serverPrivKey, caRoot);
-//        groups.add(new ArrayList<>());
-//        for (int i = 0 ; i < n ; i++) {
-//            groups.get(0).add(i); // At the beginning there is no byzantine behaviour
-//        }
-//    }
 
     @Override
     void commSendLogic() throws InterruptedException {
@@ -66,7 +49,7 @@ public class ByzToyServer extends ToyBaseServer {
         ArrayList<Types.Block> byzs = new ArrayList<>();
         for (List<Integer> g : groups) {
             Types.Block byz = getByzBlock();
-            comm.send(channel, byz, g.stream().mapToInt(i->i).toArray());
+            comm.send(worker, byz, g.stream().mapToInt(i->i).toArray());
             byzs.add(byz);
         }
         byzProposed.add(byzs);
@@ -102,8 +85,8 @@ public class ByzToyServer extends ToyBaseServer {
             for (List<Integer> g : groups) {
                 Types.Block byz = byzProposed.element().get(i);
                 i++;
-                wrbServer.sned(createBlockHeader(byz, bc.getBlock(currHeight - 1).getHeader(), getID(), currHeight,
-                        cidSeries, cid, channel, byz.getId().getBid()),  g.stream().mapToInt(j->j).toArray());
+                WRB.WRBSend(createBlockHeader(byz, bc.getBlock(currHeight - 1).getHeader(), getID(), currHeight,
+                        cidSeries, cid, worker, byz.getId().getBid()),  g.stream().mapToInt(j->j).toArray());
             }
         }
 
@@ -114,7 +97,7 @@ public class ByzToyServer extends ToyBaseServer {
     void removeFromPendings(Types.BlockHeader recHeader, Types.Block recBlock) {
         if (currLeader == getID() && !recHeader.getEmpty()) {
             logger.debug(format("[#%d-C[%d]] nullifies currBlock [sender=%d] [height=%d] [cidSeries=%d, cid=%d]",
-                    getID(), channel, recBlock.getHeader().getM().getSender(), currHeight, cidSeries, cid));
+                    getID(), worker, recBlock.getHeader().getM().getSender(), currHeight, cidSeries, cid));
             synchronized (byzProposed) {
                 byzProposed.remove();
             }
@@ -154,7 +137,7 @@ public class ByzToyServer extends ToyBaseServer {
                                 .setProposerID(getID())
                                 .setBid(bid)
                                 .setTxNum(1)
-                                .setChannel(channel))
+                                .setChannel(worker))
                         .setServerTs(System.currentTimeMillis())
                         .build())
                 .build();
@@ -178,7 +161,7 @@ public class ByzToyServer extends ToyBaseServer {
     @Override
     void potentialBehaviourForSync() throws InterruptedException {
         if (delayTime > 0) {
-            logger.debug(format("[#%d-%d] potentialBehaviourForSync sleeps for [%d]", getID(), channel, delayTime));
+            logger.debug(format("[#%d-%d] potentialBehaviourForSync sleeps for [%d]", getID(), worker, delayTime));
             Thread.sleep(delayTime);
         }
     }

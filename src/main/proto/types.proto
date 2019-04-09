@@ -36,6 +36,7 @@ message BbcMsg {
     Meta m = 1;
     bool vote = 2;
     BlockHeader next = 3;
+    int32 height = 4;
 }
 
 message blockStatistics {
@@ -116,12 +117,17 @@ message WrbReq {
     int32 height = 2;
 }
 
-message WrbPreConsReq {
+message WrbRes {
+    Meta m = 1;
+    BlockHeader data = 2;
+}
+
+message EvidenceReq {
     Meta _meta = 1;
     int32 height = 2;
 }
 
-message WrbRes {
+message EvidenceRes {
     Meta m = 1;
     BlockHeader data = 2;
 }

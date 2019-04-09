@@ -12,42 +12,6 @@ services:
         networks:
             toy_net:
                 ipv4_address: 172.18.0.3
-   TS1:
-        image: toy:0.1
-        container_name: TS_1
-        environment:
-        - ID=1
-        - Type=r
-        volumes:
-        - /home/yoni/Desktop/dtoy/curr/:/tmp/JToy
-        - /home/yoni/Desktop/dtoy/configurations/correct:/JToy/bin/src/main/resources
-        networks:
-            toy_net:
-                ipv4_address: 172.18.0.4
-   TS2:
-        image: toy:0.1
-        container_name: TS_2
-        environment:
-        - ID=2
-        - Type=r
-        volumes:
-        - /home/yoni/Desktop/dtoy/curr/:/tmp/JToy
-        - /home/yoni/Desktop/dtoy/configurations/correct:/JToy/bin/src/main/resources
-        networks:
-            toy_net:
-                ipv4_address: 172.18.0.5
-   TS3:
-        image: toy:0.1
-        container_name: TS_3
-        environment:
-        - ID=3
-        - Type=r
-        volumes:
-        - /home/yoni/Desktop/dtoy/curr/:/tmp/JToy
-        - /home/yoni/Desktop/dtoy/configurations/correct:/JToy/bin/src/main/resources
-        networks:
-            toy_net:
-                ipv4_address: 172.18.0.6
 networks:
     toy_net:
         driver: bridge

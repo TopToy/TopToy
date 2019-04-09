@@ -7,7 +7,7 @@ import "types.proto";
 
 service Wrb {
     rpc DisseminateMessage(BlockHeader) returns (Empty) {};
-    rpc FastVote(BbcMsg) returns (Empty) {};
+//    rpc FastVote(BbcMsg) returns (Empty) {};
     rpc reqMessage(WrbReq) returns (WrbRes) {};
-    rpc PreConsReqMessage(WrbPreConsReq) returns (WrbRes) {};
+//    rpc PreConsReqMessage(WrbPreConsReq) returns (WrbRes) {};
 }
