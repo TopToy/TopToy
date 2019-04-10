@@ -132,6 +132,7 @@ public abstract class ToyBaseServer {
             txSize = StrictMath.max(0, Config.getTxSize() - bareTxSize);
         }
         currBLock = configureNewBlock();
+        logger.info(format("Initiated ToyBaseServer: [id=%d; n=%d; f=%d; worker=%d]", id, n, f, worker));
     }
 
     int getID() {

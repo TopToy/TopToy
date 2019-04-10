@@ -116,6 +116,7 @@ public class WrbRpcs extends WrbGrpc.WrbImplBase {
         this.serverCrt = serverCrt;
         this.serverPrivKey = serverPrivKey;
         this.caRoot = caRoot;
+        logger.info(format("Initiated WrbRpcs: [id=%d; n=%d; f=%d]", id, n, f));
     }
 
     void start() {

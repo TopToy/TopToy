@@ -85,6 +85,8 @@ public class Top implements server {
                 toys[i] = new AsyncToyServer(id, i, n, f, maxTx, fastMode, comm);
             }
         }
+        logger.info(format("Initiated TOP: [id=%d; n=%d; f=%d; workers=%d]", id, n, f, workers));
+
     }
 
     void initProtocols(ArrayList<Node> obbcCluster, ArrayList<Node> wrbCluster, int tmo, int tmoInterval,
@@ -100,6 +102,8 @@ public class Top implements server {
         logger.info(format("[%d] has initiated communication layer", id));
         new WRB(id, workers, n, f, tmo, tmoInterval, wrbCluster, serverCrt, serverPrivKey, caRoot, comm);
         logger.info(format("[%d] has initiated WRB", id));
+
+
     }
 
     public Statistics getStatistics() {

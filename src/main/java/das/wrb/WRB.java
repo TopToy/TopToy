@@ -16,6 +16,7 @@ import proto.WrbGrpc;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static java.lang.Math.max;
 import static java.lang.String.format;
 
 public class WRB {
@@ -46,7 +47,8 @@ public class WRB {
         WRB.comm = comm;
         new Data(workers);
         WRB.rpcs = new WrbRpcs(id, workers, n, f, wrbCluster, serverCrt, serverPrivKey, caRoot);
-
+        logger.info(format("Initiated WRB: [id=%d; n=%d; f=%d; tmo=%d; tmoInterval=%d]", id, n, f, tmo,
+                tmoInterval));
     }
 
 
@@ -149,9 +151,9 @@ public class WRB {
                         id, channel, realTmo, cidSeries, cid));
                 Data.pending[channel].wait(realTmo);
 
-                realTmo -= (System.currentTimeMillis() - startTime);
-                logger.debug(format("[#%d-C[%d]] real TMO is [%d] ms for data msg [cidSeries=%d ; cid=%d]",
-                        id, channel, realTmo, cidSeries, cid));
+                realTmo -= max(0, (System.currentTimeMillis() - startTime));
+//                logger.debug(format("[#%d-C[%d]] real TMO is [%d] ms for data msg [cidSeries=%d ; cid=%d]",
+//                        id, channel, realTmo, cidSeries, cid));
             }
         }
 

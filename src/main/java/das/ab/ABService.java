@@ -29,6 +29,7 @@ public class ABService {
     public ABService(int id, int n, int f, String configHome) {
         ABService.id = id;
         ABService.bs = new ABBftSMaRt(id, n, f, configHome);
+        logger.info(format("Initiated ABService: [id=%d]", id));
 
     }
 

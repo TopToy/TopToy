@@ -114,6 +114,7 @@ public class OBBCRpcs extends ObbcGrpc.ObbcImplBase {
         this.caRoot = caRoot;
         this.serverCrt = serverCrt;
         this.serverPrivKey = serverPrivKey;
+        logger.info(format("Initiated OBBCRpcs: [id=%d; n=%d; f=%d; qSize=%d]", id, n, f, qSize));
     }
 
     public void start() {
@@ -176,22 +177,21 @@ public class OBBCRpcs extends ObbcGrpc.ObbcImplBase {
                 .build();
         fvData[channel].putIfAbsent(key, new VoteData());
         fvData[channel].computeIfPresent(key, (k, v) -> {
-            if (v.getVotersNum() == n - f) return v;
+            if (v.getVotersNum() == qSize) return v;
             if (!v.addVote(request.getM().getSender(), request.getVote())) return v;
             logger.debug(format("[#%d-C[%d]] received fv message [cidSeries=%d ; cid=%d ; sender=%d, v=%b]",
                     id, channel, cidSeries, cid, request.getM().getSender(), request.getVote()));
-            if (v.getVotersNum() == n - f) {
-                addNewFastDec(channel, key, v.getVoteReasult(), request.getHeight());
-//                synchronized (Data.bbcFastDec[channel]) {
-//                    Data.bbcFastDec[channel].putIfAbsent(key, new BbcDecData(v.getVoteReasult(), true));
-//                    Data.bbcFastDec[channel].notifyAll();
-//                }
+            if (v.getVotersNum() == qSize) {
+                boolean dec = v.posFastVote(qSize);
+                logger.debug(format("Add fastVote decision for [w=%d ; cidSeries=%d ; cid=%d ; dec=%b]", channel, cidSeries, cid, dec));
+                addNewFastDec(channel, key, dec, request.getHeight());
             }
             return v;
         });
     }
 
     void addNewFastDec(int worker, Types.Meta key, boolean dec, int height) {
+
         synchronized (bbcFastDec[worker]) {
             bbcFastDec[worker].computeIfAbsent(key, k1 -> {
                 if (dec) {
@@ -199,7 +199,7 @@ public class OBBCRpcs extends ObbcGrpc.ObbcImplBase {
                         logger.debug(format("[#%d-C[%d]] (addNewFastDec) found that a full bbc initialized, thus propose [cidSeries=%d ; cid=%d]",
                                 id, worker, key.getCidSeries(),  key.getCid()));
                         BBC.nonBlockingPropose(Types.BbcMsg.newBuilder()
-                                .setM(key)
+                                .setM(key.toBuilder().setSender(id))
                                 .setHeight(height)
                                 .setVote(dec).build());
                         return v2;
@@ -230,13 +230,12 @@ public class OBBCRpcs extends ObbcGrpc.ObbcImplBase {
         }
         if (msg == null) {
             msg = Types.BlockHeader.getDefaultInstance();
-            logger.debug(format("[#%d-C[%d]] has received pre das request message" +
+            logger.debug(format("[#%d-C[%d]] has received evidence request message" +
                             " from [#%d] of [cidSeries=%d ; cid=%d] response with NULL",
                     id, channel, request.getMeta().getSender(), cidSeries, cid));
 
         } else {
-            logger.debug(format("[#%d-C[%d]] has received pre das request message from [#%d] of [cidSeries=%d ; cid=%d]" +
-                            " responses with a value",
+            logger.debug(format("[#%d-C[%d]] has received evidence request message from [#%d] of [cidSeries=%d ; cid=%d] responses with a value",
                     id, channel, request.getMeta().getSender(), cidSeries, cid));
         }
 
@@ -293,7 +292,7 @@ public class OBBCRpcs extends ObbcGrpc.ObbcImplBase {
                 preConsVote[worker].computeIfPresent(key, (k, val) -> {
                     if (val.size() > n - f) return val;
                     val.add(res.getM().getSender());
-                    logger.debug(format("[#%d-C[%d]] received preCons response from [%d] [cidSeries=%d ; cid=%d]",
+                    logger.debug(format("[#%d-C[%d]] received evidence response from [%d] [cidSeries=%d ; cid=%d]",
                             id, worker, res.getM().getSender(), cidSeries, cid));
 
                     if ((!res.getData().equals(Types.BlockHeader.getDefaultInstance()))
@@ -302,24 +301,24 @@ public class OBBCRpcs extends ObbcGrpc.ObbcImplBase {
                             && res.getData().getM().getChannel() == worker
                             && res.getData().getM().getSender() == expSender) {
                         if (!blockDigSig.verifyHeader(expSender, res.getData())) {
-                            logger.debug(format("[#%d-C[%d]] has pre cons received invalid response message from [#%d] for [cidSeries=%d ; cid=%d]",
+                            logger.debug(format("[#%d-C[%d]] has evidence received invalid response message from [#%d] for [cidSeries=%d ; cid=%d]",
                                     id, worker, res.getM().getSender(), cidSeries, cid));
                             return val;
                         }
                         if (!Data.pending[worker].containsKey(key)) {
-                            logger.debug(format("[#%d-C[%d]] has pre das received message from [#%d] for [cidSeries=%d ; cid=%d]",
+                            logger.debug(format("[#%d-C[%d]] has evidence received message from [#%d] for [cidSeries=%d ; cid=%d]",
                                     id, worker, res.getM().getSender(), cidSeries, cid));
                             Data.pending[worker].putIfAbsent(key, res.getData());
                         }
                     } else if (res.getData().equals(Types.BlockHeader.getDefaultInstance())) {
-                        logger.debug(format("[#%d-C[%d]] has pre das received NULL message from [#%d] for [cidSeries=%d ; cid=%d]",
+                        logger.debug(format("[#%d-C[%d]] has evidence received NULL message from [#%d] for [cidSeries=%d ; cid=%d]",
                                 id, worker, res.getM().getSender(), cidSeries,  cid));
                     }
 
                     if (val.size() == n - f) {
                         synchronized (preConsDone[worker]) {
                             preConsDone[worker].add(key);
-                            logger.debug(format("[#%d-C[%d]] notify on preCons for [cidSeries=%d ; cid=%d]",
+                            logger.debug(format("[#%d-C[%d]] notify on evidence for [cidSeries=%d ; cid=%d]",
                                     id, worker, cidSeries,  cid));
                             preConsDone[worker].notify();
                         }

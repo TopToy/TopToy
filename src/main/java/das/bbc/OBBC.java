@@ -4,6 +4,7 @@ import config.Node;
 
 import das.data.BbcDecData;
 
+import das.data.Data;
 import das.data.VoteData;
 
 import io.grpc.*;
@@ -28,6 +29,8 @@ public class OBBC extends ObbcGrpc.ObbcImplBase  {
                 String serverPrivKey) {
         OBBC.id = id;
         rpcs = new OBBCRpcs(id, n, f, qSize, obbcCluster, caRoot, serverCrt, serverPrivKey);
+        logger.info(format("Initiated ABBftSMaRt: [id=%d]", id));
+
     }
 
     static public void start() {
@@ -50,19 +53,24 @@ public class OBBC extends ObbcGrpc.ObbcImplBase  {
         }
 
         if (bbcFastDec[worker].get(key).getDec()) {
+            logger.debug(format("decided (1) by fast vote [w=%d ; cidSereis=%d ; cid=%d ; height=%d]", worker, key.getCidSeries(), key.getCid(), height));
             return bbcFastDec[worker].get(key);
         }
 
-        rpcs.broadcastEvidenceReq(Types.EvidenceReq.newBuilder()
-                .setHeight(height)
-                .setMeta(key.toBuilder()
-                        .setSender(id)
-                        .build())
-                .build(), key, expSender);
+        pending[worker].computeIfAbsent(key, k -> {
+            logger.debug(format("broadcast evidence request [w=%d ; cidSeries=%d ; cid=%d ; height=%d]", worker, key.getCidSeries(), key.getCid(), height));
+            rpcs.broadcastEvidenceReq(Types.EvidenceReq.newBuilder()
+                    .setHeight(height)
+                    .setMeta(v.getM())
+                    .build(), key, expSender);
+            return null;
+        });
 
-        synchronized (preConsDone[worker]) {
-            while (!preConsDone[worker].contains(key)) {
-                preConsDone[worker].wait();
+        if (!pending[worker].containsKey(key)) {
+            synchronized (preConsDone[worker]) {
+                while (!preConsDone[worker].contains(key)) {
+                    preConsDone[worker].wait();
+                }
             }
         }
 
@@ -72,7 +80,7 @@ public class OBBC extends ObbcGrpc.ObbcImplBase  {
         }
 
         return BBC.propose(Types.BbcMsg.newBuilder()
-                .setM(key)
+                .setM(v.getM())
                 .setVote(vote)
                 .setHeight(height)
                 .build(), key);
@@ -86,7 +94,7 @@ public class OBBC extends ObbcGrpc.ObbcImplBase  {
                     logger.debug(format("[#%d-C[%d]] (reCons) found that a full bbc initialized, thus propose [cidSeries=%d ; cid=%d]",
                              id, worker, key.getCidSeries(),  key.getCid()));
                     BBC.nonBlockingPropose(Types.BbcMsg.newBuilder()
-                            .setM(key)
+                            .setM(key.toBuilder().setSender(id).build())
                             .setHeight(height)
                             .setVote(v1.getDec()).build());
                     return new VoteData();
@@ -100,11 +108,13 @@ public class OBBC extends ObbcGrpc.ObbcImplBase  {
                                 "thus propose [cidSeries=%d ; cid=%d; height=%d]",
                         id, worker, key.getCidSeries(),  key.getCid(), height));
                 BBC.nonBlockingPropose(Types.BbcMsg.newBuilder()
-                        .setM(key)
+                        .setM(key.toBuilder().setSender(id).build())
                         .setHeight(height)
                         .setVote(true).build());
+                return new BbcDecData(true, true);
             }
-            return new BbcDecData(true, true);
+            return null;
+
         });
 
     }

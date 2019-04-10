@@ -32,6 +32,8 @@ public class ABBftSMaRt extends DefaultSingleRecoverable {
         this.n = n;
         this.f = f;
         this.configHome = configHome;
+        logger.info(format("Initiated ABBftSMaRt: [id=%d; n=%d; f=%d]", id, n, f));
+
     }
     public void start() {
         sr = new ServiceReplica(id, this, this, configHome);
