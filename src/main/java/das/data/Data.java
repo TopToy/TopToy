@@ -60,17 +60,20 @@ public class Data {
         }
     }
 
-//    static public void evacuateOldData(int channel, Types.Meta key) {
-////        bbcDec[channel].remove(key);
-//        pending[channel].remove(key);
-////        votes[channel].remove(key);
-//        preConsVote[channel].remove(key);
-//        fvData[channel].remove(key);
-//        synchronized (preConsDone[channel]) {
-//            preConsDone[channel].remove(key);
-//        }
-//
-//    }
+    static public void evacuateOldData(int channel, Types.Meta key) {
+        logger.debug(format("evacuating all data for [worker=%d ; cidSeries=%d ; cid=%d]",channel, key.getCidSeries(),
+                key.getCid()));
+        bbcFastDec[channel].remove(key);
+        bbcRegDec[channel].remove(key);
+        bbcVotes[channel].remove(key);
+        pending[channel].remove(key);
+        preConsVote[channel].remove(key);
+        fvData[channel].remove(key);
+        synchronized (preConsDone[channel]) {
+            preConsDone[channel].remove(key);
+        }
+
+    }
     static public void addToPendings(Types.BlockHeader request, Types.Meta key) {
         int channel = key.getChannel();
         int height = request.getHeight();
@@ -80,60 +83,73 @@ public class Data {
             pending[channel].notify();
         }
     }
-//    static public void evacuateAllOldData(int channel, Types.Meta mKey) {
-//        int cidSeries = mKey.getCidSeries();
-//        int cid = mKey.getCid();
-////        for (Types.Meta key : bbcDec[channel].keySet()) {
-////            if (key.getCidSeries() < cidSeries)  {
-////                bbcDec[channel].remove(key);
-////                continue;
-////            }
-////            if (key.getCidSeries() == cidSeries && key.getCid() < cid) bbcDec[channel].remove(key);
-////        }
-//
-//        for (Types.Meta key : pending[channel].keySet()) {
-//            if (key.getCidSeries() < cidSeries)  {
-//                pending[channel].remove(key);
-//                continue;
-//            }
-//            if (key.getCidSeries() == cidSeries && key.getCid() < cid) pending[channel].remove(key);
-//        }
-////        for (Types.Meta key : votes[channel].keySet()) {
-////            if (key.getCidSeries() < cidSeries)  {
-////                votes[channel].remove(key);
-////                continue;
-////            }
-////            if (key.getCidSeries() == cidSeries && key.getCid() < cid) votes[channel].remove(key);
-////        }
-//
-//        for (Types.Meta key : preConsVote[channel].keySet()) {
-//            if (key.getCidSeries() < cidSeries)  {
-//                preConsVote[channel].remove(key);
-//                continue;
-//            }
-//            if (key.getCidSeries() == cidSeries && key.getCid() < cid) preConsVote[channel].remove(key);
-//        }
-//
-//        for (Types.Meta key : fvData[channel].keySet()) {
-//            if (key.getCidSeries() < cidSeries)  {
-//                fvData[channel].remove(key);
-//                continue;
-//            }
-//            if (key.getCidSeries() == cidSeries && key.getCid() < cid) fvData[channel].remove(key);
-//        }
-//        synchronized (preConsDone[channel]) {
-//            for (Iterator<Types.Meta> itKey = preConsDone[channel].iterator() ; itKey.hasNext() ; ) {
-//                Types.Meta key = itKey.next();
-//                if (key.getCidSeries() < cidSeries)  {
-//                    itKey.remove();
-//                    continue;
-//                }
-//                if (key.getCidSeries() == cidSeries && key.getCid() < cid) itKey.remove();
-//            }
-//        }
-//
-//
-//    }
+
+
+    static public void evacuateAllOldData(int channel, Types.Meta mKey) {
+        int cidSeries = mKey.getCidSeries();
+        int cid = mKey.getCid();
+        logger.debug(format("evacuating all data for [worker=%d ; cidSeries=%d ; cid=%d]",channel, cidSeries, cid));
+        for (Types.Meta key : bbcFastDec[channel].keySet()) {
+            if (key.getCidSeries() < cidSeries)  {
+                bbcFastDec[channel].remove(key);
+                continue;
+            }
+            if (key.getCidSeries() == cidSeries && key.getCid() < cid) bbcFastDec[channel].remove(key);
+        }
+
+        for (Types.Meta key : bbcRegDec[channel].keySet()) {
+            if (key.getCidSeries() < cidSeries)  {
+                bbcRegDec[channel].remove(key);
+                continue;
+            }
+            if (key.getCidSeries() == cidSeries && key.getCid() < cid) bbcRegDec[channel].remove(key);
+        }
+
+        for (Types.Meta key : bbcVotes[channel].keySet()) {
+            if (key.getCidSeries() < cidSeries)  {
+                bbcVotes[channel].remove(key);
+                continue;
+            }
+            if (key.getCidSeries() == cidSeries && key.getCid() < cid) bbcVotes[channel].remove(key);
+        }
+
+        for (Types.Meta key : pending[channel].keySet()) {
+            if (key.getCidSeries() < cidSeries)  {
+                pending[channel].remove(key);
+                continue;
+            }
+            if (key.getCidSeries() == cidSeries && key.getCid() < cid) pending[channel].remove(key);
+        }
+
+
+        for (Types.Meta key : preConsVote[channel].keySet()) {
+            if (key.getCidSeries() < cidSeries)  {
+                preConsVote[channel].remove(key);
+                continue;
+            }
+            if (key.getCidSeries() == cidSeries && key.getCid() < cid) preConsVote[channel].remove(key);
+        }
+
+        for (Types.Meta key : fvData[channel].keySet()) {
+            if (key.getCidSeries() < cidSeries)  {
+                fvData[channel].remove(key);
+                continue;
+            }
+            if (key.getCidSeries() == cidSeries && key.getCid() < cid) fvData[channel].remove(key);
+        }
+        synchronized (preConsDone[channel]) {
+            for (Iterator<Types.Meta> itKey = preConsDone[channel].iterator() ; itKey.hasNext() ; ) {
+                Types.Meta key = itKey.next();
+                if (key.getCidSeries() < cidSeries)  {
+                    itKey.remove();
+                    continue;
+                }
+                if (key.getCidSeries() == cidSeries && key.getCid() < cid) itKey.remove();
+            }
+        }
+
+
+    }
 
     static public RBTypes getRBType(int type) {
         switch (type) {

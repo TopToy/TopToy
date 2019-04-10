@@ -329,6 +329,13 @@ public abstract class ToyBaseServer {
                                 getID(), worker, recBlock.getHeader().getHeight(), cidSeries, cid, recBlock.getDataCount()));
                     }
                     DBUtils.writeBlockToTable(permanent);
+                    Data.evacuateOldData(worker, permanent.getHeader().getM().toBuilder().clearSender().build());
+                    communication.data.Data.evacuateOldData(worker, permanent.getId());
+
+                    if (currHeight % 1000 == 0) {
+                        Data.evacuateAllOldData(worker, permanent.getHeader().getM().toBuilder().clearSender().build());
+                        communication.data.Data.evacuateOldData(worker, permanent.getId());
+                    }
                 }
 
                 logger.debug(String.format("[#%d-C[%d]] adds new Block with [height=%d] [cidSeries=%d ; cid=%d] [size=%d]",
