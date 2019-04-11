@@ -742,11 +742,13 @@ main_byz() {
 #    main_no_failures 0 0 1 1 1 1000 10
 #
 #main_no_failures 0 0 10 10 1 1000 60
- main_no_failures 0 0 1 10 1 1000 120
-#for i in `seq 0 2`; do
+# main_no_failures 0 0 1 10 1 1000 120
+#for i in `seq 0 1`; do
 #    main_no_failures 0 0 1 10 1 1000 120
 #done
-#
+
+main_no_failures 512 10 1 10 1 10 120
+
 #for i in `seq 0 2`; do
 #    main_no_failures 512 10 1 10 1 1000 120
 #done
@@ -936,4 +938,4 @@ main_byz() {
 
 
 
-#shutdown
+shutdown
