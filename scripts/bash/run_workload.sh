@@ -76,6 +76,8 @@ install() {
 }
 
 run_remote_servers() {
+    ./watchdog.sh &
+    local pwatch=$!
     local pids=[]
     local id=0
     for s in "${servers[@]}"; do
@@ -87,6 +89,7 @@ run_remote_servers() {
     for pid in ${pids[*]}; do
         wait $pid
     done
+    kill -9 $pwatch
 
 }
 
@@ -730,6 +733,25 @@ main_byz() {
    run_byz_test ${1} ${2} ${3} ${4} ${currOut} ${5}
 }
 
+test1() {
+for i in `seq 0 2`; do
+    main_no_failures 0 0 1 10 1 1 120
+done
+
+for i in `seq 0 2`; do
+    main_no_failures 0 0 1 10 1 10 120
+done
+
+for i in `seq 0 2`; do
+    main_no_failures 0 0 1 10 1 100 120
+done
+
+for i in `seq 0 2`; do
+    main_no_failures 0 0 1 10 1 1000 120
+done
+}
+test1
+shutdown
 ##for i in `seq 0 9`; do
 #    main_tmo_failure 500 1000 1 400 400 1 1 1 60
 ##done
@@ -746,8 +768,8 @@ main_byz() {
 #for i in `seq 0 1`; do
 #    main_no_failures 0 0 1 10 1 1000 120
 #done
-
-main_no_failures 512 10 1 10 1 10 120
+#main_no_failures 0 0 1 10 1 10 60
+#main_no_failures 512 10 1 10 1 10 60
 
 #for i in `seq 0 2`; do
 #    main_no_failures 512 10 1 10 1 1000 120
@@ -938,4 +960,4 @@ main_no_failures 512 10 1 10 1 10 120
 
 
 
-shutdown
+#shutdown
