@@ -35,7 +35,7 @@ public class OBBC extends ObbcGrpc.ObbcImplBase  {
         OBBC.id = id;
         rpcs = new OBBCRpcs(id, n, f, qSize, obbcCluster, caRoot, serverCrt, serverPrivKey);
         OBBC.comm = comm;
-        logger.info(format("Initiated ABBftSMaRt: [id=%d]", id));
+        logger.info(format("Initiated OBBC: [id=%d]", id));
 
     }
 
@@ -59,7 +59,7 @@ public class OBBC extends ObbcGrpc.ObbcImplBase  {
         }
 
         if (bbcFastDec[worker].get(key).getDec()) {
-            logger.debug(format("decided (1) by fast vote [w=%d ; cidSereis=%d ; cid=%d ; height=%d]", worker, key.getCidSeries(), key.getCid(), height));
+            logger.debug(format("decided [1] by fast vote [w=%d ; cidSereis=%d ; cid=%d ; height=%d]", worker, key.getCidSeries(), key.getCid(), height));
             return bbcFastDec[worker].get(key);
         }
 

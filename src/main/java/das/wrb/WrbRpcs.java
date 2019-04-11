@@ -164,7 +164,7 @@ public class WrbRpcs extends WrbGrpc.WrbImplBase {
 
             @Override
             public void onError(Throwable throwable) {
-
+                logger.debug(throwable.getMessage());
             }
 
             @Override

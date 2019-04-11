@@ -92,14 +92,14 @@ public class Top implements server {
     void initProtocols(ArrayList<Node> obbcCluster, ArrayList<Node> wrbCluster, int tmo, int tmoInterval,
                        String serverCrt, String serverPrivKey, String caRoot,
                        ArrayList<Node> commCluster, String abConfigHome) {
+        comm = new Clique(id, workers, this.n, commCluster);
+        logger.info(format("[%d] has initiated communication layer", id));
         new ABService(id, n, f, abConfigHome);
         logger.info(format("[%d] has initiated ab service", id));
         new BBC(id, n, f, n - f);
         logger.info(format("[%d] has initiated BBC", id));
         new OBBC(id, n, f, n - f, obbcCluster, comm, caRoot, serverCrt, serverPrivKey);
         logger.info(format("[%d] has initiated OBBC service", id));
-        comm = new Clique(id, workers, this.n, commCluster);
-        logger.info(format("[%d] has initiated communication layer", id));
         new WRB(id, workers, n, f, tmo, tmoInterval, wrbCluster, serverCrt, serverPrivKey, caRoot, comm);
         logger.info(format("[%d] has initiated WRB", id));
 
