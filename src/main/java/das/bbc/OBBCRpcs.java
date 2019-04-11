@@ -146,7 +146,6 @@ public class OBBCRpcs extends ObbcGrpc.ObbcImplBase {
     void handlePgbMsg(Types.BbcMsg msg) {
         Types.BlockHeader nxt = msg.getNext();
         int sender = nxt.getM().getSender();
-        if (!blockDigSig.verifyHeader(sender, nxt)) return;
         int cid = nxt.getM().getCid();
         int channel = nxt.getM().getChannel();
         int cidSeries = nxt.getM().getCidSeries();
@@ -163,9 +162,6 @@ public class OBBCRpcs extends ObbcGrpc.ObbcImplBase {
     public void fastVote(proto.Types.BbcMsg request,
                          StreamObserver<Types.Empty> responseObserver) {
 
-        if (request.hasNext()) {
-            handlePgbMsg(request);
-        }
 
         int cid = request.getM().getCid();
         int cidSeries = request.getM().getCidSeries();
@@ -175,11 +171,18 @@ public class OBBCRpcs extends ObbcGrpc.ObbcImplBase {
                 .setCidSeries(cidSeries)
                 .setCid(cid)
                 .build();
+
+        if (request.hasNext()) {
+            handlePgbMsg(request);
+        }
+
+        logger.debug(format("[#%d-C[%d]] (1) received fv message [cidSeries=%d ; cid=%d ; sender=%d, v=%b]",
+                id, channel, cidSeries, cid, request.getM().getSender(), request.getVote()));
         fvData[channel].putIfAbsent(key, new VoteData());
         fvData[channel].computeIfPresent(key, (k, v) -> {
             if (v.getVotersNum() == qSize) return v;
             if (!v.addVote(request.getM().getSender(), request.getVote())) return v;
-            logger.debug(format("[#%d-C[%d]] received fv message [cidSeries=%d ; cid=%d ; sender=%d, v=%b]",
+            logger.debug(format("[#%d-C[%d]] (2) received valid fv message [cidSeries=%d ; cid=%d ; sender=%d, v=%b]",
                     id, channel, cidSeries, cid, request.getM().getSender(), request.getVote()));
             if (v.getVotersNum() == qSize) {
                 boolean dec = v.posFastVote(qSize);

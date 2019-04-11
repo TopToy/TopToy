@@ -59,12 +59,12 @@ public class CliqueRpcs  extends CommunicationGrpc.CommunicationImplBase {
     }
     // TODO: Re configure grpc server so it would be anble to handle mass of messages.
     public void start() {
-        Executor executor = Executors.newFixedThreadPool(n);
+//        Executor executor = Executors.newFixedThreadPool(n);
         rpcServer = ServerBuilder
                 .forPort(nodes.get(id).getPort())
                 .addService(this)
                 .maxInboundMessageSize(16 * 1024 * 1024)
-                .executor(executor)
+//                .executor(executor)
                 .build();
         try {
             rpcServer.start();

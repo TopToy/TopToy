@@ -128,15 +128,21 @@ public class Top implements server {
     }
 
     public void start() {
-        logger.info("Joining to communication layer");
-        comm.join();
-        logger.info("Starting AB");
-        ABService.start();
+//        if (id == 0) {
+//            try {
+//                Thread.sleep(3 * 1000);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        }
         logger.info("Starting OBBC");
         OBBC.start();
         logger.info("Starting wrb");
         WRB.start();
-
+        logger.info("Joining to communication layer");
+        comm.join();
+        logger.info("Starting AB");
+        ABService.start(); // Also acts as a start synchronization point
         logger.info(format("Starting [%d] Toys" , workers));
         for (int i = 0 ; i < workers ; i++) {
             toys[i].start();
@@ -150,18 +156,19 @@ public class Top implements server {
         sts.stop = System.currentTimeMillis();
         txsServer.shutdown();
         logger.info("shutdown txsServer");
+        for (int i = 0 ; i < workers ; i++) {
+            toys[i].shutdown();
+            logger.info(format("shutdown worker [%d]", i));
+        }
+        comm.leave();
+        logger.info("leaving communication layer");
         WRB.shutdown();
         logger.info("shutdown WRB");
         OBBC.shutdown();
         logger.info("shutdown OBBC");
         ABService.shutdown();
         logger.info("shutdown AB");
-        comm.leave();
-        logger.info("leaving communication layer");
-        for (int i = 0 ; i < workers ; i++) {
-            toys[i].shutdown();
-            logger.info(format("shutdown worker [%d]", i));
-        }
+
         logger.info("ByeBye");
     }
 

@@ -77,6 +77,13 @@ public class Data {
     static public void addToPendings(Types.BlockHeader request, Types.Meta key) {
         int channel = key.getChannel();
         int height = request.getHeight();
+        if (!blockDigSig.verifyHeader(request.getM().getSender(), request)) {
+            logger.debug(format("invalid pgb message [w=%d ; cidSeries=%d ; cid=%d ; sender=%d, height=%b]",
+                    request.getM().getChannel(), request.getM().getCidSeries(), request.getM().getCid()
+                    , request.getM().getSender(), request.getHeight()));
+
+            return;
+        }
         if (bcs[channel].contains(height)) return;
         synchronized (pending[channel]) {
             pending[channel].putIfAbsent(key, request);

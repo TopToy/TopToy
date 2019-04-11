@@ -5,7 +5,7 @@ package proto;
 
 message Meta {
     int32 channel = 1;
-    int32 sender = 2;
+//    int32 sender = 2;
     int32 cid = 3;
     int32 cidSeries = 4;
 }
@@ -15,6 +15,7 @@ message Meta {
 message BbcDecision {
     Meta m = 1;
     int32 decosion = 2;
+    int32 sender = 3;
 }
 
 message BlockID {
@@ -37,6 +38,7 @@ message BbcMsg {
     bool vote = 2;
     BlockHeader next = 3;
     int32 height = 4;
+    int32 sender = 5;
 }
 
 message blockStatistics {
@@ -105,6 +107,7 @@ message RBMsg {
     Meta m = 1;
     int32 type = 2;
     bytes data = 3;
+    int32 sender = 4;
 }
 
 message Empty {
@@ -115,21 +118,25 @@ message Empty {
 message WrbReq {
     Meta _meta = 1;
     int32 height = 2;
+    int32 sender = 3;
 }
 
 message WrbRes {
     Meta m = 1;
     BlockHeader data = 2;
+    int32 sender = 3;
 }
 
 message EvidenceReq {
     Meta _meta = 1;
     int32 height = 2;
+    int32 sender = 3;
 }
 
 message EvidenceRes {
     Meta m = 1;
     BlockHeader data = 2;
+    int32 sender = 3;
 }
 
 message subChainVersion {

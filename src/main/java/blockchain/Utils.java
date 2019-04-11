@@ -48,7 +48,7 @@ public class Utils {
                 .setBid(bid)
                 .setTransactionHash(ByteString.copyFrom(tHash))
                 .setPrev(ByteString.copyFrom(DigestMethod.hash(headerArray)))
-//                .setEmpty(b.getDataCount() == 0)
+                .setEmpty(b.getDataCount() == 0)
                 .build();
 
 //        if (creatorID == -1) {

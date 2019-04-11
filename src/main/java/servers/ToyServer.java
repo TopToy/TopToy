@@ -49,7 +49,7 @@ public class ToyServer extends ToyBaseServer {
         if (currLeader != getID()) {
             return null;
         }
-        logger.debug(format("[#%d -C[%d]] prepare to disseminate a new block header for [height=%d] [cidSeries=%d ; cid=%d]",
+        logger.debug(format("[#%d-C[%d]] prepare to disseminate a new block header for [height=%d] [cidSeries=%d ; cid=%d]",
                 getID(), worker, currHeight, cidSeries, cid));
 //        broadcastEmptyIfNeeded();
         WRB.WRBBroadcast(getHeaderForCurrentBlock(bc.getBlock(currHeight - 1).getHeader(),

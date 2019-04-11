@@ -99,6 +99,7 @@ public abstract class ToyBaseServer {
                     blocksForPropose.wait();
                 }
                 b = blocksForPropose.poll();
+                if (b.getDataCount() == 0) continue;
                 synchronized (proposedBlocks) {
                     comm.broadcast(worker, b);
                     proposedBlocks.add(b);
@@ -140,7 +141,7 @@ public abstract class ToyBaseServer {
     }
 
     Block.Builder configureNewBlock() {
-        return Block.newBuilder().setHeader(BlockHeader.newBuilder().setEmpty(false))
+        return Block.newBuilder()
                 .setId(BlockID.newBuilder().setPid(getID()).setBid(++bid).build());
     }
 
@@ -226,7 +227,8 @@ public abstract class ToyBaseServer {
         if (h.getEmpty()) {
             logger.debug(format("received an empty block, returning a match [w=%d ; cidSereis=%d ; cid=%d" +
                             " ; height=%d ; pid=%d ; bid=%d]",
-                    channel, h.getM().getCidSeries(), h.getM().getCid(), h.getHeight(), h.getM().getSender(), h.getBid()));
+                    channel, h.getM().getCidSeries(), h.getM().getCid(), h.getHeight(), h.getM().getSender(),
+                    h.getBid().getBid()));
             return Block.newBuilder().build();
         }
         return comm.recBlock(channel, h);
@@ -237,13 +239,15 @@ public abstract class ToyBaseServer {
         synchronized (cbl) {
             synchronized (proposedBlocks) {
                 if (proposedBlocks.isEmpty()) {
-                    Block b = currBLock.setHeader(currBLock.getHeader().toBuilder().setEmpty(true)).build();
+                    Block b = currBLock.build();
+                    logger.debug(format("[#%d-C[%d]] creates an empty header [height=%d ; cidSeries=%d ; cid=%d ; bid=%d]",
+                            getID(), worker, height, cidSeries, cid, b.getId().getBid()));
                     currBLock = configureNewBlock();
                     return createBlockHeader(b, prev, getID(), height, cidSeries, cid, worker, b.getId());
                 }
 
                 Block b = proposedBlocks.element();
-                logger.debug(format("[#%d-C[%d]] header for [height=%d ; cidSeries=%d ; cid=%d ; bid=%d] has been created",
+                logger.debug(format("[#%d-C[%d]] creates header for [height=%d ; cidSeries=%d ; cid=%d ; bid=%d]",
                         getID(), worker, height, cidSeries, cid, b.getId().getBid()));
                 return createBlockHeader(b, prev, getID(), height, cidSeries, cid, worker, b.getId());
             }
