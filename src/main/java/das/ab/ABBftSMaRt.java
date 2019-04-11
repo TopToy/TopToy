@@ -13,6 +13,7 @@ import das.data.Data;
 import proto.Types;
 
 import static das.bbc.BBC.addToBBCData;
+import static das.ms.Membership.handleStartMsg;
 import static java.lang.String.format;
 import static servers.ToyBaseServer.addForkProof;
 import static servers.ToyBaseServer.addToSyncData;
@@ -73,6 +74,8 @@ public class ABBftSMaRt extends DefaultSingleRecoverable {
                 case SYNC: addToSyncData(msg, msg.getM().getChannel(), n, f);
                     break;
                 case BBC: addToBBCData(msg, msg.getM().getChannel());
+                    break;
+                case START: handleStartMsg();
                     break;
                 case NOT_MAPPED:
                     logger.error("Invalid type for RB message");

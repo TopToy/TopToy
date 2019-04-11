@@ -153,3 +153,7 @@ message commReq {
 message commRes {
     Block b = 1;
 }
+
+message startMsg {
+    int32 id = 1;
+}

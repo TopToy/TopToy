@@ -8,6 +8,7 @@ import config.Node;
 import das.ab.ABService;
 import das.bbc.BBC;
 import das.bbc.OBBC;
+import das.ms.Membership;
 import das.wrb.WRB;
 import io.grpc.Server;
 import io.grpc.netty.NettyServerBuilder;
@@ -102,7 +103,8 @@ public class Top implements server {
         logger.info(format("[%d] has initiated OBBC service", id));
         new WRB(id, workers, n, f, tmo, tmoInterval, wrbCluster, serverCrt, serverPrivKey, caRoot, comm);
         logger.info(format("[%d] has initiated WRB", id));
-
+        new Membership(n);
+        logger.info(format("[%d] has initiated Membership", id));
 
     }
 
@@ -142,7 +144,8 @@ public class Top implements server {
         logger.info("Joining to communication layer");
         comm.join();
         logger.info("Starting AB");
-        ABService.start(); // Also acts as a start synchronization point
+        ABService.start();
+        Membership.start(); // Temporarily! Here we assume that everyone still correct
         logger.info(format("Starting [%d] Toys" , workers));
         for (int i = 0 ; i < workers ; i++) {
             toys[i].start();

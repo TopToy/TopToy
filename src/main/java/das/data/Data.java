@@ -16,6 +16,7 @@ public class Data {
         FORK,
         SYNC,
         BBC,
+        START,
         NOT_MAPPED
 
     };
@@ -163,6 +164,7 @@ public class Data {
             case 0: return RBTypes.FORK;
             case 1: return RBTypes.SYNC;
             case 2: return RBTypes.BBC;
+            case 3: return RBTypes.START;
         }
         return RBTypes.NOT_MAPPED;
     }
