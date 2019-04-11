@@ -227,7 +227,7 @@ public abstract class ToyBaseServer {
         if (h.getEmpty()) {
             logger.debug(format("received an empty block, returning a match [w=%d ; cidSereis=%d ; cid=%d" +
                             " ; height=%d ; pid=%d ; bid=%d]",
-                    channel, h.getM().getCidSeries(), h.getM().getCid(), h.getHeight(), h.getM().getSender(),
+                    channel, h.getM().getCidSeries(), h.getM().getCid(), h.getHeight(), h.getBid().getPid(),
                     h.getBid().getBid()));
             return Block.newBuilder().build();
         }
@@ -336,7 +336,7 @@ public abstract class ToyBaseServer {
                     try {
                         bc.setBlock(recBlock.getHeader().getHeight() - (f + 2), permanent);
                         logger.info(format("[#%d-C[%d]] Deliverd [[height=%d], [sender=%d], [channel=%d], [size=%d]]",
-                            getID(), worker, permanent.getHeader().getHeight(), permanent.getHeader().getM().getSender(),
+                            getID(), worker, permanent.getHeader().getHeight(), permanent.getHeader().getBid().getPid(),
                                 permanent.getHeader().getM().getChannel(),
                                 permanent.getDataCount()));
                     } catch (IOException e) {
@@ -344,11 +344,11 @@ public abstract class ToyBaseServer {
                                 getID(), worker, recBlock.getHeader().getHeight(), cidSeries, cid, recBlock.getDataCount()));
                     }
                     DBUtils.writeBlockToTable(permanent);
-                    Data.evacuateOldData(worker, permanent.getHeader().getM().toBuilder().clearSender().build());
+                    Data.evacuateOldData(worker, permanent.getHeader().getM());
                     communication.data.Data.evacuateOldData(worker, permanent.getId());
 
                     if (currHeight % 1000 == 0) {
-                        Data.evacuateAllOldData(worker, permanent.getHeader().getM().toBuilder().clearSender().build());
+                        Data.evacuateAllOldData(worker, permanent.getHeader().getM());
                         communication.data.Data.evacuateOldData(worker, permanent.getId());
                     }
                 }
@@ -370,7 +370,7 @@ public abstract class ToyBaseServer {
     void removeFromPendings(BlockHeader recHeader, Block recBlock) {
         if (currLeader == getID() && !recHeader.getEmpty()) {
             logger.debug(format("[#%d-C[%d]] nullifies currBlock [sender=%d] [height=%d] [cidSeries=%d, cid=%d]",
-                    getID(), worker, recBlock.getHeader().getM().getSender(), currHeight, cidSeries, cid));
+                    getID(), worker, recBlock.getHeader().getBid().getPid(), currHeight, cidSeries, cid));
 //                synchronized (blocksForPropose) {
 //                    blocksForPropose.remove();
 //                }
@@ -565,7 +565,6 @@ public abstract class ToyBaseServer {
                 .setChannel(worker)
                 .setCidSeries(cidSeries)
                 .setCid(cid)
-                .setSender(getID())
                 .build();
         ABService.broadcast(p.toByteArray(), key, Data.RBTypes.FORK);
 //        handleFork(p.getCurr().getHeader().getHeight());
@@ -622,7 +621,6 @@ public abstract class ToyBaseServer {
                 .setChannel(worker)
                 .setCidSeries(cidSeries)
                 .setCid(cid)
-                .setSender(getID())
                 .build();
         ABService.broadcast(sv.build().toByteArray(), key, Data.RBTypes.SYNC);
     }
@@ -712,7 +710,7 @@ public abstract class ToyBaseServer {
             newBlockNotifyer.notify();
         }
 
-        currLeader = (bc.getBlock(bc.getHeight()).getHeader().getM().getSender() + 1) % n;
+        currLeader = (bc.getBlock(bc.getHeight()).getHeader().getBid().getPid() + 1) % n;
         currHeight = bc.getHeight() + 1;
         cid = 0;
         cidSeries++;

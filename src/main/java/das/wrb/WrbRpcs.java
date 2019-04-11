@@ -191,11 +191,11 @@ public class WrbRpcs extends WrbGrpc.WrbImplBase {
                     if (Data.pending[channel].containsKey(key) || bcs[channel].contains(req.getHeight())) return;
                     if (!blockDigSig.verifyHeader(sender, res.getData())) {
                         logger.debug(format("[#%d-C[%d]] has received invalid response message from [#%d] for [cidSeries=%d ; cid=%d]",
-                                id, channel, res.getM().getSender(), cidSeries, cid));
+                                id, channel, res.getSender(), cidSeries, cid));
                         return;
                     }
                     logger.debug(format("[#%d-C[%d]] has received response message from [#%d] for [cidSeries=%d ; cid=%d]",
-                            id, channel, res.getM().getSender(), cidSeries, cid));
+                            id, channel, res.getSender(), cidSeries, cid));
                     synchronized (Data.pending[channel]) {
                         Data.pending[channel].putIfAbsent(key, res.getData());
                         Data.pending[channel].notify();
@@ -265,9 +265,8 @@ public class WrbRpcs extends WrbGrpc.WrbImplBase {
         }
         if (msg != null) {
             logger.debug(format("[#%d-C[%d]] has received request message from [#%d] of [cidSeries=%d ; cid=%d]",
-                    id, channel, request.getMeta().getSender(), cidSeries, cid));
+                    id, channel, request.getSender(), cidSeries, cid));
             Types.Meta meta = Types.Meta.newBuilder().
-                    setSender(id).
                     setChannel(channel).
                     setCid(cid).
                     setCidSeries(cidSeries).
@@ -275,10 +274,11 @@ public class WrbRpcs extends WrbGrpc.WrbImplBase {
             responseObserver.onNext(Types.WrbRes.newBuilder().
                     setData(msg).
                     setM(meta).
+                    setSender(id).
                     build());
         } else {
             logger.debug(format("[#%d-C[%d]] has received request message from [#%d] of [cidSeries=%d ; cid=%d] but buffers are empty",
-                    id, channel, request.getMeta().getSender(), cidSeries, cid));
+                    id, channel, request.getSender(), cidSeries, cid));
         }
     }
 }

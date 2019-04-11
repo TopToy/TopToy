@@ -117,7 +117,7 @@ public class DBUtils {
     }
 
     static public void writeBlockToTable(Types.Block b) {
-        int pid = b.getHeader().getM().getSender();
+        int pid = b.getHeader().getBid().getPid();
         int bid = b.getId().getBid();
         int height = b.getHeader().getHeight();
         int channel = b.getHeader().getM().getChannel();

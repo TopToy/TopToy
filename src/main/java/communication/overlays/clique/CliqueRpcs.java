@@ -141,7 +141,7 @@ public class CliqueRpcs  extends CommunicationGrpc.CommunicationImplBase {
         Types.BlockID bid = request.getProof().getBid();
         int height = request.getProof().getHeight();
         int channel = request.getProof().getM().getChannel();
-        int pid = request.getProof().getM().getSender();
+        int pid = request.getProof().getBid().getPid();
         logger.debug(format("[%d-C[%d]] received commReq [height=%d]", id, channel, height));
         Types.Block res[] = {null};
         Data.blocks[pid][channel].computeIfPresent(bid, (k, v) -> {
@@ -169,7 +169,7 @@ public class CliqueRpcs  extends CommunicationGrpc.CommunicationImplBase {
                 @Override
                 public void onNext(Types.commRes commRes) {
                     int channel = request.getProof().getM().getChannel();
-                    int pid = request.getProof().getM().getSender();
+                    int pid = request.getProof().getBid().getPid();
                     Types.BlockID bid = request.getProof().getBid();
                     if (verfiyBlockWRTheader(commRes.getB(), request.getProof())) {
                         logger.debug(format("[%d-C[%d]] received valid commRes [height=%d]", id, channel,

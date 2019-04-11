@@ -50,7 +50,7 @@ public class OBBC extends ObbcGrpc.ObbcImplBase  {
 
     static public BbcDecData propose(Types.BbcMsg v, int worker, int height, int expSender) throws InterruptedException
     {
-        Types.Meta key = v.getM().toBuilder().clearSender().build();
+        Types.Meta key = v.getM();
         rpcs.broadcastFVMessage(v);
         synchronized (bbcFastDec[worker]) {
             while (!bbcFastDec[worker].containsKey(key)) {
@@ -67,7 +67,7 @@ public class OBBC extends ObbcGrpc.ObbcImplBase  {
             logger.debug(format("broadcast evidence request [w=%d ; cidSeries=%d ; cid=%d ; height=%d]", worker, key.getCidSeries(), key.getCid(), height));
             rpcs.broadcastEvidenceReq(Types.EvidenceReq.newBuilder()
                     .setHeight(height)
-                    .setMeta(v.getM())
+                    .setMeta(key)
                     .build(), key, expSender);
             return null;
         });
@@ -91,9 +91,10 @@ public class OBBC extends ObbcGrpc.ObbcImplBase  {
         }
 
         return BBC.propose(Types.BbcMsg.newBuilder()
-                .setM(v.getM())
+                .setM(key)
                 .setVote(vote)
                 .setHeight(height)
+                .setSender(id)
                 .build(), key);
     }
     
@@ -105,8 +106,9 @@ public class OBBC extends ObbcGrpc.ObbcImplBase  {
                     logger.debug(format("[#%d-C[%d]] (reCons) found that a full bbc initialized, thus propose [cidSeries=%d ; cid=%d]",
                              id, worker, key.getCidSeries(),  key.getCid()));
                     BBC.nonBlockingPropose(Types.BbcMsg.newBuilder()
-                            .setM(key.toBuilder().setSender(id).build())
+                            .setM(key)
                             .setHeight(height)
+                            .setSender(id)
                             .setVote(v1.getDec()).build());
                     return new VoteData();
                 });
@@ -119,8 +121,9 @@ public class OBBC extends ObbcGrpc.ObbcImplBase  {
                                 "thus propose [cidSeries=%d ; cid=%d; height=%d]",
                         id, worker, key.getCidSeries(),  key.getCid(), height));
                 BBC.nonBlockingPropose(Types.BbcMsg.newBuilder()
-                        .setM(key.toBuilder().setSender(id).build())
+                        .setM(key)
                         .setHeight(height)
+                        .setSender(id)
                         .setVote(true).build());
                 return new BbcDecData(true, true);
             }
@@ -133,21 +136,17 @@ public class OBBC extends ObbcGrpc.ObbcImplBase  {
     static public Types.BbcMsg setFastBbcVote(Types.Meta key, int channel, int sender, int cidSeries, int cid, Types.BlockHeader next) {
         Types.BbcMsg.Builder bv = Types.BbcMsg
                 .newBuilder()
-                .setM(Types.Meta.newBuilder()
-                        .setChannel(channel)
-                        .setCidSeries(cidSeries)
-                        .setCid(cid)
-                        .setSender(id)
-                        .build())
+                .setM(key)
+                .setSender(id)
                 .setVote(false);
 
         Data.pending[channel].computeIfPresent(key, (k, val) -> {
 
-            if (val.getM().getSender() != sender ||
+            if (val.getBid().getPid() != sender ||
                     val.getM().getCidSeries() != cidSeries ||
                     val.getM().getCid() != cid ||
                     val.getM().getChannel() != channel) {
-                logger.debug(format("[s=%d:%d; w=%d:%d ; cidSeries=%d:%d ; cid=%d:%d]",sender, val.getM().getSender(), channel, val.getM().getChannel(), cidSeries, val.getM().getCidSeries(), cid, val.getM().getCid()));
+//                logger.debug(format("[#%d-C[%d]][s=%d:%d; w=%d:%d ; cidSeries=%d:%d ; cid=%d:%d]",sender, val.getBid().getPid(), channel, val.getM().getChannel(), cidSeries, val.getM().getCidSeries(), cid, val.getM().getCid()));
                 return val;
             }
             Types.BlockID bid = val.getBid();

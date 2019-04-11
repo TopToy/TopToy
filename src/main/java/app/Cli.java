@@ -283,10 +283,10 @@ public class Cli {
             return bb.setHeader(Types.BlockHeader.newBuilder()
                     .setM(Types.Meta.newBuilder()
                             .setChannel(0)
-                            .setSender(0)
                             .setCidSeries(0)
                             .setCid(0).build())
                     .setHeight(0)
+                    .setBid(Types.BlockID.newBuilder().setBid(0).setPid(0).build())
                     .setPrev(ByteString.copyFrom(tx)));
 
 
@@ -389,7 +389,7 @@ public class Cli {
                                 , String.valueOf(t.getSerializedSize()),
                                 String.valueOf(t.getClientID()), String.valueOf(b.getSt().getDecided()),
                                 String.valueOf(t.getData().size()), String.valueOf(i),
-                                String.valueOf(b.getHeader().getM().getSender()));
+                                String.valueOf(b.getHeader().getBid().getPid()));
                         CSVUtils.writeLine(writer, row);
                     }
                 }

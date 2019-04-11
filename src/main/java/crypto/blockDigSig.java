@@ -25,7 +25,7 @@ public class blockDigSig {
 
     static public boolean verifyBlock(Types.Block b) {
         return verfiyBlockWRTheader(b, b.getHeader())
-                && verifyHeader(b.getHeader().getM().getSender(), b.getHeader());
+                && verifyHeader(b.getHeader().getBid().getPid(), b.getHeader());
     }
 
     static public String sign(Types.BlockHeader header) {

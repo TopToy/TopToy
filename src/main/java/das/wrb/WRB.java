@@ -141,12 +141,12 @@ public class WRB {
                 newBuilder().
                 setCid(cid).
                 setCidSeries(cidSeries).
-                setChannel(channel)
-                .setSender(id).
+                setChannel(channel).
                 build();
         WrbReq req = WrbReq.newBuilder()
                 .setMeta(meta)
                 .setHeight(height)
+                .setSender(id)
                 .build();
         rpcs.broadcastReqMsg(req,channel, cidSeries, cid, sender);
         synchronized (Data.pending[channel]) {

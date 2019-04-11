@@ -57,7 +57,7 @@ public class Blockchain {
     public boolean validateCurrentLeader(int leader, int f) {
         int last =  getHeight();
         for (int i = last ; i > Math.max(0, last - f) ; i--) {
-            if (getBlock(i).getHeader().getM().getSender() == leader) return false;
+            if (getBlock(i).getHeader().getBid().getPid() == leader) return false;
         }
         return true;
     }

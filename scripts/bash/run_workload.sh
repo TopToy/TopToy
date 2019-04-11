@@ -737,12 +737,12 @@ main_byz() {
 #
 # main_no_failures 0 0 10 10 1 1000 20
 #for i in `seq 0 9`; do
-    main_no_failures 0 0 10 10 1 1000 20
+#    main_no_failures 512 1000 10 10 1 1000 30
 #done
-
-main_no_failures 0 0 10 10 1 1000 60
-main_no_failures 512 1000 10 10 1 1000 60
-
+#    main_no_failures 0 0 1 1 1 1000 10
+#
+#main_no_failures 0 0 10 10 1 1000 60
+ main_no_failures 0 0 1 10 1 1000 120
 #for i in `seq 0 2`; do
 #    main_no_failures 0 0 1 10 1 1000 120
 #done

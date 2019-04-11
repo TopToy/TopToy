@@ -77,10 +77,10 @@ public class Data {
     static public void addToPendings(Types.BlockHeader request, Types.Meta key) {
         int channel = key.getChannel();
         int height = request.getHeight();
-        if (!blockDigSig.verifyHeader(request.getM().getSender(), request)) {
+        if (!blockDigSig.verifyHeader(request.getBid().getPid(), request)) {
             logger.debug(format("invalid pgb message [w=%d ; cidSeries=%d ; cid=%d ; sender=%d, height=%b]",
                     request.getM().getChannel(), request.getM().getCidSeries(), request.getM().getCid()
-                    , request.getM().getSender(), request.getHeight()));
+                    , request.getBid().getPid(), request.getHeight()));
 
             return;
         }
@@ -188,7 +188,7 @@ public class Data {
     static public boolean validateSubChainVersion(Types.subChainVersion v, int f) {
         if (v.getVCount() == 0) return true;
         ArrayList<Integer> leaders = new ArrayList<>();
-        leaders.add(v.getV(0).getHeader().getM().getSender());
+        leaders.add(v.getV(0).getHeader().getBid().getPid());
         for (int i = 1 ; i < v.getVList().size() ; i++ ) {
             Types.Block pb = v.getV(i);
             if (!blockDigSig.verifyBlock(pb)) {
@@ -202,7 +202,7 @@ public class Data {
                 return false;
             }
             if (leaders.size() > f) {
-                if (leaders.contains(pb.getHeader().getM().getSender())) {
+                if (leaders.contains(pb.getHeader().getBid().getPid())) {
                     logger.debug(format("invalid invalid sub chain version, block creator is invalid [height=%d]",
                              pb.getHeader().getHeight()));
                     return false;

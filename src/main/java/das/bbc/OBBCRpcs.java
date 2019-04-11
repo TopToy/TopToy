@@ -145,7 +145,7 @@ public class OBBCRpcs extends ObbcGrpc.ObbcImplBase {
 
     void handlePgbMsg(Types.BbcMsg msg) {
         Types.BlockHeader nxt = msg.getNext();
-        int sender = nxt.getM().getSender();
+//        int sender = nxt.getBid().getPid();
         int cid = nxt.getM().getCid();
         int channel = nxt.getM().getChannel();
         int cidSeries = nxt.getM().getCidSeries();
@@ -166,24 +166,23 @@ public class OBBCRpcs extends ObbcGrpc.ObbcImplBase {
         int cid = request.getM().getCid();
         int cidSeries = request.getM().getCidSeries();
         int channel = request.getM().getChannel();
-        Types.Meta key = Types.Meta.newBuilder()
-                .setChannel(channel)
-                .setCidSeries(cidSeries)
-                .setCid(cid)
-                .build();
+        Types.Meta key = request.getM();
 
         if (request.hasNext()) {
             handlePgbMsg(request);
         }
 
-        logger.debug(format("[#%d-C[%d]] (1) received fv message [cidSeries=%d ; cid=%d ; sender=%d, v=%b]",
-                id, channel, cidSeries, cid, request.getM().getSender(), request.getVote()));
+
         fvData[channel].putIfAbsent(key, new VoteData());
         fvData[channel].computeIfPresent(key, (k, v) -> {
             if (v.getVotersNum() == qSize) return v;
-            if (!v.addVote(request.getM().getSender(), request.getVote())) return v;
-            logger.debug(format("[#%d-C[%d]] (2) received valid fv message [cidSeries=%d ; cid=%d ; sender=%d, v=%b]",
-                    id, channel, cidSeries, cid, request.getM().getSender(), request.getVote()));
+            if (!v.addVote(request.getSender(), request.getVote())) {
+                logger.debug(format("[#%d-C[%d]] received an invalid fv message [cidSeries=%d ; cid=%d ; sender=%d, v=%b]",
+                        id, channel, cidSeries, cid, request.getSender(), request.getVote()));
+                return v;
+            }
+            logger.debug(format("[#%d-C[%d]] received valid fv message [cidSeries=%d ; cid=%d ; sender=%d, v=%b]",
+                    id, channel, cidSeries, cid, request.getSender(), request.getVote()));
             if (v.getVotersNum() == qSize) {
                 boolean dec = v.posFastVote(qSize);
                 logger.debug(format("Add fastVote decision for [w=%d ; cidSeries=%d ; cid=%d ; dec=%b]", channel, cidSeries, cid, dec));
@@ -202,8 +201,9 @@ public class OBBCRpcs extends ObbcGrpc.ObbcImplBase {
                         logger.debug(format("[#%d-C[%d]] (addNewFastDec) found that a full bbc initialized, thus propose [cidSeries=%d ; cid=%d]",
                                 id, worker, key.getCidSeries(),  key.getCid()));
                         BBC.nonBlockingPropose(Types.BbcMsg.newBuilder()
-                                .setM(key.toBuilder().setSender(id))
+                                .setM(key)
                                 .setHeight(height)
+                                .setSender(id)
                                 .setVote(dec).build());
                         return v2;
                     });
@@ -235,21 +235,21 @@ public class OBBCRpcs extends ObbcGrpc.ObbcImplBase {
             msg = Types.BlockHeader.getDefaultInstance();
             logger.debug(format("[#%d-C[%d]] has received evidence request message" +
                             " from [#%d] of [cidSeries=%d ; cid=%d] response with NULL",
-                    id, channel, request.getMeta().getSender(), cidSeries, cid));
+                    id, channel, request.getSender(), cidSeries, cid));
 
         } else {
             logger.debug(format("[#%d-C[%d]] has received evidence request message from [#%d] of [cidSeries=%d ; cid=%d] responses with a value",
-                    id, channel, request.getMeta().getSender(), cidSeries, cid));
+                    id, channel, request.getSender(), cidSeries, cid));
         }
 
         Types.Meta meta = Types.Meta.newBuilder().
-                setSender(id).
                 setChannel(channel).
                 setCid(cid).
                 setCidSeries(cidSeries).
                 build();
         responseObserver.onNext(Types.EvidenceRes.newBuilder().
                 setData(msg).
+                setSender(id).
                 setM(meta).
                 build());
     }
@@ -291,31 +291,31 @@ public class OBBCRpcs extends ObbcGrpc.ObbcImplBase {
                         || res.getM().getCidSeries() != cidSeries
                         || res.getM().getCid() != cid) return;
                 preConsVote[worker].computeIfAbsent(key, k -> new ArrayList<>());
-                if (preConsVote[worker].get(key).contains(res.getM().getSender())) return;
+                if (preConsVote[worker].get(key).contains(res.getSender())) return;
                 preConsVote[worker].computeIfPresent(key, (k, val) -> {
                     if (val.size() > n - f) return val;
-                    val.add(res.getM().getSender());
+                    val.add(res.getSender());
                     logger.debug(format("[#%d-C[%d]] received evidence response from [%d] [cidSeries=%d ; cid=%d]",
-                            id, worker, res.getM().getSender(), cidSeries, cid));
+                            id, worker, res.getSender(), cidSeries, cid));
 
                     if ((!res.getData().equals(Types.BlockHeader.getDefaultInstance()))
                             && res.getData().getM().getCid() == cid
                             && res.getData().getM().getCidSeries() == cidSeries
                             && res.getData().getM().getChannel() == worker
-                            && res.getData().getM().getSender() == expSender) {
+                            && res.getSender() == expSender) {
                         if (!blockDigSig.verifyHeader(expSender, res.getData())) {
                             logger.debug(format("[#%d-C[%d]] has evidence received invalid response message from [#%d] for [cidSeries=%d ; cid=%d]",
-                                    id, worker, res.getM().getSender(), cidSeries, cid));
+                                    id, worker, res.getSender(), cidSeries, cid));
                             return val;
                         }
                         if (!Data.pending[worker].containsKey(key)) {
                             logger.debug(format("[#%d-C[%d]] has evidence received message from [#%d] for [cidSeries=%d ; cid=%d]",
-                                    id, worker, res.getM().getSender(), cidSeries, cid));
+                                    id, worker, res.getSender(), cidSeries, cid));
                             Data.pending[worker].putIfAbsent(key, res.getData());
                         }
                     } else if (res.getData().equals(Types.BlockHeader.getDefaultInstance())) {
                         logger.debug(format("[#%d-C[%d]] has evidence received NULL message from [#%d] for [cidSeries=%d ; cid=%d]",
-                                id, worker, res.getM().getSender(), cidSeries,  cid));
+                                id, worker, res.getSender(), cidSeries,  cid));
                     }
 
                     if (val.size() == n - f) {

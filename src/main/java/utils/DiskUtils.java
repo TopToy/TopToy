@@ -90,8 +90,8 @@ public class DiskUtils {
 //                        b.getHeader().getBid()));
                 cutBlock(b, path);
                 logger.debug(format("have write to Disk (2) [c=%d, h=%d, pid=%d, bid=%d",
-                        b.getHeader().getM().getChannel(), b.getHeader().getHeight(), b.getHeader().getM().getSender(),
-                        b.getHeader().getBid()));
+                        b.getHeader().getM().getChannel(), b.getHeader().getHeight(), b.getHeader().getBid().getPid(),
+                        b.getHeader().getBid().getBid()));
             } catch (IOException e) {
                 logger.error("", e);
             }

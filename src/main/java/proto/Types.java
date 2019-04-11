@@ -24,11 +24,10 @@ public final class Types {
     int getChannel();
 
     /**
-     * <code>int32 sender = 2;</code>
-     */
-    int getSender();
-
-    /**
+     * <pre>
+     *    int32 sender = 2;
+     * </pre>
+     *
      * <code>int32 cid = 3;</code>
      */
     int getCid();
@@ -52,7 +51,6 @@ public final class Types {
     }
     private Meta() {
       channel_ = 0;
-      sender_ = 0;
       cid_ = 0;
       cidSeries_ = 0;
     }
@@ -91,11 +89,6 @@ public final class Types {
             case 8: {
 
               channel_ = input.readInt32();
-              break;
-            }
-            case 16: {
-
-              sender_ = input.readInt32();
               break;
             }
             case 24: {
@@ -141,18 +134,13 @@ public final class Types {
       return channel_;
     }
 
-    public static final int SENDER_FIELD_NUMBER = 2;
-    private int sender_;
-    /**
-     * <code>int32 sender = 2;</code>
-     */
-    public int getSender() {
-      return sender_;
-    }
-
     public static final int CID_FIELD_NUMBER = 3;
     private int cid_;
     /**
+     * <pre>
+     *    int32 sender = 2;
+     * </pre>
+     *
      * <code>int32 cid = 3;</code>
      */
     public int getCid() {
@@ -183,9 +171,6 @@ public final class Types {
       if (channel_ != 0) {
         output.writeInt32(1, channel_);
       }
-      if (sender_ != 0) {
-        output.writeInt32(2, sender_);
-      }
       if (cid_ != 0) {
         output.writeInt32(3, cid_);
       }
@@ -203,10 +188,6 @@ public final class Types {
       if (channel_ != 0) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(1, channel_);
-      }
-      if (sender_ != 0) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(2, sender_);
       }
       if (cid_ != 0) {
         size += com.google.protobuf.CodedOutputStream
@@ -234,8 +215,6 @@ public final class Types {
       boolean result = true;
       result = result && (getChannel()
           == other.getChannel());
-      result = result && (getSender()
-          == other.getSender());
       result = result && (getCid()
           == other.getCid());
       result = result && (getCidSeries()
@@ -253,8 +232,6 @@ public final class Types {
       hash = (19 * hash) + getDescriptor().hashCode();
       hash = (37 * hash) + CHANNEL_FIELD_NUMBER;
       hash = (53 * hash) + getChannel();
-      hash = (37 * hash) + SENDER_FIELD_NUMBER;
-      hash = (53 * hash) + getSender();
       hash = (37 * hash) + CID_FIELD_NUMBER;
       hash = (53 * hash) + getCid();
       hash = (37 * hash) + CIDSERIES_FIELD_NUMBER;
@@ -390,8 +367,6 @@ public final class Types {
         super.clear();
         channel_ = 0;
 
-        sender_ = 0;
-
         cid_ = 0;
 
         cidSeries_ = 0;
@@ -419,7 +394,6 @@ public final class Types {
       public proto.Types.Meta buildPartial() {
         proto.Types.Meta result = new proto.Types.Meta(this);
         result.channel_ = channel_;
-        result.sender_ = sender_;
         result.cid_ = cid_;
         result.cidSeries_ = cidSeries_;
         onBuilt();
@@ -465,9 +439,6 @@ public final class Types {
         if (other == proto.Types.Meta.getDefaultInstance()) return this;
         if (other.getChannel() != 0) {
           setChannel(other.getChannel());
-        }
-        if (other.getSender() != 0) {
-          setSender(other.getSender());
         }
         if (other.getCid() != 0) {
           setCid(other.getCid());
@@ -528,40 +499,22 @@ public final class Types {
         return this;
       }
 
-      private int sender_ ;
-      /**
-       * <code>int32 sender = 2;</code>
-       */
-      public int getSender() {
-        return sender_;
-      }
-      /**
-       * <code>int32 sender = 2;</code>
-       */
-      public Builder setSender(int value) {
-        
-        sender_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>int32 sender = 2;</code>
-       */
-      public Builder clearSender() {
-        
-        sender_ = 0;
-        onChanged();
-        return this;
-      }
-
       private int cid_ ;
       /**
+       * <pre>
+       *    int32 sender = 2;
+       * </pre>
+       *
        * <code>int32 cid = 3;</code>
        */
       public int getCid() {
         return cid_;
       }
       /**
+       * <pre>
+       *    int32 sender = 2;
+       * </pre>
+       *
        * <code>int32 cid = 3;</code>
        */
       public Builder setCid(int value) {
@@ -571,6 +524,10 @@ public final class Types {
         return this;
       }
       /**
+       * <pre>
+       *    int32 sender = 2;
+       * </pre>
+       *
        * <code>int32 cid = 3;</code>
        */
       public Builder clearCid() {
@@ -675,6 +632,11 @@ public final class Types {
      * <code>int32 decosion = 2;</code>
      */
     int getDecosion();
+
+    /**
+     * <code>int32 sender = 3;</code>
+     */
+    int getSender();
   }
   /**
    * Protobuf type {@code proto.BbcDecision}
@@ -690,6 +652,7 @@ public final class Types {
     }
     private BbcDecision() {
       decosion_ = 0;
+      sender_ = 0;
     }
 
     @java.lang.Override
@@ -739,6 +702,11 @@ public final class Types {
             case 16: {
 
               decosion_ = input.readInt32();
+              break;
+            }
+            case 24: {
+
+              sender_ = input.readInt32();
               break;
             }
           }
@@ -795,6 +763,15 @@ public final class Types {
       return decosion_;
     }
 
+    public static final int SENDER_FIELD_NUMBER = 3;
+    private int sender_;
+    /**
+     * <code>int32 sender = 3;</code>
+     */
+    public int getSender() {
+      return sender_;
+    }
+
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -813,6 +790,9 @@ public final class Types {
       if (decosion_ != 0) {
         output.writeInt32(2, decosion_);
       }
+      if (sender_ != 0) {
+        output.writeInt32(3, sender_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -828,6 +808,10 @@ public final class Types {
       if (decosion_ != 0) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(2, decosion_);
+      }
+      if (sender_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(3, sender_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -852,6 +836,8 @@ public final class Types {
       }
       result = result && (getDecosion()
           == other.getDecosion());
+      result = result && (getSender()
+          == other.getSender());
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -869,6 +855,8 @@ public final class Types {
       }
       hash = (37 * hash) + DECOSION_FIELD_NUMBER;
       hash = (53 * hash) + getDecosion();
+      hash = (37 * hash) + SENDER_FIELD_NUMBER;
+      hash = (53 * hash) + getSender();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -1006,6 +994,8 @@ public final class Types {
         }
         decosion_ = 0;
 
+        sender_ = 0;
+
         return this;
       }
 
@@ -1034,6 +1024,7 @@ public final class Types {
           result.m_ = mBuilder_.build();
         }
         result.decosion_ = decosion_;
+        result.sender_ = sender_;
         onBuilt();
         return result;
       }
@@ -1080,6 +1071,9 @@ public final class Types {
         }
         if (other.getDecosion() != 0) {
           setDecosion(other.getDecosion());
+        }
+        if (other.getSender() != 0) {
+          setSender(other.getSender());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -1247,6 +1241,32 @@ public final class Types {
       public Builder clearDecosion() {
         
         decosion_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private int sender_ ;
+      /**
+       * <code>int32 sender = 3;</code>
+       */
+      public int getSender() {
+        return sender_;
+      }
+      /**
+       * <code>int32 sender = 3;</code>
+       */
+      public Builder setSender(int value) {
+        
+        sender_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int32 sender = 3;</code>
+       */
+      public Builder clearSender() {
+        
+        sender_ = 0;
         onChanged();
         return this;
       }
@@ -3024,6 +3044,11 @@ public final class Types {
      * <code>int32 height = 4;</code>
      */
     int getHeight();
+
+    /**
+     * <code>int32 sender = 5;</code>
+     */
+    int getSender();
   }
   /**
    * Protobuf type {@code proto.BbcMsg}
@@ -3040,6 +3065,7 @@ public final class Types {
     private BbcMsg() {
       vote_ = false;
       height_ = 0;
+      sender_ = 0;
     }
 
     @java.lang.Override
@@ -3107,6 +3133,11 @@ public final class Types {
             case 32: {
 
               height_ = input.readInt32();
+              break;
+            }
+            case 40: {
+
+              sender_ = input.readInt32();
               break;
             }
           }
@@ -3193,6 +3224,15 @@ public final class Types {
       return height_;
     }
 
+    public static final int SENDER_FIELD_NUMBER = 5;
+    private int sender_;
+    /**
+     * <code>int32 sender = 5;</code>
+     */
+    public int getSender() {
+      return sender_;
+    }
+
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -3217,6 +3257,9 @@ public final class Types {
       if (height_ != 0) {
         output.writeInt32(4, height_);
       }
+      if (sender_ != 0) {
+        output.writeInt32(5, sender_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -3240,6 +3283,10 @@ public final class Types {
       if (height_ != 0) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(4, height_);
+      }
+      if (sender_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(5, sender_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -3271,6 +3318,8 @@ public final class Types {
       }
       result = result && (getHeight()
           == other.getHeight());
+      result = result && (getSender()
+          == other.getSender());
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -3295,6 +3344,8 @@ public final class Types {
       }
       hash = (37 * hash) + HEIGHT_FIELD_NUMBER;
       hash = (53 * hash) + getHeight();
+      hash = (37 * hash) + SENDER_FIELD_NUMBER;
+      hash = (53 * hash) + getSender();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -3440,6 +3491,8 @@ public final class Types {
         }
         height_ = 0;
 
+        sender_ = 0;
+
         return this;
       }
 
@@ -3474,6 +3527,7 @@ public final class Types {
           result.next_ = nextBuilder_.build();
         }
         result.height_ = height_;
+        result.sender_ = sender_;
         onBuilt();
         return result;
       }
@@ -3526,6 +3580,9 @@ public final class Types {
         }
         if (other.getHeight() != 0) {
           setHeight(other.getHeight());
+        }
+        if (other.getSender() != 0) {
+          setSender(other.getSender());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -3836,6 +3893,32 @@ public final class Types {
       public Builder clearHeight() {
         
         height_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private int sender_ ;
+      /**
+       * <code>int32 sender = 5;</code>
+       */
+      public int getSender() {
+        return sender_;
+      }
+      /**
+       * <code>int32 sender = 5;</code>
+       */
+      public Builder setSender(int value) {
+        
+        sender_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int32 sender = 5;</code>
+       */
+      public Builder clearSender() {
+        
+        sender_ = 0;
         onChanged();
         return this;
       }
@@ -11195,6 +11278,11 @@ public final class Types {
      * <code>bytes data = 3;</code>
      */
     com.google.protobuf.ByteString getData();
+
+    /**
+     * <code>int32 sender = 4;</code>
+     */
+    int getSender();
   }
   /**
    * Protobuf type {@code proto.RBMsg}
@@ -11211,6 +11299,7 @@ public final class Types {
     private RBMsg() {
       type_ = 0;
       data_ = com.google.protobuf.ByteString.EMPTY;
+      sender_ = 0;
     }
 
     @java.lang.Override
@@ -11265,6 +11354,11 @@ public final class Types {
             case 26: {
 
               data_ = input.readBytes();
+              break;
+            }
+            case 32: {
+
+              sender_ = input.readInt32();
               break;
             }
           }
@@ -11330,6 +11424,15 @@ public final class Types {
       return data_;
     }
 
+    public static final int SENDER_FIELD_NUMBER = 4;
+    private int sender_;
+    /**
+     * <code>int32 sender = 4;</code>
+     */
+    public int getSender() {
+      return sender_;
+    }
+
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -11351,6 +11454,9 @@ public final class Types {
       if (!data_.isEmpty()) {
         output.writeBytes(3, data_);
       }
+      if (sender_ != 0) {
+        output.writeInt32(4, sender_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -11370,6 +11476,10 @@ public final class Types {
       if (!data_.isEmpty()) {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(3, data_);
+      }
+      if (sender_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(4, sender_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -11396,6 +11506,8 @@ public final class Types {
           == other.getType());
       result = result && getData()
           .equals(other.getData());
+      result = result && (getSender()
+          == other.getSender());
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -11415,6 +11527,8 @@ public final class Types {
       hash = (53 * hash) + getType();
       hash = (37 * hash) + DATA_FIELD_NUMBER;
       hash = (53 * hash) + getData().hashCode();
+      hash = (37 * hash) + SENDER_FIELD_NUMBER;
+      hash = (53 * hash) + getSender();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -11554,6 +11668,8 @@ public final class Types {
 
         data_ = com.google.protobuf.ByteString.EMPTY;
 
+        sender_ = 0;
+
         return this;
       }
 
@@ -11583,6 +11699,7 @@ public final class Types {
         }
         result.type_ = type_;
         result.data_ = data_;
+        result.sender_ = sender_;
         onBuilt();
         return result;
       }
@@ -11632,6 +11749,9 @@ public final class Types {
         }
         if (other.getData() != com.google.protobuf.ByteString.EMPTY) {
           setData(other.getData());
+        }
+        if (other.getSender() != 0) {
+          setSender(other.getSender());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -11828,6 +11948,32 @@ public final class Types {
       public Builder clearData() {
         
         data_ = getDefaultInstance().getData();
+        onChanged();
+        return this;
+      }
+
+      private int sender_ ;
+      /**
+       * <code>int32 sender = 4;</code>
+       */
+      public int getSender() {
+        return sender_;
+      }
+      /**
+       * <code>int32 sender = 4;</code>
+       */
+      public Builder setSender(int value) {
+        
+        sender_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int32 sender = 4;</code>
+       */
+      public Builder clearSender() {
+        
+        sender_ = 0;
         onChanged();
         return this;
       }
@@ -12288,6 +12434,11 @@ public final class Types {
      * <code>int32 height = 2;</code>
      */
     int getHeight();
+
+    /**
+     * <code>int32 sender = 3;</code>
+     */
+    int getSender();
   }
   /**
    * Protobuf type {@code proto.WrbReq}
@@ -12303,6 +12454,7 @@ public final class Types {
     }
     private WrbReq() {
       height_ = 0;
+      sender_ = 0;
     }
 
     @java.lang.Override
@@ -12352,6 +12504,11 @@ public final class Types {
             case 16: {
 
               height_ = input.readInt32();
+              break;
+            }
+            case 24: {
+
+              sender_ = input.readInt32();
               break;
             }
           }
@@ -12408,6 +12565,15 @@ public final class Types {
       return height_;
     }
 
+    public static final int SENDER_FIELD_NUMBER = 3;
+    private int sender_;
+    /**
+     * <code>int32 sender = 3;</code>
+     */
+    public int getSender() {
+      return sender_;
+    }
+
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -12426,6 +12592,9 @@ public final class Types {
       if (height_ != 0) {
         output.writeInt32(2, height_);
       }
+      if (sender_ != 0) {
+        output.writeInt32(3, sender_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -12441,6 +12610,10 @@ public final class Types {
       if (height_ != 0) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(2, height_);
+      }
+      if (sender_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(3, sender_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -12465,6 +12638,8 @@ public final class Types {
       }
       result = result && (getHeight()
           == other.getHeight());
+      result = result && (getSender()
+          == other.getSender());
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -12482,6 +12657,8 @@ public final class Types {
       }
       hash = (37 * hash) + HEIGHT_FIELD_NUMBER;
       hash = (53 * hash) + getHeight();
+      hash = (37 * hash) + SENDER_FIELD_NUMBER;
+      hash = (53 * hash) + getSender();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -12619,6 +12796,8 @@ public final class Types {
         }
         height_ = 0;
 
+        sender_ = 0;
+
         return this;
       }
 
@@ -12647,6 +12826,7 @@ public final class Types {
           result.Meta_ = MetaBuilder_.build();
         }
         result.height_ = height_;
+        result.sender_ = sender_;
         onBuilt();
         return result;
       }
@@ -12693,6 +12873,9 @@ public final class Types {
         }
         if (other.getHeight() != 0) {
           setHeight(other.getHeight());
+        }
+        if (other.getSender() != 0) {
+          setSender(other.getSender());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -12863,6 +13046,32 @@ public final class Types {
         onChanged();
         return this;
       }
+
+      private int sender_ ;
+      /**
+       * <code>int32 sender = 3;</code>
+       */
+      public int getSender() {
+        return sender_;
+      }
+      /**
+       * <code>int32 sender = 3;</code>
+       */
+      public Builder setSender(int value) {
+        
+        sender_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int32 sender = 3;</code>
+       */
+      public Builder clearSender() {
+        
+        sender_ = 0;
+        onChanged();
+        return this;
+      }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFieldsProto3(unknownFields);
@@ -12941,6 +13150,11 @@ public final class Types {
      * <code>.proto.BlockHeader data = 2;</code>
      */
     proto.Types.BlockHeaderOrBuilder getDataOrBuilder();
+
+    /**
+     * <code>int32 sender = 3;</code>
+     */
+    int getSender();
   }
   /**
    * Protobuf type {@code proto.WrbRes}
@@ -12955,6 +13169,7 @@ public final class Types {
       super(builder);
     }
     private WrbRes() {
+      sender_ = 0;
     }
 
     @java.lang.Override
@@ -13012,6 +13227,11 @@ public final class Types {
                 data_ = subBuilder.buildPartial();
               }
 
+              break;
+            }
+            case 24: {
+
+              sender_ = input.readInt32();
               break;
             }
           }
@@ -13080,6 +13300,15 @@ public final class Types {
       return getData();
     }
 
+    public static final int SENDER_FIELD_NUMBER = 3;
+    private int sender_;
+    /**
+     * <code>int32 sender = 3;</code>
+     */
+    public int getSender() {
+      return sender_;
+    }
+
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -13098,6 +13327,9 @@ public final class Types {
       if (data_ != null) {
         output.writeMessage(2, getData());
       }
+      if (sender_ != 0) {
+        output.writeInt32(3, sender_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -13113,6 +13345,10 @@ public final class Types {
       if (data_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(2, getData());
+      }
+      if (sender_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(3, sender_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -13140,6 +13376,8 @@ public final class Types {
         result = result && getData()
             .equals(other.getData());
       }
+      result = result && (getSender()
+          == other.getSender());
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -13159,6 +13397,8 @@ public final class Types {
         hash = (37 * hash) + DATA_FIELD_NUMBER;
         hash = (53 * hash) + getData().hashCode();
       }
+      hash = (37 * hash) + SENDER_FIELD_NUMBER;
+      hash = (53 * hash) + getSender();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -13300,6 +13540,8 @@ public final class Types {
           data_ = null;
           dataBuilder_ = null;
         }
+        sender_ = 0;
+
         return this;
       }
 
@@ -13332,6 +13574,7 @@ public final class Types {
         } else {
           result.data_ = dataBuilder_.build();
         }
+        result.sender_ = sender_;
         onBuilt();
         return result;
       }
@@ -13378,6 +13621,9 @@ public final class Types {
         }
         if (other.hasData()) {
           mergeData(other.getData());
+        }
+        if (other.getSender() != 0) {
+          setSender(other.getSender());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -13639,6 +13885,32 @@ public final class Types {
         }
         return dataBuilder_;
       }
+
+      private int sender_ ;
+      /**
+       * <code>int32 sender = 3;</code>
+       */
+      public int getSender() {
+        return sender_;
+      }
+      /**
+       * <code>int32 sender = 3;</code>
+       */
+      public Builder setSender(int value) {
+        
+        sender_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int32 sender = 3;</code>
+       */
+      public Builder clearSender() {
+        
+        sender_ = 0;
+        onChanged();
+        return this;
+      }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFieldsProto3(unknownFields);
@@ -13709,6 +13981,11 @@ public final class Types {
      * <code>int32 height = 2;</code>
      */
     int getHeight();
+
+    /**
+     * <code>int32 sender = 3;</code>
+     */
+    int getSender();
   }
   /**
    * Protobuf type {@code proto.EvidenceReq}
@@ -13724,6 +14001,7 @@ public final class Types {
     }
     private EvidenceReq() {
       height_ = 0;
+      sender_ = 0;
     }
 
     @java.lang.Override
@@ -13773,6 +14051,11 @@ public final class Types {
             case 16: {
 
               height_ = input.readInt32();
+              break;
+            }
+            case 24: {
+
+              sender_ = input.readInt32();
               break;
             }
           }
@@ -13829,6 +14112,15 @@ public final class Types {
       return height_;
     }
 
+    public static final int SENDER_FIELD_NUMBER = 3;
+    private int sender_;
+    /**
+     * <code>int32 sender = 3;</code>
+     */
+    public int getSender() {
+      return sender_;
+    }
+
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -13847,6 +14139,9 @@ public final class Types {
       if (height_ != 0) {
         output.writeInt32(2, height_);
       }
+      if (sender_ != 0) {
+        output.writeInt32(3, sender_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -13862,6 +14157,10 @@ public final class Types {
       if (height_ != 0) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(2, height_);
+      }
+      if (sender_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(3, sender_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -13886,6 +14185,8 @@ public final class Types {
       }
       result = result && (getHeight()
           == other.getHeight());
+      result = result && (getSender()
+          == other.getSender());
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -13903,6 +14204,8 @@ public final class Types {
       }
       hash = (37 * hash) + HEIGHT_FIELD_NUMBER;
       hash = (53 * hash) + getHeight();
+      hash = (37 * hash) + SENDER_FIELD_NUMBER;
+      hash = (53 * hash) + getSender();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -14040,6 +14343,8 @@ public final class Types {
         }
         height_ = 0;
 
+        sender_ = 0;
+
         return this;
       }
 
@@ -14068,6 +14373,7 @@ public final class Types {
           result.Meta_ = MetaBuilder_.build();
         }
         result.height_ = height_;
+        result.sender_ = sender_;
         onBuilt();
         return result;
       }
@@ -14114,6 +14420,9 @@ public final class Types {
         }
         if (other.getHeight() != 0) {
           setHeight(other.getHeight());
+        }
+        if (other.getSender() != 0) {
+          setSender(other.getSender());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -14284,6 +14593,32 @@ public final class Types {
         onChanged();
         return this;
       }
+
+      private int sender_ ;
+      /**
+       * <code>int32 sender = 3;</code>
+       */
+      public int getSender() {
+        return sender_;
+      }
+      /**
+       * <code>int32 sender = 3;</code>
+       */
+      public Builder setSender(int value) {
+        
+        sender_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int32 sender = 3;</code>
+       */
+      public Builder clearSender() {
+        
+        sender_ = 0;
+        onChanged();
+        return this;
+      }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFieldsProto3(unknownFields);
@@ -14362,6 +14697,11 @@ public final class Types {
      * <code>.proto.BlockHeader data = 2;</code>
      */
     proto.Types.BlockHeaderOrBuilder getDataOrBuilder();
+
+    /**
+     * <code>int32 sender = 3;</code>
+     */
+    int getSender();
   }
   /**
    * Protobuf type {@code proto.EvidenceRes}
@@ -14376,6 +14716,7 @@ public final class Types {
       super(builder);
     }
     private EvidenceRes() {
+      sender_ = 0;
     }
 
     @java.lang.Override
@@ -14433,6 +14774,11 @@ public final class Types {
                 data_ = subBuilder.buildPartial();
               }
 
+              break;
+            }
+            case 24: {
+
+              sender_ = input.readInt32();
               break;
             }
           }
@@ -14501,6 +14847,15 @@ public final class Types {
       return getData();
     }
 
+    public static final int SENDER_FIELD_NUMBER = 3;
+    private int sender_;
+    /**
+     * <code>int32 sender = 3;</code>
+     */
+    public int getSender() {
+      return sender_;
+    }
+
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -14519,6 +14874,9 @@ public final class Types {
       if (data_ != null) {
         output.writeMessage(2, getData());
       }
+      if (sender_ != 0) {
+        output.writeInt32(3, sender_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -14534,6 +14892,10 @@ public final class Types {
       if (data_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(2, getData());
+      }
+      if (sender_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(3, sender_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -14561,6 +14923,8 @@ public final class Types {
         result = result && getData()
             .equals(other.getData());
       }
+      result = result && (getSender()
+          == other.getSender());
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -14580,6 +14944,8 @@ public final class Types {
         hash = (37 * hash) + DATA_FIELD_NUMBER;
         hash = (53 * hash) + getData().hashCode();
       }
+      hash = (37 * hash) + SENDER_FIELD_NUMBER;
+      hash = (53 * hash) + getSender();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -14721,6 +15087,8 @@ public final class Types {
           data_ = null;
           dataBuilder_ = null;
         }
+        sender_ = 0;
+
         return this;
       }
 
@@ -14753,6 +15121,7 @@ public final class Types {
         } else {
           result.data_ = dataBuilder_.build();
         }
+        result.sender_ = sender_;
         onBuilt();
         return result;
       }
@@ -14799,6 +15168,9 @@ public final class Types {
         }
         if (other.hasData()) {
           mergeData(other.getData());
+        }
+        if (other.getSender() != 0) {
+          setSender(other.getSender());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -15059,6 +15431,32 @@ public final class Types {
           data_ = null;
         }
         return dataBuilder_;
+      }
+
+      private int sender_ ;
+      /**
+       * <code>int32 sender = 3;</code>
+       */
+      public int getSender() {
+        return sender_;
+      }
+      /**
+       * <code>int32 sender = 3;</code>
+       */
+      public Builder setSender(int value) {
+        
+        sender_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int32 sender = 3;</code>
+       */
+      public Builder clearSender() {
+        
+        sender_ = 0;
+        onChanged();
+        return this;
       }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -17346,49 +17744,52 @@ public final class Types {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\013types.proto\022\005proto\"G\n\004Meta\022\017\n\007channel\030" +
-      "\001 \001(\005\022\016\n\006sender\030\002 \001(\005\022\013\n\003cid\030\003 \001(\005\022\021\n\tci" +
-      "dSeries\030\004 \001(\005\"7\n\013BbcDecision\022\026\n\001m\030\001 \001(\0132" +
-      "\013.proto.Meta\022\020\n\010decosion\030\002 \001(\005\"#\n\007BlockI" +
+      "\n\013types.proto\022\005proto\"7\n\004Meta\022\017\n\007channel\030" +
+      "\001 \001(\005\022\013\n\003cid\030\003 \001(\005\022\021\n\tcidSeries\030\004 \001(\005\"G\n" +
+      "\013BbcDecision\022\026\n\001m\030\001 \001(\0132\013.proto.Meta\022\020\n\010" +
+      "decosion\030\002 \001(\005\022\016\n\006sender\030\003 \001(\005\"#\n\007BlockI" +
       "D\022\013\n\003pid\030\001 \001(\005\022\013\n\003bid\030\002 \001(\005\"\227\001\n\013BlockHea" +
       "der\022\026\n\001m\030\001 \001(\0132\013.proto.Meta\022\014\n\004prev\030\002 \001(" +
       "\014\022\016\n\006height\030\003 \001(\005\022\027\n\017transactionHash\030\004 \001" +
       "(\014\022\r\n\005proof\030\005 \001(\t\022\033\n\003bid\030\006 \001(\0132\016.proto.B" +
-      "lockID\022\r\n\005empty\030\007 \001(\010\"`\n\006BbcMsg\022\026\n\001m\030\001 \001" +
+      "lockID\022\r\n\005empty\030\007 \001(\010\"p\n\006BbcMsg\022\026\n\001m\030\001 \001" +
       "(\0132\013.proto.Meta\022\014\n\004vote\030\002 \001(\010\022 \n\004next\030\003 " +
-      "\001(\0132\022.proto.BlockHeader\022\016\n\006height\030\004 \001(\005\"" +
-      "x\n\017blockStatistics\022\014\n\004sign\030\002 \001(\003\022\020\n\010prop" +
-      "osed\030\003 \001(\003\022\020\n\010verified\030\004 \001(\003\022\026\n\016channelD" +
-      "ecided\030\005 \001(\003\022\n\n\002pd\030\006 \001(\003\022\017\n\007decided\030\007 \001(" +
-      "\003\"\215\001\n\005Block\022\"\n\006header\030\001 \001(\0132\022.proto.Bloc" +
-      "kHeader\022\032\n\002id\030\002 \001(\0132\016.proto.BlockID\022 \n\004d" +
-      "ata\030\003 \003(\0132\022.proto.Transaction\022\"\n\002st\030\004 \001(" +
-      "\0132\026.proto.blockStatistics\"3\n\004Comm\022\017\n\007cha" +
-      "nnel\030\001 \001(\005\022\032\n\004data\030\002 \001(\0132\014.proto.Block\"G" +
-      "\n\004txID\022\022\n\nproposerID\030\001 \001(\005\022\013\n\003bid\030\002 \001(\005\022" +
-      "\r\n\005txNum\030\003 \001(\005\022\017\n\007channel\030\004 \001(\005\"j\n\013Trans" +
-      "action\022\020\n\010clientID\030\001 \001(\005\022\027\n\002id\030\002 \001(\0132\013.p" +
-      "roto.txID\022\014\n\004data\030\003 \001(\014\022\020\n\010clientTs\030\004 \001(" +
-      "\003\022\020\n\010serverTs\030\005 \001(\003\"7\n\010accepted\022\020\n\010accep" +
-      "ted\030\001 \001(\010\022\031\n\004txID\030\002 \001(\0132\013.proto.txID\"N\n\010" +
-      "approved\022\036\n\002tx\030\001 \001(\0132\022.proto.Transaction" +
-      "\022\"\n\002st\030\003 \001(\0132\026.proto.blockStatistics\"!\n\004" +
-      "read\022\031\n\004txID\030\001 \001(\0132\013.proto.txID\"S\n\tForkP" +
-      "roof\022\016\n\006sender\030\001 \001(\005\022\032\n\004curr\030\002 \001(\0132\014.pro" +
-      "to.Block\022\032\n\004prev\030\003 \001(\0132\014.proto.Block\";\n\005" +
-      "RBMsg\022\026\n\001m\030\001 \001(\0132\013.proto.Meta\022\014\n\004type\030\002 " +
-      "\001(\005\022\014\n\004data\030\003 \001(\014\"\007\n\005Empty\"4\n\006WrbReq\022\032\n\005" +
-      "_meta\030\001 \001(\0132\013.proto.Meta\022\016\n\006height\030\002 \001(\005" +
-      "\"B\n\006WrbRes\022\026\n\001m\030\001 \001(\0132\013.proto.Meta\022 \n\004da" +
-      "ta\030\002 \001(\0132\022.proto.BlockHeader\"9\n\013Evidence" +
-      "Req\022\032\n\005_meta\030\001 \001(\0132\013.proto.Meta\022\016\n\006heigh" +
-      "t\030\002 \001(\005\"G\n\013EvidenceRes\022\026\n\001m\030\001 \001(\0132\013.prot" +
+      "\001(\0132\022.proto.BlockHeader\022\016\n\006height\030\004 \001(\005\022" +
+      "\016\n\006sender\030\005 \001(\005\"x\n\017blockStatistics\022\014\n\004si" +
+      "gn\030\002 \001(\003\022\020\n\010proposed\030\003 \001(\003\022\020\n\010verified\030\004" +
+      " \001(\003\022\026\n\016channelDecided\030\005 \001(\003\022\n\n\002pd\030\006 \001(\003" +
+      "\022\017\n\007decided\030\007 \001(\003\"\215\001\n\005Block\022\"\n\006header\030\001 " +
+      "\001(\0132\022.proto.BlockHeader\022\032\n\002id\030\002 \001(\0132\016.pr" +
+      "oto.BlockID\022 \n\004data\030\003 \003(\0132\022.proto.Transa" +
+      "ction\022\"\n\002st\030\004 \001(\0132\026.proto.blockStatistic" +
+      "s\"3\n\004Comm\022\017\n\007channel\030\001 \001(\005\022\032\n\004data\030\002 \001(\013" +
+      "2\014.proto.Block\"G\n\004txID\022\022\n\nproposerID\030\001 \001" +
+      "(\005\022\013\n\003bid\030\002 \001(\005\022\r\n\005txNum\030\003 \001(\005\022\017\n\007channe" +
+      "l\030\004 \001(\005\"j\n\013Transaction\022\020\n\010clientID\030\001 \001(\005" +
+      "\022\027\n\002id\030\002 \001(\0132\013.proto.txID\022\014\n\004data\030\003 \001(\014\022" +
+      "\020\n\010clientTs\030\004 \001(\003\022\020\n\010serverTs\030\005 \001(\003\"7\n\010a" +
+      "ccepted\022\020\n\010accepted\030\001 \001(\010\022\031\n\004txID\030\002 \001(\0132" +
+      "\013.proto.txID\"N\n\010approved\022\036\n\002tx\030\001 \001(\0132\022.p" +
+      "roto.Transaction\022\"\n\002st\030\003 \001(\0132\026.proto.blo" +
+      "ckStatistics\"!\n\004read\022\031\n\004txID\030\001 \001(\0132\013.pro" +
+      "to.txID\"S\n\tForkProof\022\016\n\006sender\030\001 \001(\005\022\032\n\004" +
+      "curr\030\002 \001(\0132\014.proto.Block\022\032\n\004prev\030\003 \001(\0132\014" +
+      ".proto.Block\"K\n\005RBMsg\022\026\n\001m\030\001 \001(\0132\013.proto" +
+      ".Meta\022\014\n\004type\030\002 \001(\005\022\014\n\004data\030\003 \001(\014\022\016\n\006sen" +
+      "der\030\004 \001(\005\"\007\n\005Empty\"D\n\006WrbReq\022\032\n\005_meta\030\001 " +
+      "\001(\0132\013.proto.Meta\022\016\n\006height\030\002 \001(\005\022\016\n\006send" +
+      "er\030\003 \001(\005\"R\n\006WrbRes\022\026\n\001m\030\001 \001(\0132\013.proto.Me" +
+      "ta\022 \n\004data\030\002 \001(\0132\022.proto.BlockHeader\022\016\n\006" +
+      "sender\030\003 \001(\005\"I\n\013EvidenceReq\022\032\n\005_meta\030\001 \001" +
+      "(\0132\013.proto.Meta\022\016\n\006height\030\002 \001(\005\022\016\n\006sende" +
+      "r\030\003 \001(\005\"W\n\013EvidenceRes\022\026\n\001m\030\001 \001(\0132\013.prot" +
       "o.Meta\022 \n\004data\030\002 \001(\0132\022.proto.BlockHeader" +
-      "\"`\n\017subChainVersion\022\021\n\tforkPoint\030\001 \001(\005\022\021" +
-      "\n\tsuggested\030\002 \001(\005\022\027\n\001v\030\003 \003(\0132\014.proto.Blo" +
-      "ck\022\016\n\006sender\030\004 \001(\005\",\n\007commReq\022!\n\005proof\030\001" +
-      " \001(\0132\022.proto.BlockHeader\"\"\n\007commRes\022\027\n\001b" +
-      "\030\001 \001(\0132\014.proto.BlockB\007\n\005protob\006proto3"
+      "\022\016\n\006sender\030\003 \001(\005\"`\n\017subChainVersion\022\021\n\tf" +
+      "orkPoint\030\001 \001(\005\022\021\n\tsuggested\030\002 \001(\005\022\027\n\001v\030\003" +
+      " \003(\0132\014.proto.Block\022\016\n\006sender\030\004 \001(\005\",\n\007co" +
+      "mmReq\022!\n\005proof\030\001 \001(\0132\022.proto.BlockHeader" +
+      "\"\"\n\007commRes\022\027\n\001b\030\001 \001(\0132\014.proto.BlockB\007\n\005" +
+      "protob\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -17407,13 +17808,13 @@ public final class Types {
     internal_static_proto_Meta_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_Meta_descriptor,
-        new java.lang.String[] { "Channel", "Sender", "Cid", "CidSeries", });
+        new java.lang.String[] { "Channel", "Cid", "CidSeries", });
     internal_static_proto_BbcDecision_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_proto_BbcDecision_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_BbcDecision_descriptor,
-        new java.lang.String[] { "M", "Decosion", });
+        new java.lang.String[] { "M", "Decosion", "Sender", });
     internal_static_proto_BlockID_descriptor =
       getDescriptor().getMessageTypes().get(2);
     internal_static_proto_BlockID_fieldAccessorTable = new
@@ -17431,7 +17832,7 @@ public final class Types {
     internal_static_proto_BbcMsg_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_BbcMsg_descriptor,
-        new java.lang.String[] { "M", "Vote", "Next", "Height", });
+        new java.lang.String[] { "M", "Vote", "Next", "Height", "Sender", });
     internal_static_proto_blockStatistics_descriptor =
       getDescriptor().getMessageTypes().get(5);
     internal_static_proto_blockStatistics_fieldAccessorTable = new
@@ -17491,7 +17892,7 @@ public final class Types {
     internal_static_proto_RBMsg_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_RBMsg_descriptor,
-        new java.lang.String[] { "M", "Type", "Data", });
+        new java.lang.String[] { "M", "Type", "Data", "Sender", });
     internal_static_proto_Empty_descriptor =
       getDescriptor().getMessageTypes().get(15);
     internal_static_proto_Empty_fieldAccessorTable = new
@@ -17503,25 +17904,25 @@ public final class Types {
     internal_static_proto_WrbReq_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_WrbReq_descriptor,
-        new java.lang.String[] { "Meta", "Height", });
+        new java.lang.String[] { "Meta", "Height", "Sender", });
     internal_static_proto_WrbRes_descriptor =
       getDescriptor().getMessageTypes().get(17);
     internal_static_proto_WrbRes_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_WrbRes_descriptor,
-        new java.lang.String[] { "M", "Data", });
+        new java.lang.String[] { "M", "Data", "Sender", });
     internal_static_proto_EvidenceReq_descriptor =
       getDescriptor().getMessageTypes().get(18);
     internal_static_proto_EvidenceReq_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_EvidenceReq_descriptor,
-        new java.lang.String[] { "Meta", "Height", });
+        new java.lang.String[] { "Meta", "Height", "Sender", });
     internal_static_proto_EvidenceRes_descriptor =
       getDescriptor().getMessageTypes().get(19);
     internal_static_proto_EvidenceRes_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_EvidenceRes_descriptor,
-        new java.lang.String[] { "M", "Data", });
+        new java.lang.String[] { "M", "Data", "Sender", });
     internal_static_proto_subChainVersion_descriptor =
       getDescriptor().getMessageTypes().get(20);
     internal_static_proto_subChainVersion_fieldAccessorTable = new

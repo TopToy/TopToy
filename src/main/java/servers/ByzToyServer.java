@@ -97,7 +97,7 @@ public class ByzToyServer extends ToyBaseServer {
     void removeFromPendings(Types.BlockHeader recHeader, Types.Block recBlock) {
         if (currLeader == getID() && !recHeader.getEmpty()) {
             logger.debug(format("[#%d-C[%d]] nullifies currBlock [sender=%d] [height=%d] [cidSeries=%d, cid=%d]",
-                    getID(), worker, recBlock.getHeader().getM().getSender(), currHeight, cidSeries, cid));
+                    getID(), worker, recBlock.getHeader().getBid().getPid(), currHeight, cidSeries, cid));
             synchronized (byzProposed) {
                 byzProposed.remove();
             }

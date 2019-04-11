@@ -27,10 +27,9 @@ public class BBC {
     }
 
     static public BbcDecData propose(Types.BbcMsg bm, Types.Meta key) throws InterruptedException {
-        logger.debug(format("broadcast BBC message [w=%d ; sender=%d ; cidSeries=%d ; cid=%d ; height=%d ; vote=%b]",
-                bm.getM().getSender(), bm.getM().getSender(), bm.getM().getCidSeries(),
-                bm.getM().getCid(), bm.getHeight(), bm.getVote()));
-        ABService.broadcast(bm.toByteArray(), bm.getM().toBuilder().setSender(id).build(), Data.RBTypes.BBC);
+        logger.debug(format("[#%d-C[%d]] broadcast BBC message [cidSeries=%d ; cid=%d ; height=%d ; vote=%b]",
+                id, bm.getM().getChannel(), bm.getM().getCidSeries(), bm.getM().getCid(), bm.getHeight(), bm.getVote()));
+        ABService.broadcast(bm.toByteArray(), bm.getM(), Data.RBTypes.BBC);
         int worker = bm.getM().getChannel();
         synchronized (Data.bbcRegDec[worker]) {
             while (!Data.bbcRegDec[worker].containsKey(key)) {
@@ -41,18 +40,19 @@ public class BBC {
     }
 
     static public void nonBlockingPropose(Types.BbcMsg bm) {
-        ABService.broadcast(bm.toByteArray(), bm.getM().toBuilder().setSender(id).build(), Data.RBTypes.BBC);
+        ABService.broadcast(bm.toByteArray(), bm.getM(), Data.RBTypes.BBC);
     }
 
     static public void addToBBCData(Types.RBMsg omsg, int worker) throws InvalidProtocolBufferException {
         Types.BbcMsg bm = Types.BbcMsg.parseFrom(omsg.getData());
-        Types.Meta key = omsg.getM().toBuilder().clearSender().build();
-        logger.debug(format("received BBC message [w=%d ; sender=%d ; cidSeries=%d ; cid=%d ; height=%d ; vote=%b]", worker, bm.getM().getSender(), bm.getM().getCidSeries(), bm.getM().getCid(), bm.getHeight(), bm.getVote()));
+        Types.Meta key = omsg.getM();
+        logger.debug(format("[#%d-C[%d]] received BBC message [sender=%d ; cidSeries=%d ; cid=%d ; height=%d ; vote=%b]"
+                ,id, worker, bm.getSender(), bm.getM().getCidSeries(), bm.getM().getCid(), bm.getHeight(), bm.getVote()));
         OBBC.reCons(key, id, bm.getHeight());
         Data.bbcVotes[worker].putIfAbsent(key, new VoteData());
         Data.bbcVotes[worker].computeIfPresent(key, (k, v) -> {
             if (v.getVotersNum() == n - f) return v;
-            if (!v.addVote(bm.getM().getSender(), bm.getVote())) return v;
+            if (!v.addVote(bm.getSender(), bm.getVote())) return v;
             if (v.getVotersNum() == n - f) {
                 synchronized (Data.bbcRegDec[worker]) {
                     Data.bbcRegDec[worker].putIfAbsent(key, new BbcDecData(v.getVoteReasult(), false));

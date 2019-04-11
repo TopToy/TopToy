@@ -40,7 +40,6 @@ public class Utils {
         }
         Types.BlockHeader h = Types.BlockHeader.newBuilder()
                 .setM(Types.Meta.newBuilder()
-                        .setSender(creatorID)
                         .setCid(cid)
                         .setCidSeries(cidSeries)
                         .setChannel(channel))
