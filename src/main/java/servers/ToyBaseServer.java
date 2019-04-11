@@ -271,6 +271,7 @@ public abstract class ToyBaseServer {
                 fastMode = false;
                 cid += 2; // I think we have no reason to increase CID.
             }
+            long start = System.currentTimeMillis();
             BlockHeader next; // = leaderImpl();
             try {
                 next = leaderImpl();
@@ -335,10 +336,13 @@ public abstract class ToyBaseServer {
                     permanent = permanent.toBuilder().setSt(permanent.getSt().toBuilder().setPd(System.currentTimeMillis())).build();
                     try {
                         bc.setBlock(recBlock.getHeader().getHeight() - (f + 2), permanent);
-                        logger.info(format("[#%d-C[%d]] Deliverd [[height=%d], [sender=%d], [channel=%d], [size=%d]]",
-                            getID(), worker, permanent.getHeader().getHeight(), permanent.getHeader().getBid().getPid(),
-                                permanent.getHeader().getM().getChannel(),
-                                permanent.getDataCount()));
+//                        if (permanent.getHeader().getHeight() % 100 == 0) {
+                            logger.info(format("[#%d-C[%d]] Deliverd [[height=%d], [sender=%d], [channel=%d], [size=%d]]",
+                                    getID(), worker, permanent.getHeader().getHeight(), permanent.getHeader().getBid().getPid(),
+                                    permanent.getHeader().getM().getChannel(),
+                                    permanent.getDataCount()));
+//                        }
+
                     } catch (IOException e) {
                         logger.error(String.format("[#%d-C[%d]] unable to record permanent time for block [height=%d] [cidSeries=%d ; cid=%d] [size=%d]",
                                 getID(), worker, recBlock.getHeader().getHeight(), cidSeries, cid, recBlock.getDataCount()));
