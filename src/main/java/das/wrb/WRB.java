@@ -16,6 +16,7 @@ import proto.WrbGrpc;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static das.bbc.OBBC.setFastBbcVote;
 import static java.lang.Math.max;
 import static java.lang.String.format;
 
@@ -67,45 +68,6 @@ public class WRB {
     static public void shutdown() {
         rpcs.shutdown();
         logger.info(format("[#%d] shutting down wrb service", id));
-    }
-
-    static private BbcMsg setFastBbcVote(Meta key, int channel, int sender, int cidSeries, int cid, BlockHeader next) {
-        BbcMsg.Builder bv = BbcMsg
-                .newBuilder()
-                .setM(Meta.newBuilder()
-                        .setChannel(channel)
-                        .setCidSeries(cidSeries)
-                        .setCid(cid)
-                        .setSender(id)
-                        .build())
-                .setVote(false);
-
-        Data.pending[channel].computeIfPresent(key, (k, val) -> {
-
-            if (val.getM().getSender() != sender ||
-                    val.getM().getCidSeries() != cidSeries ||
-                    val.getM().getCid() != cid ||
-                    val.getM().getChannel() != channel) {
-                logger.debug(format("[s=%d:%d; w=%d:%d ; cidSeries=%d:%d ; cid=%d:%d]",sender, val.getM().getSender(), channel, val.getM().getChannel(), cidSeries, val.getM().getCidSeries(), cid, val.getM().getCid()));
-                return val;
-            }
-            BlockID bid = BlockID.newBuilder().setPid(val.getM().getSender()).setBid(val.getBid()).build();
-            if (!comm.contains(channel, bid, val)) {
-                logger.debug(format("[#%d-C[%d]] comm does not contains the block itself (or it is invalid) [cidSeries=%d ; cid=%d ; bid=%d ; empty=%b]",
-                        id, channel, val.getM().getCidSeries(), val.getM().getCid(), bid.getBid(), val.getEmpty()));
-                return val;
-            }
-                bv.setVote(true);
-            if (next != null) {
-                logger.debug(format("[#%d-C[%d]] broadcasts [cidSeries=%d ; cid=%d] via fast mode",
-                        id, channel, next.getM().getCidSeries(), next.getM().getCid()));
-                bv.setNext(setFastModeData(val, next));
-            }
-               return val;
-        });
-        logger.debug(format("[#%d-C[%d]] sending fast vote [cidSeries=%d ; cid=%d ; val=%b]",
-                id, channel, cidSeries, cid, bv.getVote()));
-        return bv.build();
     }
 
     static public void WRBBroadcast(BlockHeader h) {
@@ -195,16 +157,5 @@ public class WRB {
 
     }
 
-    static private BlockHeader setFastModeData(BlockHeader curr, BlockHeader next) {
-        BlockHeader.Builder nextBuilder = next
-                    .toBuilder()
-                    .setPrev(ByteString
-                            .copyFrom(DigestMethod
-                                    .hash(curr.toByteArray())));
-        String signature = blockDigSig.sign(next);
-        return nextBuilder
-                .setProof(signature)
-                .build();
-    }
     
 }

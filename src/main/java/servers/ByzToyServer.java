@@ -86,7 +86,7 @@ public class ByzToyServer extends ToyBaseServer {
                 Types.Block byz = byzProposed.element().get(i);
                 i++;
                 WRB.WRBSend(createBlockHeader(byz, bc.getBlock(currHeight - 1).getHeader(), getID(), currHeight,
-                        cidSeries, cid, worker, byz.getId().getBid()),  g.stream().mapToInt(j->j).toArray());
+                        cidSeries, cid, worker, byz.getId()),  g.stream().mapToInt(j->j).toArray());
             }
         }
 

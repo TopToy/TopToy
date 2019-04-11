@@ -1856,9 +1856,17 @@ public final class Types {
         getProofBytes();
 
     /**
-     * <code>int32 bid = 6;</code>
+     * <code>.proto.BlockID bid = 6;</code>
      */
-    int getBid();
+    boolean hasBid();
+    /**
+     * <code>.proto.BlockID bid = 6;</code>
+     */
+    proto.Types.BlockID getBid();
+    /**
+     * <code>.proto.BlockID bid = 6;</code>
+     */
+    proto.Types.BlockIDOrBuilder getBidOrBuilder();
 
     /**
      * <code>bool empty = 7;</code>
@@ -1882,7 +1890,6 @@ public final class Types {
       height_ = 0;
       transactionHash_ = com.google.protobuf.ByteString.EMPTY;
       proof_ = "";
-      bid_ = 0;
       empty_ = false;
     }
 
@@ -1951,9 +1958,17 @@ public final class Types {
               proof_ = s;
               break;
             }
-            case 48: {
+            case 50: {
+              proto.Types.BlockID.Builder subBuilder = null;
+              if (bid_ != null) {
+                subBuilder = bid_.toBuilder();
+              }
+              bid_ = input.readMessage(proto.Types.BlockID.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(bid_);
+                bid_ = subBuilder.buildPartial();
+              }
 
-              bid_ = input.readInt32();
               break;
             }
             case 56: {
@@ -2068,12 +2083,24 @@ public final class Types {
     }
 
     public static final int BID_FIELD_NUMBER = 6;
-    private int bid_;
+    private proto.Types.BlockID bid_;
     /**
-     * <code>int32 bid = 6;</code>
+     * <code>.proto.BlockID bid = 6;</code>
      */
-    public int getBid() {
-      return bid_;
+    public boolean hasBid() {
+      return bid_ != null;
+    }
+    /**
+     * <code>.proto.BlockID bid = 6;</code>
+     */
+    public proto.Types.BlockID getBid() {
+      return bid_ == null ? proto.Types.BlockID.getDefaultInstance() : bid_;
+    }
+    /**
+     * <code>.proto.BlockID bid = 6;</code>
+     */
+    public proto.Types.BlockIDOrBuilder getBidOrBuilder() {
+      return getBid();
     }
 
     public static final int EMPTY_FIELD_NUMBER = 7;
@@ -2112,8 +2139,8 @@ public final class Types {
       if (!getProofBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 5, proof_);
       }
-      if (bid_ != 0) {
-        output.writeInt32(6, bid_);
+      if (bid_ != null) {
+        output.writeMessage(6, getBid());
       }
       if (empty_ != false) {
         output.writeBool(7, empty_);
@@ -2145,9 +2172,9 @@ public final class Types {
       if (!getProofBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(5, proof_);
       }
-      if (bid_ != 0) {
+      if (bid_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(6, bid_);
+          .computeMessageSize(6, getBid());
       }
       if (empty_ != false) {
         size += com.google.protobuf.CodedOutputStream
@@ -2182,8 +2209,11 @@ public final class Types {
           .equals(other.getTransactionHash());
       result = result && getProof()
           .equals(other.getProof());
-      result = result && (getBid()
-          == other.getBid());
+      result = result && (hasBid() == other.hasBid());
+      if (hasBid()) {
+        result = result && getBid()
+            .equals(other.getBid());
+      }
       result = result && (getEmpty()
           == other.getEmpty());
       result = result && unknownFields.equals(other.unknownFields);
@@ -2209,8 +2239,10 @@ public final class Types {
       hash = (53 * hash) + getTransactionHash().hashCode();
       hash = (37 * hash) + PROOF_FIELD_NUMBER;
       hash = (53 * hash) + getProof().hashCode();
-      hash = (37 * hash) + BID_FIELD_NUMBER;
-      hash = (53 * hash) + getBid();
+      if (hasBid()) {
+        hash = (37 * hash) + BID_FIELD_NUMBER;
+        hash = (53 * hash) + getBid().hashCode();
+      }
       hash = (37 * hash) + EMPTY_FIELD_NUMBER;
       hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
           getEmpty());
@@ -2357,8 +2389,12 @@ public final class Types {
 
         proof_ = "";
 
-        bid_ = 0;
-
+        if (bidBuilder_ == null) {
+          bid_ = null;
+        } else {
+          bid_ = null;
+          bidBuilder_ = null;
+        }
         empty_ = false;
 
         return this;
@@ -2392,7 +2428,11 @@ public final class Types {
         result.height_ = height_;
         result.transactionHash_ = transactionHash_;
         result.proof_ = proof_;
-        result.bid_ = bid_;
+        if (bidBuilder_ == null) {
+          result.bid_ = bid_;
+        } else {
+          result.bid_ = bidBuilder_.build();
+        }
         result.empty_ = empty_;
         onBuilt();
         return result;
@@ -2451,8 +2491,8 @@ public final class Types {
           proof_ = other.proof_;
           onChanged();
         }
-        if (other.getBid() != 0) {
-          setBid(other.getBid());
+        if (other.hasBid()) {
+          mergeBid(other.getBid());
         }
         if (other.getEmpty() != false) {
           setEmpty(other.getEmpty());
@@ -2754,30 +2794,121 @@ public final class Types {
         return this;
       }
 
-      private int bid_ ;
+      private proto.Types.BlockID bid_ = null;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          proto.Types.BlockID, proto.Types.BlockID.Builder, proto.Types.BlockIDOrBuilder> bidBuilder_;
       /**
-       * <code>int32 bid = 6;</code>
+       * <code>.proto.BlockID bid = 6;</code>
        */
-      public int getBid() {
-        return bid_;
+      public boolean hasBid() {
+        return bidBuilder_ != null || bid_ != null;
       }
       /**
-       * <code>int32 bid = 6;</code>
+       * <code>.proto.BlockID bid = 6;</code>
        */
-      public Builder setBid(int value) {
-        
-        bid_ = value;
-        onChanged();
+      public proto.Types.BlockID getBid() {
+        if (bidBuilder_ == null) {
+          return bid_ == null ? proto.Types.BlockID.getDefaultInstance() : bid_;
+        } else {
+          return bidBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>.proto.BlockID bid = 6;</code>
+       */
+      public Builder setBid(proto.Types.BlockID value) {
+        if (bidBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          bid_ = value;
+          onChanged();
+        } else {
+          bidBuilder_.setMessage(value);
+        }
+
         return this;
       }
       /**
-       * <code>int32 bid = 6;</code>
+       * <code>.proto.BlockID bid = 6;</code>
+       */
+      public Builder setBid(
+          proto.Types.BlockID.Builder builderForValue) {
+        if (bidBuilder_ == null) {
+          bid_ = builderForValue.build();
+          onChanged();
+        } else {
+          bidBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <code>.proto.BlockID bid = 6;</code>
+       */
+      public Builder mergeBid(proto.Types.BlockID value) {
+        if (bidBuilder_ == null) {
+          if (bid_ != null) {
+            bid_ =
+              proto.Types.BlockID.newBuilder(bid_).mergeFrom(value).buildPartial();
+          } else {
+            bid_ = value;
+          }
+          onChanged();
+        } else {
+          bidBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <code>.proto.BlockID bid = 6;</code>
        */
       public Builder clearBid() {
-        
-        bid_ = 0;
-        onChanged();
+        if (bidBuilder_ == null) {
+          bid_ = null;
+          onChanged();
+        } else {
+          bid_ = null;
+          bidBuilder_ = null;
+        }
+
         return this;
+      }
+      /**
+       * <code>.proto.BlockID bid = 6;</code>
+       */
+      public proto.Types.BlockID.Builder getBidBuilder() {
+        
+        onChanged();
+        return getBidFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.proto.BlockID bid = 6;</code>
+       */
+      public proto.Types.BlockIDOrBuilder getBidOrBuilder() {
+        if (bidBuilder_ != null) {
+          return bidBuilder_.getMessageOrBuilder();
+        } else {
+          return bid_ == null ?
+              proto.Types.BlockID.getDefaultInstance() : bid_;
+        }
+      }
+      /**
+       * <code>.proto.BlockID bid = 6;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          proto.Types.BlockID, proto.Types.BlockID.Builder, proto.Types.BlockIDOrBuilder> 
+          getBidFieldBuilder() {
+        if (bidBuilder_ == null) {
+          bidBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              proto.Types.BlockID, proto.Types.BlockID.Builder, proto.Types.BlockIDOrBuilder>(
+                  getBid(),
+                  getParentForChildren(),
+                  isClean());
+          bid_ = null;
+        }
+        return bidBuilder_;
       }
 
       private boolean empty_ ;
@@ -17219,45 +17350,45 @@ public final class Types {
       "\001 \001(\005\022\016\n\006sender\030\002 \001(\005\022\013\n\003cid\030\003 \001(\005\022\021\n\tci" +
       "dSeries\030\004 \001(\005\"7\n\013BbcDecision\022\026\n\001m\030\001 \001(\0132" +
       "\013.proto.Meta\022\020\n\010decosion\030\002 \001(\005\"#\n\007BlockI" +
-      "D\022\013\n\003pid\030\001 \001(\005\022\013\n\003bid\030\002 \001(\005\"\207\001\n\013BlockHea" +
+      "D\022\013\n\003pid\030\001 \001(\005\022\013\n\003bid\030\002 \001(\005\"\227\001\n\013BlockHea" +
       "der\022\026\n\001m\030\001 \001(\0132\013.proto.Meta\022\014\n\004prev\030\002 \001(" +
       "\014\022\016\n\006height\030\003 \001(\005\022\027\n\017transactionHash\030\004 \001" +
-      "(\014\022\r\n\005proof\030\005 \001(\t\022\013\n\003bid\030\006 \001(\005\022\r\n\005empty\030" +
-      "\007 \001(\010\"`\n\006BbcMsg\022\026\n\001m\030\001 \001(\0132\013.proto.Meta\022" +
-      "\014\n\004vote\030\002 \001(\010\022 \n\004next\030\003 \001(\0132\022.proto.Bloc" +
-      "kHeader\022\016\n\006height\030\004 \001(\005\"x\n\017blockStatisti" +
-      "cs\022\014\n\004sign\030\002 \001(\003\022\020\n\010proposed\030\003 \001(\003\022\020\n\010ve" +
-      "rified\030\004 \001(\003\022\026\n\016channelDecided\030\005 \001(\003\022\n\n\002" +
-      "pd\030\006 \001(\003\022\017\n\007decided\030\007 \001(\003\"\215\001\n\005Block\022\"\n\006h" +
-      "eader\030\001 \001(\0132\022.proto.BlockHeader\022\032\n\002id\030\002 " +
-      "\001(\0132\016.proto.BlockID\022 \n\004data\030\003 \003(\0132\022.prot" +
-      "o.Transaction\022\"\n\002st\030\004 \001(\0132\026.proto.blockS" +
-      "tatistics\"3\n\004Comm\022\017\n\007channel\030\001 \001(\005\022\032\n\004da" +
-      "ta\030\002 \001(\0132\014.proto.Block\"G\n\004txID\022\022\n\npropos" +
-      "erID\030\001 \001(\005\022\013\n\003bid\030\002 \001(\005\022\r\n\005txNum\030\003 \001(\005\022\017" +
-      "\n\007channel\030\004 \001(\005\"j\n\013Transaction\022\020\n\010client" +
-      "ID\030\001 \001(\005\022\027\n\002id\030\002 \001(\0132\013.proto.txID\022\014\n\004dat" +
-      "a\030\003 \001(\014\022\020\n\010clientTs\030\004 \001(\003\022\020\n\010serverTs\030\005 " +
-      "\001(\003\"7\n\010accepted\022\020\n\010accepted\030\001 \001(\010\022\031\n\004txI" +
-      "D\030\002 \001(\0132\013.proto.txID\"N\n\010approved\022\036\n\002tx\030\001" +
-      " \001(\0132\022.proto.Transaction\022\"\n\002st\030\003 \001(\0132\026.p" +
-      "roto.blockStatistics\"!\n\004read\022\031\n\004txID\030\001 \001" +
-      "(\0132\013.proto.txID\"S\n\tForkProof\022\016\n\006sender\030\001" +
-      " \001(\005\022\032\n\004curr\030\002 \001(\0132\014.proto.Block\022\032\n\004prev" +
-      "\030\003 \001(\0132\014.proto.Block\";\n\005RBMsg\022\026\n\001m\030\001 \001(\013" +
-      "2\013.proto.Meta\022\014\n\004type\030\002 \001(\005\022\014\n\004data\030\003 \001(" +
-      "\014\"\007\n\005Empty\"4\n\006WrbReq\022\032\n\005_meta\030\001 \001(\0132\013.pr" +
-      "oto.Meta\022\016\n\006height\030\002 \001(\005\"B\n\006WrbRes\022\026\n\001m\030" +
-      "\001 \001(\0132\013.proto.Meta\022 \n\004data\030\002 \001(\0132\022.proto" +
-      ".BlockHeader\"9\n\013EvidenceReq\022\032\n\005_meta\030\001 \001" +
-      "(\0132\013.proto.Meta\022\016\n\006height\030\002 \001(\005\"G\n\013Evide" +
-      "nceRes\022\026\n\001m\030\001 \001(\0132\013.proto.Meta\022 \n\004data\030\002" +
-      " \001(\0132\022.proto.BlockHeader\"`\n\017subChainVers" +
-      "ion\022\021\n\tforkPoint\030\001 \001(\005\022\021\n\tsuggested\030\002 \001(" +
-      "\005\022\027\n\001v\030\003 \003(\0132\014.proto.Block\022\016\n\006sender\030\004 \001" +
-      "(\005\",\n\007commReq\022!\n\005proof\030\001 \001(\0132\022.proto.Blo" +
-      "ckHeader\"\"\n\007commRes\022\027\n\001b\030\001 \001(\0132\014.proto.B" +
-      "lockB\007\n\005protob\006proto3"
+      "(\014\022\r\n\005proof\030\005 \001(\t\022\033\n\003bid\030\006 \001(\0132\016.proto.B" +
+      "lockID\022\r\n\005empty\030\007 \001(\010\"`\n\006BbcMsg\022\026\n\001m\030\001 \001" +
+      "(\0132\013.proto.Meta\022\014\n\004vote\030\002 \001(\010\022 \n\004next\030\003 " +
+      "\001(\0132\022.proto.BlockHeader\022\016\n\006height\030\004 \001(\005\"" +
+      "x\n\017blockStatistics\022\014\n\004sign\030\002 \001(\003\022\020\n\010prop" +
+      "osed\030\003 \001(\003\022\020\n\010verified\030\004 \001(\003\022\026\n\016channelD" +
+      "ecided\030\005 \001(\003\022\n\n\002pd\030\006 \001(\003\022\017\n\007decided\030\007 \001(" +
+      "\003\"\215\001\n\005Block\022\"\n\006header\030\001 \001(\0132\022.proto.Bloc" +
+      "kHeader\022\032\n\002id\030\002 \001(\0132\016.proto.BlockID\022 \n\004d" +
+      "ata\030\003 \003(\0132\022.proto.Transaction\022\"\n\002st\030\004 \001(" +
+      "\0132\026.proto.blockStatistics\"3\n\004Comm\022\017\n\007cha" +
+      "nnel\030\001 \001(\005\022\032\n\004data\030\002 \001(\0132\014.proto.Block\"G" +
+      "\n\004txID\022\022\n\nproposerID\030\001 \001(\005\022\013\n\003bid\030\002 \001(\005\022" +
+      "\r\n\005txNum\030\003 \001(\005\022\017\n\007channel\030\004 \001(\005\"j\n\013Trans" +
+      "action\022\020\n\010clientID\030\001 \001(\005\022\027\n\002id\030\002 \001(\0132\013.p" +
+      "roto.txID\022\014\n\004data\030\003 \001(\014\022\020\n\010clientTs\030\004 \001(" +
+      "\003\022\020\n\010serverTs\030\005 \001(\003\"7\n\010accepted\022\020\n\010accep" +
+      "ted\030\001 \001(\010\022\031\n\004txID\030\002 \001(\0132\013.proto.txID\"N\n\010" +
+      "approved\022\036\n\002tx\030\001 \001(\0132\022.proto.Transaction" +
+      "\022\"\n\002st\030\003 \001(\0132\026.proto.blockStatistics\"!\n\004" +
+      "read\022\031\n\004txID\030\001 \001(\0132\013.proto.txID\"S\n\tForkP" +
+      "roof\022\016\n\006sender\030\001 \001(\005\022\032\n\004curr\030\002 \001(\0132\014.pro" +
+      "to.Block\022\032\n\004prev\030\003 \001(\0132\014.proto.Block\";\n\005" +
+      "RBMsg\022\026\n\001m\030\001 \001(\0132\013.proto.Meta\022\014\n\004type\030\002 " +
+      "\001(\005\022\014\n\004data\030\003 \001(\014\"\007\n\005Empty\"4\n\006WrbReq\022\032\n\005" +
+      "_meta\030\001 \001(\0132\013.proto.Meta\022\016\n\006height\030\002 \001(\005" +
+      "\"B\n\006WrbRes\022\026\n\001m\030\001 \001(\0132\013.proto.Meta\022 \n\004da" +
+      "ta\030\002 \001(\0132\022.proto.BlockHeader\"9\n\013Evidence" +
+      "Req\022\032\n\005_meta\030\001 \001(\0132\013.proto.Meta\022\016\n\006heigh" +
+      "t\030\002 \001(\005\"G\n\013EvidenceRes\022\026\n\001m\030\001 \001(\0132\013.prot" +
+      "o.Meta\022 \n\004data\030\002 \001(\0132\022.proto.BlockHeader" +
+      "\"`\n\017subChainVersion\022\021\n\tforkPoint\030\001 \001(\005\022\021" +
+      "\n\tsuggested\030\002 \001(\005\022\027\n\001v\030\003 \003(\0132\014.proto.Blo" +
+      "ck\022\016\n\006sender\030\004 \001(\005\",\n\007commReq\022!\n\005proof\030\001" +
+      " \001(\0132\022.proto.BlockHeader\"\"\n\007commRes\022\027\n\001b" +
+      "\030\001 \001(\0132\014.proto.BlockB\007\n\005protob\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

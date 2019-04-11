@@ -7,13 +7,11 @@ echo "title = \"configuration\"
     c = 1
     testing = true
     txSize = 0
-    cutterBatch = 1
 
 [setting]
     tmo = 1000
     tmoInterval = 100
-    rmfBbcConfigPath = \"src/main/resources/bbcConfig\"
-    RBConfigPath = \"src/main/resources/RBConfig\"
+    ABConfigPath = \"src/main/resources/ABConfig\"
     maxTransactionInBlock = 1000
     caRootPath = \"\"
     fastMode = true
@@ -22,9 +20,6 @@ echo "title = \"configuration\"
     privateKey = \"\"\"MIGNAgEAMBAGByqGSM49AgEGBSuBBAAKBHYwdAIBAQQg/ngTdAL+eZOyh4lilm6djqsl
                     RDHT5C60eLxRcEoNjAGgBwYFK4EEAAqhRANCAASeFQqtyOwJcJtYceofW2TeNg7rJBlW
                     L28GZn+tk32fz95JqVS3+iF6JdoM1clkRFLliyXSxEnS1iO4wzRKGQwm\"\"\"
-
-    publicKey = \"\"\"MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
-                    N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg==\"\"\"
 
     TlsPrivKeyPath = \"src/main/resources/sslConfig/server.pem\"
     TlsCertPath = \"src/main/resources/sslConfig/server.crt\"
@@ -41,6 +36,7 @@ echo "      [cluster.s${i}]
             ip = \"${line}\"
             wrbPort = 30000
             commPort = 30010
+            obbcPort = 30020
             publicKey =\"\"\"MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
                            N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg==\"\"\"
 " >> config.txt

@@ -96,7 +96,7 @@ public class Top implements server {
         logger.info(format("[%d] has initiated ab service", id));
         new BBC(id, n, f, n - f);
         logger.info(format("[%d] has initiated BBC", id));
-        new OBBC(id, n, f, n - f, obbcCluster, caRoot, serverCrt, serverPrivKey);
+        new OBBC(id, n, f, n - f, obbcCluster, comm, caRoot, serverCrt, serverPrivKey);
         logger.info(format("[%d] has initiated OBBC service", id));
         comm = new Clique(id, workers, this.n, commCluster);
         logger.info(format("[%d] has initiated communication layer", id));

@@ -26,7 +26,7 @@ public class Utils {
 
     static public Types.BlockHeader createBlockHeader(Types.Block b, Types.BlockHeader header,
                                                          int creatorID, int height, int cidSeries, int cid,
-                                                         int channel, int bid) {
+                                                         int channel, Types.BlockID bid) {
 
         byte[] tHash = new byte[0];
         for (Types.Transaction t : b.getDataList()) {
@@ -48,7 +48,7 @@ public class Utils {
                 .setBid(bid)
                 .setTransactionHash(ByteString.copyFrom(tHash))
                 .setPrev(ByteString.copyFrom(DigestMethod.hash(headerArray)))
-                .setEmpty(b.getDataCount() == 0)
+//                .setEmpty(b.getDataCount() == 0)
                 .build();
 
 //        if (creatorID == -1) {

@@ -140,7 +140,7 @@ public abstract class ToyBaseServer {
     }
 
     Block.Builder configureNewBlock() {
-        return Block.newBuilder().setHeader(BlockHeader.newBuilder())
+        return Block.newBuilder().setHeader(BlockHeader.newBuilder().setEmpty(false))
                 .setId(BlockID.newBuilder().setPid(getID()).setBid(++bid).build());
     }
 
@@ -158,12 +158,15 @@ public abstract class ToyBaseServer {
 
 
     public void serve() {
+        commSendThread.start();
+        while (commSendThread.getState() != Thread.State.RUNNABLE);
+        logger.debug(format("[#%d-C[%d]] starts commSendThread thread", getID(), worker));
         panicThread.start();
+        while (panicThread.getState() != Thread.State.RUNNABLE);
         logger.debug(format("[#%d-C[%d]] starts panic thread", getID(), worker));
         mainThread.start();
+        while (mainThread.getState() != Thread.State.RUNNABLE);
         logger.debug(format("[#%d-C[%d]] starts main thread", getID(), worker));
-        commSendThread.start();
-        logger.debug(format("[#%d-C[%d]] starts commSendThread thread", getID(), worker));
         logger.info(format("[#%d-C[%d]] starts serving", getID(), worker));
     }
 
@@ -220,25 +223,32 @@ public abstract class ToyBaseServer {
 
 
     Types.Block getBlockWRTheader(Types.BlockHeader h, int channel) throws InterruptedException {
-        Types.BlockID bid = Types.BlockID.newBuilder().setBid(h.getBid()).setPid(h.getM().getSender()).build();
-        return comm.recBlock(channel, bid, h);
+        if (h.getEmpty()) {
+            logger.debug(format("received an empty block, returning a match [w=%d ; cidSereis=%d ; cid=%d" +
+                            " ; height=%d ; pid=%d ; bid=%d]",
+                    channel, h.getM().getCidSeries(), h.getM().getCid(), h.getHeight(), h.getM().getSender(), h.getBid()));
+            return Block.newBuilder().build();
+        }
+        return comm.recBlock(channel, h);
     }
 
     BlockHeader getHeaderForCurrentBlock(Types.BlockHeader prev,
                                          int height, int cidSeries, int cid) {
-        synchronized (proposedBlocks) {
-            if (proposedBlocks.isEmpty()) {
-                logger.debug(format("[#%d-C[%d]] header for an empty block [height=%d ; cidSeries=%d ; cid=%d] has been created",
-                        getID(), worker, height, cidSeries, cid));
-                return createBlockHeader(Block.getDefaultInstance(),
-                        prev, getID(), height, cidSeries, cid, worker, -1);
-            }
+        synchronized (cbl) {
+            synchronized (proposedBlocks) {
+                if (proposedBlocks.isEmpty()) {
+                    Block b = currBLock.setHeader(currBLock.getHeader().toBuilder().setEmpty(true)).build();
+                    currBLock = configureNewBlock();
+                    return createBlockHeader(b, prev, getID(), height, cidSeries, cid, worker, b.getId());
+                }
 
-            Block b = proposedBlocks.element();
-            logger.debug(format("[#%d-C[%d]] header for [height=%d ; cidSeries=%d ; cid=%d ; bid=%d] has been created",
-                    getID(), worker, height, cidSeries, cid, b.getId().getBid()));
-            return createBlockHeader(b, prev, getID(), height, cidSeries, cid, worker, b.getId().getBid());
+                Block b = proposedBlocks.element();
+                logger.debug(format("[#%d-C[%d]] header for [height=%d ; cidSeries=%d ; cid=%d ; bid=%d] has been created",
+                        getID(), worker, height, cidSeries, cid, b.getId().getBid()));
+                return createBlockHeader(b, prev, getID(), height, cidSeries, cid, worker, b.getId());
+            }
         }
+
     }
 
     private boolean mainLoop() {
@@ -295,6 +305,7 @@ public abstract class ToyBaseServer {
                 logger.debug(format("[#%d-C[%d]] main thread has been interrupted on block deliver " +
                                 "[height=%d, cidSeries=%d ; cid=%d]",
                         getID(), worker, currHeight, cidSeries, cid));
+                return true;
             }
             recBlock = recBlock.toBuilder().setHeader(recHeader).build();
             removeFromPendings(recHeader, recBlock);
@@ -475,23 +486,23 @@ public abstract class ToyBaseServer {
             }
     }
 
-    void broadcastEmptyIfNeeded() {
-        synchronized (cbl) {
-            synchronized (blocksForPropose) {
-                synchronized (proposedBlocks) {
-                    if (blocksForPropose.size() == 0 && proposedBlocks.size() == 0) {
-                        logger.debug(format("[#%d-C[%d]] broadcast empty block"
-                                , getID(),worker));
-                        blocksForPropose.add(currBLock.build());
-                        currBLock = configureNewBlock();
-                    }
-
-                }
-            }
-        }
-
-
-    }
+//    void broadcastEmptyIfNeeded() {
+//        synchronized (cbl) {
+//            synchronized (blocksForPropose) {
+//                synchronized (proposedBlocks) {
+//                    if (blocksForPropose.size() == 0 && proposedBlocks.size() == 0) {
+//                        logger.debug(format("[#%d-C[%d]] broadcast empty block"
+//                                , getID(),worker));
+//                        blocksForPropose.add(currBLock.build());
+//                        currBLock = configureNewBlock();
+//                    }
+//
+//                }
+//            }
+//        }
+//
+//
+//    }
 
 
     private void mainFork() throws InterruptedException, IOException {

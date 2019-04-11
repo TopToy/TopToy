@@ -71,8 +71,9 @@ public class Clique implements CommLayer {
     }
 
     @Override
-    public Types.Block recBlock(int channel, Types.BlockID bid, Types.BlockHeader proof) throws InterruptedException {
-        if (proof.getEmpty()) return Types.Block.getDefaultInstance();
+    public Types.Block recBlock(int channel, Types.BlockHeader proof) throws InterruptedException {
+//        if (proof.getEmpty()) return Types.Block.getDefaultInstance();
+        Types.BlockID bid = proof.getBid();
         Types.Block res = getBlockFromData(channel, bid, proof);
         if (res != null) return res;
         rpcs.broadcastCommReq(Types.commReq.newBuilder().setProof(proof).build());
@@ -87,8 +88,9 @@ public class Clique implements CommLayer {
     }
 
     @Override
-    public boolean contains(int channel, Types.BlockID bid, Types.BlockHeader proof) {
+    public boolean contains(int channel, Types.BlockHeader proof) {
         if (proof.getEmpty()) return true;
+        Types.BlockID bid = proof.getBid();
         int pid = bid.getPid();
         Data.blocks[pid][channel].computeIfPresent(bid, (k, v) -> {
             int bef = v.size();

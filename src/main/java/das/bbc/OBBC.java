@@ -1,7 +1,11 @@
 package das.bbc;
 
+import com.google.protobuf.ByteString;
+import communication.CommLayer;
 import config.Node;
 
+import crypto.DigestMethod;
+import crypto.blockDigSig;
 import das.data.BbcDecData;
 
 import das.data.Data;
@@ -24,11 +28,13 @@ public class OBBC extends ObbcGrpc.ObbcImplBase  {
 
     static private int id;
     private static OBBCRpcs rpcs;
+    private static CommLayer comm;
 
-    public OBBC(int id, int n, int f, int qSize,  ArrayList<Node> obbcCluster, String caRoot, String serverCrt,
+    public OBBC(int id, int n, int f, int qSize,  ArrayList<Node> obbcCluster, CommLayer comm, String caRoot, String serverCrt,
                 String serverPrivKey) {
         OBBC.id = id;
         rpcs = new OBBCRpcs(id, n, f, qSize, obbcCluster, caRoot, serverCrt, serverPrivKey);
+        OBBC.comm = comm;
         logger.info(format("Initiated ABBftSMaRt: [id=%d]", id));
 
     }
@@ -75,8 +81,13 @@ public class OBBC extends ObbcGrpc.ObbcImplBase  {
         }
 
         boolean vote = false;
+
         if (pending[worker].containsKey(key)) {
-            vote = true;
+            Types.BlockHeader h = pending[worker].get(key);
+            if (comm.contains(worker, h)) {
+                vote = true;
+            }
+
         }
 
         return BBC.propose(Types.BbcMsg.newBuilder()
@@ -119,7 +130,56 @@ public class OBBC extends ObbcGrpc.ObbcImplBase  {
 
     }
 
+    static public Types.BbcMsg setFastBbcVote(Types.Meta key, int channel, int sender, int cidSeries, int cid, Types.BlockHeader next) {
+        Types.BbcMsg.Builder bv = Types.BbcMsg
+                .newBuilder()
+                .setM(Types.Meta.newBuilder()
+                        .setChannel(channel)
+                        .setCidSeries(cidSeries)
+                        .setCid(cid)
+                        .setSender(id)
+                        .build())
+                .setVote(false);
 
+        Data.pending[channel].computeIfPresent(key, (k, val) -> {
+
+            if (val.getM().getSender() != sender ||
+                    val.getM().getCidSeries() != cidSeries ||
+                    val.getM().getCid() != cid ||
+                    val.getM().getChannel() != channel) {
+                logger.debug(format("[s=%d:%d; w=%d:%d ; cidSeries=%d:%d ; cid=%d:%d]",sender, val.getM().getSender(), channel, val.getM().getChannel(), cidSeries, val.getM().getCidSeries(), cid, val.getM().getCid()));
+                return val;
+            }
+            Types.BlockID bid = val.getBid();
+            if (!comm.contains(channel, val)) {
+                logger.debug(format("[#%d-C[%d]] comm does not contains the block itself (or it is invalid) [cidSeries=%d ; cid=%d ; bid=%d ; empty=%b]",
+                        id, channel, val.getM().getCidSeries(), val.getM().getCid(), bid.getBid(), val.getEmpty()));
+                return val;
+            }
+            bv.setVote(true);
+            if (next != null) {
+                logger.debug(format("[#%d-C[%d]] broadcasts [cidSeries=%d ; cid=%d] via fast mode",
+                        id, channel, next.getM().getCidSeries(), next.getM().getCid()));
+                bv.setNext(setFastModeData(val, next));
+            }
+            return val;
+        });
+        logger.debug(format("[#%d-C[%d]] sending fast vote [cidSeries=%d ; cid=%d ; val=%b]",
+                id, channel, cidSeries, cid, bv.getVote()));
+        return bv.build();
+    }
+
+    static private Types.BlockHeader setFastModeData(Types.BlockHeader curr, Types.BlockHeader next) {
+        Types.BlockHeader.Builder nextBuilder = next
+                .toBuilder()
+                .setPrev(ByteString
+                        .copyFrom(DigestMethod
+                                .hash(curr.toByteArray())));
+        String signature = blockDigSig.sign(next);
+        return nextBuilder
+                .setProof(signature)
+                .build();
+    }
 
 
 }

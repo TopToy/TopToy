@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #readarray -t gate < ./gateway.txt
 out_path_t=/home/yoni/toy/res
-gate_t=toy@13.58.200.49
+gate_t=toy@18.222.131.61
 #rsync -au ${gate}:./toy/out/* ${out_path}
 while sleep 5; do
 #    echo "getting files from ${gate_f}..."

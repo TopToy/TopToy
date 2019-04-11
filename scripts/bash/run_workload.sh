@@ -11,15 +11,15 @@ binDir=${tDir}/bin
 clientBinDir=${tDir}/bin_client
 inst=${configDir}/inst/input.inst
 config_toml=${configDir}/config.toml
-config_bbc=${configDir}/bbcConfig/hosts.config
+#config_bbc=${configDir}/bbcConfig/hosts.config
 #config_panic=${configDir}/panicRBConfig/hosts.config
 #config_sync=${configDir}/syncRBConfig/hosts.config
-config_rb=${configDir}/RBConfig/hosts.config
+config_rb=${configDir}/ABConfig/hosts.config
 
-tconfig_bbc=${configDir}/bbcConfig/hosts.config.tmp
+#tconfig_bbc=${configDir}/bbcConfig/hosts.config.tmp
 #tconfig_panic=${configDir}/panicRBConfig/hosts.config.tmp
 #tconfig_sync=${configDir}/syncRBConfig/hosts.config.tmp
-tconfig_rb=${configDir}/RBConfig/hosts.config.tmp
+tconfig_rb=${configDir}/ABConfig/hosts.config.tmp
 tconfig=${config_toml}.tmp
 
 user="toy"
@@ -188,7 +188,7 @@ configure_server_files() {
     local id=${1}
     local public_ip=`echo "${servers[${id}]}" | sed 's/'${user}'\@//g'`
     local private_ip=${servers_p[${id}]}
-    sed -i 's/'"${public_ip}"'/'"${private_ip}"'/g' ${config_bbc}
+#    sed -i 's/'"${public_ip}"'/'"${private_ip}"'/g' ${config_bbc}
     sed -i 's/'"${public_ip}"'/'"${private_ip}"'/g' ${config_rb}
 #    sed -i 's/'"${public_ip}"'/'"${private_ip}"'/g' ${config_panic}
 #    sed -i 's/'"${public_ip}"'/'"${private_ip}"'/g' ${config_sync}
@@ -506,7 +506,7 @@ run_byz_test() {
 # ${8} - test time
 run_no_failures_test() {
     for i in `seq 0 $((${#servers[@]} - 1))`; do
-        cat ${config_bbc} > ${tconfig_bbc}
+#        cat ${config_bbc} > ${tconfig_bbc}
         cat ${config_rb} > ${tconfig_rb}
 #        cat ${config_panic} > ${tconfig_panic}
 #        cat ${config_sync} > ${tconfig_sync}
@@ -516,7 +516,7 @@ run_no_failures_test() {
         configure_servers ${8}
         configure_server_files ${i}
         install_server ${i}
-        cat ${tconfig_bbc} > ${config_bbc}
+#        cat ${tconfig_bbc} > ${config_bbc}
         cat ${tconfig_rb} > ${config_rb}
 #        cat ${tconfig_panic} > ${config_panic}
 #        cat ${tconfig_sync} > ${config_sync}
@@ -736,46 +736,49 @@ main_byz() {
 #
 #
 
-
-for i in `seq 0 2`; do
-    main_no_failures 0 0 1 10 1 1000 120
+for i in `seq 0 9`; do
+    main_no_failures 0 0 10 10 1 1000 20
 done
 
-for i in `seq 0 2`; do
-    main_no_failures 512 10 1 10 1 1000 120
-done
-
-for i in `seq 0 2`; do
-    main_no_failures 512 100 1 10 1 1000 120
-done
-
-for i in `seq 0 2`; do
-    main_no_failures 512 1000 1 10 1 1000 120
-done
-
-for i in `seq 0 2`; do
-    main_no_failures 1024 10 1 10 1 1000 120
-done
-
-for i in `seq 0 2`; do
-    main_no_failures 1024 100 1 10 1 1000 120
-done
-
-for i in `seq 0 2`; do
-    main_no_failures 1024 1000 1 10 1 1000 120
-done
-
-for i in `seq 0 2`; do
-    main_no_failures 4096 10 1 10 1 1000 120
-done
-
-for i in `seq 0 2`; do
-    main_no_failures 4096 100 1 10 1 1000 120
-done
-
-for i in `seq 0 2`; do
-    main_no_failures 4096 1000 1 10 1 1000 120
-done
+#for i in `seq 0 2`; do
+#    main_no_failures 0 0 1 10 1 1000 120
+#done
+#
+#for i in `seq 0 2`; do
+#    main_no_failures 512 10 1 10 1 1000 120
+#done
+#
+#for i in `seq 0 2`; do
+#    main_no_failures 512 100 1 10 1 1000 120
+#done
+#
+#for i in `seq 0 2`; do
+#    main_no_failures 512 1000 1 10 1 1000 120
+#done
+#
+#for i in `seq 0 2`; do
+#    main_no_failures 1024 10 1 10 1 1000 120
+#done
+#
+#for i in `seq 0 2`; do
+#    main_no_failures 1024 100 1 10 1 1000 120
+#done
+#
+#for i in `seq 0 2`; do
+#    main_no_failures 1024 1000 1 10 1 1000 120
+#done
+#
+#for i in `seq 0 2`; do
+#    main_no_failures 4096 10 1 10 1 1000 120
+#done
+#
+#for i in `seq 0 2`; do
+#    main_no_failures 4096 100 1 10 1 1000 120
+#done
+#
+#for i in `seq 0 2`; do
+#    main_no_failures 4096 1000 1 10 1 1000 120
+#done
 
 #main_no_failures 4096 1000 10 10 1 1000 120
 

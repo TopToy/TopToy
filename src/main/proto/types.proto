@@ -28,7 +28,7 @@ message BlockHeader {
     int32 height = 3;
     bytes transactionHash = 4;
     string proof = 5;
-    int32 bid = 6;
+    BlockID bid = 6;
     bool empty = 7;
 }
 
