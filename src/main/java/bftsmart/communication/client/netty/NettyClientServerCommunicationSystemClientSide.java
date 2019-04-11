@@ -340,10 +340,8 @@ public class NettyClientServerCommunicationSystemClientSide extends SimpleChanne
                 quorum = (int) Math.ceil((controller.getCurrentViewN()) / 2) + 1;
         }
         
-        if (listener.waitForChannels(quorum) == -1) { // wait for the previous transmission to complete
-            return;
-        };
-        
+        listener.waitForChannels(quorum); // wait for the previous transmission to complete
+
         logger.info("Sending request from " + sm.getSender() + " with sequence number " + sm.getSequence() + " to " + Arrays.toString(targets));
                 
         if (sm.serializedMessage == null) {
@@ -557,7 +555,7 @@ public class NettyClientServerCommunicationSystemClientSide extends SimpleChanne
               
             }
             
-            public int waitForChannels(int n) {
+            public void waitForChannels(int n) {
                 
                 this.futureLock.lock();
                 if (this.remainingFutures > 0) {
@@ -568,17 +566,16 @@ public class NettyClientServerCommunicationSystemClientSide extends SimpleChanne
                         this.enoughCompleted.await(1000, TimeUnit.MILLISECONDS); // timeout if a malicous replica refuses to acknowledge the operation as completed
                     } catch (InterruptedException ex) {
                         logger.error("", ex);
-                        return -1;
+
                     }
                     
                 }
                 
-                    logger.info("(SyncListener.waitForChannels)  All channel operations completed or timed out");
+                logger.info("(SyncListener.waitForChannels)  All channel operations completed or timed out");
 
                 this.remainingFutures = n;
                 
                 this.futureLock.unlock();
-                return 0;
             }
             
         }

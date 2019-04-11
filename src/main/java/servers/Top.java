@@ -145,7 +145,12 @@ public class Top implements server {
         comm.join();
         logger.info("Starting AB");
         ABService.start();
-        Membership.start(); // Temporarily! Here we assume that everyone still correct
+        if (Membership.start() == -1) {
+            // Temporarily! Here we assume that everyone still correct
+            logger.info("Error while trying to connect");
+            shutdown();
+            System.exit(0);
+        }
         logger.info(format("Starting [%d] Toys" , workers));
         for (int i = 0 ; i < workers ; i++) {
             toys[i].start();

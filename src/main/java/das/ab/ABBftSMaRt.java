@@ -75,7 +75,7 @@ public class ABBftSMaRt extends DefaultSingleRecoverable {
                     break;
                 case BBC: addToBBCData(msg, msg.getM().getChannel());
                     break;
-                case START: handleStartMsg();
+                case START: handleStartMsg(msg);
                     break;
                 case NOT_MAPPED:
                     logger.error("Invalid type for RB message");
