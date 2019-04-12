@@ -44,7 +44,7 @@ public class JToy {
 
             int serverID = Integer.parseInt(argv[0]);
             Config.setConfig(config, serverID);
-            logger = org.apache.log4j.Logger.getLogger(Cli.class);
+            logger = org.apache.log4j.Logger.getLogger(JToy.class);
             type = argv[1];
             logger.debug("type is " + type);
             switch (type) {
@@ -66,10 +66,9 @@ public class JToy {
                 }
                 try {
                     parser.parse(getArgs(scan.next()));
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                } catch (Exception e) {
+                    logger.error(e);
+                    System.exit(0);
                 }
             }
 //        } catch (Exception ex) {

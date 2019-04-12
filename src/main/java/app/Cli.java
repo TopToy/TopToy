@@ -121,7 +121,7 @@ public class Cli {
                     DBUtils.shutdown();
                     DiskUtils.shutdown();
                     recorded.set(true);
-                    System.out.println("Goodbye :)");
+//                    System.out.println("Goodbye :)");
                     System.exit(0);
                     return;
                 }
