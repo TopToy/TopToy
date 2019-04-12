@@ -277,7 +277,8 @@ public abstract class DefaultRecoverable implements Recoverable, BatchExecutable
                     appExecuteBatch(commands, msgCtx, false);
                     
                 } catch (Exception e) {
-                    e.printStackTrace(System.err);
+//                    e.printStackTrace(System.err);
+                    logger.error(e);
                     if (e instanceof ArrayIndexOutOfBoundsException) {
                        logger.info("Last checkpoint, last das ID (CID): " + state.getLastCheckpointCID());
                         logger.info("Last CID: " + state.getLastCID());

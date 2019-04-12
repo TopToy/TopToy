@@ -272,10 +272,8 @@ public class Synchronizer {
                 catch_up(regency);
             }
 
-        } catch (IOException ex) {
-            ex.printStackTrace(System.err);
-        } catch (ClassNotFoundException ex) {
-            ex.printStackTrace(System.err);
+        } catch (IOException | ClassNotFoundException ex) {
+            logger.error(ex);
         }
 
     }

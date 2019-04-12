@@ -123,7 +123,8 @@ public class ServerCommunicationSystem extends Thread {
                     messageHandler.verifyPending();               
                 }
             } catch (InterruptedException e) {
-                e.printStackTrace(System.err);
+//                e.printStackTrace(System.err);
+                logger.error(e);
             }
         }
         logger.info("ServerCommunicationSystem stopped.");

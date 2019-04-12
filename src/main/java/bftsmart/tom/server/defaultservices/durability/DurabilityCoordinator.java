@@ -269,7 +269,8 @@ public abstract class DurabilityCoordinator implements Recoverable, BatchExecuta
                                         
 					appExecuteBatch(commands, msgCtx);
 				} catch (Exception e) {
-					e.printStackTrace(System.err);
+//					e.printStackTrace(System.err);
+					logger.error(e);
 				}
 
 			}
