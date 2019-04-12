@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
-sleep 1200
+sleep 600
 ./clean_machines.sh
