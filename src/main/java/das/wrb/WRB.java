@@ -110,6 +110,7 @@ public class WRB {
         currentTmo[channel] = tmo;
         pos.getAndIncrement();
         if (dec.fv) {
+            pos.getAndIncrement();
             optimialDec.getAndIncrement();
         }
         logger.debug(format("[#%d-C[%d]] bbc returned [%d] for [cidSeries=%d ; cid=%d]", id, channel, 1, cidSeries, cid));
