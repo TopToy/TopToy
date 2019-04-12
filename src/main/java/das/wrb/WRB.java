@@ -31,6 +31,9 @@ public class WRB {
     private static int[] currentTmo;
     private static AtomicInteger totalDeliveredTries = new AtomicInteger(0);
     private static AtomicInteger optimialDec = new AtomicInteger(0);
+    private static AtomicInteger pos = new AtomicInteger(0);
+    private static AtomicInteger neg = new AtomicInteger(0);
+
     private static WrbRpcs rpcs;
     private static CommLayer comm;
 
@@ -59,6 +62,14 @@ public class WRB {
 
     static public long getTotalDeliveredTries() {
         return totalDeliveredTries.get();
+    }
+
+    static public int getTotalPos() {
+        return pos.get();
+    }
+
+    static public int getTotalNeg() {
+        return neg.get();
     }
 
     static public long getOptimialDec() {
@@ -93,10 +104,12 @@ public class WRB {
         if (!dec.getDec()) {
             currentTmo[channel] += tmoInterval;
             logger.debug(format("[#%d-C[%d]] bbc returned [%d] for [cidSeries=%d ; cid=%d]", id, channel, 0, cidSeries, cid));
+            neg.getAndIncrement();
             return null;
         }
         currentTmo[channel] = tmo;
         if (dec.fv) {
+            pos.getAndIncrement();
             optimialDec.getAndIncrement();
         }
         logger.debug(format("[#%d-C[%d]] bbc returned [%d] for [cidSeries=%d ; cid=%d]", id, channel, 1, cidSeries, cid));

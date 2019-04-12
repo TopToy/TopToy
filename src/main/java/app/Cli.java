@@ -468,9 +468,8 @@ public class Cli {
                         JToy.type, String.valueOf(Config.getC()), String.valueOf(Config.getTMO()), String.valueOf(Config.getFastMode()),
                         String.valueOf(st.txSize), String.valueOf(Config.getMaxTransactionsInBlock()),
                         String.valueOf(st.txCount), String.valueOf(time), String.valueOf(thrp),
-//                        String.valueOf(st.totalDec), String.valueOf(st.optemisticDec), String.valueOf(opRate),
-                        String.valueOf(nob), String.valueOf(bps), String.valueOf(avgTxInBlock),String.valueOf(delaysAvgMs), String.valueOf(opRate),
-                        String.valueOf(eRate), String.valueOf(dRate), String.valueOf(st.syncEvents));
+                        String.valueOf(nob), String.valueOf(bps), String.valueOf(avgTxInBlock), String.valueOf(st.pos), String.valueOf(st.neg),
+                        String.valueOf(opRate), String.valueOf(st.syncEvents));
                 CSVUtils.writeLine(writer, row);
                 writer.flush();
                 writer.close();

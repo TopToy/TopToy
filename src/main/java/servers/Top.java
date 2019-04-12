@@ -114,6 +114,8 @@ public class Top implements server {
     public Statistics getStatistics() {
         sts.totalDec = WRB.getTotalDeliveredTries();
         sts.optemisticDec = WRB.getOptimialDec();
+        sts.pos = WRB.getTotalPos();
+        sts.neg = WRB.getTotalNeg();
         for (int i = 0 ; i < workers ; i++) {
             sts.syncEvents += toys[i].getSyncEvents();
         }
