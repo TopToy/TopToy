@@ -17,6 +17,7 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import proto.Types;
 import proto.blockchainServiceGrpc;
+import utils.DBUtils;
 
 import java.io.IOException;
 import java.util.*;
@@ -105,6 +106,8 @@ public class Top implements server {
         logger.info(format("[%d] has initiated WRB", id));
         new Membership(n);
         logger.info(format("[%d] has initiated Membership", id));
+        new DBUtils(workers);
+        logger.info(format("[%d] has initiated DB Utils", id));
 
     }
 
@@ -145,17 +148,12 @@ public class Top implements server {
         comm.join();
         logger.info("Starting AB");
         ABService.start();
-        if (Membership.start() == -1) {
+        if (Membership.start(id) == -1) {
             // Temporarily! Here we assume that everyone still correct
             logger.info("Error while trying to connect");
             shutdown();
             System.exit(0);
         }
-        logger.info(format("Starting [%d] Toys" , workers));
-        for (int i = 0 ; i < workers ; i++) {
-            toys[i].start();
-        }
-        sts.start = System.currentTimeMillis();
         logger.info("Everything is up and good");
 
     }
@@ -199,6 +197,8 @@ public class Top implements server {
             logger.error("", e);
         }
         up = true;
+        sts.start = System.currentTimeMillis();
+        logger.info("Start serving, everything looks good");
     }
 
     public Types.txID addTransaction(Types.Transaction tx) {
