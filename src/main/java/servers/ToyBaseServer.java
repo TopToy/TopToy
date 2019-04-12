@@ -133,6 +133,13 @@ public abstract class ToyBaseServer {
             txSize = StrictMath.max(0, Config.getTxSize() - bareTxSize);
         }
         currBLock = configureNewBlock();
+        try {
+            DBUtils.initTables(worker);
+        } catch (SQLException e) {
+            logger.error(format("[#%d-C[%d]] unable to start DBUtils", getID(), worker), e);
+            shutdown();
+        }
+        logger.info(format("[#%d-C[%d]] is up", getID(), worker));
         logger.info(format("Initiated ToyBaseServer: [id=%d; n=%d; f=%d; worker=%d]", id, n, f, worker));
     }
 
@@ -143,18 +150,6 @@ public abstract class ToyBaseServer {
     Block.Builder configureNewBlock() {
         return Block.newBuilder()
                 .setId(BlockID.newBuilder().setPid(getID()).setBid(++bid).build());
-    }
-
-    public void start() {
-
-        new DBUtils();
-        try {
-            DBUtils.initTables(worker);
-        } catch (SQLException e) {
-            logger.error(format("[#%d-C[%d]] unable to start DBUtils", getID(), worker), e);
-            shutdown();
-        }
-        logger.info(format("[#%d-C[%d]] is up", getID(), worker));
     }
 
 
