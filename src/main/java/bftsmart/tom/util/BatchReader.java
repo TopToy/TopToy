@@ -22,6 +22,8 @@ import java.util.Random;
 
 import bftsmart.reconfiguration.ServerViewController;
 import bftsmart.tom.core.messages.TOMMessage;
+import org.apache.log4j.Logger;
+
 
 /**
  * Batch format: N_MESSAGES(int) + N_MESSAGES*[MSGSIZE(int),MSG(byte)] +
@@ -29,7 +31,7 @@ import bftsmart.tom.core.messages.TOMMessage;
  *
  */
 public final class BatchReader {
-
+    private final static Logger logger = Logger.getLogger(BatchReader.class);
     private ByteBuffer proposalBuffer;
     private boolean useSignatures;
 
@@ -89,7 +91,8 @@ public final class BatchReader {
                 requests[i] = tm;
 
             } catch (Exception e) {
-                e.printStackTrace(System.out);
+//                e.printStackTrace(System.out);
+                logger.error(e);
             }
         }
         return requests;

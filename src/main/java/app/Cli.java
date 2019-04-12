@@ -475,7 +475,7 @@ public class Cli {
                 writer.flush();
                 writer.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error(e);
             }
 
         }
@@ -544,7 +544,7 @@ public class Cli {
             writer.flush();
             writer.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e);
         }
     }
 
@@ -595,7 +595,7 @@ public class Cli {
                 writer.flush();
                 writer.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error(e);
             }
         }
 

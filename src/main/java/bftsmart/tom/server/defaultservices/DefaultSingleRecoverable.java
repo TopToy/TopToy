@@ -222,7 +222,8 @@ public abstract class DefaultSingleRecoverable implements Recoverable, SingleExe
                     	appExecuteOrdered(cmds[i], msgCtxs[i]);
                     }
                 } catch (Exception e) {
-                    e.printStackTrace(System.err);
+//                    e.printStackTrace(System.err);
+                    logger.error(e);
                     if (e instanceof ArrayIndexOutOfBoundsException) {
                         logger.info("Last checkpoint, last das ID (CID): " + state.getLastCheckpointCID());
                         logger.info("Last CID: " + state.getLastCID());

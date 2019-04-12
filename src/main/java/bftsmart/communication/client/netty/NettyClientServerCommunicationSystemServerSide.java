@@ -172,7 +172,8 @@ public class NettyClientServerCommunicationSystemServerSide extends SimpleChanne
 		else if(cause instanceof ConnectException) {
 			logger.info("Impossible to connect to client.");
 		} else {
-			cause.printStackTrace(System.err);
+//			cause.printStackTrace(System.err);
+					logger.error(cause);
 		}
 	}
 

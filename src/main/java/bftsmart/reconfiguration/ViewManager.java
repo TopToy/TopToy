@@ -86,7 +86,8 @@ public class ViewManager {
             rd.close();
             return -1;
         } catch (Exception e) {
-            e.printStackTrace(System.out);
+//            e.printStackTrace(System.out);
+            logger.error(e);
             return -1;
         }
     }

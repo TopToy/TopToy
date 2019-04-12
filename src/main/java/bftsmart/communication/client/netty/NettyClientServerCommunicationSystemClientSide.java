@@ -148,14 +148,14 @@ public class NettyClientServerCommunicationSystemClientSide extends SimpleChanne
                         //What the fuck is this??? This is not possible!!!
                         logger.warn("Should fix the problem, and I think it has no other implications :-), "
                                         + "but we must make the servers store the view in a different place.");
-                } catch (InvalidKeyException ex) {
-                        ex.printStackTrace(System.err);
-                } catch (Exception ex){
-                        ex.printStackTrace(System.err);
+                } catch (Exception ex) {
+//                        ex.printStackTrace(System.err);
+                    logger.error(ex);
                 }
             }
         } catch (NoSuchAlgorithmException ex) {
-                ex.printStackTrace(System.err);
+//                ex.printStackTrace(System.err);
+            logger.error(ex);
         }
     }
 
@@ -238,7 +238,8 @@ public class NettyClientServerCommunicationSystemClientSide extends SimpleChanne
         } else {
             logger.info("Replica disconnected.");
         }
-        cause.printStackTrace();
+//        cause.printStackTrace();
+        logger.error(cause);
     }
 
     @Override
