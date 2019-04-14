@@ -28,7 +28,7 @@ public class WRB {
     private static int f;
     private static int tmo;
     private static int tmoInterval;
-    private static int[] currentTmo;
+    private static int[][] currentTmo;
     private static AtomicInteger totalDeliveredTries = new AtomicInteger(0);
     private static AtomicInteger optimialDec = new AtomicInteger(0);
     private static AtomicInteger pos = new AtomicInteger(0);
@@ -41,13 +41,16 @@ public class WRB {
                String serverCrt, String serverPrivKey, String caRoot, CommLayer comm) {
         WRB.tmo = tmo;
         WRB.tmoInterval = tmoInterval;
-        WRB.currentTmo = new int[workers];
+        WRB.currentTmo = new int[n][workers];
         WRB.f = f;
         WRB.n = n;
         WRB.id = id;
-        for (int i = 0 ; i < workers ; i++) {
-            WRB.currentTmo[i] = tmo;
+        for (int j = 0 ; j < n ; j++) {
+            for (int i = 0 ; i < workers ; i++) {
+                WRB.currentTmo[j][i] = tmo;
+            }
         }
+
         WRB.comm = comm;
         new Data(workers);
         WRB.rpcs = new WrbRpcs(id, workers, n, f, wrbCluster, serverCrt, serverPrivKey, caRoot);
@@ -98,16 +101,16 @@ public class WRB {
                 .setCid(cid)
                 .build();
 
-        preDeliverLogic(key, channel, cidSeries, cid);
+        preDeliverLogic(key, channel, cidSeries, cid, sender);
         BbcDecData dec = OBBC.propose(setFastBbcVote(key, channel, sender, cidSeries, cid, next), channel, height, sender);
 
         if (!dec.getDec()) {
-            currentTmo[channel] += tmoInterval;
+            currentTmo[sender][channel] += tmoInterval;
             logger.debug(format("[#%d-C[%d]] bbc returned [%d] for [cidSeries=%d ; cid=%d]", id, channel, 0, cidSeries, cid));
             neg.getAndIncrement();
             return null;
         }
-        currentTmo[channel] = tmo;
+        currentTmo[sender][channel] = tmo;
         pos.getAndIncrement();
         if (dec.fv) {
 //            pos.getAndIncrement();
@@ -118,8 +121,13 @@ public class WRB {
         return postDeliverLogic(key, channel, cidSeries, cid, sender, height);
     }
 
-    static private void preDeliverLogic(Meta key, int channel, int cidSeries, int cid) throws InterruptedException {
-        int realTmo = currentTmo[channel];
+    static private void preDeliverLogic(Meta key, int channel, int cidSeries, int cid, int sender) throws InterruptedException {
+        int realTmo = currentTmo[sender][channel];
+//        if (realTmo > tmo + 10*tmoInterval) {
+//            logger.info(format("[#%d-C[%d]] node [%d] is suspected, we will not wait for it [cidSeries=%d ; cid=%d]",
+//                    id, channel, sender, cidSeries, cid));
+//            return; // kind of reputation mechanism? it gives the node 10 tries before being excluded from proposing
+//        }
         long startTime = System.currentTimeMillis();
         synchronized (Data.pending[channel]) {
             while (realTmo > 0 && !Data.pending[channel].containsKey(key)) {

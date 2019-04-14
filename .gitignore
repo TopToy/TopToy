@@ -19,7 +19,6 @@ target/
 #bft-SMaRt
 *currentView
 
-Dockerfile
 
 bin*
 scripts/python/.idea*
