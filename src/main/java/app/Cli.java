@@ -453,7 +453,7 @@ public class Cli {
                 int thrp = ((int) (st.txCount / time)); // / 1000;
                 int bps = (int) (nob / time);
 //                int thrp = ((int) (txCount / time));
-                double opRate = ((double) st.optemisticDec) / ((double) st.totalDec);
+                double opRate = ((double) st.optemisticDec) / ((double) st.pos);
                 long delaysAvgMs = 0; //st.delaysSum / st.txCount;
                 int avgTxInBlock = 0;
                 if (nob > 0) {

@@ -90,6 +90,8 @@ run_remote_servers() {
         wait $pid
     done
     kill -9 $pwatch
+    ./clean_machines.sh
+    sleep 10
 
 }
 
@@ -323,17 +325,17 @@ collect_res_from_servers() {
         scp -o ConnectTimeout=30 -r ${s}:/tmp/JToy/logs/* $currOut/servers/logs  > /dev/null
         scp -o ConnectTimeout=30 -r ${s}:/tmp/JToy/res/* $currOut/servers/res  > /dev/null
     done
-
+#    ./extract_workers_logs.sh $currOut/servers/logs ${channels}
     for i in `seq 0 $((${#servers[@]} - 1))`; do
         echo "collecting results summery from server ${servers[$i]}"
         cat $currOut/servers/res/${i}/summery.csv >> $currOut/servers/res/summery.csv
-        cat $currOut/servers/res/${i}/sig_summery.csv >> $currOut/servers/res/sig_summery.csv
-        cat $currOut/servers/res/${i}/blocksStat.csv >> $currOut/servers/res/blocksStat_${channels}.csv
-        cat $currOut/servers/res/${i}/blocksStatSummery.csv >> $currOut/servers/res/blocksStatSummery.csv
+#        cat $currOut/servers/res/${i}/sig_summery.csv >> $currOut/servers/res/sig_summery.csv
+#        cat $currOut/servers/res/${i}/blocksStat.csv >> $currOut/servers/res/blocksStat_${channels}.csv
+#        cat $currOut/servers/res/${i}/blocksStatSummery.csv >> $currOut/servers/res/blocksStatSummery.csv
         rm -f $currOut/servers/res/${i}/summery.csv
-        rm -f $currOut/servers/res/${i}/sig_summery.csv
-        rm -f $currOut/servers/res/${i}/blocksStat.csv
-        rm -f $currOut/servers/res/${i}/blocksStatSummery.csv
+#        rm -f $currOut/servers/res/${i}/sig_summery.csv
+#        rm -f $currOut/servers/res/${i}/blocksStat.csv
+#        rm -f $currOut/servers/res/${i}/blocksStatSummery.csv
     done
 }
 
@@ -734,20 +736,20 @@ main_byz() {
 }
 
 test1() {
-for i in `seq 0 2`; do
-    main_no_failures 0 0 1 10 1 1 120
-done
+#for i in `seq 0 2`; do
+#    main_no_failures 0 0 1 10 1 1 60
+#done
+
+#for i in `seq 0 0`; do
+#    main_no_failures 0 0 1 10 1 10 60
+#done
 
 for i in `seq 0 2`; do
-    main_no_failures 0 0 1 10 1 10 120
-done
+    main_no_failures 512 1000 1 10 1 100 60
+#done
 
-for i in `seq 0 2`; do
-    main_no_failures 0 0 1 10 1 100 120
-done
-
-for i in `seq 0 2`; do
-    main_no_failures 0 0 1 10 1 1000 120
+#for i in `seq 0 2`; do
+    main_no_failures 512 1000 1 10 1 1000 60
 done
 }
 test1
