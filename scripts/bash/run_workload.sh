@@ -220,7 +220,7 @@ run_servers_instance_with_tmo() {
 
 print_headers() {
     local currOut=${1}
-    echo "valid,ts,id,type,channels,tmo,fm,txSize,txInBlock,txTotal,duration,txPsec,blocksNum,bps,avgTxInBlock,pos,neg,opRate,syncEvents" >> $currOut/servers/res/summery.csv
+    echo "valid,ts,id,type,workers,tmo,txSize,txInBlock,txTotal,duration,tps,nob,bps,avgTxInBlock,opt,opRate,pos,posRate,neg,negRate,ATDT,APDT,T,P,syncEvents" >> $currOut/servers/res/summery.csv
     echo "id,type,channels,txSize,maxTxInBlock,signaturePeriod,verificationPeriod,propose2tentative,tentative2permanent,channelPermanent2decide,propose2permanentchannel,propose2decide" >> $currOut/servers/res/blocksStatSummery.csv
     echo "channels,txInBlock,ts,id,txSize,txCount,clientLatency,serverLatency,clientOnly" >> ${currOut}/clients/res/summery.csv
 }

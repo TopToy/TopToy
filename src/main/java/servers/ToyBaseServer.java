@@ -28,11 +28,13 @@ import static blockchain.Utils.*;
 import static blockchain.data.BCS.bcs;
 import static java.lang.Math.max;
 import static java.lang.String.format;
+import static utils.Statistics.*;
+
 import proto.Types.*;
 
 public abstract class ToyBaseServer {
-
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ToyBaseServer.class);
+
 //    WrbNode wrbServer;
     int id;
     final Blockchain bc;
@@ -53,21 +55,21 @@ public abstract class ToyBaseServer {
     boolean fastMode;
     int worker;
     private boolean testing = Config.getTesting();
-    private int txPoolMax = 100000;
-    private int bareTxSize = Transaction.newBuilder()
-            .setClientID(0)
-            .setId(txID.newBuilder().setProposerID(0).setTxNum(0).build())
-            .build().getSerializedSize() + 8;
+    private int txPoolMax = 10000;
+//    private int bareTxSize = Transaction.newBuilder()
+//            .setClientID(0)
+//            .setId(txID.newBuilder().setProposerID(0).setTxNum(0).build())
+//            .build().getSerializedSize() + 8;
     private int txSize = 0;
     private int cID = new Random().nextInt(10000);
     Path sPath;
 //    private ExecutorService storageWorker = Executors.newSingleThreadExecutor();
-    private int syncEvents = 0;
+//    private int syncEvents = 0;
     private int bid = 0;
-    final Queue<Block> blocksForPropose = new LinkedList<>();
-    final Queue<Block> proposedBlocks = new LinkedList<>();
-    Block.Builder currBLock;
-    final Object cbl = new Object();
+    private final Queue<Block> blocksForPropose = new LinkedList<>();
+    private final Queue<Block> proposedBlocks = new LinkedList<>();
+    private Block.Builder currBLock;
+    private final Object cbl = new Object();
     private CacheUtils txCache = new CacheUtils(0);
     private boolean intCatched = false;
     CommLayer comm;
@@ -130,7 +132,7 @@ public abstract class ToyBaseServer {
 //        wrbServer = wrb;
         currLeader = worker % n;
         if (testing) {
-            txSize = StrictMath.max(0, Config.getTxSize() - bareTxSize);
+            txSize = StrictMath.max(0, Config.getTxSize());
         }
         currBLock = configureNewBlock();
         try {
@@ -308,6 +310,8 @@ public abstract class ToyBaseServer {
                 return true;
             }
             recBlock = recBlock.toBuilder().setHeader(recHeader).build();
+            updateHeaderTD(recHeader, worker);
+            updateT(worker);
             removeFromPendings(recHeader, recBlock);
 
             if (!bc.validateBlockHash(recBlock)) {
@@ -317,31 +321,39 @@ public abstract class ToyBaseServer {
             }
 
             synchronized (newBlockNotifyer) {
-                recBlock = recBlock
-                        .toBuilder()
-                        .setSt(recBlock.getSt()
-                                .toBuilder()
-                                .setChannelDecided(System.currentTimeMillis()))
-                        .build();
+//                recBlock = recBlock
+//                        .toBuilder()
+//                        .setSt(recBlock.getSt()
+//                                .toBuilder()
+//                                .setChannelDecided(System.currentTimeMillis()))
+//                        .build();
 
                 bc.addBlock(recBlock);
 
                 if (recBlock.getHeader().getHeight() - (f + 2) > 0) {
                     Block permanent = bc.getBlock(recBlock.getHeader().getHeight() - (f + 2));
-                    permanent = permanent.toBuilder().setSt(permanent.getSt().toBuilder().setPd(System.currentTimeMillis())).build();
-                    try {
-                        bc.setBlock(recBlock.getHeader().getHeight() - (f + 2), permanent);
-//                        if (permanent.getHeader().getHeight() % 100 == 0) {
-                            logger.info(format("[#%d-C[%d]] Deliverd [[height=%d], [sender=%d], [channel=%d], [size=%d]]",
-                                    getID(), worker, permanent.getHeader().getHeight(), permanent.getHeader().getBid().getPid(),
-                                    permanent.getHeader().getM().getChannel(),
-                                    permanent.getDataCount()));
-//                        }
-
-                    } catch (IOException e) {
-                        logger.error(String.format("[#%d-C[%d]] unable to record permanent time for block [height=%d] [cidSeries=%d ; cid=%d] [size=%d]",
-                                getID(), worker, recBlock.getHeader().getHeight(), cidSeries, cid, recBlock.getDataCount()));
-                    }
+                    updateTxCount(worker, permanent.getDataCount());
+                    updateHeaderPD(permanent.getHeader(), worker);
+                    updateHeaderStatus(permanent.getHeader(), worker);
+                    updateP(worker);
+                    logger.info(format("[#%d-C[%d]] Deliverd [[height=%d], [sender=%d], [channel=%d], [size=%d]]",
+                            getID(), worker, permanent.getHeader().getHeight(), permanent.getHeader().getBid().getPid(),
+                            permanent.getHeader().getM().getChannel(),
+                            permanent.getDataCount()));
+//                    permanent = permanent.toBuilder().setSt(permanent.getSt().toBuilder().setPd(System.currentTimeMillis())).build();
+//                    try {
+//                        bc.setBlock(recBlock.getHeader().getHeight() - (f + 2), permanent);
+////                        if (permanent.getHeader().getHeight() % 100 == 0) {
+//                            logger.info(format("[#%d-C[%d]] Deliverd [[height=%d], [sender=%d], [channel=%d], [size=%d]]",
+//                                    getID(), worker, permanent.getHeader().getHeight(), permanent.getHeader().getBid().getPid(),
+//                                    permanent.getHeader().getM().getChannel(),
+//                                    permanent.getDataCount()));
+////                        }
+//
+//                    } catch (IOException e) {
+//                        logger.error(String.format("[#%d-C[%d]] unable to record permanent time for block [height=%d] [cidSeries=%d ; cid=%d] [size=%d]",
+//                                getID(), worker, recBlock.getHeader().getHeight(), cidSeries, cid, recBlock.getDataCount()));
+//                    }
                     DBUtils.writeBlockToTable(permanent);
                     Data.evacuateOldData(worker, permanent.getHeader().getM());
                     communication.data.Data.evacuateOldData(worker, permanent.getId());
@@ -546,7 +558,7 @@ public abstract class ToyBaseServer {
                 fp.put(forkPoint, false);
             }
 
-            syncEvents++;
+            updateSyncEvents(worker);
             sync(forkPoint);
 
         }
@@ -595,9 +607,9 @@ public abstract class ToyBaseServer {
         return max(bc.getHeight() - (f + 2), 0);
     }
 
-    public int getSyncEvents() {
-        return syncEvents;
-    }
+//    public int getSyncEvents() {
+//        return syncEvents;
+//    }
     private void disseminateChainVersion(int forkPoint) {
         subChainVersion.Builder sv = subChainVersion.newBuilder();
         if (currHeight < forkPoint - 1) {

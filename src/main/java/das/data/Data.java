@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import static blockchain.Utils.validateBlockHash;
 import static blockchain.data.BCS.bcs;
 import static java.lang.String.format;
+import static utils.Statistics.updateHeaderProposed;
 
 public class Data {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Data.class);
@@ -76,7 +77,7 @@ public class Data {
 
     }
     static public void addToPendings(Types.BlockHeader request, Types.Meta key) {
-        int channel = key.getChannel();
+        int worker = key.getChannel();
         int height = request.getHeight();
         if (!blockDigSig.verifyHeader(request.getBid().getPid(), request)) {
             logger.debug(format("invalid pgb message [w=%d ; cidSeries=%d ; cid=%d ; sender=%d, height=%b]",
@@ -85,10 +86,11 @@ public class Data {
 
             return;
         }
-        if (bcs[channel].contains(height)) return;
-        synchronized (pending[channel]) {
-            pending[channel].putIfAbsent(key, request);
-            pending[channel].notify();
+        if (bcs[worker].contains(height)) return;
+        updateHeaderProposed(request, worker);
+        synchronized (pending[worker]) {
+            pending[worker].putIfAbsent(key, request);
+            pending[worker].notify();
         }
     }
 

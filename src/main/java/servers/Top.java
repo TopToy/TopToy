@@ -3,7 +3,6 @@ package servers;
 import blockchain.data.BCS;
 import communication.CommLayer;
 import communication.overlays.clique.Clique;
-import config.Config;
 import config.Node;
 import das.ab.ABService;
 import das.bbc.BBC;
@@ -18,6 +17,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import proto.Types;
 import proto.blockchainServiceGrpc;
 import utils.DBUtils;
+import utils.Statistics;
 
 import java.io.IOException;
 import java.util.*;
@@ -26,8 +26,11 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicBoolean;
 import static java.lang.Math.min;
 import static java.lang.String.format;
+import static utils.Statistics.updateStart;
+import static utils.Statistics.updateStop;
 
 public class Top implements server {
+
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Top.class);
     boolean up = false;
 
@@ -39,7 +42,6 @@ public class Top implements server {
     private int workers;
     private String type;
     private AtomicBoolean stopped = new AtomicBoolean(false);
-    private Statistics sts = new Statistics();
     private int maxTx;
     private Server txsServer;
     private ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(1);
@@ -108,31 +110,10 @@ public class Top implements server {
         logger.info(format("[%d] has initiated Membership", id));
         new DBUtils(workers);
         logger.info(format("[%d] has initiated DB Utils", id));
+        new Statistics(workers);
 
     }
 
-    public Statistics getStatistics() {
-        sts.totalDec = WRB.getTotalDeliveredTries();
-        sts.optemisticDec = WRB.getOptimialDec();
-        sts.pos = WRB.getTotalPos();
-        sts.neg = WRB.getTotalNeg();
-        for (int i = 0 ; i < workers ; i++) {
-            sts.syncEvents += toys[i].getSyncEvents();
-        }
-        long txAll = 0;
-        for (int i = 0 ; i < getBCSize() ; i++) {
-            Types.Block b = nonBlockingDeliver(i);
-            sts.txCount += b.getDataCount();
-            for (Types.Transaction t : b.getDataList()) {
-                txAll += t.getData().size();
-
-            }
-        }
-        if (sts.txCount > 0) {
-            sts.txSize = (int) (txAll / (long) sts.txCount);
-        }
-        return sts;
-    }
 
     public void start() {
 //        if (id == 0) {
@@ -161,7 +142,7 @@ public class Top implements server {
     }
 
     public void shutdown() {
-        sts.stop = System.currentTimeMillis();
+        updateStop();
         txsServer.shutdown();
         logger.info("shutdown txsServer");
         for (int i = 0 ; i < workers ; i++) {
@@ -199,7 +180,7 @@ public class Top implements server {
             logger.error("", e);
         }
         up = true;
-        sts.start = System.currentTimeMillis();
+        updateStart();
         logger.info("Start serving, everything looks good");
     }
 
