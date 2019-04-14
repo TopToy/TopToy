@@ -123,11 +123,11 @@ public class WRB {
 
     static private void preDeliverLogic(Meta key, int channel, int cidSeries, int cid, int sender) throws InterruptedException {
         int realTmo = currentTmo[sender][channel];
-//        if (realTmo > tmo + 10*tmoInterval) {
-//            logger.info(format("[#%d-C[%d]] node [%d] is suspected, we will not wait for it [cidSeries=%d ; cid=%d]",
-//                    id, channel, sender, cidSeries, cid));
-//            return; // kind of reputation mechanism? it gives the node 10 tries before being excluded from proposing
-//        }
+        if (realTmo > tmo + 10*tmoInterval) {
+            logger.info(format("[#%d-C[%d]] node [%d] is suspected, we will not wait for it [cidSeries=%d ; cid=%d]",
+                    id, channel, sender, cidSeries, cid));
+            return; // kind of reputation mechanism? it gives the node 10 tries before being excluded from proposing
+        }
         long startTime = System.currentTimeMillis();
         synchronized (Data.pending[channel]) {
             while (realTmo > 0 && !Data.pending[channel].containsKey(key)) {
