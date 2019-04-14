@@ -141,7 +141,7 @@ public abstract class ToyBaseServer {
             logger.error(format("[#%d-C[%d]] unable to start DBUtils", getID(), worker), e);
             shutdown();
         }
-        logger.info(format("[#%d-C[%d]] is up", getID(), worker));
+//        logger.info(format("[#%d-C[%d]] is up", getID(), worker));
         logger.info(format("Initiated ToyBaseServer: [id=%d; n=%d; f=%d; worker=%d]", id, n, f, worker));
     }
 
