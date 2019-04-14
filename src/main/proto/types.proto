@@ -41,21 +41,17 @@ message BbcMsg {
     int32 sender = 5;
 }
 
-message blockStatistics {
-//    int64 created = 1; // creation ts
-    int64 sign = 2; // the time that signature took
-    int64 proposed = 3; // propose ts
-    int64 verified = 4; // verification time
-    int64 channelDecided = 5; // tentative decision
-    int64 pd = 6; // permanent decision
-    int64 decided = 7; // decision ts
+message HeaderStatistics {
+    int64 proposed = 1; // propose ts
+    int64 TD = 2; // tentative decision
+    int64 PD = 3; // permanent decision
 }
 
 message Block {
     BlockHeader header = 1;
     BlockID id = 2;
     repeated Transaction data = 3;
-    blockStatistics st = 4;
+//    blockStatistics st = 4;
 }
 
 message Comm {
@@ -89,7 +85,7 @@ message accepted {
 
 message approved {
     Transaction tx = 1;
-    blockStatistics st = 3;
+//    blockStatistics st = 3;
 }
 
 message read {

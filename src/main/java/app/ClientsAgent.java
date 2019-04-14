@@ -94,7 +94,7 @@ public class ClientsAgent {
 //                            logger.info(format("read message took [%d]", System.currentTimeMillis() - start));
                             if (stopped.get()) break;
                             synchronized (st) {
-                                approved.add(collectSummery(st, app));
+//                                approved.add(collectSummery(st, app));
                             }
 //                            sent.getAndIncrement();
 //                            submitted.put(cl.getID(), ret.getTxID());
@@ -135,14 +135,14 @@ public class ClientsAgent {
     }
 
 
-    static Types.approved collectSummery(Stat st, Types.approved app) {
-        long ts = System.currentTimeMillis();
-        st.txCount++;
-        st.diff += ts - app.getTx().getClientTs();
-        st.diffServer += app.getSt().getDecided() - app.getTx().getServerTs();
-        st.txSize = app.getTx().getSerializedSize();
-        return app.toBuilder().setSt(app.getSt().toBuilder().setSign(ts)).build(); // We save here the client delivery time
-    }
+//    static Types.approved collectSummery(Stat st, Types.approved app) {
+//        long ts = System.currentTimeMillis();
+//        st.txCount++;
+//        st.diff += ts - app.getTx().getClientTs();
+//        st.diffServer += app.getSt().getDecided() - app.getTx().getServerTs();
+//        st.txSize = app.getTx().getSerializedSize();
+//        return app.toBuilder().setSt(app.getSt().toBuilder().setSign(ts)).build(); // We save here the client delivery time
+//    }
 
     static void writeSummery(String pathString, int agentID, Stat st) throws IOException {
         Path path = Paths.get(pathString,   String.valueOf(agentID), "summery.csv");
@@ -178,14 +178,14 @@ public class ClientsAgent {
         }
         FileWriter writer = new FileWriter(path.toString(), true);
         DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy-HH:mm:ss");
-        for (Types.approved app : approveds) {
-            Types.blockStatistics bst = app.getSt();
-            List<String> row = Arrays.asList(dateFormat.format(new Date()), String.valueOf(agentID)
-                    ,String.valueOf(st.txSize), String.valueOf(bst.getSign() - app.getTx().getClientTs()),
-                    String.valueOf(bst.getDecided() - app.getTx().getServerTs()),
-                    String.valueOf((bst.getSign() - app.getTx().getClientTs()) - (bst.getDecided() - app.getTx().getServerTs())));
-            CSVUtils.writeLine(writer, row);
-        }
+//        for (Types.approved app : approveds) {
+//            Types.blockStatistics bst = app.getSt();
+//            List<String> row = Arrays.asList(dateFormat.format(new Date()), String.valueOf(agentID)
+//                    ,String.valueOf(st.txSize), String.valueOf(bst.getSign() - app.getTx().getClientTs()),
+//                    String.valueOf(bst.getDecided() - app.getTx().getServerTs()),
+//                    String.valueOf((bst.getSign() - app.getTx().getClientTs()) - (bst.getDecided() - app.getTx().getServerTs())));
+//            CSVUtils.writeLine(writer, row);
+//        }
         writer.flush();
         writer.close();
     }

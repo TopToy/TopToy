@@ -1,6 +1,7 @@
 package servers;
 
 import proto.Types;
+import utils.Statistics;
 
 import java.util.List;
 
@@ -15,7 +16,6 @@ public interface server {
     Types.Block nonBlockingDeliver(int index);
     void setByzSetting(boolean fullByz, List<List<Integer>> groups);
     void setAsyncParam(int time);
-    Statistics getStatistics();
     boolean isValid();
 
 }
