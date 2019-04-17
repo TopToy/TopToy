@@ -3,7 +3,7 @@
 folder=${1}
 workers=${2}
 
-readarray -t logs <<< `find ${folder} -name "*.log" -not -name "*.err.log"`
+readarray -t logs <<< `find ${folder} -name "*.log*" -not -name "*.err.log"`
 
 for log in "${logs[@]}"; do
     d_name=$(dirname "$log")

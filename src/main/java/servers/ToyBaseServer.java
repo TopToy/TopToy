@@ -21,6 +21,7 @@ import java.nio.file.Paths;
 import java.security.SecureRandom;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
@@ -74,10 +75,12 @@ public abstract class ToyBaseServer {
     private boolean intCatched = false;
     CommLayer comm;
     private Validator v = new Tvalidator();
+    CountDownLatch startLatch = new CountDownLatch(3);
 
     void initThreads() {
         mainThread = new Thread(this::intMain);
         panicThread = new Thread(() -> {
+            startLatch.countDown();
             try {
                 mainFork();
             } catch (InterruptedException | IOException e) {
@@ -85,6 +88,7 @@ public abstract class ToyBaseServer {
             }
         });
         commSendThread = new Thread(() -> {
+            startLatch.countDown();
             try {
                 commSendLogic();
             } catch (InterruptedException e) {
@@ -155,16 +159,17 @@ public abstract class ToyBaseServer {
     }
 
 
-    public void serve() {
+    public void serve() throws InterruptedException {
         commSendThread.start();
-        while (commSendThread.getState() != Thread.State.RUNNABLE);
+//        while (commSendThread.getState() != Thread.State.RUNNABLE);
         logger.debug(format("[#%d-C[%d]] starts commSendThread thread", getID(), worker));
         panicThread.start();
-        while (panicThread.getState() != Thread.State.RUNNABLE);
+//        while (panicThread.getState() != Thread.State.RUNNABLE);
         logger.debug(format("[#%d-C[%d]] starts panic thread", getID(), worker));
         mainThread.start();
-        while (mainThread.getState() != Thread.State.RUNNABLE);
+//        while (mainThread.getState() != Thread.State.RUNNABLE);
         logger.debug(format("[#%d-C[%d]] starts main thread", getID(), worker));
+        startLatch.await();
         logger.info(format("[#%d-C[%d]] starts serving", getID(), worker));
     }
 
@@ -173,13 +178,13 @@ public abstract class ToyBaseServer {
 //        storageWorker.shutdownNow();
 
         try {
-            logger.debug(format("[#%d-C[%d]] interrupt main thread", getID(), worker));
+            logger.info(format("[#%d-C[%d]] interrupt main thread", getID(), worker));
             mainThread.interrupt();
             mainThread.join();
-            logger.debug(format("[#%d-C[%d]] interrupt panic thread", getID(), worker));
+            logger.info(format("[#%d-C[%d]] interrupt panic thread", getID(), worker));
             panicThread.interrupt();
             panicThread.join();
-            logger.debug(format("[#%d-C[%d]] interrupt commSendThread thread", getID(), worker));
+            logger.info(format("[#%d-C[%d]] interrupt commSendThread thread", getID(), worker));
             commSendThread.interrupt();
             commSendThread.join();
         } catch (InterruptedException e) {
@@ -211,6 +216,7 @@ public abstract class ToyBaseServer {
     }
 
     private void intMain() {
+        startLatch.countDown();
         if (mainLoop()) {
             synchronized (fp) {
                 intCatched = true;
@@ -253,11 +259,11 @@ public abstract class ToyBaseServer {
     }
 
     private boolean mainLoop() {
-        if (testing) {
-            for (int i = 0 ; i < 10 ; i++) {
-                addTransactionsToCurrBlock();
-            }
-        }
+//        if (testing) {
+//            for (int i = 0 ; i < 10 ; i++) {
+//                addTransactionsToCurrBlock();
+//            }
+//        }
         while (!stopped.get()) {
             if (Thread.interrupted()) return true;
             checkSyncEvent();
@@ -268,7 +274,7 @@ public abstract class ToyBaseServer {
                 fastMode = false;
                 cid += 2; // I think we have no reason to increase CID.
             }
-            long start = System.currentTimeMillis();
+//            long start = System.currentTimeMillis();
             BlockHeader next; // = leaderImpl();
             try {
                 next = leaderImpl();
@@ -283,11 +289,11 @@ public abstract class ToyBaseServer {
             try {
                 long startTime = System.currentTimeMillis();
                 recHeader = WRB.WRBDeliver(worker, cidSeries, cid, currLeader, currHeight, next);
-                logger.debug(format("[#%d-C[%d]] deliver took about [%d] ms [cidSeries=%d ; cid=%d]",
-                        getID(), worker, System.currentTimeMillis() - startTime, cidSeries, cid));
+                logger.info(format("[#%d-C[%d]] WRB deliver took about [%d] ms [cidSeries=%d ; cid=%d ; height=%d]",
+                        getID(), worker, System.currentTimeMillis() - startTime, cidSeries, cid, currHeight));
 
             } catch (InterruptedException e) {
-                logger.debug(format("[#%d-C[%d]] main thread has been interrupted on wrb deliver " +
+                logger.info(format("[#%d-C[%d]] main thread has been interrupted on wrb deliver " +
                                 "[height=%d, cidSeries=%d ; cid=%d]",
                         getID(), worker, currHeight, cidSeries, cid));
                 return true;
@@ -304,7 +310,7 @@ public abstract class ToyBaseServer {
             try {
                 recBlock = getBlockWRTheader(recHeader, worker);
             } catch (InterruptedException e) {
-                logger.debug(format("[#%d-C[%d]] main thread has been interrupted on block deliver " +
+                logger.info(format("[#%d-C[%d]] main thread has been interrupted on block deliver " +
                                 "[height=%d, cidSeries=%d ; cid=%d]",
                         getID(), worker, currHeight, cidSeries, cid));
                 return true;

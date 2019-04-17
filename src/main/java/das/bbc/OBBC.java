@@ -14,6 +14,7 @@ import das.data.VoteData;
 import io.grpc.*;
 import proto.ObbcGrpc;
 import proto.Types;
+import utils.Statistics;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -59,12 +60,13 @@ public class OBBC extends ObbcGrpc.ObbcImplBase  {
         }
 
         if (bbcFastDec[worker].get(key).getDec()) {
-            logger.debug(format("decided [1] by fast vote [w=%d ; cidSereis=%d ; cid=%d ; height=%d]", worker, key.getCidSeries(), key.getCid(), height));
+            logger.debug(format("C[%d] decided [1] by fast vote [cidSereis=%d ; cid=%d ; height=%d]", worker, key.getCidSeries(), key.getCid(), height));
             return bbcFastDec[worker].get(key);
         }
-
+        long start = System.currentTimeMillis();
+        logger.info(format("C[%d] unable to decide fast, start full BBC phase [cidSeries=%d ; cid=%d ; height=%d", worker, key.getCidSeries(), key.getCid(), height));
         pending[worker].computeIfAbsent(key, k -> {
-            logger.debug(format("broadcast evidence request [w=%d ; cidSeries=%d ; cid=%d ; height=%d]", worker, key.getCidSeries(), key.getCid(), height));
+            logger.debug(format("C[%d] broadcast evidence request [cidSeries=%d ; cid=%d ; height=%d]", worker, key.getCidSeries(), key.getCid(), height));
             rpcs.broadcastEvidenceReq(Types.EvidenceReq.newBuilder()
                     .setHeight(height)
                     .setMeta(key)
@@ -90,12 +92,17 @@ public class OBBC extends ObbcGrpc.ObbcImplBase  {
 
         }
 
-        return BBC.propose(Types.BbcMsg.newBuilder()
+        BbcDecData dec = BBC.propose(Types.BbcMsg.newBuilder()
                 .setM(key)
                 .setVote(vote)
                 .setHeight(height)
                 .setSender(id)
                 .build(), key);
+        if (!dec.getDec()) {
+            Statistics.updateNegTime(worker, System.currentTimeMillis() - start);
+        }
+
+        return dec;
     }
     
     static void reCons(Types.Meta key, int id, int height) {
@@ -103,7 +110,7 @@ public class OBBC extends ObbcGrpc.ObbcImplBase  {
         bbcFastDec[worker].computeIfPresent(key, (k1, v1) -> {
             if (v1.getDec()) {
                 bbcVotes[worker].computeIfAbsent(key, k2 -> {
-                    logger.debug(format("[#%d-C[%d]] (reCons) found that a full bbc initialized, thus propose [cidSeries=%d ; cid=%d]",
+                    logger.info(format("[#%d-C[%d]] (reCons) found that a full bbc initialized, thus propose [cidSeries=%d ; cid=%d]",
                              id, worker, key.getCidSeries(),  key.getCid()));
                     BBC.nonBlockingPropose(Types.BbcMsg.newBuilder()
                             .setM(key)
@@ -117,7 +124,7 @@ public class OBBC extends ObbcGrpc.ObbcImplBase  {
         });
         bbcFastDec[worker].computeIfAbsent(key, k -> {
             if (bcs[worker].contains(height)) {
-                logger.debug(format("[#%d-C[%d]] (reCons) found that a full bbc initialized and a block is exist, " +
+                logger.info(format("[#%d-C[%d]] (reCons) found that a full bbc initialized and a block is exist, " +
                                 "thus propose [cidSeries=%d ; cid=%d; height=%d]",
                         id, worker, key.getCidSeries(),  key.getCid(), height));
                 BBC.nonBlockingPropose(Types.BbcMsg.newBuilder()

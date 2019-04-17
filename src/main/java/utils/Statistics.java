@@ -10,16 +10,18 @@ public class Statistics {
     // Note that due to late nodes this list may grow infinitely. Currently we assume that this is an uncommon case.
     private ConcurrentHashMap<Types.BlockHeader, Types.HeaderStatistics> headerStats;
 
-    private AtomicInteger txCount;
-    private AtomicInteger totalDec;
-    private AtomicInteger optimisticDec;
-    private AtomicInteger syncEvents;
-    private AtomicInteger pos;
-    private AtomicInteger neg;
-    private AtomicLong headerTotalTD;
-    private AtomicLong headersTotalPD;
-    private AtomicInteger totalT;
-    private AtomicInteger totalP;
+    private int txCount; //AtomicInteger txCount;
+    private int totalDec; // AtomicInteger totalDec;
+    private int optimisticDec; //AtomicInteger optimisticDec;
+    private int syncEvents; //AtomicInteger syncEvents;
+    private int pos; //AtomicInteger pos;
+    private int neg; //AtomicInteger neg;
+    private long headerTotalTD; //AtomicLong headerTotalTD;
+    private long headersTotalPD; //AtomicLong headersTotalPD;
+    private int totalT; //AtomicInteger totalT;
+    private int totalP; //AtomicInteger totalP;
+    private long totalNegDecTime; //AtomicLong totalNegDecTime;
+    private int avgTmo;
 
     static private Statistics[] sworkers;
     static private long start;
@@ -28,16 +30,18 @@ public class Statistics {
 
     public Statistics() {
         headerStats = new ConcurrentHashMap<>();
-        txCount = new AtomicInteger(0);
-        totalDec = new AtomicInteger(0);
-        optimisticDec = new AtomicInteger(0);
-        syncEvents = new AtomicInteger(0);
-        pos = new AtomicInteger(0);
-        neg = new AtomicInteger(0);
-        headerTotalTD = new AtomicLong(0);
-        headersTotalPD = new AtomicLong(0);
-        totalT = new AtomicInteger(0);
-        totalP = new AtomicInteger(0);
+        txCount = 0; //new AtomicInteger(0);
+        totalDec = 0; // new AtomicInteger(0);
+        optimisticDec = 0; //new AtomicInteger(0);
+        syncEvents = 0; //new AtomicInteger(0);
+        pos = 0; //new AtomicInteger(0);
+        neg = 0; //new AtomicInteger(0);
+        headerTotalTD = 0; //new AtomicLong(0);
+        headersTotalPD = 0; //new AtomicLong(0);
+        totalT = 0; //new AtomicInteger(0);
+        totalP = 0; //new AtomicInteger(0);
+        totalNegDecTime = 0; //new AtomicLong(0);
+        avgTmo = 0;
     }
 
     public Statistics(int workers) {
@@ -52,23 +56,30 @@ public class Statistics {
 
     static public void updateHeaderProposed(Types.BlockHeader h, int worker) {
         sworkers[worker].headerStats.putIfAbsent(h, Types.HeaderStatistics.newBuilder().setProposed(System.currentTimeMillis()).build());
+//        sworkers.get(worker).headerStats.putIfAbsent(h, Types.HeaderStatistics.newBuilder().setProposed(System.currentTimeMillis()).build());
     }
 
     static public void updateHeaderTD(Types.BlockHeader h, int worker) {
-        if (!sworkers[worker].headerStats.containsKey(h)) return;
-        sworkers[worker].headerStats.computeIfPresent(h, (k, v) -> v.toBuilder().setTD(System.currentTimeMillis() - v.getProposed()).build());
+        sworkers[worker].headerStats.computeIfPresent(h, (k, v1) -> v1.toBuilder().setTD(System.currentTimeMillis() - v1.getProposed()).build());
+//        if (!sworkers.get(worker).headerStats.containsKey(h)) return;
+//        sworkers.get(worker).headerStats.computeIfPresent(h, (k, v) -> v.toBuilder().setTD(System.currentTimeMillis() - v.getProposed()).build());
     }
 
     static public void updateHeaderPD(Types.BlockHeader h, int worker) {
-        if (!sworkers[worker].headerStats.containsKey(h)) return;
-        sworkers[worker].headerStats.computeIfPresent(h, (k, v) -> v.toBuilder().setPD(System.currentTimeMillis() - v.getProposed()).build());
+        sworkers[worker].headerStats.computeIfPresent(h, (k, v1) -> v1.toBuilder().setPD(System.currentTimeMillis() - v1.getProposed()).build());
+//        if (!sworkers.get(worker).headerStats.containsKey(h)) return;
+//        sworkers.get(worker).headerStats.computeIfPresent(h, (k, v) -> v.toBuilder().setPD(System.currentTimeMillis() - v.getProposed()).build());
     }
 
     static public void updateHeaderStatus(Types.BlockHeader h, int worker) {
         if (!sworkers[worker].headerStats.containsKey(h)) return;
-        sworkers[worker].headerTotalTD.getAndAdd(sworkers[worker].headerStats.get(h).getTD());
-        sworkers[worker].headersTotalPD.getAndAdd(sworkers[worker].headerStats.get(h).getPD());
+        sworkers[worker].headerTotalTD += sworkers[worker].headerStats.get(h).getTD();
+        sworkers[worker].headerTotalTD += sworkers[worker].headerStats.get(h).getPD();
         sworkers[worker].headerStats.remove(h);
+//        if (!sworkers.get(worker).headerStats.containsKey(h)) return;
+//        sworkers.get(worker).headerTotalTD += sworkers.get(worker).headerStats.get(h).getTD(); //.getAndAdd(sworkers[worker].headerStats.get(h).getTD());
+//        sworkers.get(worker).headersTotalPD += sworkers.get(worker).headerStats.get(h).getPD(); //.getAndAdd(sworkers[worker].headerStats.get(h).getPD());
+//        sworkers.get(worker).headerStats.remove(h);
     }
 
     static public void updateStart() {
@@ -80,35 +91,83 @@ public class Statistics {
     }
 
     static public void updateTxCount(int worker, int count) {
-        sworkers[worker].txCount.getAndAdd(count);
+        sworkers[worker].txCount += count;
+//        sworkers.computeIfPresent(worker, (w,v) ->{
+//            v.txCount += count;
+//            return v;
+//        });
     }
 
     static public void updateTotalDec(int worker) {
-        sworkers[worker].totalDec.getAndIncrement();
+        sworkers[worker].totalDec++;
+//        sworkers.computeIfPresent(worker, (w,v) ->{
+//            v.totalDec++;
+//            return v;
+//        });
     }
 
     static public void updateOptimisitcDec(int worker) {
-        sworkers[worker].optimisticDec.getAndIncrement();
+        sworkers[worker].optimisticDec++;
+//        sworkers.computeIfPresent(worker, (w,v) ->{
+//            v.optimisticDec++;
+//            return v;
+//        });
     }
 
     static public void updateSyncEvents(int worker) {
-        sworkers[worker].syncEvents.getAndIncrement();
+        sworkers[worker].syncEvents++;
+//        sworkers.computeIfPresent(worker, (w,v) ->{
+//            v.syncEvents++;
+//            return v;
+//        });
     }
 
     static public void updatePosDec(int worker) {
-        sworkers[worker].pos.getAndIncrement();
+        sworkers[worker].pos++;
+//        sworkers.computeIfPresent(worker, (w,v) ->{
+//            v.pos++;
+//            return v;
+//        });
     }
 
     static public void updateNegDec(int worker) {
-        sworkers[worker].neg.getAndIncrement();
+        sworkers[worker].neg++;
+//        sworkers.computeIfPresent(worker, (w,v) ->{
+//            v.neg++;
+//            return v;
+//        });
     }
 
     static public void updateT(int worker) {
-        sworkers[worker].totalT.getAndIncrement();
+        sworkers[worker].totalT++;
+//        sworkers.computeIfPresent(worker, (w,v) ->{
+//            v.totalT++;
+//            return v;
+//        });
     }
 
     static public void updateP(int worker) {
-        sworkers[worker].totalP.getAndIncrement();
+        sworkers[worker].totalP++;
+//        sworkers.computeIfPresent(worker, (w,v) ->{
+//            v.totalP++;
+//            return v;
+//        });
+    }
+
+    static public void updateNegTime(int worker, long time) {
+        sworkers[worker].totalNegDecTime += time;
+//        sworkers.computeIfPresent(worker, (w,v) ->{
+//            v.totalNegDecTime += time;
+//            return v;
+//        });
+    }
+
+    static public void updateTmo(int worker, int tmo) {
+        sworkers[worker].avgTmo += tmo;
+//        sworkers.computeIfPresent(worker, (w,v) ->{
+//            v.totalNegDecTime += time;
+//            return v;
+//        });
     }
 
     static public long getStart() {
@@ -122,61 +181,77 @@ public class Statistics {
     static public Statistics getStatistics() {
         Statistics sts = new Statistics();
         for (int i = 0 ; i < workers ; i++) {
-            sts.txCount.getAndAdd(sworkers[i].txCount.get());
-            sts.optimisticDec.getAndAdd(sworkers[i].optimisticDec.get());
-            sts.totalDec.getAndAdd(sworkers[i].totalDec.get());
-            sts.pos.getAndAdd(sworkers[i].pos.get());
-            sts.neg.getAndAdd(sworkers[i].neg.get());
-            sts.syncEvents.getAndAdd(sworkers[i].syncEvents.get());
-            sts.headerTotalTD.getAndAdd(sworkers[i].headerTotalTD.get());
-            sts.headersTotalPD.getAndAdd(sworkers[i].headersTotalPD.get());
-            sts.totalT.getAndAdd(sworkers[i].totalT.get());
-            sts.totalP.getAndAdd(sworkers[i].totalP.get());
+            sts.txCount += sworkers[i].txCount; //.getAndAdd(sworkers[i].txCount.get());
+            sts.optimisticDec += sworkers[i].optimisticDec; //.getAndAdd(sworkers[i].optimisticDec.get());
+            sts.totalDec += sworkers[i].totalDec; //.getAndAdd(sworkers[i].totalDec.get());
+            sts.pos += sworkers[i].pos; //.getAndAdd(sworkers[i].pos.get());
+            sts.neg += sworkers[i].neg; //.getAndAdd(sworkers[i].neg.get());
+            sts.syncEvents += sworkers[i].syncEvents; //.getAndAdd(sworkers[i].syncEvents.get());
+            sts.headerTotalTD += sworkers[i].headerTotalTD; //.getAndAdd(sworkers[i].headerTotalTD.get());
+            sts.headersTotalPD += sworkers[i].headersTotalPD; //.getAndAdd(sworkers[i].headersTotalPD.get());
+            sts.totalT += sworkers[i].totalT; //.getAndAdd(sworkers[i].totalT.get());
+            sts.totalP += sworkers[i].totalP; //.getAndAdd(sworkers[i].totalP.get());
+            sts.totalNegDecTime += sworkers[i].totalNegDecTime; //.getAndAdd(sworkers[i].totalNegDecTime.get());
+            sts.avgTmo += sworkers[i].avgTmo;
         }
         return sts;
     }
 
     public int getTxCount() {
-        return txCount.get();
+        return txCount;//.get();
     }
 
     public int getOptimisticDec() {
-        return optimisticDec.get();
+        return optimisticDec;
+//        .get();
     }
 
     public int getTotalDec() {
-        return totalDec.get();
+        return totalDec;
+        //.get();
     }
 
     public int getPosDec() {
-        return pos.get();
+        return pos;
+//        .get();
     }
 
     public int getNegDec() {
-        return neg.get();
+        return neg;
+//        .get();
     }
 
     public int getSyncEnvents() {
-        return syncEvents.get();
+        return syncEvents;
+//        .get();
     }
 
     public long getHeadersTotalTD() {
-        return headerTotalTD.get();
+        return headerTotalTD;
+//        .get();
     }
 
     public long getHeadersTtoalPD() {
-        return headersTotalPD.get();
+        return headersTotalPD;
+//        .get();
     }
 
     public int getTotalT() {
-        return totalT.get();
+        return totalT;
+//        .get();
     }
 
     public int getTotalP() {
-        return totalP.get();
+        return totalP;
+//        .get();
     }
 
+    public long getTotalNegTime() {
+        return totalNegDecTime;
+//    .get();
+    }
 
-
-
+    public int getAvgTmo() {
+        return avgTmo;
+    }
 }
