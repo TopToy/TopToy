@@ -33,7 +33,7 @@ public class DiskUtils {
 //    }
 
     static public void shutdown() {
-        if (worker.isShutdown()) return;
+//        if (worker.isShutdown()) return;
         worker.shutdownNow();
     }
 

@@ -11,14 +11,7 @@ binDir=${tDir}/bin
 clientBinDir=${tDir}/bin_client
 inst=${configDir}/inst/input.inst
 config_toml=${configDir}/config.toml
-#config_bbc=${configDir}/bbcConfig/hosts.config
-#config_panic=${configDir}/panicRBConfig/hosts.config
-#config_sync=${configDir}/syncRBConfig/hosts.config
 config_rb=${configDir}/ABConfig/hosts.config
-
-#tconfig_bbc=${configDir}/bbcConfig/hosts.config.tmp
-#tconfig_panic=${configDir}/panicRBConfig/hosts.config.tmp
-#tconfig_sync=${configDir}/syncRBConfig/hosts.config.tmp
 tconfig_rb=${configDir}/ABConfig/hosts.config.tmp
 tconfig=${config_toml}.tmp
 
@@ -90,8 +83,8 @@ run_remote_servers() {
         wait $pid
     done
     kill -9 $pwatch
-    ./clean_machines.sh
-    sleep 10
+#    ./clean_machines.sh
+#    sleep 10
 
 }
 
@@ -181,6 +174,10 @@ configure_max_tx_in_block() {
    sed -i 's/maxTransactionInBlock = .*/maxTransactionInBlock = '${1}'/g' ${config_toml}
 }
 
+configure_tmo_interval() {
+   sed -i 's/tmoInterval = .*/tmoInterval = '${1}'/g' ${config_toml}
+}
+
 configure_channels()  {
     sed -i 's/c =.*/c = '${1}'/g' ${config_toml}
 }
@@ -222,24 +219,23 @@ run_servers_instance_with_tmo() {
 
 print_headers() {
     local currOut=${1}
-    echo "valid,ts,id,type,workers,tmo,txSize,txInBlock,txTotal,duration,tps,nob,bps,avgTxInBlock,opt,opRate,pos,posRate,neg,negRate,ATDT,APDT,T,P,syncEvents" >> $currOut/servers/res/summery.csv
-    echo "id,type,channels,txSize,maxTxInBlock,signaturePeriod,verificationPeriod,propose2tentative,tentative2permanent,channelPermanent2decide,propose2permanentchannel,propose2decide" >> $currOut/servers/res/blocksStatSummery.csv
-    echo "channels,txInBlock,ts,id,txSize,txCount,clientLatency,serverLatency,clientOnly" >> ${currOut}/clients/res/summery.csv
+    echo "valid,ts,id,type,workers,tmo,txSize,txInBlock,txTotal,duration,tps,nob,bps,avgTxInBlock,opt,opRate,pos,posRate,neg,negRate,avgNegTime,ATDT,APDT,T,P,syncEvents" >> $currOut/servers/res/summery.csv
+#    echo "id,type,channels,txSize,maxTxInBlock,signaturePeriod,verificationPeriod,propose2tentative,tentative2permanent,channelPermanent2decide,propose2permanentchannel,propose2decide" >> $currOut/servers/res/blocksStatSummery.csv
+#    echo "channels,txInBlock,ts,id,txSize,txCount,clientLatency,serverLatency,clientOnly" >> ${currOut}/clients/res/summery.csv
 }
 # ${1} - channel to start with
 # ${2} - max channels
 # ${3} - interval
 # ${3} - output directory
 run_servers_channels() {
-    local currOut=${4}
-    print_headers ${currOut}
+#    print_headers ${currOut}
     for i in `seq ${1} ${3} ${2}`; do
         chan=${i}
 #        echo "id,type,channels,txSize,maxTxInBlock,actualTxInBlock,height,signaturePeriod,verificationPeriod,propose2tentative,tentative2permanent,channelPermanent2decide,propose2permanentchannel,propose2decide" >> $currOut/servers/res/blocksStat_${i}.csv
         echo "[${i} channels]"
         run_servers_instance_with_cahnnels ${i}
 #        sleep 10
-        collect_res_from_servers ${currOut} ${chan}
+        collect_res_from_servers
     done
 }
 
@@ -296,47 +292,33 @@ shutdown() {
 #    echo "finished main"
 #}
 
-collect_res_from_single_server() {
-    local currOut=${1}
-    local channels=${2}
-    local id=${3}
-    local s=${servers[${id}]}
-    echo "getting files from server ${s}"
-    scp -o ConnectTimeout=30 -r ${s}:/tmp/JToy/logs/* $currOut/servers/logs  > /dev/null
-    scp -o ConnectTimeout=30 -r ${s}:/tmp/JToy/res/* $currOut/servers/res  > /dev/null
-
-    local i=${id}
-    echo "collecting results summery from server ${servers[$i]}"
-    cat $currOut/servers/res/${i}/summery.csv >> $currOut/servers/res/summery.csv
-    cat $currOut/servers/res/${i}/sig_summery.csv >> $currOut/servers/res/sig_summery.csv
-    tail -n -10 $currOut/servers/res/${i}/blocksStat.csv >> $currOut/servers/res/blocksStat_${channels}.csv
-    cat $currOut/servers/res/${i}/blocksStatSummery.csv >> $currOut/servers/res/blocksStatSummery.csv
-    rm -f $currOut/servers/res/${i}/summery.csv
-    rm -f $currOut/servers/res/${i}/sig_summery.csv
-    rm -f $currOut/servers/res/${i}/blocksStat.csv
-    rm -f $currOut/servers/res/${i}/blocksStatSummery.csv
-}
-
 collect_res_from_servers() {
-    local currOut=${1}
-    local channels=${2}
+    local dt=$(date '+%F-%H:%M:%S')
+    local logs=${tDir}/out/logs/$dt
+    local tmp=$tDir/tmp
+    local sum=${tDir}/out/summeries/$dt.csv
+    mkdir -p ${tDir}/out/summeries
+    mkdir -p $logs
+    mkdir -p $tmp
     for s in "${servers[@]}"; do
         echo "getting files from server ${s}"
-        scp -o ConnectTimeout=30 -r ${s}:/tmp/JToy/logs/* $currOut/servers/logs  > /dev/null
-        scp -o ConnectTimeout=30 -r ${s}:/tmp/JToy/res/* $currOut/servers/res  > /dev/null
+        scp -o ConnectTimeout=30 -r ${s}:/tmp/JToy/logs/* $logs  > /dev/null
+        scp -o ConnectTimeout=30 -r ${s}:/tmp/JToy/res/* $tmp  > /dev/null
     done
 #    ./extract_workers_logs.sh $currOut/servers/logs ${channels}
+    echo "valid,ts,id,type,workers,tmo,txSize,txInBlock,txTotal,duration,tps,nob,bps,avgTxInBlock,opt,opRate,pos,posRate,neg,negRate,avgNegTime,ATDT,APDT,T,P,syncEvents" >> $sum
+
     for i in `seq 0 $((${#servers[@]} - 1))`; do
         echo "collecting results summery from server ${servers[$i]}"
-        cat $currOut/servers/res/${i}/summery.csv >> $currOut/servers/res/summery.csv
+        cat $tmp/${i}/summery.csv >> $sum #$currOut/servers/res/summery.csv
 #        cat $currOut/servers/res/${i}/sig_summery.csv >> $currOut/servers/res/sig_summery.csv
 #        cat $currOut/servers/res/${i}/blocksStat.csv >> $currOut/servers/res/blocksStat_${channels}.csv
 #        cat $currOut/servers/res/${i}/blocksStatSummery.csv >> $currOut/servers/res/blocksStatSummery.csv
-        rm -f $currOut/servers/res/${i}/summery.csv
 #        rm -f $currOut/servers/res/${i}/sig_summery.csv
 #        rm -f $currOut/servers/res/${i}/blocksStat.csv
 #        rm -f $currOut/servers/res/${i}/blocksStatSummery.csv
     done
+        rm -r -f $tmp
 }
 
 # ${1} - output directory
@@ -506,8 +488,8 @@ run_byz_test() {
 # ${3} - channel to start with
 # ${4} - max channel
 # ${5} - channel interval
-# ${6} - output directory
-# ${7} - tmo
+# ${6} - tmo
+# ${7} - tmo interval
 # ${8} - test time
 run_no_failures_test() {
     for i in `seq 0 $((${#servers[@]} - 1))`; do
@@ -517,7 +499,8 @@ run_no_failures_test() {
 #        cat ${config_sync} > ${tconfig_sync}
         configure_tx_size ${1}
         configure_max_tx_in_block ${2}
-        configure_tmo ${7}
+        configure_tmo ${6}
+        configure_tmo_interval ${7}
         configure_servers ${8}
         configure_server_files ${i}
         install_server ${i}
@@ -526,7 +509,7 @@ run_no_failures_test() {
 #        cat ${tconfig_panic} > ${config_panic}
 #        cat ${tconfig_sync} > ${config_sync}
     done
-    run_servers_channels ${3} ${4} ${5} ${6}
+    run_servers_channels ${3} ${4} ${5}
 }
 
 # ${1} - transaction size
@@ -584,18 +567,6 @@ create_output_dir() {
 
 }
 
-create_output_dir_server() {
-    local outputDir=${tDir}/out/$(date '+%F-%H:%M:%S')
-    local currOut=${outputDir}.${1}.${2}.${3}
-    mkdir -p $currOut/clients/logs
-    mkdir -p $currOut/clients/res
-    mkdir -p $currOut/servers/logs
-    mkdir -p $currOut/servers/res
-    echo ${currOut}
-
-}
-
-
 
 # ${1} - transaction size
 # ${2} - transactions in block
@@ -614,10 +585,11 @@ main_latency() {
 # ${4} - max channel
 # ${5} - channel interval
 # ${6} - tmo
-# ${7} - test time
+# ${7} -tmo interval
+# ${8} - test time
 main_no_failures() {
-    local currOut=`create_output_dir ${1} ${2} "correct"`
-    run_no_failures_test ${1} ${2} ${3} ${4} ${5} ${currOut} ${6} ${7}
+#    local currOut=`create_output_dir ${1} ${2} "correct"`
+    run_no_failures_test ${1} ${2} ${3} ${4} ${5} ${6} ${7} ${8}
 }
 
 # ${1} - transaction size
@@ -734,148 +706,6 @@ main_byz() {
    echo ${currOut}
    run_byz_test ${1} ${2} ${3} ${4} ${currOut} ${5}
 }
-
-test1() {
-#for i in `seq 0 2`; do
-#    main_no_failures 0 0 1 10 1 1 60
-#done
-
-#for i in `seq 0 0`; do
-#    main_no_failures 0 0 1 10 1 10 60
-#done
-
-for i in `seq 0 2`; do
-    main_no_failures 512 1000 1 10 1 100 60
-#done
-
-#for i in `seq 0 2`; do
-    main_no_failures 512 1000 1 10 1 1000 60
-done
-}
-test1
-shutdown
-##for i in `seq 0 9`; do
-#    main_tmo_failure 500 1000 1 400 400 1 1 1 60
-##done
-#
-#
-# main_no_failures 0 0 10 10 1 1000 20
-#for i in `seq 0 9`; do
-#    main_no_failures 512 1000 10 10 1 1000 30
-#done
-#    main_no_failures 0 0 1 1 1 1000 10
-#
-#main_no_failures 0 0 10 10 1 1000 60
-# main_no_failures 0 0 1 10 1 1000 120
-#for i in `seq 0 1`; do
-#    main_no_failures 0 0 1 10 1 1000 120
-#done
-#main_no_failures 0 0 1 10 1 10 60
-#main_no_failures 512 10 1 10 1 10 60
-
-#for i in `seq 0 2`; do
-#    main_no_failures 512 10 1 10 1 1000 120
-#done
-#
-#for i in `seq 0 2`; do
-#    main_no_failures 512 100 1 10 1 1000 120
-#done
-#
-#for i in `seq 0 2`; do
-#    main_no_failures 512 1000 1 10 1 1000 120
-#done
-#
-#for i in `seq 0 2`; do
-#    main_no_failures 1024 10 1 10 1 1000 120
-#done
-#
-#for i in `seq 0 2`; do
-#    main_no_failures 1024 100 1 10 1 1000 120
-#done
-#
-#for i in `seq 0 2`; do
-#    main_no_failures 1024 1000 1 10 1 1000 120
-#done
-#
-#for i in `seq 0 2`; do
-#    main_no_failures 4096 10 1 10 1 1000 120
-#done
-#
-#for i in `seq 0 2`; do
-#    main_no_failures 4096 100 1 10 1 1000 120
-#done
-#
-#for i in `seq 0 2`; do
-#    main_no_failures 4096 1000 1 10 1 1000 120
-#done
-
-#main_no_failures 4096 1000 10 10 1 1000 120
-
-
-#for i in `seq 0 2`; do
-#    main_no_failures 0 10 1 1 1 2000
-#    main_no_failures 0 100 1 1 1 2000
-#    main_no_failures 0 1000 1 1 1 2000
-#done
-#main_no_failures 500 1000 1 10 1 1000
-#for i in `seq 0 0`; do
-#    main_no_failures 0 10 2 20 2 2000
-#    main_no_failures 0 100 2 20 2 2000
-#    main_no_failures 0 1000 2 20 2 2000
-#done
-
-#for i in `seq 0 2`; do
-#    main_no_failures 500 10 1 1 1 2000
-#    main_no_failures 500 100 1 1 1 2000
-#    main_no_failures 500 1000 1 1 1 2000
-#done
-#
-#for i in `seq 0 0`; do
-##    main_no_failures 500 10 2 20 2 2000
-##    main_no_failures 500 100 2 20 2 2000
-#    main_no_failures 500 1000 2 20 2 2000
-#done
-###
-##
-#for i in `seq 0 2`; do
-#    main_no_failures 1012 10 1 1 1 2000
-#    main_no_failures 1012 100 1 1 1 2000
-#    main_no_failures 1012 1000 1 1 1 2000
-#done
-#
-#for i in `seq 0 2`; do
-#    main_no_failures 1012 10 2 20 2 2000
-#    main_no_failures 1012 100 2 20 2 2000
-#    main_no_failures 1012 1000 2 20 2 2000
-#done
-##
-#for i in `seq 0 2`; do
-#    main_no_failures 4084 10 1 1 1 2000
-#    main_no_failures 4084 100 1 1 1 2000
-#    main_no_failures 4084 1000 1 1 1 2000
-#done
-#
-#for i in `seq 0 2`; do
-#    main_no_failures 4084 10 2 20 2 2000
-#    main_no_failures 4084 100 2 20 2 2000
-#    main_no_failures 4084 1000 2 20 2 2000
-#done
-#
-#    main_no_failures 1012 1000 16 16 1 2000
-#    main_no_failures 4084 1000 12 12 1 2000
-
-#for i in `seq 0 2`; do
-#    main_byz 500 100 200 1 1
-#    main_byz 500 100 400 5 1
-#    main_byz 500 100 600 10 1
-#done
-#
-#for i in `seq 0 2`; do
-#    main_byz 500 1000 200 1 1
-#    main_byz 500 1000 500 5 1
-#    main_byz 500 1000 900 10 1
-#done
-
 # ${1} - transaction size
 # ${2} - max transactions in block
 # ${3} - tmo
@@ -885,81 +715,49 @@ shutdown
 # ${7} - f
 # ${8} - correct time
 # ${9} - test time
+test1() {
+#main_bengin 0 0 1 1 2 1 2 1 60
+#for i in `seq 0 0`; do
+#    main_no_failures 0 0 1 1 1 3 3 600
+    main_no_failures 0 0 1 1 1 100 100 300
+    main_no_failures 0 0 2 2 1 100 100 300
+    main_no_failures 0 0 3 3 1 100 100 300
+#    main_no_failures 0 0 4 4 1 30 30 300
+#    main_no_failures 0 0 5 5 1 35 35 300
+#    main_no_failures 0 0 6 6 1 45 45 300
+#    main_no_failures 0 0 7 7 1 55 55 300
+#    main_no_failures 0 0 8 8 1 60 60 300
+#    main_no_failures 0 0 9 9 1 70 70 300
+#    main_no_failures 0 0 10 10 1 80 80 300
 
 
-#main_bengin 500 100 400 5 1
-#main_bengin 500 100 500 10 1
-
-#main_byz 500 100 200 1 1
-#main_byz 500 100 400 5 1
-#main_byz 500 100 500 10 1
+##    main_no_failures 0 0 10 10 1 100 600
+##done
 #
-##main_bengin 500 1000 200 1 1
-##main_bengin 500 1000 500 5 1
-##main_bengin 500 1000 900 10 1
-#
-
-
-#main_bengin 500 100 400 10 1
-#main_bengin 500 1000 500 10 1
-#
-#main_bengin 500 100 600 20 1
-#main_bengin 500 1000 900 20 1
-
-#for i in `seq 0 5`; do
-#    main_async 500 100 400 10 0 0 60 3
-#    main_async 500 1000 500 10 0 0 60 3
-#    main_async 500 100 600 20 20 10 30 3
-#    main_async 500 1000 900 20 20 10 30 3
-#done
-#
-#for i in `seq 0 3`; do
-#main_async 500 100 200 5 20 10 30 1
-#main_async 500 100 400 10 20 10 30 1
-#main_async 500 100 500 15 20 10 30 2
-#main_async 500 100 600 20 20 10 30 3
-#main_async 500 1000 300 5 20 10 30 1
-#main_async 500 1000 500 10 20 10 30 2
-#main_async 500 1000 800 15 20 10 30 3
-#main_async 500 1000 900 20 20 10 30 3
+##for i in `seq 0 2`; do
+##    main_no_failures 0 0 1 1 1 3 10 600
+##    main_no_failures 0 0 10 10 1 1000 600
 #done
 
-
-#for i in `seq 0 2`; do
-#    main_run_sig_test 0 10 1 4 1
-#    main_run_sig_test 0 100 1 4 1
-#    main_run_sig_test 0 1000 1 4 1
+#for i in `seq 0 1`; do
+#    main_no_failures 0 0 1 10 2 1 600
+#    main_no_failures 0 0 10 10 1 1 600
+##done
 #
-#    main_run_sig_test 512 10 1 4 1
-#    main_run_sig_test 512 100 1 4 1
-#    main_run_sig_test 512 1000 1 4 1
+##for i in `seq 0 0`; do
+#    main_no_failures 0 0 1 10 2 10 600
+#    main_no_failures 0 0 10 10 1 10 600
+##done
 #
+##for i in `seq 0 2`; do
+#    main_no_failures 0 0 1 10 2 100 600
+#    main_no_failures 0 0 10 10 1 100 600
+##done
 #
-#    main_run_sig_test 1024 10 1 4 1
-#    main_run_sig_test 1024 100 1 4 1
-#    main_run_sig_test 1024 1000 1 4 1
-#
-#
-#    main_run_sig_test 4096 10 1 4 1
-#    main_run_sig_test 4096 100 1 4 1
-#    main_run_sig_test 4096 1000 1 4 1
+##for i in `seq 0 2`; do
+#    main_no_failures 0 0 1 10 2 1000 600
+#    main_no_failures 0 0 10 10 1 1000 600
 #done
-
-# ${1} - transaction size
-# ${2} - transactions in block
-# ${3} - channel to start with
-# ${4} - max channel
-# ${5} - channel interval
-# ${6} - tmo
-
-#for i in `seq 0 2`; do
-#    main_latency 500 100 1 1 1 15000
-#    main_latency 500 100 5 5 1 15000
-#
-#    main_latency 500 1000 1 1 1 15000
-#    main_latency 500 1000 5 5 1 15000
-#done
-
-
-
-#shutdown
+}
+test1
+shutdown

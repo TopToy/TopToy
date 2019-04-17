@@ -17,6 +17,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import proto.Types;
 import proto.blockchainServiceGrpc;
 import utils.DBUtils;
+import utils.DiskUtils;
 import utils.Statistics;
 
 import java.io.IOException;
@@ -133,7 +134,7 @@ public class Top implements server {
         ABService.start();
         if (Membership.start(id) == -1) {
             // Temporarily! Here we assume that everyone still correct
-            logger.info("Error while trying to connect");
+            logger.error("Error while trying to connect");
             shutdown();
             System.exit(0);
         }
@@ -157,13 +158,22 @@ public class Top implements server {
         logger.info("shutdown OBBC");
         ABService.shutdown();
         logger.info("shutdown AB");
+        DBUtils.shutdown();
+        logger.info("shutdown DBUtils");
+        DiskUtils.shutdown();
+        logger.info("shutdown DiskUtils");
 
         logger.info("ByeBye");
     }
 
     public void serve() {
-        for (int i = 0 ; i < workers ; i++) {
-            toys[i].serve();
+        try {
+            for (int i = 0 ; i < workers ; i++) {
+                toys[i].serve();
+            }
+        } catch (InterruptedException e) {
+            logger.error(e);
+            return;
         }
 
         try {

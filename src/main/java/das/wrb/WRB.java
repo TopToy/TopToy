@@ -107,13 +107,15 @@ public class WRB {
         BbcDecData dec = OBBC.propose(setFastBbcVote(key, worker, sender, cidSeries, cid, next), worker, height, sender);
 
         if (!dec.getDec()) {
-            currentTmo[sender][worker] += tmoInterval;
+//            currentTmo[sender][worker] += tmoInterval;
+            currentTmo[sender][worker] += currentTmo[sender][worker];
+
             logger.debug(format("[#%d-C[%d]] bbc returned [%d] for [cidSeries=%d ; cid=%d]", id, worker, 0, cidSeries, cid));
 //            neg.getAndIncrement();
             updateNegDec(worker);
             return null;
         }
-        currentTmo[sender][worker] = tmo;
+//        currentTmo[sender][worker] = tmo;
         updatePosDec(worker);
         if (dec.fv) {
             updateOptimisitcDec(worker);
@@ -123,35 +125,33 @@ public class WRB {
         return postDeliverLogic(key, worker, cidSeries, cid, sender, height);
     }
 
-    static private void preDeliverLogic(Meta key, int channel, int cidSeries, int cid, int sender) throws InterruptedException {
-        int realTmo = currentTmo[sender][channel];
-        if (realTmo > tmo + 10*tmoInterval) {
-            logger.info(format("[#%d-C[%d]] node [%d] is suspected, we will not wait for it [cidSeries=%d ; cid=%d]",
-                    id, channel, sender, cidSeries, cid));
-            return; // kind of reputation mechanism? it gives the node 10 tries before being excluded from proposing
-        }
+    static private void preDeliverLogic(Meta key, int worker, int cidSeries, int cid, int sender) throws InterruptedException {
+        int realTmo = currentTmo[sender][worker];
+//        if (realTmo > tmo + 10*tmoInterval) {
+//            logger.info(format("[#%d-C[%d]] node [%d] is suspected, we will not wait for it [cidSeries=%d ; cid=%d]",
+//                    id, channel, sender, cidSeries, cid));
+//            return; // kind of reputation mechanism? it gives the node 10 tries before being excluded from proposing
+//        }
         long startTime = System.currentTimeMillis();
-        synchronized (Data.pending[channel]) {
-            while (realTmo > 0 && !Data.pending[channel].containsKey(key)) {
+        synchronized (Data.pending[worker]) {
+            while (realTmo > 0 && !Data.pending[worker].containsKey(key)) {
                 logger.debug(format("[#%d-C[%d]] going to sleep for at most [%d] ms for data msg [cidSeries=%d ; cid=%d]",
-                        id, channel, realTmo, cidSeries, cid));
-                Data.pending[channel].wait(realTmo);
+                        id, worker, realTmo, cidSeries, cid));
+                Data.pending[worker].wait(realTmo);
 
                 realTmo -= max(0, (System.currentTimeMillis() - startTime));
-//                logger.debug(format("[#%d-C[%d]] real TMO is [%d] ms for data msg [cidSeries=%d ; cid=%d]",
-//                        id, channel, realTmo, cidSeries, cid));
             }
         }
-
+        int epsilon = 1;
         long estimatedTime = System.currentTimeMillis() - startTime;
+        currentTmo[sender][worker] = (int) (estimatedTime + epsilon);
         logger.debug(format("[#%d-C[%d]] have waited [%d] ms for data msg [cidSeries=%d ; cid=%d]",
-                id, channel, estimatedTime, cidSeries, cid));
+                id, worker, estimatedTime, cidSeries, cid));
     }
 
     static private BlockHeader postDeliverLogic(Meta key, int channel, int cidSeries, int cid, int sender, int height) throws InterruptedException {
         requestData(channel, cidSeries, cid, sender, height);
-        BlockHeader msg = Data.pending[channel].get(key);
-        return msg;
+        return Data.pending[channel].get(key);
     }
 
     static private void requestData(int channel, int cidSeries, int cid, int sender, int height) throws InterruptedException {

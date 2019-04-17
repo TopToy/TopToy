@@ -35,15 +35,15 @@ public class DBUtils {
         }
     }
 
-    static public void shutdown(int channel) {
-        try {
-            rc.get(channel).close();
-            wc.get(channel).close();
-        } catch (SQLException e) {
-            logger.error(format("unable shutdown connection [channel=%d]", channel));
-        }
-        worker.shutdownNow();
-    }
+//    static public void shutdown(int channel) {
+//        try {
+//            rc.get(channel).close();
+//            wc.get(channel).close();
+//        } catch (SQLException e) {
+//            logger.error(format("unable shutdown connection [channel=%d]", channel));
+//        }
+//        worker.shutdownNow();
+//    }
 
     static public void shutdown() {
 
@@ -55,11 +55,13 @@ public class DBUtils {
                 c.close();
             }
         } catch (SQLException e) {
-            logger.error(format("Unable shutdown connection"));
+            logger.error(format("Unable to shutdown connection"));
+            return;
         }
-        if (rc.size() == 0 && wc.size() == 0) {
-            worker.shutdownNow();
-        }
+        worker.shutdownNow();
+//        if (rc.size() == 0 && wc.size() == 0) {
+
+//        }
     }
 
     static private String getTableName(int channel) {

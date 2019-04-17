@@ -74,8 +74,8 @@ public class Cli {
 ////                writeToScv(outPath);
 ////                writeBlocksStatistics(outPath);
 //                    writeBlocksStatisticsSummery(outPath);
-                    DBUtils.shutdown();
-                    DiskUtils.shutdown();
+//                    DBUtils.shutdown();
+//                    DiskUtils.shutdown();
                 }
 //
             }));
@@ -104,21 +104,20 @@ public class Cli {
 
                 if (args[0].equals("serve")) {
                     serve();
-                    totalRT = System.currentTimeMillis();
+//                    totalRT = System.currentTimeMillis();
                     System.out.println("Serving... [OK]");
                     return;
                 }
                 if (args[0].equals("stop")) {
                     stop();
-                    totalRT = System.currentTimeMillis() - totalRT;
+//                    totalRT = System.currentTimeMillis() - totalRT;
                     System.out.println("stop server... [OK]");
                     return;
                 }
                 if (args[0].equals("quit")) {
                     writeSummery(outPath);
 //                    writeBlocksStatisticsSummery(outPath);
-                    DBUtils.shutdown();
-                    DiskUtils.shutdown();
+
                     recorded.set(true);
 //                    System.out.println("Goodbye :)");
                     System.exit(0);
@@ -412,6 +411,7 @@ public class Cli {
 //            return true;
         }
         void writeSummery(String pathString) {
+            logger.info("Starting writeSummery");
             Path path = Paths.get(pathString,   String.valueOf(JToy.s.getID()), "summery.csv");
             File f = new File(path.toString());
 
@@ -425,16 +425,33 @@ public class Cli {
 
                 int nob = JToy.s.getBCSize();
                 Statistics st = getStatistics();
-
                 double time = ((double) getStop() - getStart()) / 1000;
-                int tps = ((int) (st.getTxCount() / time));
-                int bps = (int) (nob / time);
-                double opRate = ((double) st.getOptimisticDec()) / ((double) st.getPosDec());
-                double posRate = ((double) st.getPosDec()) / ((double) st.getTotalDec());
-                double negRate = ((double) st.getNegDec()) / ((double) st.getTotalDec());
+                int tps = 0;
+                int bps = 0;
+                if (time > 0) {
+                    tps = ((int) (st.getTxCount() / time));
+                    bps = (int) (nob / time);
+                }
                 int pos = st.getPosDec();
                 int neg = st.getNegDec();
                 int opt = st.getOptimisticDec();
+                double opRate = 0;
+                double posRate = 0;
+                double negRate = 0;
+                double avgNegDecTime = 0;
+                int avgTmo = 0;
+                if (st.getPosDec() > 0) {
+                    opRate = ((double) opt) / ((double) st.getPosDec());
+                }
+                if (st.getTotalDec() > 0) {
+                    posRate = ((double) pos) / ((double) st.getTotalDec());
+                    negRate = ((double) neg) / ((double) st.getTotalDec());
+                    avgTmo = st.getAvgTmo() / st.getTotalDec();
+                }
+                if (neg > 0) {
+                    avgNegDecTime = ((double) st.getTotalNegTime() / (double) neg);
+                }
+
                 int txCount = st.getTxCount();
                 int syncEvents = st.getSyncEnvents();
                 int totalT = st.getTotalT();
@@ -448,14 +465,13 @@ public class Cli {
                     APDT = ((double) st.getHeadersTtoalPD() / (double) nob);
                 }
 
-
                 DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy-HH:mm:ss");
                 List<String> row = Arrays.asList(
                         String.valueOf(validateBC())
                         , dateFormat.format(new Date())
                         , String.valueOf(JToy.s.getID())
                         , JToy.type, String.valueOf(Config.getC())
-                        , String.valueOf(Config.getTMO())
+                        , String.valueOf(avgTmo)
                         , String.valueOf(Config.getTxSize())
                         , String.valueOf(Config.getMaxTransactionsInBlock())
                         , String.valueOf(txCount)
@@ -470,6 +486,7 @@ public class Cli {
                         , String.valueOf(posRate)
                         , String.valueOf(neg)
                         , String.valueOf(negRate)
+                        , String.valueOf(avgNegDecTime)
                         , String.valueOf(ATDT)
                         , String.valueOf(APDT)
                         , String.valueOf(totalT)
@@ -479,6 +496,7 @@ public class Cli {
                 CSVUtils.writeLine(writer, row);
                 writer.flush();
                 writer.close();
+                logger.info("ended writeSummery");
             } catch (IOException e) {
                 logger.error(e);
             }
