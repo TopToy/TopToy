@@ -145,6 +145,7 @@ public class WRB {
         int epsilon = 1;
         long estimatedTime = System.currentTimeMillis() - startTime;
         currentTmo[sender][worker] = (int) (estimatedTime + epsilon);
+        updateTmo(worker, currentTmo[sender][worker]);
         logger.debug(format("[#%d-C[%d]] have waited [%d] ms for data msg [cidSeries=%d ; cid=%d]",
                 id, worker, estimatedTime, cidSeries, cid));
     }
