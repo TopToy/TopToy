@@ -302,11 +302,11 @@ collect_res_from_servers() {
     mkdir -p $tmp
     for s in "${servers[@]}"; do
         echo "getting files from server ${s}"
-        scp -o ConnectTimeout=30 -r ${s}:/tmp/JToy/logs/* $logs  > /dev/null
+#        scp -o ConnectTimeout=30 -r ${s}:/tmp/JToy/logs/* $logs  > /dev/null
         scp -o ConnectTimeout=30 -r ${s}:/tmp/JToy/res/* $tmp  > /dev/null
     done
 #    ./extract_workers_logs.sh $currOut/servers/logs ${channels}
-    echo "valid,ts,id,type,workers,tmo,txSize,txInBlock,txTotal,duration,tps,nob,bps,avgTxInBlock,opt,opRate,pos,posRate,neg,negRate,avgNegTime,ATDT,APDT,T,P,syncEvents" >> $sum
+    echo "id,type,workers,tmo,actTmo,maxTmo,txSize,txInBlock,txTotal,duration,tps,nob,bps,avgTxInBlock,opt,opRate,pos,posRate,neg,negRate,avgNegTime,ATDT,APDT,T,P,syncEvents" >> $sum
 
     for i in `seq 0 $((${#servers[@]} - 1))`; do
         echo "collecting results summery from server ${servers[$i]}"
@@ -717,11 +717,16 @@ main_byz() {
 # ${9} - test time
 test1() {
 #main_bengin 0 0 1 1 2 1 2 1 60
-#for i in `seq 0 0`; do
+for i in `seq 0 2`; do
 #    main_no_failures 0 0 1 1 1 3 3 600
-    main_no_failures 0 0 1 1 1 100 100 300
-    main_no_failures 0 0 2 2 1 100 100 300
-    main_no_failures 0 0 3 3 1 100 100 300
+    main_no_failures 0 0 1 10 1 10 10 300
+#    main_no_failures 0 0 1 10 3 100 100 300
+#    main_no_failures 0 0 1 10 3 1000 1000 300
+#    main_no_failures 0 0 1 10 1 10 10 300
+
+
+#    main_no_failures 0 0 2 2 1 100 100 300
+#    main_no_failures 0 0 3 3 1 100 100 300
 #    main_no_failures 0 0 4 4 1 30 30 300
 #    main_no_failures 0 0 5 5 1 35 35 300
 #    main_no_failures 0 0 6 6 1 45 45 300
@@ -732,7 +737,7 @@ test1() {
 
 
 ##    main_no_failures 0 0 10 10 1 100 600
-##done
+done
 #
 ##for i in `seq 0 2`; do
 ##    main_no_failures 0 0 1 1 1 3 10 600

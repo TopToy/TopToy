@@ -439,14 +439,16 @@ public class Cli {
                 double posRate = 0;
                 double negRate = 0;
                 double avgNegDecTime = 0;
-                int avgTmo = 0;
+                int avgTmo = st.getAvgTmo();
+                int avgActTmo = 0;
                 if (st.getPosDec() > 0) {
                     opRate = ((double) opt) / ((double) st.getPosDec());
                 }
                 if (st.getTotalDec() > 0) {
                     posRate = ((double) pos) / ((double) st.getTotalDec());
                     negRate = ((double) neg) / ((double) st.getTotalDec());
-                    avgTmo = st.getAvgTmo() / st.getTotalDec();
+//                    avgTmo = st.getAvgTmo() / st.getTotalDec();
+                    avgActTmo = st.getAvgActTmo() / st.getTotalDec();
                 }
                 if (neg > 0) {
                     avgNegDecTime = ((double) st.getTotalNegTime() / (double) neg);
@@ -467,11 +469,13 @@ public class Cli {
 
                 DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy-HH:mm:ss");
                 List<String> row = Arrays.asList(
-                        String.valueOf(validateBC())
-                        , dateFormat.format(new Date())
-                        , String.valueOf(JToy.s.getID())
+//                        String.valueOf(validateBC())
+//                        , dateFormat.format(new Date())
+                         String.valueOf(JToy.s.getID())
                         , JToy.type, String.valueOf(Config.getC())
                         , String.valueOf(avgTmo)
+                        , String.valueOf(avgActTmo)
+                        , String.valueOf(st.getMaxTmo())
                         , String.valueOf(Config.getTxSize())
                         , String.valueOf(Config.getMaxTransactionsInBlock())
                         , String.valueOf(txCount)

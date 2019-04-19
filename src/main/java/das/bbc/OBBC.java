@@ -1,5 +1,6 @@
 package das.bbc;
 
+import blockchain.Utils;
 import com.google.protobuf.ByteString;
 import communication.CommLayer;
 import config.Node;
@@ -17,8 +18,6 @@ import proto.Types;
 import utils.Statistics;
 
 import java.util.ArrayList;
-import java.util.Objects;
-
 
 import static blockchain.data.BCS.bcs;
 import static das.data.Data.*;
