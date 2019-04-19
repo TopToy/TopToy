@@ -182,7 +182,7 @@ public class Statistics {
 
     }
 
-    static public void updateMAxTmo(int worker, int tmo) {
+    static public void updateMaxTmo(int worker, int tmo) {
         sworkers[worker].maxTmo = max(sworkers[worker].maxTmo, tmo);
 
     }
