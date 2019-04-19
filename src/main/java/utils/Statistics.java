@@ -6,6 +6,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
+import static das.utils.Utils.getOverallTmoAvg;
+import static java.lang.Math.max;
+
 public class Statistics {
     // Note that due to late nodes this list may grow infinitely. Currently we assume that this is an uncommon case.
     private ConcurrentHashMap<Types.BlockHeader, Types.HeaderStatistics> headerStats;
@@ -22,6 +25,8 @@ public class Statistics {
     private int totalP; //AtomicInteger totalP;
     private long totalNegDecTime; //AtomicLong totalNegDecTime;
     private int avgTmo;
+    private int avgActTmo;
+    private int maxTmo;
 
     static private Statistics[] sworkers;
     static private long start;
@@ -42,6 +47,8 @@ public class Statistics {
         totalP = 0; //new AtomicInteger(0);
         totalNegDecTime = 0; //new AtomicLong(0);
         avgTmo = 0;
+        avgActTmo = 0;
+        maxTmo = 0;
     }
 
     public Statistics(int workers) {
@@ -74,7 +81,7 @@ public class Statistics {
     static public void updateHeaderStatus(Types.BlockHeader h, int worker) {
         if (!sworkers[worker].headerStats.containsKey(h)) return;
         sworkers[worker].headerTotalTD += sworkers[worker].headerStats.get(h).getTD();
-        sworkers[worker].headerTotalTD += sworkers[worker].headerStats.get(h).getPD();
+        sworkers[worker].headersTotalPD += sworkers[worker].headerStats.get(h).getPD();
         sworkers[worker].headerStats.remove(h);
 //        if (!sworkers.get(worker).headerStats.containsKey(h)) return;
 //        sworkers.get(worker).headerTotalTD += sworkers.get(worker).headerStats.get(h).getTD(); //.getAndAdd(sworkers[worker].headerStats.get(h).getTD());
@@ -162,12 +169,22 @@ public class Statistics {
 //        });
     }
 
-    static public void updateTmo(int worker, int tmo) {
-        sworkers[worker].avgTmo += tmo;
-//        sworkers.computeIfPresent(worker, (w,v) ->{
-//            v.totalNegDecTime += time;
-//            return v;
-//        });
+//    static public void updateTmo(int worker, int tmo) {
+//        sworkers[worker].avgTmo += tmo;
+////        sworkers.computeIfPresent(worker, (w,v) ->{
+////            v.totalNegDecTime += time;
+////            return v;
+////        });
+//    }
+
+    static public void updateActTmo(int worker, int tmo) {
+        sworkers[worker].avgActTmo += tmo;
+
+    }
+
+    static public void updateMAxTmo(int worker, int tmo) {
+        sworkers[worker].maxTmo = max(sworkers[worker].maxTmo, tmo);
+
     }
 
     static public long getStart() {
@@ -180,6 +197,7 @@ public class Statistics {
 
     static public Statistics getStatistics() {
         Statistics sts = new Statistics();
+        int maxT = 0;
         for (int i = 0 ; i < workers ; i++) {
             sts.txCount += sworkers[i].txCount; //.getAndAdd(sworkers[i].txCount.get());
             sts.optimisticDec += sworkers[i].optimisticDec; //.getAndAdd(sworkers[i].optimisticDec.get());
@@ -192,8 +210,11 @@ public class Statistics {
             sts.totalT += sworkers[i].totalT; //.getAndAdd(sworkers[i].totalT.get());
             sts.totalP += sworkers[i].totalP; //.getAndAdd(sworkers[i].totalP.get());
             sts.totalNegDecTime += sworkers[i].totalNegDecTime; //.getAndAdd(sworkers[i].totalNegDecTime.get());
-            sts.avgTmo += sworkers[i].avgTmo;
+            sts.avgTmo = getOverallTmoAvg();
+            sts.avgActTmo += sworkers[i].avgActTmo;
+            maxT = max(maxT, sworkers[i].maxTmo);
         }
+        sts.maxTmo = maxT;
         return sts;
     }
 
@@ -253,5 +274,13 @@ public class Statistics {
 
     public int getAvgTmo() {
         return avgTmo;
+    }
+
+    public int getAvgActTmo() {
+        return avgActTmo;
+    }
+
+    public int getMaxTmo() {
+        return maxTmo;
     }
 }
