@@ -342,10 +342,13 @@ public abstract class ToyBaseServer {
                     updateHeaderPD(permanent.getHeader(), worker);
                     updateHeaderStatus(permanent.getHeader(), worker);
                     updateP(worker);
-                    logger.info(format("[#%d-C[%d]] Deliverd [[height=%d], [sender=%d], [channel=%d], [size=%d]]",
-                            getID(), worker, permanent.getHeader().getHeight(), permanent.getHeader().getBid().getPid(),
-                            permanent.getHeader().getM().getChannel(),
-                            permanent.getDataCount()));
+                    if (permanent.getHeader().getHeight() % 1000 == 0) {
+                        logger.info(format("[#%d-C[%d]] Deliver [[height=%d], [sender=%d], [channel=%d], [size=%d]]",
+                                getID(), worker, permanent.getHeader().getHeight(), permanent.getHeader().getBid().getPid(),
+                                permanent.getHeader().getM().getChannel(),
+                                permanent.getDataCount()));
+                    }
+
 //                    permanent = permanent.toBuilder().setSt(permanent.getSt().toBuilder().setPd(System.currentTimeMillis())).build();
 //                    try {
 //                        bc.setBlock(recBlock.getHeader().getHeight() - (f + 2), permanent);

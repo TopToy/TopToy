@@ -59,7 +59,7 @@ public class WRB {
 //        WRB.comm = comm;
         new Utils(n, workers, tmo);
         new Data(workers);
-        new BFD(n, f, tmo, 10);
+//        new BFD(n, f, tmo, 10);
         WRB.rpcs = new WrbRpcs(id, workers, n, f, wrbCluster, serverCrt, serverPrivKey, caRoot);
         logger.info(format("Initiated WRB: [id=%d; n=%d; f=%d; tmo=%d; tmoInterval=%d]", id, n, f, tmo,
                 tmoInterval));
@@ -134,18 +134,18 @@ public class WRB {
 
     static private void preDeliverLogic(Meta key, int worker, int cidSeries, int cid, int sender) throws InterruptedException {
 //        int realTmo = currentTmo[sender][worker];
-        if (Data.pending[worker].containsKey(key) && BFD.isSuspected(id)) {
-            Utils.setTmo(sender, worker, tmo);
-            BFD.handleSuspection(sender, tmo);
-            return;
-        }
+//        if (Data.pending[worker].containsKey(key) && BFD.isSuspected(id)) {
+//            Utils.setTmo(sender, worker, tmo);
+//            BFD.handleSuspection(sender, tmo);
+//            return;
+//        }
         int realTmo = Utils.getTmo(sender, worker);
-        BFD.handleSuspection(sender, realTmo);
-        if (BFD.isSuspected(sender)) {
-            logger.info(format("[#%d-C[%d]] node [%d] is suspected, we will not wait for it [cidSeries=%d ; cid=%d]",
-                    id, worker, sender, cidSeries, cid));
-            return; // kind of reputation mechanism? it gives the node 10 tries before being excluded from proposing
-        }
+//        BFD.handleSuspection(sender, realTmo);
+//        if (BFD.isSuspected(sender)) {
+//            logger.info(format("[#%d-C[%d]] node [%d] is suspected, we will not wait for it [cidSeries=%d ; cid=%d]",
+//                    id, worker, sender, cidSeries, cid));
+//            return; // kind of reputation mechanism? it gives the node 10 tries before being excluded from proposing
+//        }
 
         updateMaxTmo(worker, realTmo);
 

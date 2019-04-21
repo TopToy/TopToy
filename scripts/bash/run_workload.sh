@@ -302,7 +302,7 @@ collect_res_from_servers() {
     mkdir -p $tmp
     for s in "${servers[@]}"; do
         echo "getting files from server ${s}"
-#        scp -o ConnectTimeout=30 -r ${s}:/tmp/JToy/logs/* $logs  > /dev/null
+        scp -o ConnectTimeout=30 -r ${s}:/tmp/JToy/logs/* $logs  > /dev/null
         scp -o ConnectTimeout=30 -r ${s}:/tmp/JToy/res/* $tmp  > /dev/null
     done
 #    ./extract_workers_logs.sh $currOut/servers/logs ${channels}
@@ -717,7 +717,7 @@ main_byz() {
 # ${9} - test time
 test1() {
 #main_bengin 0 0 1 1 2 1 2 1 60
-for i in `seq 0 2`; do
+for i in `seq 0 1`; do
 #    main_no_failures 0 0 1 1 1 3 3 600
     main_no_failures 0 0 1 10 1 10 10 300
 #    main_no_failures 0 0 1 10 3 100 100 300
