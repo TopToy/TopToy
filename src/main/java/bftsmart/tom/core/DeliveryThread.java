@@ -157,7 +157,7 @@ public final class DeliveryThread extends Thread {
         //stateManager.setWaiting(-1);
         tomLayer.setNoExec();
 
-        System.out.print("Current decided size: " + decided.size());
+        logger.info("Current decided size: " + decided.size());
         decided.clear();
 
         logger.info("(DeliveryThread.update) All finished up to " + lastCID);

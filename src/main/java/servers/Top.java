@@ -110,7 +110,7 @@ public class Top implements server {
         new Membership(n);
         logger.info(format("[%d] has initiated Membership", id));
         new DBUtils(workers);
-        logger.info(format("[%d] has initiated DB Utils", id));
+        logger.info(format("[%d] has initiated DB TmoUtils", id));
         new Statistics(workers);
 
     }

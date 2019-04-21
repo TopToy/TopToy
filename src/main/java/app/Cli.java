@@ -447,7 +447,7 @@ public class Cli {
                 if (st.getTotalDec() > 0) {
                     posRate = ((double) pos) / ((double) st.getTotalDec());
                     negRate = ((double) neg) / ((double) st.getTotalDec());
-//                    avgTmo = st.getAvgTmo() / st.getTotalDec();
+                    avgTmo = st.getAvgTmo() / st.getTotalDec();
                     avgActTmo = st.getAvgActTmo() / st.getTotalDec();
                 }
                 if (neg > 0) {
@@ -496,6 +496,7 @@ public class Cli {
                         , String.valueOf(totalT)
                         , String.valueOf(totalP)
                         , String.valueOf(syncEvents)
+                        , String.valueOf(st.getSuspected())
                 );
                 CSVUtils.writeLine(writer, row);
                 writer.flush();

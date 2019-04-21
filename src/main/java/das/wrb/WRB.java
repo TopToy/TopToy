@@ -1,26 +1,18 @@
 package das.wrb;
 
-import com.google.protobuf.ByteString;
-import communication.CommLayer;
 import config.Node;
-import crypto.DigestMethod;
-import crypto.blockDigSig;
 import das.bbc.OBBC;
 import das.data.BbcDecData;
 import das.data.Data;
 
 import das.ms.BFD;
-import das.utils.Utils;
-import io.grpc.stub.StreamObserver;
+import das.utils.TmoUtils;
 import proto.Types.*;
-import proto.WrbGrpc;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static das.bbc.OBBC.setFastBbcVote;
-import static das.utils.Utils.origTmo;
-import static das.utils.Utils.setTmo;
+import static das.utils.TmoUtils.*;
 import static java.lang.Math.max;
 import static java.lang.String.format;
 import static utils.Statistics.*;
@@ -57,9 +49,10 @@ public class WRB {
 //        }
 
 //        WRB.comm = comm;
-        new Utils(n, workers, tmo);
+        new TmoUtils(n, workers, tmo);
         new Data(workers);
-//        new BFD(n, f, tmo, 10);
+        new BFD(n, f, workers,1000 * tmo);
+        BFD.activateAll();
         WRB.rpcs = new WrbRpcs(id, workers, n, f, wrbCluster, serverCrt, serverPrivKey, caRoot);
         logger.info(format("Initiated WRB: [id=%d; n=%d; f=%d; tmo=%d; tmoInterval=%d]", id, n, f, tmo,
                 tmoInterval));
@@ -133,23 +126,18 @@ public class WRB {
     }
 
     static private void preDeliverLogic(Meta key, int worker, int cidSeries, int cid, int sender) throws InterruptedException {
-//        int realTmo = currentTmo[sender][worker];
-//        if (Data.pending[worker].containsKey(key) && BFD.isSuspected(id)) {
-//            Utils.setTmo(sender, worker, tmo);
-//            BFD.handleSuspection(sender, tmo);
-//            return;
-//        }
-        int realTmo = Utils.getTmo(sender, worker);
-//        BFD.handleSuspection(sender, realTmo);
-//        if (BFD.isSuspected(sender)) {
-//            logger.info(format("[#%d-C[%d]] node [%d] is suspected, we will not wait for it [cidSeries=%d ; cid=%d]",
-//                    id, worker, sender, cidSeries, cid));
-//            return; // kind of reputation mechanism? it gives the node 10 tries before being excluded from proposing
-//        }
 
+        if (BFD.isSuspected(sender, worker)) {
+            if (!Data.pending[worker].containsKey(key)) {
+                return;
+            }
+            BFD.unsuspect(sender, worker);
+        }
+
+
+        int realTmo = TmoUtils.getTmo(sender, worker);
         updateMaxTmo(worker, realTmo);
-
-
+        updateAvgTmo(worker, realTmo);
         long startTime = System.currentTimeMillis();
         synchronized (Data.pending[worker]) {
             while (realTmo > 0 && !Data.pending[worker].containsKey(key)) {
@@ -163,28 +151,16 @@ public class WRB {
 
 
         long estimatedTime = System.currentTimeMillis() - startTime;
+        updateTmo(sender, worker, (int) estimatedTime, Data.pending[worker].containsKey(key));
         logger.debug(format("[#%d-C[%d]] have waited [%d] ms for data msg [cidSeries=%d ; cid=%d]",
                 id, worker, estimatedTime, cidSeries, cid));
-//        updateTmo(worker, Utils.getTmo(sender, worker));
         updateActTmo(worker, (int) estimatedTime);
         if (Data.pending[worker].containsKey(key)) {
-            Utils.updateTmo(sender, worker, (int) estimatedTime); // Fast decrease
-        } else {
-            if (estimatedTime == 1) {
-                estimatedTime = 2;
-            }
-            Utils.updateTmoVars(sender, worker, (int) estimatedTime + origTmo); // Fast decrease
-            setTmo(sender, worker, (int) estimatedTime + origTmo); // Fast recovery
-
+            BFD.activate(worker);
         }
-
-
-//        if (!Data.pending[worker].containsKey(key)) {
-//            currentTmo[sender][worker] += tmo;
-//        } else {
-//            int epsilon = 1;
-//            currentTmo[sender][worker] = (int) max(estimatedTime, epsilon);
-//        }
+        if (BFD.isExceedsThreshold((int) estimatedTime)) {
+            BFD.suspect(sender, worker, getTmo(sender, worker));
+        }
 
     }
 

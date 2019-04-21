@@ -11,6 +11,7 @@ import config.Node;
 import das.ab.ABService;
 import das.data.Data;
 //import das.wrb.WrbNode;
+import das.ms.BFD;
 import das.wrb.WRB;
 import proto.Types;
 import utils.CacheUtils;
@@ -272,7 +273,8 @@ public abstract class ToyBaseServer {
                         getID(), worker, currHeight, currHeight));
                 currLeader = (currLeader + 1) % n;
                 fastMode = false;
-                cid += 2; // I think we have no reason to increase CID.
+                cid += 1;
+                BFD.deactivate(worker);
             }
 //            long start = System.currentTimeMillis();
             BlockHeader next; // = leaderImpl();

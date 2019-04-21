@@ -325,7 +325,7 @@ public class FileRecoverer {
 							}
 						} else {
 							logLastConsensusId = log.readInt();
-							System.out.print("ELSE 1. Recovered batches: " + recoveredBatches);
+							logger.info("ELSE 1. Recovered batches: " + recoveredBatches);
 							logger.info(", logLastConsensusId: " + logLastConsensusId);
 							return state.toArray(new CommandsInfo[state.size()]);
 						}

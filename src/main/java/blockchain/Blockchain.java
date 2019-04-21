@@ -93,7 +93,7 @@ public class Blockchain {
     public boolean isValid() {
         for (int i = 1 ; i < getHeight() + 1 ; i++) {
             if (!validateBlockHash(getBlock(i - 1))) {
-                System.out.println(String.format("Invalid Blockchain!! [%d -> %d]", i-1, i));
+                logger.info(String.format("Invalid Blockchain!! [%d -> %d]", i-1, i));
                 return false;
             }
         }
