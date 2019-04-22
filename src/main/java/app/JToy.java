@@ -3,6 +3,7 @@ package app;
 import config.Config;
 import servers.server;
 import servers.Top;
+import utils.GEH;
 //import TmoUtils.derbyUtils;
 
 import java.io.IOException;
@@ -45,6 +46,7 @@ public class JToy {
             int serverID = Integer.parseInt(argv[0]);
             Config.setConfig(config, serverID);
             logger = org.apache.log4j.Logger.getLogger(JToy.class);
+            Thread.setDefaultUncaughtExceptionHandler(new GEH());
             type = argv[1];
             logger.debug("type is " + type);
             switch (type) {

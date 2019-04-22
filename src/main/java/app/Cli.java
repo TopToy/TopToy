@@ -175,6 +175,18 @@ public class Cli {
                     return;
 
                 }
+
+            if (args[0].equals("stStart")) {
+               Statistics.activate();
+                return;
+
+            }
+
+            if (args[0].equals("stStop")) {
+                Statistics.deactivate();
+                return;
+
+            }
 //                if (args[0].equals("bm")) {
 //                    if (args.length != 7) return;
 //                    if (!args[1].equals("-t")) return;
@@ -497,6 +509,8 @@ public class Cli {
                         , String.valueOf(totalP)
                         , String.valueOf(syncEvents)
                         , String.valueOf(st.getSuspected())
+                        , String.valueOf(Runtime.getRuntime().totalMemory() / (1024 * 1024))
+                        , String.valueOf(Runtime.getRuntime().freeMemory() / (1024 * 1024))
                 );
                 CSVUtils.writeLine(writer, row);
                 writer.flush();
