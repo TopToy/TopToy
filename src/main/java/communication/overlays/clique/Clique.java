@@ -3,19 +3,11 @@ package communication.overlays.clique;
 import communication.CommLayer;
 import communication.data.Data;
 import config.Node;
-import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
-import io.grpc.Server;
-import io.grpc.ServerBuilder;
-import io.grpc.stub.StreamObserver;
-import proto.CommunicationGrpc;
 import proto.Types;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static blockchain.data.BCS.bcs;
 import static crypto.blockDigSig.verfiyBlockWRTheader;
 import static java.lang.String.format;
 

@@ -138,8 +138,24 @@ public class Blockchain {
         }
         DiskUtils.deleteBlockFile(index, swapPath);
     }
-
     public void writeNextToDisk() {
+        if (!swapAble) return;
+        if (blocks.size() < maxCacheSize) return;
+        int currBlockIndex = swapSize;
+        try {
+            DiskUtils.cutBlock(blocks.get(currBlockIndex), swapPath);
+            swapSize++;
+            blocks.remove(currBlockIndex);
+        } catch (IOException e) {
+            logger.error("", e);
+            return;
+        }
+//        System.out.println("(3) " + blocks.size());
+
+
+    }
+
+    public void writeNextToDiskAsync() {
         if (!swapAble) return;
         if (blocks.size() < maxCacheSize) return;
         int currBlockIndex = swapSize;

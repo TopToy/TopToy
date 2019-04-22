@@ -238,11 +238,7 @@ public class WrbRpcs extends WrbGrpc.WrbImplBase {
 
     @Override
     public void disseminateMessage(Types.BlockHeader request, StreamObserver<Types.Empty> responseObserver) {
-        Types.Meta key1 = Types.Meta.newBuilder()
-                .setChannel(request.getM().getChannel())
-                .setCidSeries(request.getM().getCidSeries())
-                .setCid(request.getM().getCid())
-                .build();
+        Types.Meta key1 = request.getM();
         logger.debug(format("received a header for [w=%d; cidSeries=%d; cid=%d]", key1.getChannel(),
                 key1.getCidSeries(), key1.getCid()));
         addToPendings(request, key1);

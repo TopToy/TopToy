@@ -48,10 +48,10 @@ public class CliqueRpcs  extends CommunicationGrpc.CommunicationImplBase {
     private Server rpcServer;
     private Map<Integer, Peer> peers = new HashMap<>();
     private List<Node> nodes;
-    int id;
-    int n;
+    private int id;
+    private int n;
 
-    public CliqueRpcs(int id, ArrayList<Node> commCluster, int n) {
+    CliqueRpcs(int id, ArrayList<Node> commCluster, int n) {
         this.id = id;
         this.nodes = commCluster;
         this.n = n;
@@ -86,12 +86,12 @@ public class CliqueRpcs  extends CommunicationGrpc.CommunicationImplBase {
         logger.debug("Shutting down clique rpc server");
     }
 
-    public void broadcast(int worker, Types.Block data) {
+    void broadcast(int worker, Types.Block data) {
         for (Peer p : peers.values()) {
             p.stub.dsm(Types.Comm.newBuilder()
                     .setChannel(worker)
                     .setData(data)
-                    .build(), new StreamObserver<Types.Empty>() {
+                    .build(), new StreamObserver<>() {
                 @Override
                 public void onNext(Types.Empty empty) {
 
@@ -116,7 +116,7 @@ public class CliqueRpcs  extends CommunicationGrpc.CommunicationImplBase {
             peers.get(i).stub.dsm(Types.Comm.newBuilder()
                     .setChannel(channel)
                     .setData(data)
-                    .build(), new StreamObserver<Types.Empty>() {
+                    .build(), new StreamObserver<>() {
                 @Override
                 public void onNext(Types.Empty empty) {
 
@@ -143,7 +143,7 @@ public class CliqueRpcs  extends CommunicationGrpc.CommunicationImplBase {
         int channel = request.getProof().getM().getChannel();
         int pid = request.getProof().getBid().getPid();
         logger.debug(format("[%d-C[%d]] received commReq [height=%d]", id, channel, height));
-        Types.Block res[] = {null};
+        Types.Block[] res = {null};
         Data.blocks[pid][channel].computeIfPresent(bid, (k, v) -> {
 
             LinkedList<Types.Block> ll = v.stream().filter(b -> verfiyBlockWRTheader(b, request.getProof()))
@@ -165,7 +165,7 @@ public class CliqueRpcs  extends CommunicationGrpc.CommunicationImplBase {
 
     void broadcastCommReq(Types.commReq request) {
         for (Peer p : peers.values()) {
-            p.stub.reqBlock(request, new StreamObserver<Types.commRes>() {
+            p.stub.reqBlock(request, new StreamObserver<>() {
                 @Override
                 public void onNext(Types.commRes commRes) {
                     int channel = request.getProof().getM().getChannel();
@@ -202,7 +202,7 @@ public class CliqueRpcs  extends CommunicationGrpc.CommunicationImplBase {
     public void dsm(Types.Comm request, StreamObserver<proto.Types.Empty> responseObserver) {
         int c = request.getChannel();
         int pid = request.getData().getId().getPid();
-        Data.blocks[pid][c].putIfAbsent(request.getData().getId(), new LinkedList<Types.Block>());
+        Data.blocks[pid][c].putIfAbsent(request.getData().getId(), new LinkedList<>());
         synchronized (Data.blocks[pid][c]) {
             Data.blocks[pid][c].computeIfPresent(request.getData().getId(), (k, v) -> {
                 Types.BlockID bid = request.getData().getId();
