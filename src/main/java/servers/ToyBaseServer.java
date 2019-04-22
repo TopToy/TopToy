@@ -58,15 +58,9 @@ public abstract class ToyBaseServer {
     int worker;
     private boolean testing = Config.getTesting();
     private int txPoolMax = 10000;
-//    private int bareTxSize = Transaction.newBuilder()
-//            .setClientID(0)
-//            .setId(txID.newBuilder().setProposerID(0).setTxNum(0).build())
-//            .build().getSerializedSize() + 8;
     private int txSize = 0;
     private int cID = new Random().nextInt(10000);
     Path sPath;
-//    private ExecutorService storageWorker = Executors.newSingleThreadExecutor();
-//    private int syncEvents = 0;
     private int bid = 0;
     private final Queue<Block> blocksForPropose = new LinkedList<>();
     private final Queue<Block> proposedBlocks = new LinkedList<>();
@@ -291,8 +285,8 @@ public abstract class ToyBaseServer {
             try {
                 long startTime = System.currentTimeMillis();
                 recHeader = WRB.WRBDeliver(worker, cidSeries, cid, currLeader, currHeight, next);
-                logger.info(format("[#%d-C[%d]] WRB deliver took about [%d] ms [cidSeries=%d ; cid=%d ; height=%d]",
-                        getID(), worker, System.currentTimeMillis() - startTime, cidSeries, cid, currHeight));
+                logger.debug(format("[#%d-C[%d]] WRB deliver took about [%d] ms [cidSeries=%d ; cid=%d ; height=%d ; dec=%b]",
+                        getID(), worker, System.currentTimeMillis() - startTime, cidSeries, cid, currHeight, recHeader != null));
 
             } catch (InterruptedException e) {
                 logger.info(format("[#%d-C[%d]] main thread has been interrupted on wrb deliver " +
@@ -345,7 +339,7 @@ public abstract class ToyBaseServer {
                     updateHeaderStatus(permanent.getHeader(), worker);
                     updateP(worker);
                     if (permanent.getHeader().getHeight() % 1000 == 0) {
-                        logger.info(format("[#%d-C[%d]] Deliver [[height=%d], [sender=%d], [channel=%d], [size=%d]]",
+                        logger.debug(format("[#%d-C[%d]] Deliver [[height=%d], [sender=%d], [channel=%d], [size=%d]]",
                                 getID(), worker, permanent.getHeader().getHeight(), permanent.getHeader().getBid().getPid(),
                                 permanent.getHeader().getM().getChannel(),
                                 permanent.getDataCount()));
@@ -369,9 +363,16 @@ public abstract class ToyBaseServer {
                     Data.evacuateOldData(worker, permanent.getHeader().getM());
                     communication.data.Data.evacuateOldData(worker, permanent.getId());
 
-                    if (currHeight % 1000 == 0) {
+                    if (currHeight % 10 == 0) {
                         Data.evacuateAllOldData(worker, permanent.getHeader().getM());
-                        communication.data.Data.evacuateOldData(worker, permanent.getId());
+                        communication.data.Data.evacuateAllOldData(worker, permanent.getId());
+                        logger.info(format("Start Calling gc [tm=%d ; fm=%d]", Runtime.getRuntime().totalMemory() / (1024 * 1024)
+                                , Runtime.getRuntime().freeMemory()/ (1024 * 1024)));
+                        long start = System.currentTimeMillis();
+                        System.gc();
+                        logger.info(format("Done Calling gc [tm=%d ; fm=%d ; duration=%d]"
+                                , Runtime.getRuntime().totalMemory() / (1024 * 1024), Runtime.getRuntime().freeMemory() / (1024 * 1024), System.currentTimeMillis() - start));
+
                     }
                 }
 
@@ -384,7 +385,6 @@ public abstract class ToyBaseServer {
             }
             updateLeaderAndHeight();
             bc.writeNextToDisk();
-//            storageWorker.execute(bc::writeNextToDisk);
         }
         return false;
     }

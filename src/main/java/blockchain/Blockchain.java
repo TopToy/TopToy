@@ -105,6 +105,7 @@ public class Blockchain {
     }
 
     public Block getBlock(int index) {
+        if (index > getHeight()) return null;
         if (blocks.keySet().contains(index)) {
             return blocks.get(index);
         }
@@ -139,19 +140,14 @@ public class Blockchain {
     }
 
     public void writeNextToDisk() {
-//        logger.debug("BD(-1)");
         if (!swapAble) return;
-//        logger.debug(format("BD(0), [%d ; %d]", blocks.size(), maxCacheSize));
         if (blocks.size() < maxCacheSize) return;
-//        logger.debug("BD(1)");
         int currBlockIndex = swapSize;
         finishedTasks.add(DiskUtils.cutBlockAsync(blocks.get(currBlockIndex), swapPath));
         swapSize++;
         assert finishedTasks.peek() != null;
         boolean task_done = finishedTasks.peek().isDone();
-//        logger.debug("BD(2)");
         while (task_done) {
-//            logger.debug("BD(3)");
             blocks.remove(currBlockIndex);
             finishedTasks.remove();
             if (finishedTasks.isEmpty()) break;

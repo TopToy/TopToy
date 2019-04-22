@@ -125,7 +125,11 @@ configure_servers() {
     echo "init" > ${inst}
 #    echo "wait 30" >> ${inst}
     echo "serve" >> ${inst}
+    echo "wait 30" >> ${inst}
+    echo "stStart" >> ${inst}
     echo "wait ${1}" >> ${inst}
+    echo "stStop" >> ${inst}
+    echo "wait 30" >> ${inst}
     echo "stop" >> ${inst}
     echo "quit" >> ${inst}
 }
@@ -306,7 +310,7 @@ collect_res_from_servers() {
         scp -o ConnectTimeout=30 -r ${s}:/tmp/JToy/res/* $tmp  > /dev/null
     done
 #    ./extract_workers_logs.sh $currOut/servers/logs ${channels}
-    echo "id,type,workers,tmo,actTmo,maxTmo,txSize,txInBlock,txTotal,duration,tps,nob,bps,avgTxInBlock,opt,opRate,pos,posRate,neg,negRate,avgNegTime,ATDT,APDT,T,P,syncEvents,suspected" >> $sum
+    echo "id,type,workers,tmo,actTmo,maxTmo,txSize,txInBlock,txTotal,duration,tps,nob,bps,avgTxInBlock,opt,opRate,pos,posRate,neg,negRate,avgNegTime,ATDT,APDT,T,P,syncEvents,suspected,tm,fm" >> $sum
 
     for i in `seq 0 $((${#servers[@]} - 1))`; do
         echo "collecting results summery from server ${servers[$i]}"
@@ -717,9 +721,19 @@ main_byz() {
 # ${9} - test time
 test1() {
 #main_bengin 0 0 1 1 2 1 2 1 60
-for i in `seq 0 1`; do
+for i in `seq 0 0`; do
 #    main_no_failures 0 0 1 1 1 3 3 600
-    main_no_failures 0 0 1 10 1 10 10 300
+#    main_no_failures 512 1000 4 4 2 10 10 60
+#    main_no_failures 512 100 4 4 2 10 10 300
+#    main_no_failures 512 1000 4 4 2 10 10 300
+    main_no_failures 512 1000 4 4 2 10 10 60
+#    main_no_failures 512 1000 4 4 2 1000 1000 120
+#    main_no_failures 512 1000 4 4 2 1000 1000 180
+    main_no_failures 512 1000 4 4 2 10 10 240
+#    main_no_failures 512 1000 4 4 2 1000 1000 300
+
+#    main_no_failures 1024 100 1 10 1 10 10 300
+#    main_no_failures 4096 100 1 10 1 10 10 300
 #    main_no_failures 0 0 1 10 3 100 100 300
 #    main_no_failures 0 0 1 10 3 1000 1000 300
 #    main_no_failures 0 0 1 10 1 10 10 300

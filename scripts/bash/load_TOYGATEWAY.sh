@@ -22,8 +22,8 @@ ssh ${gate} "mkdir -p ./toy/Configurations"
 
 echo "copy bin to ${gate}..."
 scp  -r ${tDir}/bin ${gate}:./toy > /dev/null
-echo "copy bin_client to ${gate}..."
-scp  -r ${tDir}/bin_client ${gate}:./toy > /dev/null
+#echo "copy bin_client to ${gate}..."
+#scp  -r ${tDir}/bin_client ${gate}:./toy > /dev/null
 echo "copy Configuration to ${gate}..."
 scp  -r ${config}/* ${gate}:./toy/Configurations > /dev/null
 echo "copy scripts to ${gate}..."

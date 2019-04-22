@@ -129,6 +129,7 @@ public class WRB {
 
         if (BFD.isSuspected(sender, worker)) {
             if (!Data.pending[worker].containsKey(key)) {
+                logger.info(format("Suspect [%d:%d] skipping...", sender, worker));
                 return;
             }
             BFD.unsuspect(sender, worker);
@@ -136,7 +137,7 @@ public class WRB {
 
 
         int realTmo = TmoUtils.getTmo(sender, worker);
-        updateMaxTmo(worker, realTmo);
+
         updateAvgTmo(worker, realTmo);
         long startTime = System.currentTimeMillis();
         synchronized (Data.pending[worker]) {
@@ -155,6 +156,7 @@ public class WRB {
         logger.debug(format("[#%d-C[%d]] have waited [%d] ms for data msg [cidSeries=%d ; cid=%d]",
                 id, worker, estimatedTime, cidSeries, cid));
         updateActTmo(worker, (int) estimatedTime);
+        updateMaxTmo(worker, (int) estimatedTime);
         if (Data.pending[worker].containsKey(key)) {
             BFD.activate(worker);
         }

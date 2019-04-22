@@ -27,8 +27,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicBoolean;
 import static java.lang.Math.min;
 import static java.lang.String.format;
-import static utils.Statistics.updateStart;
-import static utils.Statistics.updateStop;
 
 public class Top implements server {
 
@@ -143,7 +141,7 @@ public class Top implements server {
     }
 
     public void shutdown() {
-        updateStop();
+//        updateStop();
         txsServer.shutdown();
         logger.info("shutdown txsServer");
         for (int i = 0 ; i < workers ; i++) {
@@ -190,7 +188,7 @@ public class Top implements server {
             logger.error("", e);
         }
         up = true;
-        updateStart();
+//        updateStart();
         logger.info("Start serving, everything looks good");
     }
 
