@@ -69,7 +69,7 @@ public class ToyServer extends ToyBaseServer {
 
     @Override
     public Blockchain initBC(int id, int channel) {
-        return createBlockchain(Utils.BCT.SGC, id, 100, sPath);
+        return createBlockchain(Utils.BCT.SGC, id, n, sPath);
     }
 
     @Override

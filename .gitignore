@@ -19,7 +19,10 @@ target/
 #bft-SMaRt
 *currentView
 
-
+src/main/resources/ABConfig*
+src/main/resources/inst*
+src/main/resources/sslConfig*
+src/main/resources/config*
 bin*
 scripts/python/.idea*
 scripts/python/venv*

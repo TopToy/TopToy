@@ -143,6 +143,19 @@ public class Blockchain {
         if (!swapAble) return;
         if (blocks.size() < maxCacheSize) return;
         int currBlockIndex = swapSize;
+        try {
+            DiskUtils.cutBlock(blocks.get(currBlockIndex), swapPath);
+        } catch (IOException e) {
+            logger.error(e);
+        }
+        swapSize++;
+        blocks.remove(currBlockIndex);
+    }
+
+    public void writeNextToDiskAsync() {
+        if (!swapAble) return;
+        if (blocks.size() < maxCacheSize) return;
+        int currBlockIndex = swapSize;
         finishedTasks.add(DiskUtils.cutBlockAsync(blocks.get(currBlockIndex), swapPath));
         swapSize++;
         assert finishedTasks.peek() != null;
@@ -154,6 +167,21 @@ public class Blockchain {
             task_done = finishedTasks.peek().isDone();
         }
     }
+
+//    void gcPhase() {
+//        if (blocks.size() > 10 * maxCacheSize) {
+//            long start = System.currentTimeMillis();
+//            while (finishedTasks.size() > 0) {
+//                // TODO: Inspect this code...
+//                finishedTasks.poll().get();
+//
+//            }
+//            logger.info(format("Running synchronized writes to block (in order to prevent memory leaks." +
+//                    " Took about [%d] ms", System.currentTimeMillis() - start));
+//            System.out.println(format("Running synchronized writes to block (in order to prevent memory leaks." +
+//                    " Took about [%d] ms", System.currentTimeMillis() - start));
+//        }
+//    }
 
     public boolean contains(int height) {
         return height <= getHeight();

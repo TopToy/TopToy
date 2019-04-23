@@ -190,6 +190,8 @@ public class OBBCRpcs extends ObbcGrpc.ObbcImplBase {
             }
             return v;
         });
+        responseObserver.onNext(Types.Empty.newBuilder().build());
+        responseObserver.onCompleted();
     }
 
     void addNewFastDec(int worker, Types.Meta key, boolean dec, int height) {
@@ -252,6 +254,7 @@ public class OBBCRpcs extends ObbcGrpc.ObbcImplBase {
                 setSender(id).
                 setM(meta).
                 build());
+        responseObserver.onCompleted();
     }
 
     private void sendFVMessage(ObbcGrpc.ObbcStub stub, Types.BbcMsg v) {
