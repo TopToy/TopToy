@@ -4,6 +4,8 @@ import proto.Types;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 
+import static java.lang.Math.max;
+
 public class BFD {
 
     static private int n;
@@ -22,7 +24,7 @@ public class BFD {
         BFD.sus = new PriorityQueue[workers];
         for (int i = 0 ; i < workers ; i++) {
             BFD.active[i] = false;
-            BFD.sus[i] = new PriorityQueue(f, Comparator.comparing(Types.suspected::getTmo).reversed());
+            BFD.sus[i] = new PriorityQueue(max(f, 1), Comparator.comparing(Types.suspected::getTmo).reversed());
         }
 
     }

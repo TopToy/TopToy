@@ -179,6 +179,7 @@ public class WrbRpcs extends WrbGrpc.WrbImplBase {
         stub.reqMessage(req, new StreamObserver<>() {
             @Override
             public void onNext(Types.WrbRes res) {
+                if (res.equals(Types.WrbRes.getDefaultInstance())) return;
                 Types.Meta key = Types.Meta.newBuilder()
                         .setChannel(channel)
                         .setCidSeries(cidSeries)
@@ -242,6 +243,8 @@ public class WrbRpcs extends WrbGrpc.WrbImplBase {
         logger.debug(format("received a header for [w=%d; cidSeries=%d; cid=%d]", key1.getChannel(),
                 key1.getCidSeries(), key1.getCid()));
         addToPendings(request, key1);
+        responseObserver.onNext(Types.Empty.newBuilder().build());
+        responseObserver.onCompleted();
     }
 
     @Override
@@ -275,6 +278,8 @@ public class WrbRpcs extends WrbGrpc.WrbImplBase {
         } else {
             logger.debug(format("[#%d-C[%d]] has received request message from [#%d] of [cidSeries=%d ; cid=%d] but buffers are empty",
                     id, channel, request.getSender(), cidSeries, cid));
+            responseObserver.onNext(Types.WrbRes.getDefaultInstance());
         }
+        responseObserver.onCompleted();
     }
 }

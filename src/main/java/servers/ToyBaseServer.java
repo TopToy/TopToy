@@ -384,7 +384,7 @@ public abstract class ToyBaseServer {
 
             }
             updateLeaderAndHeight();
-            bc.writeNextToDisk();
+            bc.writeNextToDiskAsync();
         }
         return false;
     }

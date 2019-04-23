@@ -6,6 +6,8 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
+import io.grpc.netty.NettyChannelBuilder;
+import io.grpc.netty.NettyServerBuilder;
 import io.grpc.stub.StreamObserver;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -14,8 +16,10 @@ import proto.Types;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Semaphore;
 import java.util.stream.Collectors;
 
 import static blockchain.data.BCS.bcs;
@@ -55,15 +59,16 @@ public class CliqueRpcs  extends CommunicationGrpc.CommunicationImplBase {
         this.id = id;
         this.nodes = commCluster;
         this.n = n;
-
     }
     // TODO: Re configure grpc server so it would be anble to handle mass of messages.
     public void start() {
 //        Executor executor = Executors.newFixedThreadPool(n);
-        rpcServer = ServerBuilder
+        rpcServer =
+                NettyServerBuilder
                 .forPort(nodes.get(id).getPort())
                 .addService(this)
                 .maxInboundMessageSize(16 * 1024 * 1024)
+//                .maxConcurrentCallsPerConnection(2 * n * workers)
 //                .executor(executor)
                 .build();
         try {
@@ -88,35 +93,16 @@ public class CliqueRpcs  extends CommunicationGrpc.CommunicationImplBase {
 
     void broadcast(int worker, Types.Block data) {
         for (Peer p : peers.values()) {
-            p.stub.dsm(Types.Comm.newBuilder()
+            sendImpl(Types.Comm.newBuilder()
                     .setChannel(worker)
                     .setData(data)
-                    .build(), new StreamObserver<>() {
-                @Override
-                public void onNext(Types.Empty empty) {
-
-                }
-
-                @Override
-                public void onError(Throwable throwable) {
-
-                }
-
-                @Override
-                public void onCompleted() {
-
-                }
-            });
-        }
+                    .build(), p);
+            }
 
     }
 
-    public void send(int channel, Types.Block data, int[] recipients) {
-        for (int i : recipients) {
-            peers.get(i).stub.dsm(Types.Comm.newBuilder()
-                    .setChannel(channel)
-                    .setData(data)
-                    .build(), new StreamObserver<>() {
+    private void sendImpl(Types.Comm msg, Peer p) {
+            p.stub.dsm(msg, new StreamObserver<Types.Empty>() {
                 @Override
                 public void onNext(Types.Empty empty) {
 
@@ -129,9 +115,18 @@ public class CliqueRpcs  extends CommunicationGrpc.CommunicationImplBase {
 
                 @Override
                 public void onCompleted() {
-
                 }
             });
+    }
+
+    public void send(int worker, Types.Block data, int[] recipients) {
+        for (int i : recipients) {
+            Peer p = peers.get(i);
+           sendImpl(Types.Comm.newBuilder()
+                   .setChannel(worker)
+                   .setData(data)
+                   .build(), p);
+
         }
     }
 
@@ -160,6 +155,7 @@ public class CliqueRpcs  extends CommunicationGrpc.CommunicationImplBase {
             Types.commRes cr = Types.commRes.newBuilder().setB(res[0]).build();
             responseObserver.onNext(cr);
         }
+        responseObserver.onCompleted();
 
     }
 
@@ -168,6 +164,7 @@ public class CliqueRpcs  extends CommunicationGrpc.CommunicationImplBase {
             p.stub.reqBlock(request, new StreamObserver<>() {
                 @Override
                 public void onNext(Types.commRes commRes) {
+
                     int channel = request.getProof().getM().getChannel();
                     int pid = request.getProof().getBid().getPid();
                     Types.BlockID bid = request.getProof().getBid();
@@ -192,7 +189,6 @@ public class CliqueRpcs  extends CommunicationGrpc.CommunicationImplBase {
 
                 @Override
                 public void onCompleted() {
-
                 }
             });
         }
@@ -211,6 +207,8 @@ public class CliqueRpcs  extends CommunicationGrpc.CommunicationImplBase {
                 return v;
             });
             Data.blocks[pid][c].notifyAll();
+            responseObserver.onNext(Types.Empty.newBuilder().build());
+            responseObserver.onCompleted();
         }
 
 
