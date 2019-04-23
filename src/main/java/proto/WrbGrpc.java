@@ -116,9 +116,6 @@ public final class WrbGrpc {
     }
 
     /**
-     * <pre>
-     *    rpc FastVote(BbcMsg) returns (Empty) {};
-     * </pre>
      */
     public void reqMessage(proto.Types.WrbReq request,
         io.grpc.stub.StreamObserver<proto.Types.WrbRes> responseObserver) {
@@ -172,9 +169,6 @@ public final class WrbGrpc {
     }
 
     /**
-     * <pre>
-     *    rpc FastVote(BbcMsg) returns (Empty) {};
-     * </pre>
      */
     public void reqMessage(proto.Types.WrbReq request,
         io.grpc.stub.StreamObserver<proto.Types.WrbRes> responseObserver) {
@@ -209,9 +203,6 @@ public final class WrbGrpc {
     }
 
     /**
-     * <pre>
-     *    rpc FastVote(BbcMsg) returns (Empty) {};
-     * </pre>
      */
     public proto.Types.WrbRes reqMessage(proto.Types.WrbReq request) {
       return blockingUnaryCall(
@@ -246,9 +237,6 @@ public final class WrbGrpc {
     }
 
     /**
-     * <pre>
-     *    rpc FastVote(BbcMsg) returns (Empty) {};
-     * </pre>
      */
     public com.google.common.util.concurrent.ListenableFuture<proto.Types.WrbRes> reqMessage(
         proto.Types.WrbReq request) {

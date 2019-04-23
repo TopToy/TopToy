@@ -509,8 +509,6 @@ public class Cli {
                         , String.valueOf(totalP)
                         , String.valueOf(syncEvents)
                         , String.valueOf(st.getSuspected())
-                        , String.valueOf(Runtime.getRuntime().totalMemory() / (1024 * 1024))
-                        , String.valueOf(Runtime.getRuntime().freeMemory() / (1024 * 1024))
                 );
                 CSVUtils.writeLine(writer, row);
                 writer.flush();

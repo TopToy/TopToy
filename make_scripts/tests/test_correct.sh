@@ -21,4 +21,4 @@ run_channels() {
     done
 }
 
-run_channels 2 2 1 0 10 1000 60
+run_channels 1 1 1 0 10 1000 60
