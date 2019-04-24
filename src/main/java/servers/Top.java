@@ -301,7 +301,8 @@ public class Top implements server {
     int minBcSize() {
         int min = toys[0].bcSize();
         for (int i = 1; i < workers ; i++) {
-            min = min(min, toys[i].bcSize());
+            int s = toys[i].bcSize();
+            min = min(min, s);
         }
         return min;
     }

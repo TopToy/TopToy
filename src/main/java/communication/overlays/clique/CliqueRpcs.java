@@ -147,14 +147,16 @@ public class CliqueRpcs  extends CommunicationGrpc.CommunicationImplBase {
             res[0] = ll.peek();
             return v;
         });
+        Types.commRes cr = Types.commRes.getDefaultInstance();
         if (res[0] == null) {
             res[0] = bcs[channel].getBlock(height);
         }
         if (res[0] != null) {
             logger.debug(format("[%d-C[%d]] received commReq and has a match [height=%d]", id, channel, height));
-            Types.commRes cr = Types.commRes.newBuilder().setB(res[0]).build();
-            responseObserver.onNext(cr);
+            cr = Types.commRes.newBuilder().setB(res[0]).build();
+
         }
+        responseObserver.onNext(cr);
         responseObserver.onCompleted();
 
     }
@@ -164,7 +166,7 @@ public class CliqueRpcs  extends CommunicationGrpc.CommunicationImplBase {
             p.stub.reqBlock(request, new StreamObserver<>() {
                 @Override
                 public void onNext(Types.commRes commRes) {
-
+                    if (commRes.equals(Types.commRes.getDefaultInstance())) return;
                     int channel = request.getProof().getM().getChannel();
                     int pid = request.getProof().getBid().getPid();
                     Types.BlockID bid = request.getProof().getBid();

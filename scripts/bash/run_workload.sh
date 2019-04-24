@@ -17,6 +17,33 @@ tconfig=${config_toml}.tmp
 
 user="toy"
 
+#$(( (($elapsed)*100)/($duration)*100/100 ))
+
+progress-bar() {
+  local duration=$((${1} / 10))
+    already_done() { for ((done=0; done<$elapsed; done++)); do printf "▇"; done }
+    remaining() { for ((remain=$elapsed; remain<$duration; remain++)); do printf " "; done }
+    percentage() {
+                    sign="-"
+                    if [ $(( ${1} % 2 )) == 0 ]; then
+                        sign="|"
+                    fi
+                    printf "### %s${sign}" $(( ($duration - $elapsed) * 10 - ${1} ));
+                }
+    clean_line() { printf "\r"; }
+
+  for (( elapsed=0; elapsed<$duration; elapsed++ )); do
+      for i in `seq 0 9`; do
+          already_done; remaining; percentage ${i}
+          sleep 1
+          clean_line
+      done
+
+#      sleep 10
+#      clean_line
+  done
+  clean_line
+}
 
 load_server() {
     local s=${servers[${1}]}
@@ -79,6 +106,10 @@ run_remote_servers() {
         pids[${id}]=$!
         id=$((${id} + 1))
     done
+    sleep 20
+    t=$((${1} + 40))
+    echo "waits for more ${t} ms"
+    progress-bar ${t}
     for pid in ${pids[*]}; do
         wait $pid
     done
@@ -194,11 +225,7 @@ configure_server_files() {
     local id=${1}
     local public_ip=`echo "${servers[${id}]}" | sed 's/'${user}'\@//g'`
     local private_ip=${servers_p[${id}]}
-#    sed -i 's/'"${public_ip}"'/'"${private_ip}"'/g' ${config_bbc}
     sed -i 's/'"${public_ip}"'/'"${private_ip}"'/g' ${config_rb}
-#    sed -i 's/'"${public_ip}"'/'"${private_ip}"'/g' ${config_panic}
-#    sed -i 's/'"${public_ip}"'/'"${private_ip}"'/g' ${config_sync}
-
 }
 
 configure_server_config_toml() {
@@ -212,7 +239,7 @@ configure_server_config_toml() {
 run_servers_instance_with_cahnnels() {
     configure_channels ${1}
     load_servers_configuration
-    run_remote_servers
+    run_remote_servers ${2}
 }
 
 run_servers_instance_with_tmo() {
@@ -230,14 +257,14 @@ print_headers() {
 # ${1} - channel to start with
 # ${2} - max channels
 # ${3} - interval
-# ${3} - output directory
+# ${4} - output directory
 run_servers_channels() {
 #    print_headers ${currOut}
     for i in `seq ${1} ${3} ${2}`; do
         chan=${i}
 #        echo "id,type,channels,txSize,maxTxInBlock,actualTxInBlock,height,signaturePeriod,verificationPeriod,propose2tentative,tentative2permanent,channelPermanent2decide,propose2permanentchannel,propose2decide" >> $currOut/servers/res/blocksStat_${i}.csv
         echo "[${i} channels]"
-        run_servers_instance_with_cahnnels ${i}
+        run_servers_instance_with_cahnnels ${i} ${4}
 #        sleep 10
         collect_res_from_servers
     done
@@ -513,7 +540,7 @@ run_no_failures_test() {
 #        cat ${tconfig_panic} > ${config_panic}
 #        cat ${tconfig_sync} > ${config_sync}
     done
-    run_servers_channels ${3} ${4} ${5}
+    run_servers_channels ${3} ${4} ${5} ${8}
 }
 
 # ${1} - transaction size
@@ -720,63 +747,21 @@ main_byz() {
 # ${8} - correct time
 # ${9} - test time
 test1() {
-#main_bengin 0 0 1 1 2 1 2 1 60
-for i in `seq 0 0`; do
-#    main_no_failures 0 0 1 1 1 3 3 600
-#    main_no_failures 512 1000 4 4 2 10 10 60
-#    main_no_failures 512 100 4 4 2 10 10 300
-#    main_no_failures 512 1000 4 4 2 10 10 300
-    main_no_failures 512 1000 4 4 2 10 10 60
-#    main_no_failures 512 1000 4 4 2 1000 1000 120
-#    main_no_failures 512 1000 4 4 2 1000 1000 180
-    main_no_failures 512 1000 4 4 2 10 10 240
-#    main_no_failures 512 1000 4 4 2 1000 1000 300
-
-#    main_no_failures 1024 100 1 10 1 10 10 300
-#    main_no_failures 4096 100 1 10 1 10 10 300
-#    main_no_failures 0 0 1 10 3 100 100 300
-#    main_no_failures 0 0 1 10 3 1000 1000 300
 #    main_no_failures 0 0 1 10 1 10 10 300
-
-
-#    main_no_failures 0 0 2 2 1 100 100 300
-#    main_no_failures 0 0 3 3 1 100 100 300
-#    main_no_failures 0 0 4 4 1 30 30 300
-#    main_no_failures 0 0 5 5 1 35 35 300
-#    main_no_failures 0 0 6 6 1 45 45 300
-#    main_no_failures 0 0 7 7 1 55 55 300
-#    main_no_failures 0 0 8 8 1 60 60 300
-#    main_no_failures 0 0 9 9 1 70 70 300
-#    main_no_failures 0 0 10 10 1 80 80 300
-
-
-##    main_no_failures 0 0 10 10 1 100 600
-done
 #
-##for i in `seq 0 2`; do
-##    main_no_failures 0 0 1 1 1 3 10 600
-##    main_no_failures 0 0 10 10 1 1000 600
-#done
+#    main_no_failures 512 10 1 10 1 10 10 300
+#    main_no_failures 512 100 1 10 1 10 10 300
+#    main_no_failures 512 1000 1 10 1 10 10 300
 
-#for i in `seq 0 1`; do
-#    main_no_failures 0 0 1 10 2 1 600
-#    main_no_failures 0 0 10 10 1 1 600
-##done
+#    main_no_failures 1024 10 1 10 1 10 10 300
+#    main_no_failures 1024 100 1 10 1 10 10 300
+#    main_no_failures 1024 1000 1 10 1 10 10 300
 #
-##for i in `seq 0 0`; do
-#    main_no_failures 0 0 1 10 2 10 600
-#    main_no_failures 0 0 10 10 1 10 600
-##done
-#
-##for i in `seq 0 2`; do
-#    main_no_failures 0 0 1 10 2 100 600
-#    main_no_failures 0 0 10 10 1 100 600
-##done
-#
-##for i in `seq 0 2`; do
-#    main_no_failures 0 0 1 10 2 1000 600
-#    main_no_failures 0 0 10 10 1 1000 600
-#done
+    main_no_failures 4096 10 10 10 1 10 10 300
+#    main_no_failures 4096 100 1 10 1 10 10 300
+    main_no_failures 4096 1000 3 10 1 10 10 300
+
 }
 test1
 shutdown
+

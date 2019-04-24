@@ -28,3 +28,5 @@ scripts/python/.idea*
 scripts/python/venv*
 scripts/python/*.html
 java_pid24974\.hprof
+
+benchmark/*

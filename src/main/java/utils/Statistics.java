@@ -10,8 +10,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static java.lang.Math.max;
 import static java.lang.Math.min;
+import static java.lang.String.format;
 
 public class Statistics {
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Statistics.class);
+
     // Note that due to late nodes this list may grow infinitely. Currently we assume that this is an uncommon case.
     private ConcurrentHashMap<Types.BlockHeader, Types.HeaderStatistics> headerStats;
 
@@ -37,6 +40,8 @@ public class Statistics {
     static private long stop;
     static private int workers;
     static private boolean active = false;
+    static private int nob[];
+    static private int neb = 0;
 
     public Statistics() {
         headerStats = new ConcurrentHashMap<>();
@@ -63,6 +68,7 @@ public class Statistics {
         Statistics.workers = workers;
         Statistics.sworkers = new Statistics[workers];
         Statistics.wTxs = new Queue[workers];
+        nob = new int[workers];
         for (int i = 0 ; i < workers ; i++) {
             Statistics.sworkers[i] = new Statistics();
             Statistics.wTxs[i] = new LinkedList<>();
@@ -105,19 +111,8 @@ public class Statistics {
         stop = System.currentTimeMillis();
     }
 
-//    static public void updateStart() {
-//        if (!active) return;
-//        start = System.currentTimeMillis();
-//    }
-//
-//    static public void updateStop() {
-//        if (!active) return;
-//        stop = System.currentTimeMillis();
-//    }
-
     static public void updateTxCount(int worker, int count) {
         if (!active) return;
-//        sworkers[worker].txCount += count;
         wTxs[worker].add(count);
     }
 
@@ -183,6 +178,16 @@ public class Statistics {
         sworkers[worker].suspected += BFD.size(worker);
     }
 
+    static public void updateNob(int w) {
+        if (!active) return;
+        Statistics.nob[w]++;
+    }
+
+    static public void updateNeb() {
+        if (!active) return;
+        Statistics.neb++;
+    }
+
     static public long getStart() {
         return start;
     }
@@ -196,7 +201,6 @@ public class Statistics {
         Statistics sts = new Statistics();
         int maxT = 0;
         for (int i = 0 ; i < workers ; i++) {
-//            sts.txCount += sworkers[i].txCount;
             sts.optimisticDec += sworkers[i].optimisticDec;
             sts.totalDec += sworkers[i].totalDec;
             sts.pos += sworkers[i].pos;
@@ -222,9 +226,11 @@ public class Statistics {
     static int getAllTxs() {
         int count = 0;
         int minS = wTxs[0].size();
+
         for (int i = 1 ; i < workers ; i++) {
             minS = min(minS, wTxs[i].size());
         }
+//        logger.info(format("Statistics [min=%d]", minS));
         for (int i = 0 ; i < workers ; i++) {
             for (int j = 0 ; j < minS ; j++) {
                 count += wTxs[i].remove();
@@ -293,4 +299,17 @@ public class Statistics {
     public int getSuspected() {
         return suspected;
     }
+
+    public int getNob() {
+        int n = nob[0];
+        for (int i = 1 ; i < workers ; i++) {
+            n = min(n, nob[i]);
+        }
+        return n * workers;
+
+    }
+
+//    public int getNeb() {
+//        return neb;
+//    }
 }

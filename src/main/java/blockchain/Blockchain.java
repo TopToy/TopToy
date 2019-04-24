@@ -24,6 +24,7 @@ public class Blockchain {
     private boolean swapAble = false;
     private final ConcurrentHashMap<Integer, Block> blocks = new ConcurrentHashMap<>();
     private Queue<Future> finishedTasks = new LinkedList<>();
+    private Queue<Integer> tasksIdx = new LinkedList<>();
 
 //    int size = 0;
 
@@ -105,6 +106,7 @@ public class Blockchain {
     }
 
     public Block getBlock(int index) {
+        if (blocks.isEmpty()) return null;
         if (index > getHeight()) return null;
         if (blocks.keySet().contains(index)) {
             return blocks.get(index);
@@ -112,7 +114,7 @@ public class Blockchain {
         try {
             return DiskUtils.getBlockFromFile(index, swapPath);
         } catch (IOException e) {
-            logger.error("Unable to retrieve block from disk", e);
+            logger.error(format("Unable to retrieve block from disk [index=%d ; height=%d]", index, getHeight()), e);
             return null;
         }
     }
@@ -155,12 +157,13 @@ public class Blockchain {
         if (!swapAble) return;
         if (blocks.size() < maxCacheSize) return;
         int currBlockIndex = swapSize;
+        tasksIdx.add(currBlockIndex);
         finishedTasks.add(DiskUtils.cutBlockAsync(blocks.get(currBlockIndex), swapPath));
         swapSize++;
         assert finishedTasks.peek() != null;
         boolean task_done = finishedTasks.peek().isDone();
         while (task_done) {
-            blocks.remove(currBlockIndex);
+            blocks.remove(tasksIdx.remove());
             finishedTasks.remove();
             if (finishedTasks.isEmpty()) break;
             task_done = finishedTasks.peek().isDone();

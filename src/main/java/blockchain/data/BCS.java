@@ -7,6 +7,9 @@ public class BCS {
 
     public BCS(int workers) {
         bcs = new Blockchain[workers];
+        for (int i = 0 ; i < workers ; i++) {
+            bcs[i] = new Blockchain(-1);
+        }
     }
 
     public void registerBC(int worker, Blockchain bc) {

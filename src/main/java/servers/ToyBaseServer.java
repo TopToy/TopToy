@@ -332,14 +332,15 @@ public abstract class ToyBaseServer {
 
                 bc.addBlock(recBlock);
 
-                if (recBlock.getHeader().getHeight() - (f + 2) > 0) {
-                    Block permanent = bc.getBlock(recBlock.getHeader().getHeight() - (f + 2));
+                if (bc.getHeight() - (f + 2) > 0) {
+                    Block permanent = bc.getBlock(bc.getHeight() - (f + 2));
+                    updateNob(worker);
                     updateTxCount(worker, permanent.getDataCount());
                     updateHeaderPD(permanent.getHeader(), worker);
                     updateHeaderStatus(permanent.getHeader(), worker);
                     updateP(worker);
                     if (permanent.getHeader().getHeight() % 1000 == 0) {
-                        logger.debug(format("[#%d-C[%d]] Deliver [[height=%d], [sender=%d], [channel=%d], [size=%d]]",
+                        logger.info(format("[#%d-C[%d]] Deliver [[height=%d], [sender=%d], [channel=%d], [size=%d]]",
                                 getID(), worker, permanent.getHeader().getHeight(), permanent.getHeader().getBid().getPid(),
                                 permanent.getHeader().getM().getChannel(),
                                 permanent.getDataCount()));
@@ -366,13 +367,6 @@ public abstract class ToyBaseServer {
                     if (currHeight % 10 == 0) {
                         Data.evacuateAllOldData(worker, permanent.getHeader().getM());
                         communication.data.Data.evacuateAllOldData(worker, permanent.getId());
-                        logger.info(format("Start Calling gc [tm=%d ; fm=%d]", Runtime.getRuntime().totalMemory() / (1024 * 1024)
-                                , Runtime.getRuntime().freeMemory()/ (1024 * 1024)));
-                        long start = System.currentTimeMillis();
-                        System.gc();
-                        logger.info(format("Done Calling gc [tm=%d ; fm=%d ; duration=%d]"
-                                , Runtime.getRuntime().totalMemory() / (1024 * 1024), Runtime.getRuntime().freeMemory() / (1024 * 1024), System.currentTimeMillis() - start));
-
                     }
                 }
 
@@ -614,7 +608,7 @@ public abstract class ToyBaseServer {
         return b;
     }
 
-    public int bcSize() {
+    int bcSize() {
         return max(bc.getHeight() - (f + 2), 0);
     }
 

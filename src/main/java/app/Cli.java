@@ -177,12 +177,14 @@ public class Cli {
                 }
 
             if (args[0].equals("stStart")) {
+                logger.info("Start statistics");
                Statistics.activate();
                 return;
 
             }
 
             if (args[0].equals("stStop")) {
+                logger.info("stop statistics");
                 Statistics.deactivate();
                 return;
 
@@ -435,8 +437,9 @@ public class Cli {
                 FileWriter writer = null;
                 writer = new FileWriter(path.toString(), true);
 
-                int nob = JToy.s.getBCSize();
+
                 Statistics st = getStatistics();
+                int nob = st.getNob();
                 double time = ((double) getStop() - getStart()) / 1000;
                 int tps = 0;
                 int bps = 0;
