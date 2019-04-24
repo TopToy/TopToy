@@ -17,7 +17,7 @@ public class DBUtils {
     static private ExecutorService worker = Executors.newSingleThreadExecutor();
     private static HashMap<Integer, Connection> rc = new HashMap<>();
     private static HashMap<Integer, Connection> wc = new HashMap<>();
-    public DBUtils() {
+    public DBUtils(int workers) {
         try {
             Class.forName("org.h2.Driver");
         } catch (ClassNotFoundException e) {
@@ -28,17 +28,22 @@ public class DBUtils {
         eds.setURL("jdbc:h2:./TDB");
         eds.setUser("sa");
         eds.setPassword("sa");
+        for (int i = 0; i < workers ; i++) {
+            createWriteConn(i);
+            createReadConn(i);
+
+        }
     }
 
-    static public void shutdown(int channel) {
-        try {
-            rc.get(channel).close();
-            wc.get(channel).close();
-        } catch (SQLException e) {
-            logger.error(format("unable shutdown connection [channel=%d]", channel));
-        }
-        worker.shutdownNow();
-    }
+//    static public void shutdown(int channel) {
+//        try {
+//            rc.get(channel).close();
+//            wc.get(channel).close();
+//        } catch (SQLException e) {
+//            logger.error(format("unable shutdown connection [channel=%d]", channel));
+//        }
+//        worker.shutdownNow();
+//    }
 
     static public void shutdown() {
 
@@ -50,18 +55,20 @@ public class DBUtils {
                 c.close();
             }
         } catch (SQLException e) {
-            logger.error(format("unable shutdown connection"));
+            logger.error(format("Unable to shutdown connection"));
+            return;
         }
-        if (rc.size() == 0 && wc.size() == 0) {
-            worker.shutdownNow();
-        }
+        worker.shutdownNow();
+//        if (rc.size() == 0 && wc.size() == 0) {
+
+//        }
     }
 
     static private String getTableName(int channel) {
         return txTableName + "_" + channel;
     }
     static public void initTables(int channel) throws SQLException {
-        Connection conn = eds.getConnection();
+        Connection conn = wc.get(channel);
         Statement stmt = conn.createStatement();
         stmt.execute("DROP INDEX IF EXISTS id");
         stmt.execute("DROP TABLE IF EXISTS " +
@@ -74,8 +81,8 @@ public class DBUtils {
                 );
         stmt.execute("CREATE INDEX IF NOT EXISTS id ON " + getTableName(channel) + " (pid, bid)");
         stmt.close();
-        conn.close();
-        logger.debug(format("successfully created a table for [channel=%d]", channel));
+//        conn.close();
+        logger.info(format("successfully created a table for [channel=%d]", channel));
     }
 
     static public Connection getConnection() throws SQLException {
@@ -104,7 +111,7 @@ public class DBUtils {
     }
 
     static private void writeBlockToTable(int channel, int pid, int bid, int height) {
-        createWriteConn(channel);
+//        createWriteConn(channel);
         try {
             Statement stmt = wc.get(channel).createStatement();
             stmt.executeUpdate(format("INSERT INTO %s VALUES(%d, %d, %d)", getTableName(channel),
@@ -117,7 +124,7 @@ public class DBUtils {
     }
 
     static public void writeBlockToTable(Types.Block b) {
-        int pid = b.getHeader().getM().getSender();
+        int pid = b.getHeader().getBid().getPid();
         int bid = b.getId().getBid();
         int height = b.getHeader().getHeight();
         int channel = b.getHeader().getM().getChannel();
@@ -143,7 +150,7 @@ public class DBUtils {
 //    }
 
     static public int getBlockRecord(int channel, int pid, int bid) {
-        createReadConn(channel);
+//        createReadConn(channel);
         try {
             Statement stmt = rc.get(channel).createStatement();
             ResultSet rs = stmt.executeQuery(format("SELECT height FROM %s WHERE pid=%d AND bid=%d",

@@ -23,13 +23,11 @@ public final class WrbService {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\020wrbService.proto\022\005proto\032\013types.proto2\324" +
-      "\001\n\003Wrb\0228\n\022DisseminateMessage\022\022.proto.Blo" +
-      "ckHeader\032\014.proto.Empty\"\000\022)\n\010FastVote\022\r.p" +
-      "roto.BbcMsg\032\014.proto.Empty\"\000\022,\n\nreqMessag" +
-      "e\022\r.proto.WrbReq\032\r.proto.WrbRes\"\000\022:\n\021Pre" +
-      "ConsReqMessage\022\024.proto.WrbPreConsReq\032\r.p" +
-      "roto.WrbRes\"\000B\007\n\005protob\006proto3"
+      "\n\020wrbService.proto\022\005proto\032\013types.proto2m" +
+      "\n\003Wrb\0228\n\022DisseminateMessage\022\022.proto.Bloc" +
+      "kHeader\032\014.proto.Empty\"\000\022,\n\nreqMessage\022\r." +
+      "proto.WrbReq\032\r.proto.WrbRes\"\000B\007\n\005protob\006" +
+      "proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

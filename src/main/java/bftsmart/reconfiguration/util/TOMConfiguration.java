@@ -22,6 +22,7 @@ import java.util.StringTokenizer;
 import bftsmart.tom.util.Logger;
 
 public class TOMConfiguration extends Configuration {
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(TOMConfiguration.class);
 
     protected int n;
     protected int f;
@@ -333,7 +334,8 @@ public class TOMConfiguration extends Configuration {
             
             rsaLoader = new RSAKeyLoader(processId, TOMConfiguration.configHome, defaultKeys);
         } catch (Exception e) {
-            e.printStackTrace(System.err);
+//            e.printStackTrace(System.err);
+            logger.error(e);
         }
 
     }
@@ -488,7 +490,8 @@ public class TOMConfiguration extends Configuration {
         try {
             return rsaLoader.loadPublicKey();
         } catch (Exception e) {
-            e.printStackTrace(System.err);
+//            e.printStackTrace(System.err);
+            logger.error(e);
             return null;
         }
 
@@ -498,7 +501,8 @@ public class TOMConfiguration extends Configuration {
         try {
             return rsaLoader.loadPublicKey(id);
         } catch (Exception e) {
-            e.printStackTrace(System.err);
+//            e.printStackTrace(System.err);
+            logger.error(e);
             return null;
         }
 
@@ -508,7 +512,8 @@ public class TOMConfiguration extends Configuration {
         try {
             return rsaLoader.loadPrivateKey();
         } catch (Exception e) {
-            e.printStackTrace(System.err);
+//            e.printStackTrace(System.err);
+            logger.error(e);
             return null;
         }
     }

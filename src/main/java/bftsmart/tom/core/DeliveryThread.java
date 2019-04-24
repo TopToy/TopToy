@@ -99,7 +99,8 @@ public final class DeliveryThread extends Thread {
             decidedLock.unlock();
             logger.info("(DeliveryThread.delivery) Consensus " + dec.getConsensusId() + " finished. Decided size=" + decided.size());
         } catch (Exception e) {
-            e.printStackTrace(System.out);
+//            e.printStackTrace(System.out);
+            logger.error(e);
         }
     }
 
@@ -156,7 +157,7 @@ public final class DeliveryThread extends Thread {
         //stateManager.setWaiting(-1);
         tomLayer.setNoExec();
 
-        System.out.print("Current decided size: " + decided.size());
+        logger.info("Current decided size: " + decided.size());
         decided.clear();
 
         logger.info("(DeliveryThread.update) All finished up to " + lastCID);
@@ -250,7 +251,8 @@ public final class DeliveryThread extends Thread {
                     }
                 }
             } catch (Exception e) {
-                    e.printStackTrace(System.err);
+//                    e.printStackTrace(System.err);
+                logger.error(e);
             }
 
             /** THIS IS JOAO'S CODE, TO HANDLE STATE TRANSFER */

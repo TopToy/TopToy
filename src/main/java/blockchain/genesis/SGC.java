@@ -8,7 +8,7 @@ public class SGC implements GenCreator {
     public Types.Block createGenesisBlock() {
         Types.Block gen = Types.Block.newBuilder().build();
         gen.toBuilder().setHeader(Utils.createBlockHeader(gen, null, -1, 0,
-                -1, -1, -1, -1));
+                -1, -1, -1, Types.BlockID.newBuilder().setBid(-1).setPid(-1).build()));
         return gen;
     }
 }

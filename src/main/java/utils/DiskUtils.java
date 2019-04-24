@@ -3,8 +3,12 @@ import org.apache.commons.io.FileUtils;
 import proto.Types;
 
 import java.io.*;
+import java.nio.channels.FileChannel;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.FileAttribute;
 import java.sql.SQLException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -33,65 +37,73 @@ public class DiskUtils {
 //    }
 
     static public void shutdown() {
-        if (worker.isShutdown()) return;
+//        if (worker.isShutdown()) return;
         worker.shutdownNow();
     }
 
     public static void createStorageDir(Path pathToDir) {
-        File dir = new File(pathToDir.toString());
         try {
+//            Files.deleteIfExists(pathToDir);
+            File dir = new File(pathToDir.toString());
             if (dir.exists()) {
                 FileUtils.forceDelete(dir);
             }
-            FileUtils.forceMkdir(dir);
+            Files.createDirectories(pathToDir);
         } catch (IOException e) {
-            logger.error("", e);
+            logger.error(e);
         }
-    }
-//    public static void cut(Blockchain bc, int start, int end, Path path) throws IOException {
-//        for (Types.Block b : new ArrayList<>(bc.getBlocksCopy(start, end))) {
-//            cutBlock(b, path);
-//            bc.setBlock(b.getHeader().getHeight(), Types.Block.newBuilder()
-//                    .setHeader(b.getHeader())
-//                    .setSt(b.getSt())
-//                    .build());
+//        File dir = new File(pathToDir.toString());
+//        try {
+//            if (dir.exists()) {
+//                FileUtils.forceDelete(dir);
+//            }
+//            FileUtils.forceMkdir(dir);
+//        } catch (IOException e) {
+//            logger.error("", e);
 //        }
-//    }
+    }
 
     public static void cutBlock(Types.Block b, Path path) throws IOException {
         Path blockFile = Paths.get(path.toString(), String.valueOf(b.getHeader().getHeight()));
-        File f = new File(blockFile.toString());
-        f.createNewFile();
-        try (FileOutputStream output = new FileOutputStream(blockFile.toString())) {
-            b.writeDelimitedTo(output);
-        }
+//        Files.createFile(blockFile);
+        Files.write(blockFile, b.toByteArray(), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+//        File f = new File(blockFile.toString());
+//        RandomAccessFile f = new RandomAccessFile(blockFile.toString(), "rw");
+
+//        try (FileChannel channel = f.getChannel()) {
+//
+//        }
+//        File f = new File(blockFile.toString());
+//        f.createNewFile();
+//        try (FileOutputStream output = new FileOutputStream(blockFile.toString())) {
+//            b.writeDelimitedTo(output);
+//        }
     }
 
     public static Types.Block getBlockFromFile(int height, Path path) throws IOException {
         Path blockFile = Paths.get(path.toString(), String.valueOf(height));
-        try (FileInputStream input = new FileInputStream(blockFile.toString())) {
-            return Types.Block.parseDelimitedFrom((input));
-        }
+        return Types.Block.parseFrom(Files.readAllBytes(blockFile));
+//        try (FileInputStream input = new FileInputStream(blockFile.toString())) {
+//            return Types.Block.parseDelimitedFrom((input));
+//        }
     }
 
     public static void deleteBlockFile(int height, Path path) throws IOException {
         Path blockFile = Paths.get(path.toString(), String.valueOf(height));
-        File f = new File(blockFile.toString());
-        if (f.exists()) {
-            FileUtils.forceDelete(f);
-        }
+        Files.deleteIfExists(blockFile);
+//        File f = new File(blockFile.toString());
+//        if (f.exists()) {
+//            FileUtils.forceDelete(f);
+//        }
 
     }
     public static Future cutBlockAsync(Types.Block b, Path path) {
         return worker.submit(() -> {
             try {
-//                logger.debug(format("have write to Disk (1) [c=%d, h=%d, pid=%d, bid=%d",
-//                        b.getHeader().getM().getChannel(), b.getHeader().getHeight(), b.getHeader().getM().getSender(),
-//                        b.getHeader().getBid()));
                 cutBlock(b, path);
                 logger.debug(format("have write to Disk (2) [c=%d, h=%d, pid=%d, bid=%d",
-                        b.getHeader().getM().getChannel(), b.getHeader().getHeight(), b.getHeader().getM().getSender(),
-                        b.getHeader().getBid()));
+                        b.getHeader().getM().getChannel(), b.getHeader().getHeight(), b.getHeader().getBid().getPid(),
+                        b.getHeader().getBid().getBid()));
             } catch (IOException e) {
                 logger.error("", e);
             }

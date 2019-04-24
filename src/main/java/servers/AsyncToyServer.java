@@ -4,8 +4,8 @@ import blockchain.Blockchain;
 import blockchain.Utils;
 import communication.CommLayer;
 import config.Node;
-import das.RBroadcast.RBrodcastService;
-import das.wrb.WrbNode;
+import das.ab.ABService;
+import das.wrb.WRB;
 import proto.Types;
 
 import java.util.ArrayList;
@@ -18,19 +18,10 @@ public class AsyncToyServer extends ToyBaseServer {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(AsyncToyServer.class);
 
     int maxTime = 0;
-    public AsyncToyServer(String addr, int wrbPort, int id, int channel, int f, int maxTx, boolean fastMode,
-                     WrbNode wrb, CommLayer comm, RBrodcastService rb) {
-        super(addr, wrbPort, id, channel, f, maxTx, fastMode, wrb, comm, rb);
+    public AsyncToyServer(int id, int worker, int n, int f, int maxTx, boolean fastMode,
+                      CommLayer comm) {
+        super(id, worker, n, f, maxTx, fastMode, comm);
     }
-
-    public AsyncToyServer(String addr, int wrbPort, int commPort, int id, int channel, int f, int tmo, int tmoInterval,
-                     int maxTx, boolean fastMode, ArrayList<Node> wrbCluster, ArrayList<Node> commCluster,
-                     String bbcConfig, String rbConfigPath, String serverCrt, String serverPrivKey, String caRoot) {
-
-        super(addr, wrbPort, commPort, id, channel, f, tmo, tmoInterval, maxTx, fastMode, wrbCluster, commCluster,
-                bbcConfig, rbConfigPath, serverCrt, serverPrivKey, caRoot);
-    }
-
 
 
     Types.BlockHeader leaderImpl() throws InterruptedException {
@@ -56,11 +47,11 @@ public class AsyncToyServer extends ToyBaseServer {
         if (currLeader != getID()) {
             return null;
         }
-        broadcastEmptyIfNeeded();
+//        broadcastEmptyIfNeeded();
         logger.debug(format("[#%d -C[%d]] prepare to disseminate a new block header for [height=%d] [cidSeries=%d ; cid=%d]",
-                getID(), channel, currHeight, cidSeries, cid));
+                getID(), worker, currHeight, cidSeries, cid));
 
-        wrbServer.broadcast(getHeaderForCurrentBlock(bc.getBlock(currHeight - 1).getHeader(),
+        WRB.WRBBroadcast(getHeaderForCurrentBlock(bc.getBlock(currHeight - 1).getHeader(),
                 currHeight, cidSeries, cid));
         return null;
     }
@@ -69,15 +60,15 @@ public class AsyncToyServer extends ToyBaseServer {
         if ((currLeader + 1) % n != getID()) {
             return null;
         }
-        broadcastEmptyIfNeeded();
+//        broadcastEmptyIfNeeded();
         logger.debug(format("[#%d-C[%d]] prepare fast mode phase for [height=%d] [cidSeries=%d ; cid=%d]",
-                getID(), channel, currHeight + 1, cidSeries, cid + 1));
+                getID(), worker, currHeight + 1, cidSeries, cid + 1));
         return getHeaderForCurrentBlock(null, currHeight + 1, cidSeries, cid + 1);
     }
 
     @Override
     public Blockchain initBC(int id, int channel) {
-        return createBlockchain(Utils.BCT.SGC, id, 10000, sPath);
+        return createBlockchain(Utils.BCT.SGC, id, n, sPath);
     }
 
     @Override

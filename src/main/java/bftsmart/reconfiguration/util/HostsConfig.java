@@ -23,7 +23,8 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 public class HostsConfig {
-    
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(HostsConfig.class);
+
     private Hashtable servers = new Hashtable();
     
     
@@ -64,7 +65,8 @@ public class HostsConfig {
             fr.close();
             rd.close();
         }catch(Exception e){
-            e.printStackTrace(System.out);
+//            e.printStackTrace(System.out);
+            logger.error(e);
         }
     }
     

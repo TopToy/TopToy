@@ -1,5 +1,4 @@
 package app;
-import com.google.common.primitives.Longs;
 import com.google.protobuf.ByteString;
 import config.Config;
 //import crypto.rmfDigSig;
@@ -8,7 +7,7 @@ import crypto.blockDigSig;
 import org.apache.commons.cli.*;
 import org.apache.commons.lang.ArrayUtils;
 import proto.Types;
-import servers.Statistics;
+import utils.Statistics;
 import utils.CSVUtils;
 import utils.DBUtils;
 import utils.DiskUtils;
@@ -26,11 +25,11 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static blockchain.Utils.validateBlockHash;
 import static java.lang.Math.min;
 import static java.lang.StrictMath.max;
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
+import static utils.Statistics.*;
 
 public class Cli {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Cli.class);
@@ -75,8 +74,8 @@ public class Cli {
 ////                writeToScv(outPath);
 ////                writeBlocksStatistics(outPath);
 //                    writeBlocksStatisticsSummery(outPath);
-                    DBUtils.shutdown();
-                    DiskUtils.shutdown();
+//                    DBUtils.shutdown();
+//                    DiskUtils.shutdown();
                 }
 //
             }));
@@ -105,23 +104,22 @@ public class Cli {
 
                 if (args[0].equals("serve")) {
                     serve();
-                    totalRT = System.currentTimeMillis();
+//                    totalRT = System.currentTimeMillis();
                     System.out.println("Serving... [OK]");
                     return;
                 }
                 if (args[0].equals("stop")) {
                     stop();
-                    totalRT = System.currentTimeMillis() - totalRT;
+//                    totalRT = System.currentTimeMillis() - totalRT;
                     System.out.println("stop server... [OK]");
                     return;
                 }
                 if (args[0].equals("quit")) {
                     writeSummery(outPath);
 //                    writeBlocksStatisticsSummery(outPath);
-                    DBUtils.shutdown();
-                    DiskUtils.shutdown();
+
                     recorded.set(true);
-                    System.out.println("Goodbye :)");
+//                    System.out.println("Goodbye :)");
                     System.exit(0);
                     return;
                 }
@@ -161,15 +159,15 @@ public class Cli {
                     return;
                 }
 
-                if (args[0].equals("res")) {
-                    if (args.length == 3) {
-                        if (!args[1].equals("-p")) return;
-                        String path = args[2];
-                        writeToScv(path);
-
-                    }
-                    return;
-                }
+//                if (args[0].equals("res")) {
+//                    if (args.length == 3) {
+//                        if (!args[1].equals("-p")) return;
+//                        String path = args[2];
+//                        writeToScv(path);
+//
+//                    }
+//                    return;
+//                }
 
                 if (args[0].equals("sigTest")) {
                     logger.info("Accepted sigTest");
@@ -177,6 +175,20 @@ public class Cli {
                     return;
 
                 }
+
+            if (args[0].equals("stStart")) {
+                logger.info("Start statistics");
+               Statistics.activate();
+                return;
+
+            }
+
+            if (args[0].equals("stStop")) {
+                logger.info("stop statistics");
+                Statistics.deactivate();
+                return;
+
+            }
 //                if (args[0].equals("bm")) {
 //                    if (args.length != 7) return;
 //                    if (!args[1].equals("-t")) return;
@@ -283,10 +295,10 @@ public class Cli {
             return bb.setHeader(Types.BlockHeader.newBuilder()
                     .setM(Types.Meta.newBuilder()
                             .setChannel(0)
-                            .setSender(0)
                             .setCidSeries(0)
                             .setCid(0).build())
                     .setHeight(0)
+                    .setBid(Types.BlockID.newBuilder().setBid(0).setPid(0).build())
                     .setPrev(ByteString.copyFrom(tx)));
 
 
@@ -353,53 +365,53 @@ public class Cli {
             writer.flush();
             writer.close();
         }
-        private void writeToScv(String pathString) {
-            if (JToy.type.equals("m")) return;
-            DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy-HH:mm:ss");
-            Path path = Paths.get(pathString, String.valueOf(JToy.s.getID()), dateFormat.format(new Date()) + ".csv");
-            try {
-                File f = new File(path.toString());
-
-                f.getParentFile().mkdirs();
-                f.createNewFile();
-                FileWriter writer = new FileWriter(path.toString());
-                int nob = JToy.s.getBCSize();
-                long fts = 0;
-                long lts = 0;
-                int tCount = 0;
-                int txSize = -1;
-                fts = JToy.s.nonBlockingDeliver(1).getSt().getDecided();
-                lts = JToy.s.nonBlockingDeliver(nob - 1).getSt().getDecided();
-                tCount = (nob - 1) * Config.getMaxTransactionsInBlock();
-                txSize = JToy.s.nonBlockingDeliver(1).getData(0).getSerializedSize();
-                for (int i = 0 ; i < nob ; i++) {
-                    Types.Block b = JToy.s.nonBlockingDeliver(i);
-                    for (Types.Transaction t : b.getDataList()) {
-                        if (fts == 0) {
-                            fts = b.getSt().getDecided();
-                            lts = fts;
-                        }
-                        fts = min(fts, b.getSt().getDecided());
-                        lts = max(lts, b.getSt().getDecided());
-                        tCount++;
-                        if (txSize == -1) {
-                            txSize = t.getSerializedSize();
-                        }
-                        List<String> row = Arrays.asList(format("[%d:%d]", t.getId().getProposerID(), t.getId().getTxNum())
-                                , String.valueOf(t.getSerializedSize()),
-                                String.valueOf(t.getClientID()), String.valueOf(b.getSt().getDecided()),
-                                String.valueOf(t.getData().size()), String.valueOf(i),
-                                String.valueOf(b.getHeader().getM().getSender()));
-                        CSVUtils.writeLine(writer, row);
-                    }
-                }
-                writer.flush();
-                writer.close();
-//                writeSummery(pathString, tCount, txSize, fts, lts);
-            } catch (IOException e) {
-                logger.error("", e);
-            }
-        }
+//        private void writeToScv(String pathString) {
+//            if (JToy.type.equals("m")) return;
+//            DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy-HH:mm:ss");
+//            Path path = Paths.get(pathString, String.valueOf(JToy.s.getID()), dateFormat.format(new Date()) + ".csv");
+//            try {
+//                File f = new File(path.toString());
+//
+//                f.getParentFile().mkdirs();
+//                f.createNewFile();
+//                FileWriter writer = new FileWriter(path.toString());
+//                int nob = JToy.s.getBCSize();
+//                long fts = 0;
+//                long lts = 0;
+//                int tCount = 0;
+//                int txSize = -1;
+//                fts = JToy.s.nonBlockingDeliver(1).getSt().getDecided();
+//                lts = JToy.s.nonBlockingDeliver(nob - 1).getSt().getDecided();
+//                tCount = (nob - 1) * Config.getMaxTransactionsInBlock();
+//                txSize = JToy.s.nonBlockingDeliver(1).getData(0).getSerializedSize();
+//                for (int i = 0 ; i < nob ; i++) {
+//                    Types.Block b = JToy.s.nonBlockingDeliver(i);
+//                    for (Types.Transaction t : b.getDataList()) {
+//                        if (fts == 0) {
+//                            fts = b.getSt().getDecided();
+//                            lts = fts;
+//                        }
+//                        fts = min(fts, b.getSt().getDecided());
+//                        lts = max(lts, b.getSt().getDecided());
+//                        tCount++;
+//                        if (txSize == -1) {
+//                            txSize = t.getSerializedSize();
+//                        }
+//                        List<String> row = Arrays.asList(format("[%d:%d]", t.getId().getProposerID(), t.getId().getTxNum())
+//                                , String.valueOf(t.getSerializedSize()),
+//                                String.valueOf(t.getClientID()), String.valueOf(b.getSt().getDecided()),
+//                                String.valueOf(t.getData().size()), String.valueOf(i),
+//                                String.valueOf(b.getHeader().getBid().getPid()));
+//                        CSVUtils.writeLine(writer, row);
+//                    }
+//                }
+//                writer.flush();
+//                writer.close();
+////                writeSummery(pathString, tCount, txSize, fts, lts);
+//            } catch (IOException e) {
+//                logger.error("", e);
+//            }
+//        }
 
         boolean validateBC() {
             return JToy.s.isValid();
@@ -413,24 +425,7 @@ public class Cli {
 //            return true;
         }
         void writeSummery(String pathString) {
-//            long avgWt = 0;
-//            int txCount = 0;
-            int nob = JToy.s.getBCSize();
-//            int txSize = 0;
-//            for (int i = 0 ; i < nob ; i++) {
-//                Types.Block b = JToy.s.nonBlockingDeliver(i);
-//                for (Types.Transaction t : b.getDataList()) {
-//                    txSize += t.getData().size();
-//                }
-////                if (b == null) {
-////                    System.out.println(format("[i=%d] and NULL!!!!!", i));
-////                    continue;
-////                }
-////                for (Types.Transaction t : b.getDataList()) {
-////                    avgWt += b.getSt().getDecided() - Longs.fromByteArray(Arrays.copyOfRange(t.getData().toByteArray(), 0, 8));
-////                }
-////                txCount += b.getDataCount();
-//            }
+            logger.info("Starting writeSummery");
             Path path = Paths.get(pathString,   String.valueOf(JToy.s.getID()), "summery.csv");
             File f = new File(path.toString());
 
@@ -441,163 +436,211 @@ public class Cli {
                 }
                 FileWriter writer = null;
                 writer = new FileWriter(path.toString(), true);
-//                List<String> head = Arrays.asList("ts","id","type","channels","fm","txSize","txInBlock","txTotal"
-//                        ,"duration","txPsec","blocksNum","avgTxInBlock","eRate","dRate");
-//
-//                CSVUtils.writeLine(writer, head);
-                Statistics st = JToy.s.getStatistics();
 
-//                double time = ((double) st.lastTxTs - st.firstTxTs) / 1000;
-//                double time = ((double) totalRT / 1000);
-                double time = ((double) st.stop - st.start) / 1000;
-                int thrp = ((int) (st.txCount / time)); // / 1000;
-                int bps = (int) (nob / time);
-//                int thrp = ((int) (txCount / time));
-                double opRate = ((double) st.optemisticDec) / ((double) st.totalDec);
-                long delaysAvgMs = 0; //st.delaysSum / st.txCount;
+
+                Statistics st = getStatistics();
+                int nob = st.getNob();
+                double time = ((double) getStop() - getStart()) / 1000;
+                int tps = 0;
+                int bps = 0;
+                if (time > 0) {
+                    tps = ((int) (st.getTxCount() / time));
+                    bps = (int) (nob / time);
+                }
+                int pos = st.getPosDec();
+                int neg = st.getNegDec();
+                int opt = st.getOptimisticDec();
+                double opRate = 0;
+                double posRate = 0;
+                double negRate = 0;
+                double avgNegDecTime = 0;
+                int avgTmo = st.getAvgTmo();
+                int avgActTmo = 0;
+                if (st.getPosDec() > 0) {
+                    opRate = ((double) opt) / ((double) st.getPosDec());
+                }
+                if (st.getTotalDec() > 0) {
+                    posRate = ((double) pos) / ((double) st.getTotalDec());
+                    negRate = ((double) neg) / ((double) st.getTotalDec());
+                    avgTmo = st.getAvgTmo() / st.getTotalDec();
+                    avgActTmo = st.getAvgActTmo() / st.getTotalDec();
+                }
+                if (neg > 0) {
+                    avgNegDecTime = ((double) st.getTotalNegTime() / (double) neg);
+                }
+
+                int txCount = st.getTxCount();
+                int syncEvents = st.getSyncEnvents();
+                int totalT = st.getTotalT();
+                int totalP = st.getTotalP();
+                double ATDT = 0;
+                double APDT = 0;
                 int avgTxInBlock = 0;
                 if (nob > 0) {
-                    avgTxInBlock = st.txCount / nob;
+                    avgTxInBlock = st.getTxCount() / nob;
+                    ATDT = ((double) st.getHeadersTotalTD() / (double) nob);
+                    APDT = ((double) st.getHeadersTtoalPD() / (double) nob);
                 }
-                double eRate = ((double)st.eb) / ((double) st.all);
-                double dRate = ((double)st.deliveredTime) / ((double) st.all);
-
 
                 DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy-HH:mm:ss");
-                List<String> row = Arrays.asList(String.valueOf(validateBC()), dateFormat.format(new Date()), String.valueOf(JToy.s.getID()),
-                        JToy.type, String.valueOf(Config.getC()), String.valueOf(Config.getTMO()), String.valueOf(Config.getFastMode()),
-                        String.valueOf(st.txSize), String.valueOf(Config.getMaxTransactionsInBlock()),
-                        String.valueOf(st.txCount), String.valueOf(time), String.valueOf(thrp),
-//                        String.valueOf(st.totalDec), String.valueOf(st.optemisticDec), String.valueOf(opRate),
-                        String.valueOf(nob), String.valueOf(bps), String.valueOf(avgTxInBlock),String.valueOf(delaysAvgMs), String.valueOf(opRate),
-                        String.valueOf(eRate), String.valueOf(dRate), String.valueOf(st.syncEvents));
+                List<String> row = Arrays.asList(
+//                        String.valueOf(validateBC())
+//                        , dateFormat.format(new Date())
+                         String.valueOf(JToy.s.getID())
+                        , JToy.type, String.valueOf(Config.getC())
+                        , String.valueOf(avgTmo)
+                        , String.valueOf(avgActTmo)
+                        , String.valueOf(st.getMaxTmo())
+                        , String.valueOf(Config.getTxSize())
+                        , String.valueOf(Config.getMaxTransactionsInBlock())
+                        , String.valueOf(txCount)
+                        , String.valueOf(time)
+                        , String.valueOf(tps)
+                        , String.valueOf(nob)
+                        , String.valueOf(bps)
+                        , String.valueOf(avgTxInBlock)
+                        , String.valueOf(opt)
+                        , String.valueOf(opRate)
+                        , String.valueOf(pos)
+                        , String.valueOf(posRate)
+                        , String.valueOf(neg)
+                        , String.valueOf(negRate)
+                        , String.valueOf(avgNegDecTime)
+                        , String.valueOf(ATDT)
+                        , String.valueOf(APDT)
+                        , String.valueOf(totalT)
+                        , String.valueOf(totalP)
+                        , String.valueOf(syncEvents)
+                        , String.valueOf(st.getSuspected())
+                );
                 CSVUtils.writeLine(writer, row);
                 writer.flush();
                 writer.close();
+                logger.info("ended writeSummery");
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error(e);
             }
 
         }
 
-    void writeBlocksStatisticsSummery(String pathString)  {
-        Path path = Paths.get(pathString,   String.valueOf(JToy.s.getID()), "blocksStatSummery.csv");
-        try {
-            File f = new File(path.toString());
-            if (!f.exists()) {
-                f.getParentFile().mkdirs();
-                f.createNewFile();
-            }
-            FileWriter writer = null;
-            writer = new FileWriter(path.toString(), true);
-            int nob = JToy.s.getBCSize();
-//            DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy-HH:mm:ss");
-            Statistics st = JToy.s.getStatistics();
-//            long total = 0;
-            long signaturePeriod = 0;
-//            long create2propose = 0;
-            long verificationPeriod = 0;
-            long propose2tentative = 0;
-            long tentative2permanent = 0;
-            long channelPermanent2decide = 0;
-            long propose2permanentchannel= 0;
-            long propose2decide = 0;
-            for (int i = 1 ; i < nob ; i++) {
-                Types.Block b = JToy.s.nonBlockingDeliver(i);
-                if (b == null) {
-                    System.out.println(format("[i=%d] and NULL!!!!!", i));
-                    continue;
-                }
-                Types.blockStatistics bst = b.getSt();
-                signaturePeriod += bst.getSign();
-//                create2propose += bst.getProposed() - bst.getCreated();
-                verificationPeriod += bst.getVerified();
-                propose2tentative += bst.getChannelDecided() - bst.getProposed();
-                tentative2permanent += bst.getPd() - bst.getChannelDecided();
-                channelPermanent2decide += bst.getDecided() - bst.getPd();
-                propose2permanentchannel += bst.getPd() - bst.getProposed();
-                propose2decide += bst.getDecided() - bst.getProposed();
-//                total += b.getSt().getDecided() - b.getSt().getProposed();
-            }
-//            long avgTotal = total / nob;
-            signaturePeriod = signaturePeriod / nob;
-//            create2propose = create2propose / nob;
-            verificationPeriod = verificationPeriod / nob;
-            propose2tentative = propose2tentative / nob;
-            tentative2permanent = tentative2permanent / nob;
-            channelPermanent2decide = channelPermanent2decide / nob;
-            propose2permanentchannel = propose2permanentchannel / nob;
-            propose2decide = propose2decide / nob;
-            List<String> row = Arrays.asList(String.valueOf(JToy.s.getID()),
-                    JToy.type, String.valueOf(Config.getC()), String.valueOf(st.txSize),
-                    String.valueOf(Config.getMaxTransactionsInBlock()),
-                    String.valueOf(signaturePeriod),
-                    String.valueOf(verificationPeriod),
-//                    String.valueOf(create2propose),
-                    String.valueOf(propose2tentative),
-                    String.valueOf(tentative2permanent),
-                    String.valueOf(channelPermanent2decide),
-                    String.valueOf(propose2permanentchannel),
-                    String.valueOf(propose2decide));
-//                    String.valueOf(avgTotal));
-            CSVUtils.writeLine(writer, row);
-            writer.flush();
-            writer.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+//    void writeBlocksStatisticsSummery(String pathString)  {
+//        Path path = Paths.get(pathString,   String.valueOf(JToy.s.getID()), "blocksStatSummery.csv");
+//        try {
+//            File f = new File(path.toString());
+//            if (!f.exists()) {
+//                f.getParentFile().mkdirs();
+//                f.createNewFile();
+//            }
+//            FileWriter writer = null;
+//            writer = new FileWriter(path.toString(), true);
+//            int nob = JToy.s.getBCSize();
+////            DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy-HH:mm:ss");
+//            Statistics st = JToy.s.getStatistics();
+////            long total = 0;
+//            long signaturePeriod = 0;
+////            long create2propose = 0;
+//            long verificationPeriod = 0;
+//            long propose2tentative = 0;
+//            long tentative2permanent = 0;
+//            long channelPermanent2decide = 0;
+//            long propose2permanentchannel= 0;
+//            long propose2decide = 0;
+//            for (int i = 1 ; i < nob ; i++) {
+//                Types.Block b = JToy.s.nonBlockingDeliver(i);
+//                if (b == null) {
+//                    System.out.println(format("[i=%d] and NULL!!!!!", i));
+//                    continue;
+//                }
+//                Types.blockStatistics bst = b.getSt();
+//                signaturePeriod += bst.getSign();
+////                create2propose += bst.getProposed() - bst.getCreated();
+//                verificationPeriod += bst.getVerified();
+//                propose2tentative += bst.getChannelDecided() - bst.getProposed();
+//                tentative2permanent += bst.getPd() - bst.getChannelDecided();
+//                channelPermanent2decide += bst.getDecided() - bst.getPd();
+//                propose2permanentchannel += bst.getPd() - bst.getProposed();
+//                propose2decide += bst.getDecided() - bst.getProposed();
+////                total += b.getSt().getDecided() - b.getSt().getProposed();
+//            }
+////            long avgTotal = total / nob;
+//            signaturePeriod = signaturePeriod / nob;
+////            create2propose = create2propose / nob;
+//            verificationPeriod = verificationPeriod / nob;
+//            propose2tentative = propose2tentative / nob;
+//            tentative2permanent = tentative2permanent / nob;
+//            channelPermanent2decide = channelPermanent2decide / nob;
+//            propose2permanentchannel = propose2permanentchannel / nob;
+//            propose2decide = propose2decide / nob;
+//            List<String> row = Arrays.asList(String.valueOf(JToy.s.getID()),
+//                    JToy.type, String.valueOf(Config.getC()), String.valueOf(st.txSize),
+//                    String.valueOf(Config.getMaxTransactionsInBlock()),
+//                    String.valueOf(signaturePeriod),
+//                    String.valueOf(verificationPeriod),
+////                    String.valueOf(create2propose),
+//                    String.valueOf(propose2tentative),
+//                    String.valueOf(tentative2permanent),
+//                    String.valueOf(channelPermanent2decide),
+//                    String.valueOf(propose2permanentchannel),
+//                    String.valueOf(propose2decide));
+////                    String.valueOf(avgTotal));
+//            CSVUtils.writeLine(writer, row);
+//            writer.flush();
+//            writer.close();
+//        } catch (IOException e) {
+//            logger.error(e);
+//        }
+//    }
 
-        void writeBlocksStatistics(String pathString)  {
-            Path path = Paths.get(pathString,   String.valueOf(JToy.s.getID()), "blocksStat.csv");
-            try {
-                File f = new File(path.toString());
-                if (!f.exists()) {
-                    f.getParentFile().mkdirs();
-                    f.createNewFile();
-                }
-                FileWriter writer = null;
-                writer = new FileWriter(path.toString(), true);
-                int nob = JToy.s.getBCSize();
-//                DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy-HH:mm:ss");
-                Statistics st = JToy.s.getStatistics();
-                for (int i = 1 ; i < nob ; i++) {
-                    Types.Block b = JToy.s.nonBlockingDeliver(i);
-//                    logger.info(format("[height=%d] [tentative=%d] [permanent=%d] [diff=%d]",
-//                            b.getHeader().getHeight(), b.getSt().getChannelDecided(),
-//                            b.getSt().getPd(), b.getSt().getPd() - b.getSt().getChannelDecided()));
-                    Types.blockStatistics bst = b.getSt();
-//                    long total = bst.getDecided() - bst.getChannelDecided();
-                    long signaturePeriod = bst.getSign();
-                    long verificationPeriod = bst.getVerified();
-//                    long create2propose = bst.getProposed() - bst.getCreated();
-                    long propose2tentative = bst.getChannelDecided() - bst.getProposed();
-                    long tentative2permanent = bst.getPd() - bst.getChannelDecided();
-                    long channelPermanent2decide = bst.getDecided() - bst.getPd();
-                    long propose2permanentchannel= bst.getPd() - bst.getProposed();
-                    long propose2decide = bst.getDecided() - bst.getProposed();
-                    List<String> row = Arrays.asList(String.valueOf(JToy.s.getID()),
-                            JToy.type, String.valueOf(Config.getC()), String.valueOf(st.txSize),
-                            String.valueOf(Config.getMaxTransactionsInBlock()),
-                            String.valueOf(b.getDataCount()),
-                            String.valueOf(b.getHeader().getHeight()),
-                            String.valueOf(signaturePeriod),
-                            String.valueOf(verificationPeriod),
-//                            String.valueOf(create2propose),
-                            String.valueOf(propose2tentative),
-                            String.valueOf(tentative2permanent),
-                            String.valueOf(channelPermanent2decide),
-                            String.valueOf(propose2permanentchannel),
-                            String.valueOf(propose2decide));
-//                            String.valueOf(total));
-                    CSVUtils.writeLine(writer, row);
-                }
-                writer.flush();
-                writer.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+//        void writeBlocksStatistics(String pathString)  {
+//            Path path = Paths.get(pathString,   String.valueOf(JToy.s.getID()), "blocksStat.csv");
+//            try {
+//                File f = new File(path.toString());
+//                if (!f.exists()) {
+//                    f.getParentFile().mkdirs();
+//                    f.createNewFile();
+//                }
+//                FileWriter writer = null;
+//                writer = new FileWriter(path.toString(), true);
+//                int nob = JToy.s.getBCSize();
+////                DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy-HH:mm:ss");
+//                Statistics st = JToy.s.getStatistics();
+//                for (int i = 1 ; i < nob ; i++) {
+//                    Types.Block b = JToy.s.nonBlockingDeliver(i);
+////                    logger.info(format("[height=%d] [tentative=%d] [permanent=%d] [diff=%d]",
+////                            b.getHeader().getHeight(), b.getSt().getChannelDecided(),
+////                            b.getSt().getPd(), b.getSt().getPd() - b.getSt().getChannelDecided()));
+//                    Types.blockStatistics bst = b.getSt();
+////                    long total = bst.getDecided() - bst.getChannelDecided();
+//                    long signaturePeriod = bst.getSign();
+//                    long verificationPeriod = bst.getVerified();
+////                    long create2propose = bst.getProposed() - bst.getCreated();
+//                    long propose2tentative = bst.getChannelDecided() - bst.getProposed();
+//                    long tentative2permanent = bst.getPd() - bst.getChannelDecided();
+//                    long channelPermanent2decide = bst.getDecided() - bst.getPd();
+//                    long propose2permanentchannel= bst.getPd() - bst.getProposed();
+//                    long propose2decide = bst.getDecided() - bst.getProposed();
+//                    List<String> row = Arrays.asList(String.valueOf(JToy.s.getID()),
+//                            JToy.type, String.valueOf(Config.getC()), String.valueOf(st.txSize),
+//                            String.valueOf(Config.getMaxTransactionsInBlock()),
+//                            String.valueOf(b.getDataCount()),
+//                            String.valueOf(b.getHeader().getHeight()),
+//                            String.valueOf(signaturePeriod),
+//                            String.valueOf(verificationPeriod),
+////                            String.valueOf(create2propose),
+//                            String.valueOf(propose2tentative),
+//                            String.valueOf(tentative2permanent),
+//                            String.valueOf(channelPermanent2decide),
+//                            String.valueOf(propose2permanentchannel),
+//                            String.valueOf(propose2decide));
+////                            String.valueOf(total));
+//                    CSVUtils.writeLine(writer, row);
+//                }
+//                writer.flush();
+//                writer.close();
+//            } catch (IOException e) {
+//                logger.error(e);
+//            }
+//        }
 
         private void setByzSetting(String[] args) {
             System.out.println("Setting byz");

@@ -24,6 +24,7 @@ public class Blockchain {
     private boolean swapAble = false;
     private final ConcurrentHashMap<Integer, Block> blocks = new ConcurrentHashMap<>();
     private Queue<Future> finishedTasks = new LinkedList<>();
+    private Queue<Integer> tasksIdx = new LinkedList<>();
 
 //    int size = 0;
 
@@ -57,7 +58,7 @@ public class Blockchain {
     public boolean validateCurrentLeader(int leader, int f) {
         int last =  getHeight();
         for (int i = last ; i > Math.max(0, last - f) ; i--) {
-            if (getBlock(i).getHeader().getM().getSender() == leader) return false;
+            if (getBlock(i).getHeader().getBid().getPid() == leader) return false;
         }
         return true;
     }
@@ -93,7 +94,7 @@ public class Blockchain {
     public boolean isValid() {
         for (int i = 1 ; i < getHeight() + 1 ; i++) {
             if (!validateBlockHash(getBlock(i - 1))) {
-                System.out.println(String.format("Invalid Blockchain!! [%d -> %d]", i-1, i));
+                logger.info(String.format("Invalid Blockchain!! [%d -> %d]", i-1, i));
                 return false;
             }
         }
@@ -105,13 +106,15 @@ public class Blockchain {
     }
 
     public Block getBlock(int index) {
+        if (blocks.isEmpty()) return null;
+        if (index > getHeight()) return null;
         if (blocks.keySet().contains(index)) {
             return blocks.get(index);
         }
         try {
             return DiskUtils.getBlockFromFile(index, swapPath);
         } catch (IOException e) {
-            logger.error("Unable to retrieve block from disk", e);
+            logger.error(format("Unable to retrieve block from disk [index=%d ; height=%d]", index, getHeight()), e);
             return null;
         }
     }
@@ -137,27 +140,50 @@ public class Blockchain {
         }
         DiskUtils.deleteBlockFile(index, swapPath);
     }
-
     public void writeNextToDisk() {
-//        logger.debug("BD(-1)");
         if (!swapAble) return;
-//        logger.debug(format("BD(0), [%d ; %d]", blocks.size(), maxCacheSize));
         if (blocks.size() < maxCacheSize) return;
-//        logger.debug("BD(1)");
         int currBlockIndex = swapSize;
+        try {
+            DiskUtils.cutBlock(blocks.get(currBlockIndex), swapPath);
+        } catch (IOException e) {
+            logger.error(e);
+        }
+        swapSize++;
+        blocks.remove(currBlockIndex);
+    }
+
+    public void writeNextToDiskAsync() {
+        if (!swapAble) return;
+        if (blocks.size() < maxCacheSize) return;
+        int currBlockIndex = swapSize;
+        tasksIdx.add(currBlockIndex);
         finishedTasks.add(DiskUtils.cutBlockAsync(blocks.get(currBlockIndex), swapPath));
         swapSize++;
         assert finishedTasks.peek() != null;
         boolean task_done = finishedTasks.peek().isDone();
-//        logger.debug("BD(2)");
         while (task_done) {
-//            logger.debug("BD(3)");
-            blocks.remove(currBlockIndex);
+            blocks.remove(tasksIdx.remove());
             finishedTasks.remove();
             if (finishedTasks.isEmpty()) break;
             task_done = finishedTasks.peek().isDone();
         }
     }
+
+//    void gcPhase() {
+//        if (blocks.size() > 10 * maxCacheSize) {
+//            long start = System.currentTimeMillis();
+//            while (finishedTasks.size() > 0) {
+//                // TODO: Inspect this code...
+//                finishedTasks.poll().get();
+//
+//            }
+//            logger.info(format("Running synchronized writes to block (in order to prevent memory leaks." +
+//                    " Took about [%d] ms", System.currentTimeMillis() - start));
+//            System.out.println(format("Running synchronized writes to block (in order to prevent memory leaks." +
+//                    " Took about [%d] ms", System.currentTimeMillis() - start));
+//        }
+//    }
 
     public boolean contains(int height) {
         return height <= getHeight();

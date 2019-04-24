@@ -7,33 +7,40 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static blockchain.Utils.validateBlockHash;
+import static blockchain.data.BCS.bcs;
 import static java.lang.String.format;
+import static utils.Statistics.updateHeaderProposed;
 
 public class Data {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Data.class);
     public enum RBTypes {
         FORK,
         SYNC,
+        BBC,
+        START,
         NOT_MAPPED
 
     };
 
-    public static ConcurrentHashMap<Types.Meta, BbcDecData>[] bbcDec;
+    public static ConcurrentHashMap<Types.Meta, BbcDecData>[] bbcFastDec;
+    public static ConcurrentHashMap<Types.Meta, BbcDecData>[] bbcRegDec;
     public static ConcurrentHashMap<Types.Meta, Types.BlockHeader>[] pending;
 //    public static ConcurrentHashMap<Types.Meta, Types.BlockHeader>[] received;
-    public static ConcurrentHashMap<Types.Meta, VoteData>[] votes;
+    public static ConcurrentHashMap<Types.Meta, VoteData>[] bbcVotes;
     public static Queue<Types.ForkProof>[] forksRBData;
     public static HashMap<Integer, List<Types.subChainVersion>>[] syncRBData;
     public static ConcurrentHashMap<Types.Meta, List<Integer>>[] preConsVote;
     public static ConcurrentHashMap<Types.Meta, VoteData>[] fvData;
     public static ArrayList<Types.Meta>[] preConsDone;
+
 //    static public Object[] preConsNotifyer;
 
     public Data(int channels) {
-        bbcDec = new ConcurrentHashMap[channels];
+        bbcFastDec = new ConcurrentHashMap[channels];
+        bbcRegDec = new ConcurrentHashMap[channels];
         pending = new ConcurrentHashMap[channels];
 //        received = new ConcurrentHashMap[channels];
-        votes = new ConcurrentHashMap[channels];
+        bbcVotes = new ConcurrentHashMap[channels];
         forksRBData = new Queue[channels];
         syncRBData = new HashMap[channels];
         fvData = new ConcurrentHashMap[channels];
@@ -41,10 +48,11 @@ public class Data {
         preConsDone = new ArrayList[channels];
 //        this.preConsNotifyer = new Object[channels];
         for (int i = 0 ; i < channels ; i++) {
-            bbcDec[i] = new ConcurrentHashMap<>();
+            bbcFastDec[i] = new ConcurrentHashMap<>();
+            bbcRegDec[i] = new ConcurrentHashMap<>();
             pending[i] = new ConcurrentHashMap<>();
 //            received[i] = new ConcurrentHashMap<>();
-            votes[i] = new ConcurrentHashMap<>();
+            bbcVotes[i] = new ConcurrentHashMap<>();
             forksRBData[i] = new LinkedList<>();
             syncRBData[i] = new HashMap<>();
             fvData[i] = new ConcurrentHashMap<>();
@@ -55,9 +63,12 @@ public class Data {
     }
 
     static public void evacuateOldData(int channel, Types.Meta key) {
-//        bbcDec[channel].remove(key);
+        logger.debug(format("evacuating all data for [worker=%d ; cidSeries=%d ; cid=%d]",channel, key.getCidSeries(),
+                key.getCid()));
+        bbcFastDec[channel].remove(key);
+        bbcRegDec[channel].remove(key);
+        bbcVotes[channel].remove(key);
         pending[channel].remove(key);
-//        votes[channel].remove(key);
         preConsVote[channel].remove(key);
         fvData[channel].remove(key);
         synchronized (preConsDone[channel]) {
@@ -65,18 +76,53 @@ public class Data {
         }
 
     }
+    static public void addToPendings(Types.BlockHeader request, Types.Meta key) {
+        int worker = key.getChannel();
+        int height = request.getHeight();
+        if (!blockDigSig.verifyHeader(request.getBid().getPid(), request)) {
+            logger.debug(format("invalid pgb message [w=%d ; cidSeries=%d ; cid=%d ; sender=%d, height=%b]",
+                    request.getM().getChannel(), request.getM().getCidSeries(), request.getM().getCid()
+                    , request.getBid().getPid(), request.getHeight()));
+
+            return;
+        }
+        if (bcs[worker].contains(height)) return;
+        updateHeaderProposed(request, worker);
+        synchronized (pending[worker]) {
+            pending[worker].putIfAbsent(key, request);
+            pending[worker].notify();
+        }
+    }
+
 
     static public void evacuateAllOldData(int channel, Types.Meta mKey) {
         int cidSeries = mKey.getCidSeries();
         int cid = mKey.getCid();
-//        for (Types.Meta key : bbcDec[channel].keySet()) {
-//            if (key.getCidSeries() < cidSeries)  {
-//                bbcDec[channel].remove(key);
-//                continue;
-//            }
-//            if (key.getCidSeries() == cidSeries && key.getCid() < cid) bbcDec[channel].remove(key);
-//        }
-        
+        logger.debug(format("evacuating all data for [worker=%d ; cidSeries=%d ; cid=%d]",channel, cidSeries, cid));
+        for (Types.Meta key : bbcFastDec[channel].keySet()) {
+            if (key.getCidSeries() < cidSeries)  {
+                bbcFastDec[channel].remove(key);
+                continue;
+            }
+            if (key.getCidSeries() == cidSeries && key.getCid() < cid) bbcFastDec[channel].remove(key);
+        }
+
+        for (Types.Meta key : bbcRegDec[channel].keySet()) {
+            if (key.getCidSeries() < cidSeries)  {
+                bbcRegDec[channel].remove(key);
+                continue;
+            }
+            if (key.getCidSeries() == cidSeries && key.getCid() < cid) bbcRegDec[channel].remove(key);
+        }
+
+        for (Types.Meta key : bbcVotes[channel].keySet()) {
+            if (key.getCidSeries() < cidSeries)  {
+                bbcVotes[channel].remove(key);
+                continue;
+            }
+            if (key.getCidSeries() == cidSeries && key.getCid() < cid) bbcVotes[channel].remove(key);
+        }
+
         for (Types.Meta key : pending[channel].keySet()) {
             if (key.getCidSeries() < cidSeries)  {
                 pending[channel].remove(key);
@@ -84,13 +130,7 @@ public class Data {
             }
             if (key.getCidSeries() == cidSeries && key.getCid() < cid) pending[channel].remove(key);
         }
-//        for (Types.Meta key : votes[channel].keySet()) {
-//            if (key.getCidSeries() < cidSeries)  {
-//                votes[channel].remove(key);
-//                continue;
-//            }
-//            if (key.getCidSeries() == cidSeries && key.getCid() < cid) votes[channel].remove(key);
-//        }
+
 
         for (Types.Meta key : preConsVote[channel].keySet()) {
             if (key.getCidSeries() < cidSeries)  {
@@ -125,6 +165,8 @@ public class Data {
         switch (type) {
             case 0: return RBTypes.FORK;
             case 1: return RBTypes.SYNC;
+            case 2: return RBTypes.BBC;
+            case 3: return RBTypes.START;
         }
         return RBTypes.NOT_MAPPED;
     }
@@ -150,7 +192,7 @@ public class Data {
     static public boolean validateSubChainVersion(Types.subChainVersion v, int f) {
         if (v.getVCount() == 0) return true;
         ArrayList<Integer> leaders = new ArrayList<>();
-        leaders.add(v.getV(0).getHeader().getM().getSender());
+        leaders.add(v.getV(0).getHeader().getBid().getPid());
         for (int i = 1 ; i < v.getVList().size() ; i++ ) {
             Types.Block pb = v.getV(i);
             if (!blockDigSig.verifyBlock(pb)) {
@@ -164,7 +206,7 @@ public class Data {
                 return false;
             }
             if (leaders.size() > f) {
-                if (leaders.contains(pb.getHeader().getM().getSender())) {
+                if (leaders.contains(pb.getHeader().getBid().getPid())) {
                     logger.debug(format("invalid invalid sub chain version, block creator is invalid [height=%d]",
                              pb.getHeader().getHeight()));
                     return false;

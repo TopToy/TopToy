@@ -23,7 +23,7 @@ public class VoteData {
         return votes.get(1).size() > votes.get(0).size();
     }
 
-    public boolean isPosRes(int q) {
+    public boolean posFastVote(int q) {
         return votes.get(1).size() == q;
     }
 }

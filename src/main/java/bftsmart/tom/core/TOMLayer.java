@@ -137,13 +137,15 @@ public final class TOMLayer extends Thread implements RequestReceiver {
         try {
             this.md = MessageDigest.getInstance("MD5"); // TODO: shouldn't it be SHA?
         } catch (Exception e) {
-            e.printStackTrace(System.out);
+//            e.printStackTrace(System.out);
+            logger.error(e);
         }
 
         try {
             this.engine = Signature.getInstance("SHA1withRSA");
         } catch (Exception e) {
-            e.printStackTrace(System.err);
+//            e.printStackTrace(System.err);
+            logger.error(e);
         }
 
         this.prk = this.controller.getStaticConf().getRSAPrivateKey();
@@ -179,7 +181,8 @@ public final class TOMLayer extends Thread implements RequestReceiver {
         try {
             return new SignedObject(obj, prk, engine);
         } catch (Exception e) {
-            e.printStackTrace(System.err);
+//            e.printStackTrace(System.err);
+            logger.error(e);
             return null;
         }
     }

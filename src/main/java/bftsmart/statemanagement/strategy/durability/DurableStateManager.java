@@ -245,10 +245,10 @@ public class DurableStateManager extends BaseStateManager {
 
 					CommandsInfo[] lowerLog = stateLower.getLogLower();
 					CommandsInfo[] upperLog = stateUpper.getLogUpper();
-					System.out.print("lowerLog ");
+					logger.info("lowerLog ");
 					if (lowerLog != null)
 						logger.info(lowerLog.length);
-					System.out.print("upperLog ");
+					logger.info("upperLog ");
 					if (upperLog != null)
 						logger.info(upperLog.length);
 
@@ -356,7 +356,7 @@ public class DurableStateManager extends BaseStateManager {
 						// stop my re-transmission of STOP messages for all regencies up to the current one
 						if (currentRegency > 0) tomLayer.getSynchronizer().removeSTOPretransmissions(currentRegency - 1);
 
-						System.out.print("trying to acquire deliverlock");
+						logger.info("trying to acquire deliverlock");
 						dt.deliverLock();
 						logger.info("acquired");
 

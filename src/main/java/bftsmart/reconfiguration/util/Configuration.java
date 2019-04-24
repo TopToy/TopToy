@@ -110,7 +110,8 @@ public class Configuration {
             
         }catch(Exception e){
             logger.warn("Wrong system.config file format.");
-            e.printStackTrace(System.out);
+//            e.printStackTrace(System.out);
+            logger.error(e);
         }
     }
 
@@ -224,7 +225,8 @@ public class Configuration {
             fr.close();
             rd.close();
         }catch(Exception e){
-            e.printStackTrace(System.out);
+//            e.printStackTrace(System.out);
+            logger.error(e);
         }
     }
 }

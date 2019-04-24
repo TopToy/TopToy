@@ -11,13 +11,11 @@ generate_config_toml() {
     c = 20
     testing = true
     txSize = 0
-    cutterBatch = 1
 
 [setting]
     tmo = 1000
     tmoInterval = 100
-    rmfBbcConfigPath = \"src/main/resources/bbcConfig\"
-    RBConfigPath = \"src/main/resources/RBConfig\"
+    ABConfigPath = \"src/main/resources/ABConfig\"
     maxTransactionInBlock = 1000
     caRootPath = \"\"
     fastMode = true
@@ -26,9 +24,6 @@ generate_config_toml() {
     privateKey = \"\"\"MIGNAgEAMBAGByqGSM49AgEGBSuBBAAKBHYwdAIBAQQg/ngTdAL+eZOyh4lilm6djqsl
                     RDHT5C60eLxRcEoNjAGgBwYFK4EEAAqhRANCAASeFQqtyOwJcJtYceofW2TeNg7rJBlW
                     L28GZn+tk32fz95JqVS3+iF6JdoM1clkRFLliyXSxEnS1iO4wzRKGQwm\"\"\"
-
-    publicKey = \"\"\"MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
-                    N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg==\"\"\"
 
     TlsPrivKeyPath = \"src/main/resources/sslConfig/server.pem\"
     TlsCertPath = \"src/main/resources/sslConfig/server.crt\"
@@ -42,6 +37,7 @@ for i in `seq 0 ${n}`; do
             ip = \"172.18.0.$((${i} + 3))\"
             wrbPort = 30000
             commPort = 30010
+            obbcPort = 30020
             publicKey =\"\"\"MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
                            N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg==\"\"\"
     " >> ${1}/config.toml
@@ -228,28 +224,28 @@ generate_log4j() {
 }
 
 main(){
-    mkdir -p ${1}/bbcConfig
+    mkdir -p ${1}/ABConfig
 #    mkdir -p ${1}/panicRBConfig
 #    mkdir -p ${1}/syncRBConfig
-    mkdir -p ${1}/RBConfig
+#    mkdir -p ${1}/RBConfig
     mkdir -p ${1}/inst
 
     generate_config_toml ${1}
 
-    generate_hosts ${1}/bbcConfig 12000
+    generate_hosts ${1}/ABConfig 12000
 #    generate_hosts ${1}/panicRBConfig 11000
 #    generate_hosts ${1}/syncRBConfig 13000
-    generate_hosts ${1}/RBConfig 13000
+#    generate_hosts ${1}/RBConfig 13000
 
-    generate_system ${1}/bbcConfig
+    generate_system ${1}/ABConfig
 #    generate_system ${1}/panicRBConfig
 #    generate_system ${1}/syncRBConfig
-    generate_system ${1}/RBConfig
+#    generate_system ${1}/RBConfig
 
-    generate_keys ${1}/bbcConfig
+    generate_keys ${1}/ABConfig
 #    generate_keys ${1}/panicRBConfig
 #    generate_keys ${1}/syncRBConfig
-    generate_keys ${1}/RBConfig
+#    generate_keys ${1}/RBConfig
 
     generate_log4j ${1}
 

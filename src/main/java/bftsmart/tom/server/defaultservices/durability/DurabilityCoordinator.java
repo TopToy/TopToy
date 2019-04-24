@@ -254,7 +254,7 @@ public abstract class DurabilityCoordinator implements Recoverable, BatchExecuta
 				installSnapshot(state.getSerializedState());
 			}
 
-			System.out.print("--- Installing log from " + (lastCheckpointCID+1) + " to " + lastCID);
+			logger.info("--- Installing log from " + (lastCheckpointCID+1) + " to " + lastCID);
 
 			for (int cid = lastCheckpointCID + 1; cid <= lastCID; cid++) {
 				try {
@@ -269,7 +269,8 @@ public abstract class DurabilityCoordinator implements Recoverable, BatchExecuta
                                         
 					appExecuteBatch(commands, msgCtx);
 				} catch (Exception e) {
-					e.printStackTrace(System.err);
+//					e.printStackTrace(System.err);
+					logger.error(e);
 				}
 
 			}

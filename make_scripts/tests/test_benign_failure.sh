@@ -48,5 +48,5 @@ run_async() {
 }
 
 
-run_channels 1 1 1 0 1000 1000 60 30
-run_async 1 1 1 0 1000 1000 60 5
+run_channels 1 1 1 0 1000 1000 60 1
+#run_async 1 1 1 0 1000 1000 60 5
