@@ -1,24 +1,20 @@
 package servers;
 
-import blockchain.Blockchain;
+import blockchain.data.BCS;
 import blockchain.validation.Tvalidator;
 import blockchain.validation.Validator;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import communication.CommLayer;
 import config.Config;
-import config.Node;
 import das.ab.ABService;
 import das.data.Data;
-//import das.wrb.WrbNode;
 import das.ms.BFD;
 import das.wrb.WRB;
 import proto.Types;
 import utils.CacheUtils;
 import utils.DBUtils;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.SecureRandom;
 import java.sql.SQLException;
 import java.util.*;
@@ -27,7 +23,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import static blockchain.Utils.*;
-import static blockchain.data.BCS.bcs;
 import static java.lang.Math.max;
 import static java.lang.String.format;
 import static utils.Statistics.*;
@@ -39,13 +34,13 @@ public abstract class ToyBaseServer {
 
 //    WrbNode wrbServer;
     int id;
-    final Blockchain bc;
+//    final Blockchain bc;
     int currHeight;
     protected int f;
     protected int n;
     int currLeader;
     protected AtomicBoolean stopped = new AtomicBoolean(false);
-    private final Object newBlockNotifyer = new Object();
+//    private final Object newBlockNotifyer = new Object();
     private int maxTransactionInBlock;
     private Thread mainThread;
     private Thread panicThread;
@@ -60,7 +55,7 @@ public abstract class ToyBaseServer {
     private int txPoolMax = 10000;
     private int txSize = 0;
     private int cID = new Random().nextInt(10000);
-    Path sPath;
+//    Path sPath;
     private int bid = 0;
     private final Queue<Block> blocksForPropose = new LinkedList<>();
     private final Queue<Block> proposedBlocks = new LinkedList<>();
@@ -117,9 +112,9 @@ public abstract class ToyBaseServer {
         this.f = f;
         this.n = n;
         this.comm = comm;
-        sPath = Paths.get("blocks", String.valueOf(worker));
-        bc = initBC(id, worker);
-        bcs[worker] = bc;
+//        sPath = Paths.get("blocks", String.valueOf(worker));
+//        bc = initBC(id, worker);
+//        bcs[worker] = bc;
         currHeight = 1; // starts from 1 due to the genesis BaseBlock
         currLeader = 0;
         this.maxTransactionInBlock = maxTx;
@@ -190,7 +185,7 @@ public abstract class ToyBaseServer {
 
     }
     private void updateLeaderAndHeight() {
-        currHeight = bc.getHeight() + 1;
+        currHeight = BCS.lastIndex(worker) + 1; //bc.getHeight() + 1;
         currLeader = (currLeader + 1) % n;
         cid++;
     }
@@ -262,7 +257,7 @@ public abstract class ToyBaseServer {
         while (!stopped.get()) {
             if (Thread.interrupted()) return true;
             checkSyncEvent();
-            while (!bc.validateCurrentLeader(currLeader, f)) {
+            while (!BCS.validateCurrentLeader(worker, currLeader, f)) {
                 logger.debug(format("[#%d-C[%d]] invalid leader [l=%d, h=%d]",
                         getID(), worker, currHeight, currHeight));
                 currLeader = (currLeader + 1) % n;
@@ -316,13 +311,13 @@ public abstract class ToyBaseServer {
             updateT(worker);
             removeFromPendings(recHeader, recBlock);
 
-            if (!bc.validateBlockHash(recBlock)) {
+            if (!BCS.validateBlockHash(worker, recBlock)) {
                 announceFork(recBlock);
                 fastMode = false;
                 return true; // TODO: Check it very carefully! (maybe continue is better)
             }
 
-            synchronized (newBlockNotifyer) {
+//            synchronized (newBlockNotifyer) {
 //                recBlock = recBlock
 //                        .toBuilder()
 //                        .setSt(recBlock.getSt()
@@ -330,55 +325,43 @@ public abstract class ToyBaseServer {
 //                                .setChannelDecided(System.currentTimeMillis()))
 //                        .build();
 
-                bc.addBlock(recBlock);
+            BCS.addBlock(worker, recBlock);
+//            bc.addBlock(recBlock);
 
-                if (bc.getHeight() - (f + 2) > 0) {
-                    Block permanent = bc.getBlock(bc.getHeight() - (f + 2));
-                    updateNob(worker);
-                    updateTxCount(worker, permanent.getDataCount());
-                    updateHeaderPD(permanent.getHeader(), worker);
-                    updateHeaderStatus(permanent.getHeader(), worker);
-                    updateP(worker);
-                    if (permanent.getHeader().getHeight() % 1000 == 0) {
-                        logger.info(format("[#%d-C[%d]] Deliver [[height=%d], [sender=%d], [channel=%d], [size=%d]]",
-                                getID(), worker, permanent.getHeader().getHeight(), permanent.getHeader().getBid().getPid(),
-                                permanent.getHeader().getM().getChannel(),
-                                permanent.getDataCount()));
-                    }
-
-//                    permanent = permanent.toBuilder().setSt(permanent.getSt().toBuilder().setPd(System.currentTimeMillis())).build();
-//                    try {
-//                        bc.setBlock(recBlock.getHeader().getHeight() - (f + 2), permanent);
-////                        if (permanent.getHeader().getHeight() % 100 == 0) {
-//                            logger.info(format("[#%d-C[%d]] Deliverd [[height=%d], [sender=%d], [channel=%d], [size=%d]]",
-//                                    getID(), worker, permanent.getHeader().getHeight(), permanent.getHeader().getBid().getPid(),
-//                                    permanent.getHeader().getM().getChannel(),
-//                                    permanent.getDataCount()));
-////                        }
-//
-//                    } catch (IOException e) {
-//                        logger.error(String.format("[#%d-C[%d]] unable to record permanent time for block [height=%d] [cidSeries=%d ; cid=%d] [size=%d]",
-//                                getID(), worker, recBlock.getHeader().getHeight(), cidSeries, cid, recBlock.getDataCount()));
-//                    }
-                    DBUtils.writeBlockToTable(permanent);
-                    Data.evacuateOldData(worker, permanent.getHeader().getM());
-                    communication.data.Data.evacuateOldData(worker, permanent.getId());
-
-                    if (currHeight % 10 == 0) {
-                        Data.evacuateAllOldData(worker, permanent.getHeader().getM());
-                        communication.data.Data.evacuateAllOldData(worker, permanent.getId());
-                    }
+            if (BCS.height(worker) > 0) {
+                Block permanent = BCS.nbGetBlock(worker, BCS.height(worker));
+                updateNob(worker);
+                updateTxCount(worker, permanent.getDataCount());
+                updateHeaderPD(permanent.getHeader(), worker);
+                updateHeaderStatus(permanent.getHeader(), worker);
+                updateP(worker);
+                if (permanent.getHeader().getHeight() % 1000 == 0) {
+                    logger.info(format("[#%d-C[%d]] Deliver [[height=%d], [sender=%d], [channel=%d], [size=%d]]",
+                            getID(), worker, permanent.getHeader().getHeight(), permanent.getHeader().getBid().getPid(),
+                            permanent.getHeader().getM().getChannel(),
+                            permanent.getDataCount()));
                 }
 
-                logger.debug(String.format("[#%d-C[%d]] adds new Block with [height=%d] [cidSeries=%d ; cid=%d] [size=%d]",
-                        getID(), worker, recBlock.getHeader().getHeight(), cidSeries, cid, recBlock.getDataCount()));
+                DBUtils.writeBlockToTable(permanent);
+                Data.evacuateOldData(worker, permanent.getHeader().getM());
+                communication.data.Data.evacuateOldData(worker, permanent.getId());
 
-                newBlockNotifyer.notify();
-
-
+                if (currHeight % 10 == 0) {
+                    Data.evacuateAllOldData(worker, permanent.getHeader().getM());
+                    communication.data.Data.evacuateAllOldData(worker, permanent.getId());
+                }
             }
+
+            logger.debug(String.format("[#%d-C[%d]] adds new Block with [height=%d] [cidSeries=%d ;" +
+                            " cid=%d] [size=%d]",
+                    getID(), worker, recBlock.getHeader().getHeight(), cidSeries, cid, recBlock
+                            .getDataCount()));
+
+//                newBlockNotifyer.notifyAll();
+            BCS.notifyOnNewDifiniteBlock(worker);
+
             updateLeaderAndHeight();
-            bc.writeNextToDiskAsync();
+            BCS.writeNextToDiskAsync(worker);
         }
         return false;
     }
@@ -398,11 +381,11 @@ public abstract class ToyBaseServer {
 
     abstract BlockHeader leaderImpl() throws InterruptedException;
 
-    abstract public Blockchain initBC(int id, int channel);
+//    abstract public Blockchain initBC(int id, int channel);
 
-    abstract public Blockchain getBC(int start, int end);
-
-    abstract public Blockchain getEmptyBC();
+//    abstract public Blockchain getBC(int start, int end);
+//
+//    abstract public Blockchain getEmptyBC();
 
     public int getTxPoolSize() {
         synchronized (cbl) {
@@ -426,7 +409,7 @@ public abstract class ToyBaseServer {
                             .setBid(cbid)
                             .setTxNum(txnum)
                             .setChannel(worker))
-                    .setServerTs(System.currentTimeMillis())
+//                    .setServerTs(System.currentTimeMillis())
                     .build();
             if (validateTransactionWRTBlock(currBLock, ntx, v)) {
                 currBLock.addData(ntx);
@@ -444,7 +427,7 @@ public abstract class ToyBaseServer {
     }
 
 
-    public txID addTransaction(byte[] data, int clientID) {
+    txID addTransaction(byte[] data, int clientID) {
         Transaction tx = Transaction.newBuilder()
                 .setClientID(clientID)
                 .setData(ByteString.copyFrom(data)).build();
@@ -452,21 +435,46 @@ public abstract class ToyBaseServer {
 
     }
 
-    public int isTxPresent(txID tid) {
-         if (txCache.contains(tid)) {
-             return 0;
+    int status(txID tid, boolean blocking) throws InterruptedException {
+        if (getTx(tid, blocking) != null) return 0;
+        return -1;
+    }
+
+//    Transaction getTx(txID tid, boolean blocking) throws InterruptedException {
+//        synchronized (newBlockNotifyer) {
+//            Transaction tx = getTx(tid);
+//            while (blocking && (tx == null)) {
+//                newBlockNotifyer.wait();
+//                tx = getTx(tid);
+//            }
+//            return tx;
+//        }
+//
+//    }
+
+    public Transaction getTx(txID tid, boolean blocking) throws InterruptedException {
+        if (txCache.contains(tid)) {
+            return txCache.get(tid);
         }
         int height = DBUtils.getBlockRecord(tid.getChannel(), tid.getProposerID(), tid.getBid());
-
-        if (height == -1) return -1;
-        Block b = bc.getBlock(height);
-        if (b == null) return -1;
-        Transaction tx = b.getData(tid.getTxNum());
-         if (tx.getId().equals(tid)) {
-            txCache.add(tx);
-              return 0;
+        if (height == -1) return null;
+        Block b;
+        if (blocking) {
+            b = BCS.bGetBlock(worker, height);
+        } else {
+            b = BCS.nbGetBlock(worker, height);
         }
-        return -1;
+
+        if (b == null) return null;
+        Transaction tx = b.getData(tid.getTxNum());
+        if (tx.getId().equals(tid)) {
+            txCache.add(tx);
+            return tx;
+        } else {
+            logger.error(format("Invalid tx [w=%d ; pid=%d ; bid=%d ; tid=%d]",
+                    tid.getChannel(), tid.getProposerID(), tid.getBid(), tid.getTxNum()));
+        }
+        return null;
     }
 
     void createTxToBlock() {
@@ -485,14 +493,14 @@ public abstract class ToyBaseServer {
         }
         if (missingTxs !=  -1) {
             for (int i = 0 ; i < missingTxs ; i++) {
-                long ts = System.currentTimeMillis();
+//                long ts = System.currentTimeMillis();
                 SecureRandom random = new SecureRandom();
                 byte[] tx = new byte[txSize];
                 random.nextBytes(tx);
                 addTransaction(Transaction.newBuilder()
                         .setClientID(cID)
-                        .setClientTs(ts)
-                        .setServerTs(ts)
+//                        .setClientTs(ts)
+//                        .setServerTs(ts)
                         .setData(ByteString.copyFrom(tx))
                         .build());
             }
@@ -505,25 +513,6 @@ public abstract class ToyBaseServer {
                 createTxToBlock();
             }
     }
-
-//    void broadcastEmptyIfNeeded() {
-//        synchronized (cbl) {
-//            synchronized (blocksForPropose) {
-//                synchronized (proposedBlocks) {
-//                    if (blocksForPropose.size() == 0 && proposedBlocks.size() == 0) {
-//                        logger.debug(format("[#%d-C[%d]] broadcast empty block"
-//                                , getID(),worker));
-//                        blocksForPropose.add(currBLock.build());
-//                        currBLock = configureNewBlock();
-//                    }
-//
-//                }
-//            }
-//        }
-//
-//
-//    }
-
 
     private void mainFork() throws InterruptedException, IOException {
         while (!stopped.get()) {
@@ -574,7 +563,7 @@ public abstract class ToyBaseServer {
         ForkProof p = ForkProof.
                 newBuilder().
                 setCurr(b).
-                setPrev(bc.getBlock(bc.getHeight())).
+                setPrev(BCS.nbGetBlock(worker, BCS.lastIndex(worker))).
                 setSender(getID()).
                 build();
         Meta key = Meta.newBuilder()
@@ -583,38 +572,34 @@ public abstract class ToyBaseServer {
                 .setCid(cid)
                 .build();
         ABService.broadcast(p.toByteArray(), key, Data.RBTypes.FORK);
-//        handleFork(p.getCurr().getHeader().getHeight());
     }
 
-    public Block deliver(int index) throws InterruptedException {
-        synchronized (newBlockNotifyer) {
-            while (index >= bc.getHeight() - (f + 1)) {
-                newBlockNotifyer.wait();
-            }
-        }
-        Block b = bc.getBlock(index);
+    Block deliver(int index) throws InterruptedException {
+//        synchronized (newBlockNotifyer) {
+//            while (index >= bc.getHeight() - (f + 1)) {
+//                newBlockNotifyer.wait();
+//            }
+//        }
+        Block b = BCS.bGetBlock(worker, index);
         txCache.addBlock(b);
         return b;
     }
 
-    public Block nonBlockingdeliver(int index) {
-        synchronized (newBlockNotifyer) {
-            if (index >= bc.getHeight() - (f + 1)) {
-                return null;
-            }
-        }
-        Block b = bc.getBlock(index);
+    Block nonBlockingdeliver(int index) {
+//        synchronized (newBlockNotifyer) {
+//            if (index >= bc.getHeight() - (f + 1)) {
+//                return null;
+//            }
+//        }
+        Block b = BCS.nbGetBlock(worker, index);
         txCache.addBlock(b);
         return b;
     }
 
-    int bcSize() {
-        return max(bc.getHeight() - (f + 2), 0);
-    }
-
-//    public int getSyncEvents() {
-//        return syncEvents;
+//    int bcSize() {
+//        return max(bc.getHeight() - (f + 2), 0);
 //    }
+
     private void disseminateChainVersion(int forkPoint) {
         subChainVersion.Builder sv = subChainVersion.newBuilder();
         if (currHeight < forkPoint - 1) {
@@ -622,10 +607,10 @@ public abstract class ToyBaseServer {
                     , getID(), worker, forkPoint, currHeight));
         } else {
             int low = max(forkPoint - (f + 1), 0);
-            int high = bc.getHeight() + 1;
+            int high = BCS.lastIndex(worker) + 1;
             logger.debug(format("[#%d-C[%d]] building a sub version [(inc) %d --> (exc) %d]"
                     , getID(), worker, low, high));
-            for (Block b : bc.getBlocks(low, high)) {
+            for (Block b : BCS.getBlocks(worker, low, high)) {
                 sv.addV(b);
             }
             sv.setSuggested(1);
@@ -656,7 +641,6 @@ public abstract class ToyBaseServer {
 
             }
         }
-
 
         synchronized (Data.syncRBData[worker]) {
             while (!Data.syncRBData[worker].containsKey(forkPoint) ||
@@ -699,7 +683,7 @@ public abstract class ToyBaseServer {
                         stream().
                         filter(v -> v.getVCount() > 0).
                         filter(v -> v.getV(v.getVCount() - 1).getHeader().getHeight() == max
-                                && validateBlockHash(bc.getBlock(forkPoint - (f + 2)), v.getV(0))).collect(Collectors.toList());
+                                && validateBlockHash(BCS.nbGetBlock(worker, forkPoint - (f + 2)), v.getV(0))).collect(Collectors.toList());
                 if (valid.size() == 0) {
                     noMatch.set(true);
                     logger.error(format("No version is valid (might happen due to fast mode) [fp=%d]", forkPoint));
@@ -717,17 +701,19 @@ public abstract class ToyBaseServer {
             });
         }
         if (noMatch.get()) return;
-        synchronized (newBlockNotifyer) {
-            for (int i = sPoint[0] ; i <= bc.getHeight() ; i++) {
-                bc.removeBlock(i);
-            }
-
-            bc.setBlocks(choosen[0].getVList(), sPoint[0]);
-            newBlockNotifyer.notify();
+//        synchronized (newBlockNotifyer) {
+        for (int i = sPoint[0] ; i <= BCS.lastIndex(worker) ; i++) {
+            BCS.removeBlock(worker, i);
         }
 
-        currLeader = (bc.getBlock(bc.getHeight()).getHeader().getBid().getPid() + 1) % n;
-        currHeight = bc.getHeight() + 1;
+        BCS.setBlocks(worker, choosen[0].getVList(), sPoint[0]);
+        BCS.notifyOnNewDifiniteBlock(worker);
+//            newBlockNotifyer.notify();
+
+//        }
+
+        currLeader = (BCS.nbGetBlock(worker, BCS.lastIndex(worker)).getHeader().getBid().getPid() + 1) % n;
+        currHeight = BCS.lastIndex(worker) + 1;
         cid = 0;
         cidSeries++;
         logger.debug(format("[#%d-C[%d]] post sync: [cHeight=%d] [cLeader=%d] [cidSeries=%d]"
@@ -736,9 +722,9 @@ public abstract class ToyBaseServer {
 
     }
 
-    boolean isBcValid() {
-        return bc.isValid();
-    }
+//    boolean isBcValid() {
+//        return bc.isValid();
+//    }
 
     static public void addForkProof(RBMsg msg, int channel) throws InvalidProtocolBufferException {
         logger.debug(format("received FORK message on channel [%d]", channel));

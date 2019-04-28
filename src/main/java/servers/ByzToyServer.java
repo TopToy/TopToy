@@ -3,6 +3,7 @@ package servers;
 import blockchain.Blockchain;
 
 import blockchain.Utils;
+import blockchain.data.BCS;
 import communication.CommLayer;
 import das.ab.ABService;
 
@@ -85,8 +86,8 @@ public class ByzToyServer extends ToyBaseServer {
             for (List<Integer> g : groups) {
                 Types.Block byz = byzProposed.element().get(i);
                 i++;
-                WRB.WRBSend(createBlockHeader(byz, bc.getBlock(currHeight - 1).getHeader(), getID(), currHeight,
-                        cidSeries, cid, worker, byz.getId()),  g.stream().mapToInt(j->j).toArray());
+                WRB.WRBSend(createBlockHeader(byz, BCS.nbGetBlock(worker, currHeight - 1).getHeader(), getID(),
+                        currHeight, cidSeries, cid, worker, byz.getId()),  g.stream().mapToInt(j->j).toArray());
             }
         }
 
@@ -96,10 +97,10 @@ public class ByzToyServer extends ToyBaseServer {
     @Override
     void removeFromPendings(Types.BlockHeader recHeader, Types.Block recBlock) {
         if (currLeader == getID() && !recHeader.getEmpty()) {
-            logger.debug(format("[#%d-C[%d]] nullifies currBlock [sender=%d] [height=%d] [cidSeries=%d, cid=%d]",
+            logger.debug(format("[#%d-C[%d]] nullifies currBlock [sender=%d] [height=%d] [cidSeries=%d ; cid=%d]",
                     getID(), worker, recBlock.getHeader().getBid().getPid(), currHeight, cidSeries, cid));
             synchronized (byzProposed) {
-                byzProposed.remove();
+                byzProposed.poll();
             }
         }
     }
@@ -138,25 +139,25 @@ public class ByzToyServer extends ToyBaseServer {
                                 .setBid(bid)
                                 .setTxNum(1)
                                 .setChannel(worker))
-                        .setServerTs(System.currentTimeMillis())
+//                        .setServerTs(System.currentTimeMillis())
                         .build())
                 .build();
     }
 
-    @Override
-    public Blockchain initBC(int id, int channel) {
-        return createBlockchain(Utils.BCT.SGC, id, n, sPath);
-    }
+//    @Override
+//    public Blockchain initBC(int id, int channel) {
+//        return createBlockchain(Utils.BCT.SGC, id, n, sPath);
+//    }
 
-    @Override
-    public Blockchain getBC(int start, int end) {
-        return new Blockchain(this.bc, start, end);
-    }
-
-    @Override
-    public Blockchain getEmptyBC() {
-        return new Blockchain(this.getID());
-    }
+//    @Override
+//    public Blockchain getBC(int start, int end) {
+//        return new Blockchain(this.bc, start, end);
+//    }
+//
+//    @Override
+//    public Blockchain getEmptyBC() {
+//        return new Blockchain(this.getID());
+//    }
 
     @Override
     void potentialBehaviourForSync() throws InterruptedException {

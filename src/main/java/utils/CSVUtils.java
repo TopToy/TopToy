@@ -58,6 +58,12 @@ public class CSVUtils {
 
     }
 
+    static public void writeLines(Writer w, List<List<String>> data) throws IOException {
+        for (List<String> line : data) {
+            writeLine(w, line);
+        }
+    }
+
     public static ArrayList<String[]> readLines(Reader r) throws IOException {
         ArrayList<String[]> ret = new ArrayList<>();
         String line;

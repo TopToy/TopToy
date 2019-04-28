@@ -4,15 +4,14 @@ import blockchain.genesis.GenCreator;
 import utils.DiskUtils;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Future;
 
 import static java.lang.String.format;
 import static java.util.Collections.max;
+
 import proto.Types.*;
 
 public class Blockchain {
@@ -22,6 +21,7 @@ public class Blockchain {
     private Path swapPath;
     private int maxCacheSize = 100;
     private boolean swapAble = false;
+//    private final ConcurrentLinkedQueue<Block> blocks = new ConcurrentLinkedQueue();
     private final ConcurrentHashMap<Integer, Block> blocks = new ConcurrentHashMap<>();
     private Queue<Future> finishedTasks = new LinkedList<>();
     private Queue<Integer> tasksIdx = new LinkedList<>();
@@ -56,7 +56,7 @@ public class Blockchain {
 
     // We assume now that all the validated blocks are in memory
     public boolean validateCurrentLeader(int leader, int f) {
-        int last =  getHeight();
+        int last =  lastIndex();
         for (int i = last ; i > Math.max(0, last - f) ; i--) {
             if (getBlock(i).getHeader().getBid().getPid() == leader) return false;
         }
@@ -65,7 +65,7 @@ public class Blockchain {
 
     public void setBlocks(List<Block> Nblocks, int start) throws IOException {
         for (int i = start ; i < start + Nblocks.size() ; i++) {
-            if (i > getHeight()) {
+            if (i > lastIndex()) {
                 addBlock(Nblocks.get(i - start));
             } else {
                 setBlock(i, Nblocks.get((i - start)));
@@ -86,13 +86,13 @@ public class Blockchain {
     public boolean validateBlockHash(Block b) {
         if (b.getHeader().getHeight() == 0) return true;
         int index = b.getHeader().getHeight() - 1;
-        if (getHeight() < index) return false;
+        if (lastIndex() < index) return false;
         Block prev = getBlock(index);
         return Utils.validateBlockHash(prev, b);
     }
 
     public boolean isValid() {
-        for (int i = 1 ; i < getHeight() + 1 ; i++) {
+        for (int i = 1 ; i < lastIndex() + 1 ; i++) {
             if (!validateBlockHash(getBlock(i - 1))) {
                 logger.info(String.format("Invalid Blockchain!! [%d -> %d]", i-1, i));
                 return false;
@@ -107,14 +107,14 @@ public class Blockchain {
 
     public Block getBlock(int index) {
         if (blocks.isEmpty()) return null;
-        if (index > getHeight()) return null;
+        if (index > lastIndex()) return null;
         if (blocks.keySet().contains(index)) {
             return blocks.get(index);
         }
         try {
             return DiskUtils.getBlockFromFile(index, swapPath);
         } catch (IOException e) {
-            logger.error(format("Unable to retrieve block from disk [index=%d ; height=%d]", index, getHeight()), e);
+            logger.error(format("Unable to retrieve block from disk [index=%d ; height=%d]", index, lastIndex()), e);
             return null;
         }
     }
@@ -127,8 +127,13 @@ public class Blockchain {
         return ret;
     }
 
-    public int getHeight() {
-        return max(blocks.keySet());
+    public int lastIndex() {
+        int li = 0;
+        for (Map.Entry<Integer, Block> e: blocks.entrySet()) {
+            li = Math.max(li, e.getKey());
+        }
+        return  li;
+//        return max(blocks.keys());
     }
 
 
@@ -186,7 +191,7 @@ public class Blockchain {
 //    }
 
     public boolean contains(int height) {
-        return height <= getHeight();
+        return height <= lastIndex();
     }
 
 }

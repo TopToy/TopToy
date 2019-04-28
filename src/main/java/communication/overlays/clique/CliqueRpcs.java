@@ -1,28 +1,19 @@
 package communication.overlays.clique;
 
+import blockchain.data.BCS;
 import communication.data.Data;
 import config.Node;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.Server;
-import io.grpc.ServerBuilder;
-import io.grpc.netty.NettyChannelBuilder;
 import io.grpc.netty.NettyServerBuilder;
 import io.grpc.stub.StreamObserver;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
 import proto.CommunicationGrpc;
 import proto.Types;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Semaphore;
 import java.util.stream.Collectors;
-
-import static blockchain.data.BCS.bcs;
 import static crypto.blockDigSig.verfiyBlockWRTheader;
 import static java.lang.String.format;
 
@@ -135,11 +126,11 @@ public class CliqueRpcs  extends CommunicationGrpc.CommunicationImplBase {
                          io.grpc.stub.StreamObserver<proto.Types.commRes> responseObserver) {
         Types.BlockID bid = request.getProof().getBid();
         int height = request.getProof().getHeight();
-        int channel = request.getProof().getM().getChannel();
+        int worker = request.getProof().getM().getChannel();
         int pid = request.getProof().getBid().getPid();
-        logger.debug(format("[%d-C[%d]] received commReq [height=%d]", id, channel, height));
+        logger.debug(format("[%d-C[%d]] received commReq [height=%d]", id, worker, height));
         Types.Block[] res = {null};
-        Data.blocks[pid][channel].computeIfPresent(bid, (k, v) -> {
+        Data.blocks[pid][worker].computeIfPresent(bid, (k, v) -> {
 
             LinkedList<Types.Block> ll = v.stream().filter(b -> verfiyBlockWRTheader(b, request.getProof()))
                     .collect(Collectors.toCollection(LinkedList::new));
@@ -149,10 +140,11 @@ public class CliqueRpcs  extends CommunicationGrpc.CommunicationImplBase {
         });
         Types.commRes cr = Types.commRes.getDefaultInstance();
         if (res[0] == null) {
-            res[0] = bcs[channel].getBlock(height);
+            res[0] = BCS.nbGetBlock(worker, height);
         }
         if (res[0] != null) {
-            logger.debug(format("[%d-C[%d]] received commReq and has a match [height=%d]", id, channel, height));
+            logger.debug(format("[%d-C[%d]] received commReq and has a match [height=%d]", id,
+                    worker, height));
             cr = Types.commRes.newBuilder().setB(res[0]).build();
 
         }

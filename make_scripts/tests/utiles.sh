@@ -18,8 +18,10 @@ configure_async_inst(){
 echo \
 "init
 serve
+stStart
 async ${1} ${2}
 stop
+stStop
 quit" > ${3}/inst/input.inst
 }
 
@@ -28,9 +30,11 @@ local tme=$((${1}/2))
 echo \
 "init
 serve
+stStart
 wait ${tme}
 byz 1 -g 0 2 -g 1 3
 wait ${tme}
+stStop
 stop
 quit" > ${2}/inst/input.inst
 }
@@ -40,9 +44,11 @@ local tme=$((${1}/2))
 echo \
 "init
 serve
+stStart
 wait ${tme}
 byz 1 -g 0 2 -g 1 3
 async ${2} ${tme}
+stStop
 stop
 quit" > ${3}/inst/input.inst
 }

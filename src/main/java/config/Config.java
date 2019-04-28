@@ -95,6 +95,12 @@ public class Config {
         return conf.getBoolean(tKeys.SYSTEM_TESTING_KEY);
     }
 
+    public static String getIP(int sID) {
+        Toml t = conf.getTables(tKeys.CLUSTER_KEY).get(0);
+        Toml node = t.getTable("s" + sID);
+        return node.getString("ip");
+    }
+
     public static ArrayList<Node> getWrbCluster() {
         Toml t = conf.getTables(tKeys.CLUSTER_KEY).get(0);
         ArrayList<Node> ret = new ArrayList<>();

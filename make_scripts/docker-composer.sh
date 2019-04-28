@@ -30,6 +30,28 @@ echo \
             >> ${5}
 }
 
+compose_client() {
+local id=${1}
+local image=${2}
+local conf=${3}
+local out=${4}
+echo \
+"   TC${id}:
+        image: ${image}
+        container_name: TC_${id}
+        environment:
+        - CID=${id}
+        - SID=${id}
+        - TXS=1000
+        volumes:
+        - ${out}:/tmp/JToy
+        - ${conf}:/JToy/bin/src/main/resources
+        networks:
+            toy_net:
+                ipv4_address: 172.18.1.$((${id} + 3))" \
+            >> ${5}
+}
+
 compose_benign_server() {
 local id=${1}
 local image=${2}
@@ -145,11 +167,30 @@ compose_async_dockers() {
     done
 }
 
+compose_correct_dockers_with_clients() {
+    containers_n=$((${C} - 1))
+    for i in `seq 0 ${containers_n}`; do
+        compose_correct_server $i ${docker_image} ${cdest} ${docker_out} ${compose_file_correct_with_clients}
+#        compose_client $i ${cdocker_image} ${cdest} ${docker_out} ${compose_file_correct_with_clients}
+    done
+    for i in `seq 0 ${containers_n}`; do
+#        compose_correct_server $i ${docker_image} ${cdest} ${docker_out} ${compose_file_correct_with_clients}
+        compose_client $i ${cdocker_image} ${cldest} ${docker_out} ${compose_file_correct_with_clients}
+    done
+}
+
 main_correct(){
     compose_header ${compose_file_correct}
 #    compose_benign_network ${C} ${F}
     compose_correct_dockers
     compose_footer ${compose_file_correct}
+}
+
+main_correct_with_clients(){
+    compose_header ${compose_file_correct_with_clients}
+#    compose_benign_network ${C} ${F}
+    compose_correct_dockers_with_clients
+    compose_footer ${compose_file_correct_with_clients}
 }
 
 main_benign_failures(){
@@ -174,3 +215,4 @@ main_correct
 main_benign_failures
 main_async
 main_byz
+main_correct_with_clients

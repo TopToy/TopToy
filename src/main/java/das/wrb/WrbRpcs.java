@@ -1,6 +1,6 @@
 package das.wrb;
 
-import config.Config;
+import blockchain.data.BCS;
 import config.Node;
 import crypto.blockDigSig;
 import crypto.sslUtils;
@@ -19,7 +19,6 @@ import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-import static blockchain.data.BCS.bcs;
 import static das.data.Data.addToPendings;
 import static io.grpc.Metadata.ASCII_STRING_MARSHALLER;
 import static java.lang.String.format;
@@ -174,32 +173,32 @@ public class WrbRpcs extends WrbGrpc.WrbImplBase {
         });
     }
 
-    private void sendReqMessage(WrbGrpc.WrbStub stub, Types.WrbReq req, int channel,
+    private void sendReqMessage(WrbGrpc.WrbStub stub, Types.WrbReq req, int worker,
                                 int cidSeries, int cid, int sender) {
         stub.reqMessage(req, new StreamObserver<>() {
             @Override
             public void onNext(Types.WrbRes res) {
                 if (res.equals(Types.WrbRes.getDefaultInstance())) return;
                 Types.Meta key = Types.Meta.newBuilder()
-                        .setChannel(channel)
+                        .setChannel(worker)
                         .setCidSeries(cidSeries)
                         .setCid(cid)
                         .build();
                 if (res.getData().getM().getCid() == cid &&
                         res.getData().getM().getCidSeries() == cidSeries
-                        && res.getM().getChannel() == channel &&
-                        res.getData().getM().getChannel() == channel) {
-                    if (Data.pending[channel].containsKey(key) || bcs[channel].contains(req.getHeight())) return;
+                        && res.getM().getChannel() == worker &&
+                        res.getData().getM().getChannel() == worker) {
+                    if (Data.pending[worker].containsKey(key) || BCS.contains(worker, req.getHeight())) return;
                     if (!blockDigSig.verifyHeader(sender, res.getData())) {
                         logger.debug(format("[#%d-C[%d]] has received invalid response message from [#%d] for [cidSeries=%d ; cid=%d]",
-                                id, channel, res.getSender(), cidSeries, cid));
+                                id, worker, res.getSender(), cidSeries, cid));
                         return;
                     }
                     logger.debug(format("[#%d-C[%d]] has received response message from [#%d] for [cidSeries=%d ; cid=%d]",
-                            id, channel, res.getSender(), cidSeries, cid));
-                    synchronized (Data.pending[channel]) {
-                        Data.pending[channel].putIfAbsent(key, res.getData());
-                        Data.pending[channel].notify();
+                            id, worker, res.getSender(), cidSeries, cid));
+                    synchronized (Data.pending[worker]) {
+                        Data.pending[worker].putIfAbsent(key, res.getData());
+                        Data.pending[worker].notify();
                     }
                 }
             }
@@ -252,21 +251,21 @@ public class WrbRpcs extends WrbGrpc.WrbImplBase {
         Types.BlockHeader msg;
         int cid = request.getMeta().getCid();
         int cidSeries = request.getMeta().getCidSeries();
-        int channel = request.getMeta().getChannel();
+        int worker = request.getMeta().getChannel();
         Types.Meta key =  Types.Meta.newBuilder()
-                .setChannel(channel)
+                .setChannel(worker)
                 .setCidSeries(cidSeries)
                 .setCid(cid)
                 .build();
-        msg = Data.pending[channel].get(key);
-        if (msg == null && bcs[channel].contains(request.getHeight())) {
-            msg = bcs[channel].getBlock(request.getHeight()).getHeader();
+        msg = Data.pending[worker].get(key);
+        if (msg == null && BCS.contains(worker, request.getHeight())) {
+            msg = BCS.nbGetBlock(worker, request.getHeight()).getHeader();
         }
         if (msg != null) {
             logger.debug(format("[#%d-C[%d]] has received request message from [#%d] of [cidSeries=%d ; cid=%d]",
-                    id, channel, request.getSender(), cidSeries, cid));
+                    id, worker, request.getSender(), cidSeries, cid));
             Types.Meta meta = Types.Meta.newBuilder().
-                    setChannel(channel).
+                    setChannel(worker).
                     setCid(cid).
                     setCidSeries(cidSeries).
                     build();
@@ -277,7 +276,7 @@ public class WrbRpcs extends WrbGrpc.WrbImplBase {
                     build());
         } else {
             logger.debug(format("[#%d-C[%d]] has received request message from [#%d] of [cidSeries=%d ; cid=%d] but buffers are empty",
-                    id, channel, request.getSender(), cidSeries, cid));
+                    id, worker, request.getSender(), cidSeries, cid));
             responseObserver.onNext(Types.WrbRes.getDefaultInstance());
         }
         responseObserver.onCompleted();

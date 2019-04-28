@@ -1,5 +1,6 @@
 package das.data;
 
+import blockchain.data.BCS;
 import crypto.blockDigSig;
 import proto.Types;
 
@@ -7,7 +8,6 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static blockchain.Utils.validateBlockHash;
-import static blockchain.data.BCS.bcs;
 import static java.lang.String.format;
 import static utils.Statistics.updateHeaderProposed;
 
@@ -86,7 +86,7 @@ public class Data {
 
             return;
         }
-        if (bcs[worker].contains(height)) return;
+        if (BCS.contains(worker, height)) return;
         updateHeaderProposed(request, worker);
         synchronized (pending[worker]) {
             pending[worker].putIfAbsent(key, request);
