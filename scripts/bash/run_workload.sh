@@ -4,6 +4,7 @@ readarray -t servers_p < ./servers_privates.txt
 readarray -t clients < ./clients.txt
 readarray -t types < ./types.txt
 readarray -t ids < ./ids.txt
+readarray -t eids < ./awsInstanceIds.txt
 
 tDir=./../..
 configDir=${tDir}/Configurations
@@ -45,7 +46,13 @@ progress-bar() {
   clean_line
 #  echo  ""
 }
+start_aws_instances() {
+    aws ec2 start-instances --instance-ids ${eids[*]}
 
+}
+stop_aws_instances() {
+    aws ec2 stop-instances --instance-ids ${eids[*]}
+}
 load_server() {
     local s=${servers[${1}]}
     echo "copy bin to ${s}..."
@@ -306,10 +313,11 @@ run_clients_instance() {
 }
 
 shutdown() {
-    for s in "${servers[@]}"; do
-        echo "shutting down server ${s}..."
-        ssh -o ConnectTimeout=30 ${s} 'sudo shutdown now'
-    done
+    stop_aws_instances
+#    for s in "${servers[@]}"; do
+#        echo "shutting down server ${s}..."
+#        ssh -o ConnectTimeout=30 ${s} 'sudo shutdown now'
+#    done
 
 #    for c in "${clients[@]}"; do
 #        echo "shutting down client ${s}..."
@@ -764,5 +772,5 @@ test1() {
 
 }
 test1
-shutdown
-
+stop_aws_instances
+#shutdown
