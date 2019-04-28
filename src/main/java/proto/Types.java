@@ -7446,14 +7446,11 @@ public final class Types {
               data_ = input.readBytes();
               break;
             }
-            case 32: {
-
-              clientTs_ = input.readInt64();
-              break;
-            }
-            case 40: {
-
-              serverTs_ = input.readInt64();
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -7590,14 +7587,10 @@ public final class Types {
         if (!getId()
             .equals(other.getId())) return false;
       }
-      result = result && getData()
-          .equals(other.getData());
-      result = result && (getClientTs()
-          == other.getClientTs());
-      result = result && (getServerTs()
-          == other.getServerTs());
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!getData()
+          .equals(other.getData())) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -8060,58 +8053,7 @@ public final class Types {
         onChanged();
         return this;
       }
-
-      private long clientTs_ ;
-      /**
-       * <code>int64 clientTs = 4;</code>
-       */
-      public long getClientTs() {
-        return clientTs_;
-      }
-      /**
-       * <code>int64 clientTs = 4;</code>
-       */
-      public Builder setClientTs(long value) {
-        
-        clientTs_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>int64 clientTs = 4;</code>
-       */
-      public Builder clearClientTs() {
-        
-        clientTs_ = 0L;
-        onChanged();
-        return this;
-      }
-
-      private long serverTs_ ;
-      /**
-       * <code>int64 serverTs = 5;</code>
-       */
-      public long getServerTs() {
-        return serverTs_;
-      }
-      /**
-       * <code>int64 serverTs = 5;</code>
-       */
-      public Builder setServerTs(long value) {
-        
-        serverTs_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>int64 serverTs = 5;</code>
-       */
-      public Builder clearServerTs() {
-        
-        serverTs_ = 0L;
-        onChanged();
-        return this;
-      }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
@@ -8887,7 +8829,6 @@ public final class Types {
       super(builder);
     }
     private readReq() {
-      blocking_ = false;
     }
 
     @java.lang.Override
@@ -8938,6 +8879,18 @@ public final class Types {
                 tx_ = subBuilder.buildPartial();
               }
 
+              break;
+            }
+            case 24: {
+
+              blocking_ = input.readBool();
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -9075,14 +9028,20 @@ public final class Types {
       }
       proto.Types.readReq other = (proto.Types.readReq) obj;
 
-      boolean result = true;
-      result = result && (hasTx() == other.hasTx());
+      if (hasTid() != other.hasTid()) return false;
+      if (hasTid()) {
+        if (!getTid()
+            .equals(other.getTid())) return false;
+      }
+      if (hasTx() != other.hasTx()) return false;
       if (hasTx()) {
         if (!getTx()
             .equals(other.getTx())) return false;
       }
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (getBlocking()
+          != other.getBlocking()) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -9265,20 +9224,28 @@ public final class Types {
         return proto.Types.internal_static_proto_readReq_descriptor;
       }
 
-      public proto.Types.approved getDefaultInstanceForType() {
-        return proto.Types.approved.getDefaultInstance();
+      @java.lang.Override
+      public proto.Types.readReq getDefaultInstanceForType() {
+        return proto.Types.readReq.getDefaultInstance();
       }
 
-      public proto.Types.approved build() {
-        proto.Types.approved result = buildPartial();
+      @java.lang.Override
+      public proto.Types.readReq build() {
+        proto.Types.readReq result = buildPartial();
         if (!result.isInitialized()) {
           throw newUninitializedMessageException(result);
         }
         return result;
       }
 
-      public proto.Types.approved buildPartial() {
-        proto.Types.approved result = new proto.Types.approved(this);
+      @java.lang.Override
+      public proto.Types.readReq buildPartial() {
+        proto.Types.readReq result = new proto.Types.readReq(this);
+        if (tidBuilder_ == null) {
+          result.tid_ = tid_;
+        } else {
+          result.tid_ = tidBuilder_.build();
+        }
         if (txBuilder_ == null) {
           result.tx_ = tx_;
         } else {
@@ -9371,7 +9338,124 @@ public final class Types {
         return this;
       }
 
-      private proto.Types.Transaction tx_ = null;
+      private proto.Types.txID tid_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          proto.Types.txID, proto.Types.txID.Builder, proto.Types.txIDOrBuilder> tidBuilder_;
+      /**
+       * <code>.proto.txID tid = 1;</code>
+       */
+      public boolean hasTid() {
+        return tidBuilder_ != null || tid_ != null;
+      }
+      /**
+       * <code>.proto.txID tid = 1;</code>
+       */
+      public proto.Types.txID getTid() {
+        if (tidBuilder_ == null) {
+          return tid_ == null ? proto.Types.txID.getDefaultInstance() : tid_;
+        } else {
+          return tidBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>.proto.txID tid = 1;</code>
+       */
+      public Builder setTid(proto.Types.txID value) {
+        if (tidBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          tid_ = value;
+          onChanged();
+        } else {
+          tidBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <code>.proto.txID tid = 1;</code>
+       */
+      public Builder setTid(
+          proto.Types.txID.Builder builderForValue) {
+        if (tidBuilder_ == null) {
+          tid_ = builderForValue.build();
+          onChanged();
+        } else {
+          tidBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <code>.proto.txID tid = 1;</code>
+       */
+      public Builder mergeTid(proto.Types.txID value) {
+        if (tidBuilder_ == null) {
+          if (tid_ != null) {
+            tid_ =
+              proto.Types.txID.newBuilder(tid_).mergeFrom(value).buildPartial();
+          } else {
+            tid_ = value;
+          }
+          onChanged();
+        } else {
+          tidBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <code>.proto.txID tid = 1;</code>
+       */
+      public Builder clearTid() {
+        if (tidBuilder_ == null) {
+          tid_ = null;
+          onChanged();
+        } else {
+          tid_ = null;
+          tidBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <code>.proto.txID tid = 1;</code>
+       */
+      public proto.Types.txID.Builder getTidBuilder() {
+        
+        onChanged();
+        return getTidFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.proto.txID tid = 1;</code>
+       */
+      public proto.Types.txIDOrBuilder getTidOrBuilder() {
+        if (tidBuilder_ != null) {
+          return tidBuilder_.getMessageOrBuilder();
+        } else {
+          return tid_ == null ?
+              proto.Types.txID.getDefaultInstance() : tid_;
+        }
+      }
+      /**
+       * <code>.proto.txID tid = 1;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          proto.Types.txID, proto.Types.txID.Builder, proto.Types.txIDOrBuilder> 
+          getTidFieldBuilder() {
+        if (tidBuilder_ == null) {
+          tidBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              proto.Types.txID, proto.Types.txID.Builder, proto.Types.txIDOrBuilder>(
+                  getTid(),
+                  getParentForChildren(),
+                  isClean());
+          tid_ = null;
+        }
+        return tidBuilder_;
+      }
+
+      private proto.Types.Transaction tx_;
       private com.google.protobuf.SingleFieldBuilderV3<
           proto.Types.Transaction, proto.Types.Transaction.Builder, proto.Types.TransactionOrBuilder> txBuilder_;
       /**
@@ -9487,6 +9571,33 @@ public final class Types {
         }
         return txBuilder_;
       }
+
+      private boolean blocking_ ;
+      /**
+       * <code>bool blocking = 3;</code>
+       */
+      public boolean getBlocking() {
+        return blocking_;
+      }
+      /**
+       * <code>bool blocking = 3;</code>
+       */
+      public Builder setBlocking(boolean value) {
+        
+        blocking_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>bool blocking = 3;</code>
+       */
+      public Builder clearBlocking() {
+        
+        blocking_ = false;
+        onChanged();
+        return this;
+      }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
@@ -9512,9 +9623,10 @@ public final class Types {
       return DEFAULT_INSTANCE;
     }
 
-    private static final com.google.protobuf.Parser<approved>
-        PARSER = new com.google.protobuf.AbstractParser<approved>() {
-      public approved parsePartialFrom(
+    private static final com.google.protobuf.Parser<readReq>
+        PARSER = new com.google.protobuf.AbstractParser<readReq>() {
+      @java.lang.Override
+      public readReq parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
@@ -9531,7 +9643,8 @@ public final class Types {
       return PARSER;
     }
 
-    public proto.Types.approved getDefaultInstanceForType() {
+    @java.lang.Override
+    public proto.Types.readReq getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
 
@@ -9559,7 +9672,6 @@ public final class Types {
       super(builder);
     }
     private txStatus() {
-      res_ = 0;
     }
 
     @java.lang.Override
@@ -9586,23 +9698,7 @@ public final class Types {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
-            case 10: {
-              proto.Types.txID.Builder subBuilder = null;
-              if (txID_ != null) {
-                subBuilder = txID_.toBuilder();
-              }
-              txID_ = input.readMessage(proto.Types.txID.parser(), extensionRegistry);
-              if (subBuilder != null) {
-                subBuilder.mergeFrom(txID_);
-                txID_ = subBuilder.buildPartial();
-              }
+            case 8: {
 
               res_ = input.readInt32();
               break;
@@ -9693,14 +9789,10 @@ public final class Types {
       }
       proto.Types.txStatus other = (proto.Types.txStatus) obj;
 
-      boolean result = true;
-      result = result && (hasTxID() == other.hasTxID());
-      if (hasTxID()) {
-        result = result && getTxID()
-            .equals(other.getTxID());
-      }
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (getRes()
+          != other.getRes()) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -9856,25 +9948,24 @@ public final class Types {
         return proto.Types.internal_static_proto_txStatus_descriptor;
       }
 
-      public proto.Types.read getDefaultInstanceForType() {
-        return proto.Types.read.getDefaultInstance();
+      @java.lang.Override
+      public proto.Types.txStatus getDefaultInstanceForType() {
+        return proto.Types.txStatus.getDefaultInstance();
       }
 
-      public proto.Types.read build() {
-        proto.Types.read result = buildPartial();
+      @java.lang.Override
+      public proto.Types.txStatus build() {
+        proto.Types.txStatus result = buildPartial();
         if (!result.isInitialized()) {
           throw newUninitializedMessageException(result);
         }
         return result;
       }
 
-      public proto.Types.read buildPartial() {
-        proto.Types.read result = new proto.Types.read(this);
-        if (txIDBuilder_ == null) {
-          result.txID_ = txID_;
-        } else {
-          result.txID_ = txIDBuilder_.build();
-        }
+      @java.lang.Override
+      public proto.Types.txStatus buildPartial() {
+        proto.Types.txStatus result = new proto.Types.txStatus(this);
+        result.res_ = res_;
         onBuilt();
         return result;
       }
@@ -9955,9 +10046,7 @@ public final class Types {
         return this;
       }
 
-      private proto.Types.txID txID_ = null;
-      private com.google.protobuf.SingleFieldBuilderV3<
-          proto.Types.txID, proto.Types.txID.Builder, proto.Types.txIDOrBuilder> txIDBuilder_;
+      private int res_ ;
       /**
        * <code>int32 res = 1;</code>
        */
@@ -9982,33 +10071,7 @@ public final class Types {
         onChanged();
         return this;
       }
-      /**
-       * <code>.proto.txID txID = 1;</code>
-       */
-      public proto.Types.txIDOrBuilder getTxIDOrBuilder() {
-        if (txIDBuilder_ != null) {
-          return txIDBuilder_.getMessageOrBuilder();
-        } else {
-          return txID_ == null ?
-              proto.Types.txID.getDefaultInstance() : txID_;
-        }
-      }
-      /**
-       * <code>.proto.txID txID = 1;</code>
-       */
-      private com.google.protobuf.SingleFieldBuilderV3<
-          proto.Types.txID, proto.Types.txID.Builder, proto.Types.txIDOrBuilder> 
-          getTxIDFieldBuilder() {
-        if (txIDBuilder_ == null) {
-          txIDBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-              proto.Types.txID, proto.Types.txID.Builder, proto.Types.txIDOrBuilder>(
-                  getTxID(),
-                  getParentForChildren(),
-                  isClean());
-          txID_ = null;
-        }
-        return txIDBuilder_;
-      }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
@@ -10034,9 +10097,10 @@ public final class Types {
       return DEFAULT_INSTANCE;
     }
 
-    private static final com.google.protobuf.Parser<read>
-        PARSER = new com.google.protobuf.AbstractParser<read>() {
-      public read parsePartialFrom(
+    private static final com.google.protobuf.Parser<txStatus>
+        PARSER = new com.google.protobuf.AbstractParser<txStatus>() {
+      @java.lang.Override
+      public txStatus parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
@@ -10053,7 +10117,8 @@ public final class Types {
       return PARSER;
     }
 
-    public proto.Types.read getDefaultInstanceForType() {
+    @java.lang.Override
+    public proto.Types.txStatus getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
 

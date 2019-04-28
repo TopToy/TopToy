@@ -18,7 +18,7 @@ import static io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall;
 /**
  */
 @javax.annotation.Generated(
-    value = "by gRPC proto compiler (version 1.13.1)",
+    value = "by gRPC proto compiler (version 1.20.0)",
     comments = "Source: client.proto")
 public final class clientServiceGrpc {
 
@@ -30,6 +30,11 @@ public final class clientServiceGrpc {
   private static volatile io.grpc.MethodDescriptor<proto.Types.Transaction,
       proto.Types.txID> getWriteMethod;
 
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "write",
+      requestType = proto.Types.Transaction.class,
+      responseType = proto.Types.txID.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
   public static io.grpc.MethodDescriptor<proto.Types.Transaction,
       proto.Types.txID> getWriteMethod() {
     io.grpc.MethodDescriptor<proto.Types.Transaction, proto.Types.txID> getWriteMethod;
@@ -57,6 +62,11 @@ public final class clientServiceGrpc {
   private static volatile io.grpc.MethodDescriptor<proto.Types.readReq,
       proto.Types.Transaction> getReadMethod;
 
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "read",
+      requestType = proto.Types.readReq.class,
+      responseType = proto.Types.Transaction.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
   public static io.grpc.MethodDescriptor<proto.Types.readReq,
       proto.Types.Transaction> getReadMethod() {
     io.grpc.MethodDescriptor<proto.Types.readReq, proto.Types.Transaction> getReadMethod;
@@ -84,6 +94,11 @@ public final class clientServiceGrpc {
   private static volatile io.grpc.MethodDescriptor<proto.Types.readReq,
       proto.Types.txStatus> getStatusMethod;
 
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "status",
+      requestType = proto.Types.readReq.class,
+      responseType = proto.Types.txStatus.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
   public static io.grpc.MethodDescriptor<proto.Types.readReq,
       proto.Types.txStatus> getStatusMethod() {
     io.grpc.MethodDescriptor<proto.Types.readReq, proto.Types.txStatus> getStatusMethod;

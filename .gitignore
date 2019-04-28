@@ -24,6 +24,7 @@ src/main/resources/inst*
 src/main/resources/sslConfig*
 src/main/resources/config*
 bin*
+cbin*
 scripts/python/.idea*
 scripts/python/venv*
 scripts/python/*.html
