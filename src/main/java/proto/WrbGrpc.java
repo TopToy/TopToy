@@ -18,7 +18,7 @@ import static io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall;
 /**
  */
 @javax.annotation.Generated(
-    value = "by gRPC proto compiler (version 1.13.1)",
+    value = "by gRPC proto compiler (version 1.20.0)",
     comments = "Source: wrbService.proto")
 public final class WrbGrpc {
 
@@ -30,6 +30,11 @@ public final class WrbGrpc {
   private static volatile io.grpc.MethodDescriptor<proto.Types.BlockHeader,
       proto.Types.Empty> getDisseminateMessageMethod;
 
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "DisseminateMessage",
+      requestType = proto.Types.BlockHeader.class,
+      responseType = proto.Types.Empty.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
   public static io.grpc.MethodDescriptor<proto.Types.BlockHeader,
       proto.Types.Empty> getDisseminateMessageMethod() {
     io.grpc.MethodDescriptor<proto.Types.BlockHeader, proto.Types.Empty> getDisseminateMessageMethod;
@@ -57,6 +62,11 @@ public final class WrbGrpc {
   private static volatile io.grpc.MethodDescriptor<proto.Types.WrbReq,
       proto.Types.WrbRes> getReqMessageMethod;
 
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "reqMessage",
+      requestType = proto.Types.WrbReq.class,
+      responseType = proto.Types.WrbRes.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
   public static io.grpc.MethodDescriptor<proto.Types.WrbReq,
       proto.Types.WrbRes> getReqMessageMethod() {
     io.grpc.MethodDescriptor<proto.Types.WrbReq, proto.Types.WrbRes> getReqMessageMethod;

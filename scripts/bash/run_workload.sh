@@ -24,9 +24,9 @@ progress-bar() {
     already_done() { for ((done=0; done<$elapsed; done++)); do printf "▇"; done }
     remaining() { for ((remain=$elapsed; remain<$duration; remain++)); do printf " "; done }
     percentage() {
-                    sign="-"
+                    sign="-  "
                     if [ $(( ${1} % 2 )) == 0 ]; then
-                        sign="|"
+                        sign="|  "
                     fi
                     printf "### %s${sign}" $(( ($duration - $elapsed) * 10 - ${1} ));
                 }
@@ -43,6 +43,7 @@ progress-bar() {
 #      clean_line
   done
   clean_line
+#  echo  ""
 }
 
 load_server() {
@@ -108,7 +109,7 @@ run_remote_servers() {
     done
     sleep 20
     t=$((${1} + 40))
-    echo "waits for more ${t} ms"
+    echo "waits for more ${t} s"
     progress-bar ${t}
     for pid in ${pids[*]}; do
         wait $pid
@@ -755,11 +756,11 @@ test1() {
 
 #    main_no_failures 1024 10 1 10 1 10 10 300
 #    main_no_failures 1024 100 1 10 1 10 10 300
-#    main_no_failures 1024 1000 1 10 1 10 10 300
+    main_no_failures 1024 1000 8 8 2 10 10 300
 #
-    main_no_failures 4096 10 10 10 1 10 10 300
+#    main_no_failures 4096 10 10 10 1 10 10 300
 #    main_no_failures 4096 100 1 10 1 10 10 300
-    main_no_failures 4096 1000 3 10 1 10 10 300
+#    main_no_failures 4096 1000 3 10 1 10 10 300
 
 }
 test1

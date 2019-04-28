@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
-sleep 600
+sleep 420
 echo "watchdog activated"
 ./clean_machines.sh
+sleep 10

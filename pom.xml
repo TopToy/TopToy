@@ -162,12 +162,12 @@
                 <configuration>
                     <clearOutputDirectory>false</clearOutputDirectory>
                     <attachProtoSources>false</attachProtoSources>
-                    <protocArtifact>com.google.protobuf:protoc:3.5.1-1:exe:${os.detected.classifier}</protocArtifact>
+                    <protocArtifact>com.google.protobuf:protoc:3.7.1:exe:${os.detected.classifier}</protocArtifact>
                     <pluginId>grpc-java</pluginId>
                     <!--<includes>-->
                         <!--<include>${basedir}/src/main/proto</include>-->
                     <!--</includes>-->
-                    <pluginArtifact>io.grpc:protoc-gen-grpc-java:1.13.1:exe:${os.detected.classifier}</pluginArtifact>
+                    <pluginArtifact>io.grpc:protoc-gen-grpc-java:1.20.0:exe:${os.detected.classifier}</pluginArtifact>
                     <protoSourceRoot>${basedir}/src/main/proto</protoSourceRoot>
                     <outputDirectory>${basedir}/src/main/java/</outputDirectory>
                 </configuration>
@@ -240,37 +240,37 @@
         <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>
-            <version>3.6.0</version>
+            <version>3.7.1</version>
         </dependency>
 
         <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java-util</artifactId>
-            <version>3.5.1</version>
+            <version>3.7.1</version>
         </dependency>
 
         <dependency>
             <groupId>io.grpc</groupId>
             <artifactId>grpc-netty</artifactId>
-            <version>1.13.1</version>
+            <version>1.20.0</version>
         </dependency>
         <dependency>
             <groupId>io.grpc</groupId>
             <artifactId>grpc-protobuf</artifactId>
-            <version>1.13.1</version>
+            <version>1.20.0</version>
         </dependency>
         <dependency>
             <groupId>io.grpc</groupId>
             <artifactId>grpc-stub</artifactId>
-            <version>1.13.1</version>
+            <version>1.20.0</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>27.0.1-jre</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>com.google.guava</groupId>-->
+            <!--<artifactId>guava</artifactId>-->
+            <!--<version>27.0.1-jre</version>-->
+        <!--</dependency>-->
 
 
         <!--&lt;!&ndash; https://mvnrepository.com/artifact/org.slf4j/slf4j-log4j12 &ndash;&gt;-->
@@ -385,6 +385,7 @@
             <artifactId>h2</artifactId>
             <version>1.4.197</version>
         </dependency>
+
 
 
     </dependencies>

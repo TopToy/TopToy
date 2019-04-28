@@ -18,7 +18,7 @@ import static io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall;
 /**
  */
 @javax.annotation.Generated(
-    value = "by gRPC proto compiler (version 1.13.1)",
+    value = "by gRPC proto compiler (version 1.20.0)",
     comments = "Source: commService.proto")
 public final class CommunicationGrpc {
 
@@ -30,6 +30,11 @@ public final class CommunicationGrpc {
   private static volatile io.grpc.MethodDescriptor<proto.Types.Comm,
       proto.Types.Empty> getDsmMethod;
 
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "dsm",
+      requestType = proto.Types.Comm.class,
+      responseType = proto.Types.Empty.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
   public static io.grpc.MethodDescriptor<proto.Types.Comm,
       proto.Types.Empty> getDsmMethod() {
     io.grpc.MethodDescriptor<proto.Types.Comm, proto.Types.Empty> getDsmMethod;
@@ -57,6 +62,11 @@ public final class CommunicationGrpc {
   private static volatile io.grpc.MethodDescriptor<proto.Types.commReq,
       proto.Types.commRes> getReqBlockMethod;
 
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "reqBlock",
+      requestType = proto.Types.commReq.class,
+      responseType = proto.Types.commRes.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
   public static io.grpc.MethodDescriptor<proto.Types.commReq,
       proto.Types.commRes> getReqBlockMethod() {
     io.grpc.MethodDescriptor<proto.Types.commReq, proto.Types.commRes> getReqBlockMethod;

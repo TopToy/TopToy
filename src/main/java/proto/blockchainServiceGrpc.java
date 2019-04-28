@@ -18,7 +18,7 @@ import static io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall;
 /**
  */
 @javax.annotation.Generated(
-    value = "by gRPC proto compiler (version 1.13.1)",
+    value = "by gRPC proto compiler (version 1.20.0)",
     comments = "Source: blockchainService.proto")
 public final class blockchainServiceGrpc {
 
@@ -30,6 +30,11 @@ public final class blockchainServiceGrpc {
   private static volatile io.grpc.MethodDescriptor<proto.Types.Transaction,
       proto.Types.accepted> getAddTransactionMethod;
 
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "addTransaction",
+      requestType = proto.Types.Transaction.class,
+      responseType = proto.Types.accepted.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
   public static io.grpc.MethodDescriptor<proto.Types.Transaction,
       proto.Types.accepted> getAddTransactionMethod() {
     io.grpc.MethodDescriptor<proto.Types.Transaction, proto.Types.accepted> getAddTransactionMethod;
@@ -57,6 +62,11 @@ public final class blockchainServiceGrpc {
   private static volatile io.grpc.MethodDescriptor<proto.Types.read,
       proto.Types.approved> getGetTransactionMethod;
 
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "getTransaction",
+      requestType = proto.Types.read.class,
+      responseType = proto.Types.approved.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
   public static io.grpc.MethodDescriptor<proto.Types.read,
       proto.Types.approved> getGetTransactionMethod() {
     io.grpc.MethodDescriptor<proto.Types.read, proto.Types.approved> getGetTransactionMethod;

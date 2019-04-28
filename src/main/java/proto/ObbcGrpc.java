@@ -18,7 +18,7 @@ import static io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall;
 /**
  */
 @javax.annotation.Generated(
-    value = "by gRPC proto compiler (version 1.13.1)",
+    value = "by gRPC proto compiler (version 1.20.0)",
     comments = "Source: obbc.proto")
 public final class ObbcGrpc {
 
@@ -30,6 +30,11 @@ public final class ObbcGrpc {
   private static volatile io.grpc.MethodDescriptor<proto.Types.BbcMsg,
       proto.Types.Empty> getFastVoteMethod;
 
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "FastVote",
+      requestType = proto.Types.BbcMsg.class,
+      responseType = proto.Types.Empty.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
   public static io.grpc.MethodDescriptor<proto.Types.BbcMsg,
       proto.Types.Empty> getFastVoteMethod() {
     io.grpc.MethodDescriptor<proto.Types.BbcMsg, proto.Types.Empty> getFastVoteMethod;
@@ -57,6 +62,11 @@ public final class ObbcGrpc {
   private static volatile io.grpc.MethodDescriptor<proto.Types.EvidenceReq,
       proto.Types.EvidenceRes> getEvidenceReqMessageMethod;
 
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "EvidenceReqMessage",
+      requestType = proto.Types.EvidenceReq.class,
+      responseType = proto.Types.EvidenceRes.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
   public static io.grpc.MethodDescriptor<proto.Types.EvidenceReq,
       proto.Types.EvidenceRes> getEvidenceReqMessageMethod() {
     io.grpc.MethodDescriptor<proto.Types.EvidenceReq, proto.Types.EvidenceRes> getEvidenceReqMessageMethod;

@@ -50,9 +50,6 @@ public final class Types {
       super(builder);
     }
     private Meta() {
-      channel_ = 0;
-      cid_ = 0;
-      cidSeries_ = 0;
     }
 
     @java.lang.Override
@@ -79,13 +76,6 @@ public final class Types {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 8: {
 
               channel_ = input.readInt32();
@@ -99,6 +89,13 @@ public final class Types {
             case 32: {
 
               cidSeries_ = input.readInt32();
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -118,6 +115,7 @@ public final class Types {
       return proto.Types.internal_static_proto_Meta_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return proto.Types.internal_static_proto_Meta_fieldAccessorTable
@@ -157,6 +155,7 @@ public final class Types {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -166,6 +165,7 @@ public final class Types {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (channel_ != 0) {
@@ -180,6 +180,7 @@ public final class Types {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -212,15 +213,14 @@ public final class Types {
       }
       proto.Types.Meta other = (proto.Types.Meta) obj;
 
-      boolean result = true;
-      result = result && (getChannel()
-          == other.getChannel());
-      result = result && (getCid()
-          == other.getCid());
-      result = result && (getCidSeries()
-          == other.getCidSeries());
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (getChannel()
+          != other.getChannel()) return false;
+      if (getCid()
+          != other.getCid()) return false;
+      if (getCidSeries()
+          != other.getCidSeries()) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -311,6 +311,7 @@ public final class Types {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -318,6 +319,7 @@ public final class Types {
     public static Builder newBuilder(proto.Types.Meta prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -341,6 +343,7 @@ public final class Types {
         return proto.Types.internal_static_proto_Meta_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return proto.Types.internal_static_proto_Meta_fieldAccessorTable
@@ -363,6 +366,7 @@ public final class Types {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         channel_ = 0;
@@ -374,15 +378,18 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return proto.Types.internal_static_proto_Meta_descriptor;
       }
 
+      @java.lang.Override
       public proto.Types.Meta getDefaultInstanceForType() {
         return proto.Types.Meta.getDefaultInstance();
       }
 
+      @java.lang.Override
       public proto.Types.Meta build() {
         proto.Types.Meta result = buildPartial();
         if (!result.isInitialized()) {
@@ -391,6 +398,7 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public proto.Types.Meta buildPartial() {
         proto.Types.Meta result = new proto.Types.Meta(this);
         result.channel_ = channel_;
@@ -400,32 +408,39 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof proto.Types.Meta) {
           return mergeFrom((proto.Types.Meta)other);
@@ -451,10 +466,12 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -562,11 +579,13 @@ public final class Types {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -588,6 +607,7 @@ public final class Types {
 
     private static final com.google.protobuf.Parser<Meta>
         PARSER = new com.google.protobuf.AbstractParser<Meta>() {
+      @java.lang.Override
       public Meta parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -605,6 +625,7 @@ public final class Types {
       return PARSER;
     }
 
+    @java.lang.Override
     public proto.Types.Meta getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -651,8 +672,6 @@ public final class Types {
       super(builder);
     }
     private BbcDecision() {
-      decosion_ = 0;
-      sender_ = 0;
     }
 
     @java.lang.Override
@@ -679,13 +698,6 @@ public final class Types {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               proto.Types.Meta.Builder subBuilder = null;
               if (m_ != null) {
@@ -709,6 +721,13 @@ public final class Types {
               sender_ = input.readInt32();
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -726,6 +745,7 @@ public final class Types {
       return proto.Types.internal_static_proto_BbcDecision_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return proto.Types.internal_static_proto_BbcDecision_fieldAccessorTable
@@ -773,6 +793,7 @@ public final class Types {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -782,6 +803,7 @@ public final class Types {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (m_ != null) {
@@ -796,6 +818,7 @@ public final class Types {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -828,18 +851,17 @@ public final class Types {
       }
       proto.Types.BbcDecision other = (proto.Types.BbcDecision) obj;
 
-      boolean result = true;
-      result = result && (hasM() == other.hasM());
+      if (hasM() != other.hasM()) return false;
       if (hasM()) {
-        result = result && getM()
-            .equals(other.getM());
+        if (!getM()
+            .equals(other.getM())) return false;
       }
-      result = result && (getDecosion()
-          == other.getDecosion());
-      result = result && (getSender()
-          == other.getSender());
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (getDecosion()
+          != other.getDecosion()) return false;
+      if (getSender()
+          != other.getSender()) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -932,6 +954,7 @@ public final class Types {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -939,6 +962,7 @@ public final class Types {
     public static Builder newBuilder(proto.Types.BbcDecision prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -962,6 +986,7 @@ public final class Types {
         return proto.Types.internal_static_proto_BbcDecision_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return proto.Types.internal_static_proto_BbcDecision_fieldAccessorTable
@@ -984,6 +1009,7 @@ public final class Types {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (mBuilder_ == null) {
@@ -999,15 +1025,18 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return proto.Types.internal_static_proto_BbcDecision_descriptor;
       }
 
+      @java.lang.Override
       public proto.Types.BbcDecision getDefaultInstanceForType() {
         return proto.Types.BbcDecision.getDefaultInstance();
       }
 
+      @java.lang.Override
       public proto.Types.BbcDecision build() {
         proto.Types.BbcDecision result = buildPartial();
         if (!result.isInitialized()) {
@@ -1016,6 +1045,7 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public proto.Types.BbcDecision buildPartial() {
         proto.Types.BbcDecision result = new proto.Types.BbcDecision(this);
         if (mBuilder_ == null) {
@@ -1029,32 +1059,39 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof proto.Types.BbcDecision) {
           return mergeFrom((proto.Types.BbcDecision)other);
@@ -1080,10 +1117,12 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -1102,7 +1141,7 @@ public final class Types {
         return this;
       }
 
-      private proto.Types.Meta m_ = null;
+      private proto.Types.Meta m_;
       private com.google.protobuf.SingleFieldBuilderV3<
           proto.Types.Meta, proto.Types.Meta.Builder, proto.Types.MetaOrBuilder> mBuilder_;
       /**
@@ -1270,11 +1309,13 @@ public final class Types {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -1296,6 +1337,7 @@ public final class Types {
 
     private static final com.google.protobuf.Parser<BbcDecision>
         PARSER = new com.google.protobuf.AbstractParser<BbcDecision>() {
+      @java.lang.Override
       public BbcDecision parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -1313,6 +1355,7 @@ public final class Types {
       return PARSER;
     }
 
+    @java.lang.Override
     public proto.Types.BbcDecision getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -1346,8 +1389,6 @@ public final class Types {
       super(builder);
     }
     private BlockID() {
-      pid_ = 0;
-      bid_ = 0;
     }
 
     @java.lang.Override
@@ -1374,13 +1415,6 @@ public final class Types {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 8: {
 
               pid_ = input.readInt32();
@@ -1389,6 +1423,13 @@ public final class Types {
             case 16: {
 
               bid_ = input.readInt32();
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -1408,6 +1449,7 @@ public final class Types {
       return proto.Types.internal_static_proto_BlockID_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return proto.Types.internal_static_proto_BlockID_fieldAccessorTable
@@ -1434,6 +1476,7 @@ public final class Types {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -1443,6 +1486,7 @@ public final class Types {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (pid_ != 0) {
@@ -1454,6 +1498,7 @@ public final class Types {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -1482,13 +1527,12 @@ public final class Types {
       }
       proto.Types.BlockID other = (proto.Types.BlockID) obj;
 
-      boolean result = true;
-      result = result && (getPid()
-          == other.getPid());
-      result = result && (getBid()
-          == other.getBid());
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (getPid()
+          != other.getPid()) return false;
+      if (getBid()
+          != other.getBid()) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -1577,6 +1621,7 @@ public final class Types {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -1584,6 +1629,7 @@ public final class Types {
     public static Builder newBuilder(proto.Types.BlockID prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -1607,6 +1653,7 @@ public final class Types {
         return proto.Types.internal_static_proto_BlockID_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return proto.Types.internal_static_proto_BlockID_fieldAccessorTable
@@ -1629,6 +1676,7 @@ public final class Types {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         pid_ = 0;
@@ -1638,15 +1686,18 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return proto.Types.internal_static_proto_BlockID_descriptor;
       }
 
+      @java.lang.Override
       public proto.Types.BlockID getDefaultInstanceForType() {
         return proto.Types.BlockID.getDefaultInstance();
       }
 
+      @java.lang.Override
       public proto.Types.BlockID build() {
         proto.Types.BlockID result = buildPartial();
         if (!result.isInitialized()) {
@@ -1655,6 +1706,7 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public proto.Types.BlockID buildPartial() {
         proto.Types.BlockID result = new proto.Types.BlockID(this);
         result.pid_ = pid_;
@@ -1663,32 +1715,39 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof proto.Types.BlockID) {
           return mergeFrom((proto.Types.BlockID)other);
@@ -1711,10 +1770,12 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -1784,11 +1845,13 @@ public final class Types {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -1810,6 +1873,7 @@ public final class Types {
 
     private static final com.google.protobuf.Parser<BlockID>
         PARSER = new com.google.protobuf.AbstractParser<BlockID>() {
+      @java.lang.Override
       public BlockID parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -1827,6 +1891,7 @@ public final class Types {
       return PARSER;
     }
 
+    @java.lang.Override
     public proto.Types.BlockID getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -1907,10 +1972,8 @@ public final class Types {
     }
     private BlockHeader() {
       prev_ = com.google.protobuf.ByteString.EMPTY;
-      height_ = 0;
       transactionHash_ = com.google.protobuf.ByteString.EMPTY;
       proof_ = "";
-      empty_ = false;
     }
 
     @java.lang.Override
@@ -1937,13 +2000,6 @@ public final class Types {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               proto.Types.Meta.Builder subBuilder = null;
               if (m_ != null) {
@@ -1996,6 +2052,13 @@ public final class Types {
               empty_ = input.readBool();
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -2013,6 +2076,7 @@ public final class Types {
       return proto.Types.internal_static_proto_BlockHeader_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return proto.Types.internal_static_proto_BlockHeader_fieldAccessorTable
@@ -2133,6 +2197,7 @@ public final class Types {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -2142,6 +2207,7 @@ public final class Types {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (m_ != null) {
@@ -2168,6 +2234,7 @@ public final class Types {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -2215,29 +2282,28 @@ public final class Types {
       }
       proto.Types.BlockHeader other = (proto.Types.BlockHeader) obj;
 
-      boolean result = true;
-      result = result && (hasM() == other.hasM());
+      if (hasM() != other.hasM()) return false;
       if (hasM()) {
-        result = result && getM()
-            .equals(other.getM());
+        if (!getM()
+            .equals(other.getM())) return false;
       }
-      result = result && getPrev()
-          .equals(other.getPrev());
-      result = result && (getHeight()
-          == other.getHeight());
-      result = result && getTransactionHash()
-          .equals(other.getTransactionHash());
-      result = result && getProof()
-          .equals(other.getProof());
-      result = result && (hasBid() == other.hasBid());
+      if (!getPrev()
+          .equals(other.getPrev())) return false;
+      if (getHeight()
+          != other.getHeight()) return false;
+      if (!getTransactionHash()
+          .equals(other.getTransactionHash())) return false;
+      if (!getProof()
+          .equals(other.getProof())) return false;
+      if (hasBid() != other.hasBid()) return false;
       if (hasBid()) {
-        result = result && getBid()
-            .equals(other.getBid());
+        if (!getBid()
+            .equals(other.getBid())) return false;
       }
-      result = result && (getEmpty()
-          == other.getEmpty());
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (getEmpty()
+          != other.getEmpty()) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -2341,6 +2407,7 @@ public final class Types {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -2348,6 +2415,7 @@ public final class Types {
     public static Builder newBuilder(proto.Types.BlockHeader prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -2371,6 +2439,7 @@ public final class Types {
         return proto.Types.internal_static_proto_BlockHeader_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return proto.Types.internal_static_proto_BlockHeader_fieldAccessorTable
@@ -2393,6 +2462,7 @@ public final class Types {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (mBuilder_ == null) {
@@ -2420,15 +2490,18 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return proto.Types.internal_static_proto_BlockHeader_descriptor;
       }
 
+      @java.lang.Override
       public proto.Types.BlockHeader getDefaultInstanceForType() {
         return proto.Types.BlockHeader.getDefaultInstance();
       }
 
+      @java.lang.Override
       public proto.Types.BlockHeader build() {
         proto.Types.BlockHeader result = buildPartial();
         if (!result.isInitialized()) {
@@ -2437,6 +2510,7 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public proto.Types.BlockHeader buildPartial() {
         proto.Types.BlockHeader result = new proto.Types.BlockHeader(this);
         if (mBuilder_ == null) {
@@ -2458,32 +2532,39 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof proto.Types.BlockHeader) {
           return mergeFrom((proto.Types.BlockHeader)other);
@@ -2522,10 +2603,12 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -2544,7 +2627,7 @@ public final class Types {
         return this;
       }
 
-      private proto.Types.Meta m_ = null;
+      private proto.Types.Meta m_;
       private com.google.protobuf.SingleFieldBuilderV3<
           proto.Types.Meta, proto.Types.Meta.Builder, proto.Types.MetaOrBuilder> mBuilder_;
       /**
@@ -2814,7 +2897,7 @@ public final class Types {
         return this;
       }
 
-      private proto.Types.BlockID bid_ = null;
+      private proto.Types.BlockID bid_;
       private com.google.protobuf.SingleFieldBuilderV3<
           proto.Types.BlockID, proto.Types.BlockID.Builder, proto.Types.BlockIDOrBuilder> bidBuilder_;
       /**
@@ -2956,11 +3039,13 @@ public final class Types {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -2982,6 +3067,7 @@ public final class Types {
 
     private static final com.google.protobuf.Parser<BlockHeader>
         PARSER = new com.google.protobuf.AbstractParser<BlockHeader>() {
+      @java.lang.Override
       public BlockHeader parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -2999,6 +3085,7 @@ public final class Types {
       return PARSER;
     }
 
+    @java.lang.Override
     public proto.Types.BlockHeader getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -3063,9 +3150,6 @@ public final class Types {
       super(builder);
     }
     private BbcMsg() {
-      vote_ = false;
-      height_ = 0;
-      sender_ = 0;
     }
 
     @java.lang.Override
@@ -3092,13 +3176,6 @@ public final class Types {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               proto.Types.Meta.Builder subBuilder = null;
               if (m_ != null) {
@@ -3140,6 +3217,13 @@ public final class Types {
               sender_ = input.readInt32();
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -3157,6 +3241,7 @@ public final class Types {
       return proto.Types.internal_static_proto_BbcMsg_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return proto.Types.internal_static_proto_BbcMsg_fieldAccessorTable
@@ -3234,6 +3319,7 @@ public final class Types {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -3243,6 +3329,7 @@ public final class Types {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (m_ != null) {
@@ -3263,6 +3350,7 @@ public final class Types {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -3303,25 +3391,24 @@ public final class Types {
       }
       proto.Types.BbcMsg other = (proto.Types.BbcMsg) obj;
 
-      boolean result = true;
-      result = result && (hasM() == other.hasM());
+      if (hasM() != other.hasM()) return false;
       if (hasM()) {
-        result = result && getM()
-            .equals(other.getM());
+        if (!getM()
+            .equals(other.getM())) return false;
       }
-      result = result && (getVote()
-          == other.getVote());
-      result = result && (hasNext() == other.hasNext());
+      if (getVote()
+          != other.getVote()) return false;
+      if (hasNext() != other.hasNext()) return false;
       if (hasNext()) {
-        result = result && getNext()
-            .equals(other.getNext());
+        if (!getNext()
+            .equals(other.getNext())) return false;
       }
-      result = result && (getHeight()
-          == other.getHeight());
-      result = result && (getSender()
-          == other.getSender());
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (getHeight()
+          != other.getHeight()) return false;
+      if (getSender()
+          != other.getSender()) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -3421,6 +3508,7 @@ public final class Types {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -3428,6 +3516,7 @@ public final class Types {
     public static Builder newBuilder(proto.Types.BbcMsg prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -3451,6 +3540,7 @@ public final class Types {
         return proto.Types.internal_static_proto_BbcMsg_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return proto.Types.internal_static_proto_BbcMsg_fieldAccessorTable
@@ -3473,6 +3563,7 @@ public final class Types {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (mBuilder_ == null) {
@@ -3496,15 +3587,18 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return proto.Types.internal_static_proto_BbcMsg_descriptor;
       }
 
+      @java.lang.Override
       public proto.Types.BbcMsg getDefaultInstanceForType() {
         return proto.Types.BbcMsg.getDefaultInstance();
       }
 
+      @java.lang.Override
       public proto.Types.BbcMsg build() {
         proto.Types.BbcMsg result = buildPartial();
         if (!result.isInitialized()) {
@@ -3513,6 +3607,7 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public proto.Types.BbcMsg buildPartial() {
         proto.Types.BbcMsg result = new proto.Types.BbcMsg(this);
         if (mBuilder_ == null) {
@@ -3532,32 +3627,39 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof proto.Types.BbcMsg) {
           return mergeFrom((proto.Types.BbcMsg)other);
@@ -3589,10 +3691,12 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -3611,7 +3715,7 @@ public final class Types {
         return this;
       }
 
-      private proto.Types.Meta m_ = null;
+      private proto.Types.Meta m_;
       private com.google.protobuf.SingleFieldBuilderV3<
           proto.Types.Meta, proto.Types.Meta.Builder, proto.Types.MetaOrBuilder> mBuilder_;
       /**
@@ -3754,7 +3858,7 @@ public final class Types {
         return this;
       }
 
-      private proto.Types.BlockHeader next_ = null;
+      private proto.Types.BlockHeader next_;
       private com.google.protobuf.SingleFieldBuilderV3<
           proto.Types.BlockHeader, proto.Types.BlockHeader.Builder, proto.Types.BlockHeaderOrBuilder> nextBuilder_;
       /**
@@ -3922,11 +4026,13 @@ public final class Types {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -3948,6 +4054,7 @@ public final class Types {
 
     private static final com.google.protobuf.Parser<BbcMsg>
         PARSER = new com.google.protobuf.AbstractParser<BbcMsg>() {
+      @java.lang.Override
       public BbcMsg parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -3965,6 +4072,7 @@ public final class Types {
       return PARSER;
     }
 
+    @java.lang.Override
     public proto.Types.BbcMsg getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -4015,9 +4123,6 @@ public final class Types {
       super(builder);
     }
     private HeaderStatistics() {
-      proposed_ = 0L;
-      tD_ = 0L;
-      pD_ = 0L;
     }
 
     @java.lang.Override
@@ -4044,13 +4149,6 @@ public final class Types {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 8: {
 
               proposed_ = input.readInt64();
@@ -4064,6 +4162,13 @@ public final class Types {
             case 24: {
 
               pD_ = input.readInt64();
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -4083,6 +4188,7 @@ public final class Types {
       return proto.Types.internal_static_proto_HeaderStatistics_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return proto.Types.internal_static_proto_HeaderStatistics_fieldAccessorTable
@@ -4130,6 +4236,7 @@ public final class Types {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -4139,6 +4246,7 @@ public final class Types {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (proposed_ != 0L) {
@@ -4153,6 +4261,7 @@ public final class Types {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -4185,15 +4294,14 @@ public final class Types {
       }
       proto.Types.HeaderStatistics other = (proto.Types.HeaderStatistics) obj;
 
-      boolean result = true;
-      result = result && (getProposed()
-          == other.getProposed());
-      result = result && (getTD()
-          == other.getTD());
-      result = result && (getPD()
-          == other.getPD());
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (getProposed()
+          != other.getProposed()) return false;
+      if (getTD()
+          != other.getTD()) return false;
+      if (getPD()
+          != other.getPD()) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -4287,6 +4395,7 @@ public final class Types {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -4294,6 +4403,7 @@ public final class Types {
     public static Builder newBuilder(proto.Types.HeaderStatistics prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -4317,6 +4427,7 @@ public final class Types {
         return proto.Types.internal_static_proto_HeaderStatistics_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return proto.Types.internal_static_proto_HeaderStatistics_fieldAccessorTable
@@ -4339,6 +4450,7 @@ public final class Types {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         proposed_ = 0L;
@@ -4350,15 +4462,18 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return proto.Types.internal_static_proto_HeaderStatistics_descriptor;
       }
 
+      @java.lang.Override
       public proto.Types.HeaderStatistics getDefaultInstanceForType() {
         return proto.Types.HeaderStatistics.getDefaultInstance();
       }
 
+      @java.lang.Override
       public proto.Types.HeaderStatistics build() {
         proto.Types.HeaderStatistics result = buildPartial();
         if (!result.isInitialized()) {
@@ -4367,6 +4482,7 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public proto.Types.HeaderStatistics buildPartial() {
         proto.Types.HeaderStatistics result = new proto.Types.HeaderStatistics(this);
         result.proposed_ = proposed_;
@@ -4376,32 +4492,39 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof proto.Types.HeaderStatistics) {
           return mergeFrom((proto.Types.HeaderStatistics)other);
@@ -4427,10 +4550,12 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -4562,11 +4687,13 @@ public final class Types {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -4588,6 +4715,7 @@ public final class Types {
 
     private static final com.google.protobuf.Parser<HeaderStatistics>
         PARSER = new com.google.protobuf.AbstractParser<HeaderStatistics>() {
+      @java.lang.Override
       public HeaderStatistics parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -4605,6 +4733,7 @@ public final class Types {
       return PARSER;
     }
 
+    @java.lang.Override
     public proto.Types.HeaderStatistics getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -4725,13 +4854,6 @@ public final class Types {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               proto.Types.BlockHeader.Builder subBuilder = null;
               if (header_ != null) {
@@ -4759,12 +4881,19 @@ public final class Types {
               break;
             }
             case 26: {
-              if (!((mutable_bitField0_ & 0x00000004) == 0x00000004)) {
+              if (!((mutable_bitField0_ & 0x00000004) != 0)) {
                 data_ = new java.util.ArrayList<proto.Types.Transaction>();
                 mutable_bitField0_ |= 0x00000004;
               }
               data_.add(
                   input.readMessage(proto.Types.Transaction.parser(), extensionRegistry));
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -4775,7 +4904,7 @@ public final class Types {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
-        if (((mutable_bitField0_ & 0x00000004) == 0x00000004)) {
+        if (((mutable_bitField0_ & 0x00000004) != 0)) {
           data_ = java.util.Collections.unmodifiableList(data_);
         }
         this.unknownFields = unknownFields.build();
@@ -4787,6 +4916,7 @@ public final class Types {
       return proto.Types.internal_static_proto_Block_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return proto.Types.internal_static_proto_Block_fieldAccessorTable
@@ -4893,6 +5023,7 @@ public final class Types {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -4902,6 +5033,7 @@ public final class Types {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (header_ != null) {
@@ -4916,6 +5048,7 @@ public final class Types {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -4948,21 +5081,20 @@ public final class Types {
       }
       proto.Types.Block other = (proto.Types.Block) obj;
 
-      boolean result = true;
-      result = result && (hasHeader() == other.hasHeader());
+      if (hasHeader() != other.hasHeader()) return false;
       if (hasHeader()) {
-        result = result && getHeader()
-            .equals(other.getHeader());
+        if (!getHeader()
+            .equals(other.getHeader())) return false;
       }
-      result = result && (hasId() == other.hasId());
+      if (hasId() != other.hasId()) return false;
       if (hasId()) {
-        result = result && getId()
-            .equals(other.getId());
+        if (!getId()
+            .equals(other.getId())) return false;
       }
-      result = result && getDataList()
-          .equals(other.getDataList());
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!getDataList()
+          .equals(other.getDataList())) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -5059,6 +5191,7 @@ public final class Types {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -5066,6 +5199,7 @@ public final class Types {
     public static Builder newBuilder(proto.Types.Block prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -5089,6 +5223,7 @@ public final class Types {
         return proto.Types.internal_static_proto_Block_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return proto.Types.internal_static_proto_Block_fieldAccessorTable
@@ -5112,6 +5247,7 @@ public final class Types {
           getDataFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (headerBuilder_ == null) {
@@ -5135,15 +5271,18 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return proto.Types.internal_static_proto_Block_descriptor;
       }
 
+      @java.lang.Override
       public proto.Types.Block getDefaultInstanceForType() {
         return proto.Types.Block.getDefaultInstance();
       }
 
+      @java.lang.Override
       public proto.Types.Block build() {
         proto.Types.Block result = buildPartial();
         if (!result.isInitialized()) {
@@ -5152,6 +5291,7 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public proto.Types.Block buildPartial() {
         proto.Types.Block result = new proto.Types.Block(this);
         int from_bitField0_ = bitField0_;
@@ -5167,7 +5307,7 @@ public final class Types {
           result.id_ = idBuilder_.build();
         }
         if (dataBuilder_ == null) {
-          if (((bitField0_ & 0x00000004) == 0x00000004)) {
+          if (((bitField0_ & 0x00000004) != 0)) {
             data_ = java.util.Collections.unmodifiableList(data_);
             bitField0_ = (bitField0_ & ~0x00000004);
           }
@@ -5180,32 +5320,39 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof proto.Types.Block) {
           return mergeFrom((proto.Types.Block)other);
@@ -5254,10 +5401,12 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -5277,7 +5426,7 @@ public final class Types {
       }
       private int bitField0_;
 
-      private proto.Types.BlockHeader header_ = null;
+      private proto.Types.BlockHeader header_;
       private com.google.protobuf.SingleFieldBuilderV3<
           proto.Types.BlockHeader, proto.Types.BlockHeader.Builder, proto.Types.BlockHeaderOrBuilder> headerBuilder_;
       /**
@@ -5394,7 +5543,7 @@ public final class Types {
         return headerBuilder_;
       }
 
-      private proto.Types.BlockID id_ = null;
+      private proto.Types.BlockID id_;
       private com.google.protobuf.SingleFieldBuilderV3<
           proto.Types.BlockID, proto.Types.BlockID.Builder, proto.Types.BlockIDOrBuilder> idBuilder_;
       /**
@@ -5514,7 +5663,7 @@ public final class Types {
       private java.util.List<proto.Types.Transaction> data_ =
         java.util.Collections.emptyList();
       private void ensureDataIsMutable() {
-        if (!((bitField0_ & 0x00000004) == 0x00000004)) {
+        if (!((bitField0_ & 0x00000004) != 0)) {
           data_ = new java.util.ArrayList<proto.Types.Transaction>(data_);
           bitField0_ |= 0x00000004;
          }
@@ -5815,18 +5964,20 @@ public final class Types {
           dataBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
               proto.Types.Transaction, proto.Types.Transaction.Builder, proto.Types.TransactionOrBuilder>(
                   data_,
-                  ((bitField0_ & 0x00000004) == 0x00000004),
+                  ((bitField0_ & 0x00000004) != 0),
                   getParentForChildren(),
                   isClean());
           data_ = null;
         }
         return dataBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -5848,6 +5999,7 @@ public final class Types {
 
     private static final com.google.protobuf.Parser<Block>
         PARSER = new com.google.protobuf.AbstractParser<Block>() {
+      @java.lang.Override
       public Block parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -5865,6 +6017,7 @@ public final class Types {
       return PARSER;
     }
 
+    @java.lang.Override
     public proto.Types.Block getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -5906,7 +6059,6 @@ public final class Types {
       super(builder);
     }
     private Comm() {
-      channel_ = 0;
     }
 
     @java.lang.Override
@@ -5933,13 +6085,6 @@ public final class Types {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 8: {
 
               channel_ = input.readInt32();
@@ -5956,6 +6101,13 @@ public final class Types {
                 data_ = subBuilder.buildPartial();
               }
 
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -5975,6 +6127,7 @@ public final class Types {
       return proto.Types.internal_static_proto_Comm_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return proto.Types.internal_static_proto_Comm_fieldAccessorTable
@@ -6013,6 +6166,7 @@ public final class Types {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -6022,6 +6176,7 @@ public final class Types {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (channel_ != 0) {
@@ -6033,6 +6188,7 @@ public final class Types {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -6061,16 +6217,15 @@ public final class Types {
       }
       proto.Types.Comm other = (proto.Types.Comm) obj;
 
-      boolean result = true;
-      result = result && (getChannel()
-          == other.getChannel());
-      result = result && (hasData() == other.hasData());
+      if (getChannel()
+          != other.getChannel()) return false;
+      if (hasData() != other.hasData()) return false;
       if (hasData()) {
-        result = result && getData()
-            .equals(other.getData());
+        if (!getData()
+            .equals(other.getData())) return false;
       }
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -6161,6 +6316,7 @@ public final class Types {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -6168,6 +6324,7 @@ public final class Types {
     public static Builder newBuilder(proto.Types.Comm prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -6191,6 +6348,7 @@ public final class Types {
         return proto.Types.internal_static_proto_Comm_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return proto.Types.internal_static_proto_Comm_fieldAccessorTable
@@ -6213,6 +6371,7 @@ public final class Types {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         channel_ = 0;
@@ -6226,15 +6385,18 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return proto.Types.internal_static_proto_Comm_descriptor;
       }
 
+      @java.lang.Override
       public proto.Types.Comm getDefaultInstanceForType() {
         return proto.Types.Comm.getDefaultInstance();
       }
 
+      @java.lang.Override
       public proto.Types.Comm build() {
         proto.Types.Comm result = buildPartial();
         if (!result.isInitialized()) {
@@ -6243,6 +6405,7 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public proto.Types.Comm buildPartial() {
         proto.Types.Comm result = new proto.Types.Comm(this);
         result.channel_ = channel_;
@@ -6255,32 +6418,39 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof proto.Types.Comm) {
           return mergeFrom((proto.Types.Comm)other);
@@ -6303,10 +6473,12 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -6351,7 +6523,7 @@ public final class Types {
         return this;
       }
 
-      private proto.Types.Block data_ = null;
+      private proto.Types.Block data_;
       private com.google.protobuf.SingleFieldBuilderV3<
           proto.Types.Block, proto.Types.Block.Builder, proto.Types.BlockOrBuilder> dataBuilder_;
       /**
@@ -6467,11 +6639,13 @@ public final class Types {
         }
         return dataBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -6493,6 +6667,7 @@ public final class Types {
 
     private static final com.google.protobuf.Parser<Comm>
         PARSER = new com.google.protobuf.AbstractParser<Comm>() {
+      @java.lang.Override
       public Comm parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -6510,6 +6685,7 @@ public final class Types {
       return PARSER;
     }
 
+    @java.lang.Override
     public proto.Types.Comm getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -6553,10 +6729,6 @@ public final class Types {
       super(builder);
     }
     private txID() {
-      proposerID_ = 0;
-      bid_ = 0;
-      txNum_ = 0;
-      channel_ = 0;
     }
 
     @java.lang.Override
@@ -6583,13 +6755,6 @@ public final class Types {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 8: {
 
               proposerID_ = input.readInt32();
@@ -6610,6 +6775,13 @@ public final class Types {
               channel_ = input.readInt32();
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -6627,6 +6799,7 @@ public final class Types {
       return proto.Types.internal_static_proto_txID_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return proto.Types.internal_static_proto_txID_fieldAccessorTable
@@ -6671,6 +6844,7 @@ public final class Types {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -6680,6 +6854,7 @@ public final class Types {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (proposerID_ != 0) {
@@ -6697,6 +6872,7 @@ public final class Types {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -6733,17 +6909,16 @@ public final class Types {
       }
       proto.Types.txID other = (proto.Types.txID) obj;
 
-      boolean result = true;
-      result = result && (getProposerID()
-          == other.getProposerID());
-      result = result && (getBid()
-          == other.getBid());
-      result = result && (getTxNum()
-          == other.getTxNum());
-      result = result && (getChannel()
-          == other.getChannel());
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (getProposerID()
+          != other.getProposerID()) return false;
+      if (getBid()
+          != other.getBid()) return false;
+      if (getTxNum()
+          != other.getTxNum()) return false;
+      if (getChannel()
+          != other.getChannel()) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -6836,6 +7011,7 @@ public final class Types {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -6843,6 +7019,7 @@ public final class Types {
     public static Builder newBuilder(proto.Types.txID prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -6866,6 +7043,7 @@ public final class Types {
         return proto.Types.internal_static_proto_txID_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return proto.Types.internal_static_proto_txID_fieldAccessorTable
@@ -6888,6 +7066,7 @@ public final class Types {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         proposerID_ = 0;
@@ -6901,15 +7080,18 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return proto.Types.internal_static_proto_txID_descriptor;
       }
 
+      @java.lang.Override
       public proto.Types.txID getDefaultInstanceForType() {
         return proto.Types.txID.getDefaultInstance();
       }
 
+      @java.lang.Override
       public proto.Types.txID build() {
         proto.Types.txID result = buildPartial();
         if (!result.isInitialized()) {
@@ -6918,6 +7100,7 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public proto.Types.txID buildPartial() {
         proto.Types.txID result = new proto.Types.txID(this);
         result.proposerID_ = proposerID_;
@@ -6928,32 +7111,39 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof proto.Types.txID) {
           return mergeFrom((proto.Types.txID)other);
@@ -6982,10 +7172,12 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -7107,11 +7299,13 @@ public final class Types {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -7133,6 +7327,7 @@ public final class Types {
 
     private static final com.google.protobuf.Parser<txID>
         PARSER = new com.google.protobuf.AbstractParser<txID>() {
+      @java.lang.Override
       public txID parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -7150,6 +7345,7 @@ public final class Types {
       return PARSER;
     }
 
+    @java.lang.Override
     public proto.Types.txID getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -7210,10 +7406,7 @@ public final class Types {
       super(builder);
     }
     private Transaction() {
-      clientID_ = 0;
       data_ = com.google.protobuf.ByteString.EMPTY;
-      clientTs_ = 0L;
-      serverTs_ = 0L;
     }
 
     @java.lang.Override
@@ -7240,13 +7433,6 @@ public final class Types {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 8: {
 
               clientID_ = input.readInt32();
@@ -7280,6 +7466,13 @@ public final class Types {
               serverTs_ = input.readInt64();
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -7297,6 +7490,7 @@ public final class Types {
       return proto.Types.internal_static_proto_Transaction_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return proto.Types.internal_static_proto_Transaction_fieldAccessorTable
@@ -7366,6 +7560,7 @@ public final class Types {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -7375,6 +7570,7 @@ public final class Types {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (clientID_ != 0) {
@@ -7395,6 +7591,7 @@ public final class Types {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -7435,22 +7632,21 @@ public final class Types {
       }
       proto.Types.Transaction other = (proto.Types.Transaction) obj;
 
-      boolean result = true;
-      result = result && (getClientID()
-          == other.getClientID());
-      result = result && (hasId() == other.hasId());
+      if (getClientID()
+          != other.getClientID()) return false;
+      if (hasId() != other.hasId()) return false;
       if (hasId()) {
-        result = result && getId()
-            .equals(other.getId());
+        if (!getId()
+            .equals(other.getId())) return false;
       }
-      result = result && getData()
-          .equals(other.getData());
-      result = result && (getClientTs()
-          == other.getClientTs());
-      result = result && (getServerTs()
-          == other.getServerTs());
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!getData()
+          .equals(other.getData())) return false;
+      if (getClientTs()
+          != other.getClientTs()) return false;
+      if (getServerTs()
+          != other.getServerTs()) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -7549,6 +7745,7 @@ public final class Types {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -7556,6 +7753,7 @@ public final class Types {
     public static Builder newBuilder(proto.Types.Transaction prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -7579,6 +7777,7 @@ public final class Types {
         return proto.Types.internal_static_proto_Transaction_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return proto.Types.internal_static_proto_Transaction_fieldAccessorTable
@@ -7601,6 +7800,7 @@ public final class Types {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         clientID_ = 0;
@@ -7620,15 +7820,18 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return proto.Types.internal_static_proto_Transaction_descriptor;
       }
 
+      @java.lang.Override
       public proto.Types.Transaction getDefaultInstanceForType() {
         return proto.Types.Transaction.getDefaultInstance();
       }
 
+      @java.lang.Override
       public proto.Types.Transaction build() {
         proto.Types.Transaction result = buildPartial();
         if (!result.isInitialized()) {
@@ -7637,6 +7840,7 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public proto.Types.Transaction buildPartial() {
         proto.Types.Transaction result = new proto.Types.Transaction(this);
         result.clientID_ = clientID_;
@@ -7652,32 +7856,39 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof proto.Types.Transaction) {
           return mergeFrom((proto.Types.Transaction)other);
@@ -7709,10 +7920,12 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -7757,7 +7970,7 @@ public final class Types {
         return this;
       }
 
-      private proto.Types.txID id_ = null;
+      private proto.Types.txID id_;
       private com.google.protobuf.SingleFieldBuilderV3<
           proto.Types.txID, proto.Types.txID.Builder, proto.Types.txIDOrBuilder> idBuilder_;
       /**
@@ -7966,11 +8179,13 @@ public final class Types {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -7992,6 +8207,7 @@ public final class Types {
 
     private static final com.google.protobuf.Parser<Transaction>
         PARSER = new com.google.protobuf.AbstractParser<Transaction>() {
+      @java.lang.Override
       public Transaction parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -8009,6 +8225,7 @@ public final class Types {
       return PARSER;
     }
 
+    @java.lang.Override
     public proto.Types.Transaction getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -8050,7 +8267,6 @@ public final class Types {
       super(builder);
     }
     private accepted() {
-      accepted_ = false;
     }
 
     @java.lang.Override
@@ -8077,13 +8293,6 @@ public final class Types {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 8: {
 
               accepted_ = input.readBool();
@@ -8100,6 +8309,13 @@ public final class Types {
                 txID_ = subBuilder.buildPartial();
               }
 
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -8119,6 +8335,7 @@ public final class Types {
       return proto.Types.internal_static_proto_accepted_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return proto.Types.internal_static_proto_accepted_fieldAccessorTable
@@ -8157,6 +8374,7 @@ public final class Types {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -8166,6 +8384,7 @@ public final class Types {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (accepted_ != false) {
@@ -8177,6 +8396,7 @@ public final class Types {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -8205,16 +8425,15 @@ public final class Types {
       }
       proto.Types.accepted other = (proto.Types.accepted) obj;
 
-      boolean result = true;
-      result = result && (getAccepted()
-          == other.getAccepted());
-      result = result && (hasTxID() == other.hasTxID());
+      if (getAccepted()
+          != other.getAccepted()) return false;
+      if (hasTxID() != other.hasTxID()) return false;
       if (hasTxID()) {
-        result = result && getTxID()
-            .equals(other.getTxID());
+        if (!getTxID()
+            .equals(other.getTxID())) return false;
       }
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -8306,6 +8525,7 @@ public final class Types {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -8313,6 +8533,7 @@ public final class Types {
     public static Builder newBuilder(proto.Types.accepted prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -8336,6 +8557,7 @@ public final class Types {
         return proto.Types.internal_static_proto_accepted_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return proto.Types.internal_static_proto_accepted_fieldAccessorTable
@@ -8358,6 +8580,7 @@ public final class Types {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         accepted_ = false;
@@ -8371,15 +8594,18 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return proto.Types.internal_static_proto_accepted_descriptor;
       }
 
+      @java.lang.Override
       public proto.Types.accepted getDefaultInstanceForType() {
         return proto.Types.accepted.getDefaultInstance();
       }
 
+      @java.lang.Override
       public proto.Types.accepted build() {
         proto.Types.accepted result = buildPartial();
         if (!result.isInitialized()) {
@@ -8388,6 +8614,7 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public proto.Types.accepted buildPartial() {
         proto.Types.accepted result = new proto.Types.accepted(this);
         result.accepted_ = accepted_;
@@ -8400,32 +8627,39 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof proto.Types.accepted) {
           return mergeFrom((proto.Types.accepted)other);
@@ -8448,10 +8682,12 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -8496,7 +8732,7 @@ public final class Types {
         return this;
       }
 
-      private proto.Types.txID txID_ = null;
+      private proto.Types.txID txID_;
       private com.google.protobuf.SingleFieldBuilderV3<
           proto.Types.txID, proto.Types.txID.Builder, proto.Types.txIDOrBuilder> txIDBuilder_;
       /**
@@ -8612,11 +8848,13 @@ public final class Types {
         }
         return txIDBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -8638,6 +8876,7 @@ public final class Types {
 
     private static final com.google.protobuf.Parser<accepted>
         PARSER = new com.google.protobuf.AbstractParser<accepted>() {
+      @java.lang.Override
       public accepted parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -8655,6 +8894,7 @@ public final class Types {
       return PARSER;
     }
 
+    @java.lang.Override
     public proto.Types.accepted getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -8729,13 +8969,6 @@ public final class Types {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               proto.Types.Transaction.Builder subBuilder = null;
               if (tx_ != null) {
@@ -8747,6 +8980,13 @@ public final class Types {
                 tx_ = subBuilder.buildPartial();
               }
 
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -8766,6 +9006,7 @@ public final class Types {
       return proto.Types.internal_static_proto_approved_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return proto.Types.internal_static_proto_approved_fieldAccessorTable
@@ -8807,6 +9048,7 @@ public final class Types {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -8816,6 +9058,7 @@ public final class Types {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (tx_ != null) {
@@ -8824,6 +9067,7 @@ public final class Types {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -8848,14 +9092,13 @@ public final class Types {
       }
       proto.Types.approved other = (proto.Types.approved) obj;
 
-      boolean result = true;
-      result = result && (hasTx() == other.hasTx());
+      if (hasTx() != other.hasTx()) return false;
       if (hasTx()) {
-        result = result && getTx()
-            .equals(other.getTx());
+        if (!getTx()
+            .equals(other.getTx())) return false;
       }
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -8944,6 +9187,7 @@ public final class Types {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -8951,6 +9195,7 @@ public final class Types {
     public static Builder newBuilder(proto.Types.approved prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -8974,6 +9219,7 @@ public final class Types {
         return proto.Types.internal_static_proto_approved_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return proto.Types.internal_static_proto_approved_fieldAccessorTable
@@ -8996,6 +9242,7 @@ public final class Types {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (txBuilder_ == null) {
@@ -9007,15 +9254,18 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return proto.Types.internal_static_proto_approved_descriptor;
       }
 
+      @java.lang.Override
       public proto.Types.approved getDefaultInstanceForType() {
         return proto.Types.approved.getDefaultInstance();
       }
 
+      @java.lang.Override
       public proto.Types.approved build() {
         proto.Types.approved result = buildPartial();
         if (!result.isInitialized()) {
@@ -9024,6 +9274,7 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public proto.Types.approved buildPartial() {
         proto.Types.approved result = new proto.Types.approved(this);
         if (txBuilder_ == null) {
@@ -9035,32 +9286,39 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof proto.Types.approved) {
           return mergeFrom((proto.Types.approved)other);
@@ -9080,10 +9338,12 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -9102,7 +9362,7 @@ public final class Types {
         return this;
       }
 
-      private proto.Types.Transaction tx_ = null;
+      private proto.Types.Transaction tx_;
       private com.google.protobuf.SingleFieldBuilderV3<
           proto.Types.Transaction, proto.Types.Transaction.Builder, proto.Types.TransactionOrBuilder> txBuilder_;
       /**
@@ -9254,11 +9514,13 @@ public final class Types {
         }
         return txBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -9280,6 +9542,7 @@ public final class Types {
 
     private static final com.google.protobuf.Parser<approved>
         PARSER = new com.google.protobuf.AbstractParser<approved>() {
+      @java.lang.Override
       public approved parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -9297,6 +9560,7 @@ public final class Types {
       return PARSER;
     }
 
+    @java.lang.Override
     public proto.Types.approved getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -9359,13 +9623,6 @@ public final class Types {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               proto.Types.txID.Builder subBuilder = null;
               if (txID_ != null) {
@@ -9377,6 +9634,13 @@ public final class Types {
                 txID_ = subBuilder.buildPartial();
               }
 
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -9396,6 +9660,7 @@ public final class Types {
       return proto.Types.internal_static_proto_read_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return proto.Types.internal_static_proto_read_fieldAccessorTable
@@ -9425,6 +9690,7 @@ public final class Types {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -9434,6 +9700,7 @@ public final class Types {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (txID_ != null) {
@@ -9442,6 +9709,7 @@ public final class Types {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -9466,14 +9734,13 @@ public final class Types {
       }
       proto.Types.read other = (proto.Types.read) obj;
 
-      boolean result = true;
-      result = result && (hasTxID() == other.hasTxID());
+      if (hasTxID() != other.hasTxID()) return false;
       if (hasTxID()) {
-        result = result && getTxID()
-            .equals(other.getTxID());
+        if (!getTxID()
+            .equals(other.getTxID())) return false;
       }
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -9562,6 +9829,7 @@ public final class Types {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -9569,6 +9837,7 @@ public final class Types {
     public static Builder newBuilder(proto.Types.read prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -9592,6 +9861,7 @@ public final class Types {
         return proto.Types.internal_static_proto_read_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return proto.Types.internal_static_proto_read_fieldAccessorTable
@@ -9614,6 +9884,7 @@ public final class Types {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (txIDBuilder_ == null) {
@@ -9625,15 +9896,18 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return proto.Types.internal_static_proto_read_descriptor;
       }
 
+      @java.lang.Override
       public proto.Types.read getDefaultInstanceForType() {
         return proto.Types.read.getDefaultInstance();
       }
 
+      @java.lang.Override
       public proto.Types.read build() {
         proto.Types.read result = buildPartial();
         if (!result.isInitialized()) {
@@ -9642,6 +9916,7 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public proto.Types.read buildPartial() {
         proto.Types.read result = new proto.Types.read(this);
         if (txIDBuilder_ == null) {
@@ -9653,32 +9928,39 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof proto.Types.read) {
           return mergeFrom((proto.Types.read)other);
@@ -9698,10 +9980,12 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -9720,7 +10004,7 @@ public final class Types {
         return this;
       }
 
-      private proto.Types.txID txID_ = null;
+      private proto.Types.txID txID_;
       private com.google.protobuf.SingleFieldBuilderV3<
           proto.Types.txID, proto.Types.txID.Builder, proto.Types.txIDOrBuilder> txIDBuilder_;
       /**
@@ -9836,11 +10120,13 @@ public final class Types {
         }
         return txIDBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -9862,6 +10148,7 @@ public final class Types {
 
     private static final com.google.protobuf.Parser<read>
         PARSER = new com.google.protobuf.AbstractParser<read>() {
+      @java.lang.Override
       public read parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -9879,6 +10166,7 @@ public final class Types {
       return PARSER;
     }
 
+    @java.lang.Override
     public proto.Types.read getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -9945,7 +10233,6 @@ public final class Types {
       super(builder);
     }
     private ForkProof() {
-      sender_ = 0;
     }
 
     @java.lang.Override
@@ -9972,13 +10259,6 @@ public final class Types {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 8: {
 
               sender_ = input.readInt32();
@@ -10010,6 +10290,13 @@ public final class Types {
 
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -10027,6 +10314,7 @@ public final class Types {
       return proto.Types.internal_static_proto_ForkProof_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return proto.Types.internal_static_proto_ForkProof_fieldAccessorTable
@@ -10098,6 +10386,7 @@ public final class Types {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -10107,6 +10396,7 @@ public final class Types {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (sender_ != 0) {
@@ -10121,6 +10411,7 @@ public final class Types {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -10153,21 +10444,20 @@ public final class Types {
       }
       proto.Types.ForkProof other = (proto.Types.ForkProof) obj;
 
-      boolean result = true;
-      result = result && (getSender()
-          == other.getSender());
-      result = result && (hasCurr() == other.hasCurr());
+      if (getSender()
+          != other.getSender()) return false;
+      if (hasCurr() != other.hasCurr()) return false;
       if (hasCurr()) {
-        result = result && getCurr()
-            .equals(other.getCurr());
+        if (!getCurr()
+            .equals(other.getCurr())) return false;
       }
-      result = result && (hasPrev() == other.hasPrev());
+      if (hasPrev() != other.hasPrev()) return false;
       if (hasPrev()) {
-        result = result && getPrev()
-            .equals(other.getPrev());
+        if (!getPrev()
+            .equals(other.getPrev())) return false;
       }
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -10262,6 +10552,7 @@ public final class Types {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -10269,6 +10560,7 @@ public final class Types {
     public static Builder newBuilder(proto.Types.ForkProof prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -10292,6 +10584,7 @@ public final class Types {
         return proto.Types.internal_static_proto_ForkProof_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return proto.Types.internal_static_proto_ForkProof_fieldAccessorTable
@@ -10314,6 +10607,7 @@ public final class Types {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         sender_ = 0;
@@ -10333,15 +10627,18 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return proto.Types.internal_static_proto_ForkProof_descriptor;
       }
 
+      @java.lang.Override
       public proto.Types.ForkProof getDefaultInstanceForType() {
         return proto.Types.ForkProof.getDefaultInstance();
       }
 
+      @java.lang.Override
       public proto.Types.ForkProof build() {
         proto.Types.ForkProof result = buildPartial();
         if (!result.isInitialized()) {
@@ -10350,6 +10647,7 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public proto.Types.ForkProof buildPartial() {
         proto.Types.ForkProof result = new proto.Types.ForkProof(this);
         result.sender_ = sender_;
@@ -10367,32 +10665,39 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof proto.Types.ForkProof) {
           return mergeFrom((proto.Types.ForkProof)other);
@@ -10418,10 +10723,12 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -10466,7 +10773,7 @@ public final class Types {
         return this;
       }
 
-      private proto.Types.Block curr_ = null;
+      private proto.Types.Block curr_;
       private com.google.protobuf.SingleFieldBuilderV3<
           proto.Types.Block, proto.Types.Block.Builder, proto.Types.BlockOrBuilder> currBuilder_;
       /**
@@ -10583,7 +10890,7 @@ public final class Types {
         return currBuilder_;
       }
 
-      private proto.Types.Block prev_ = null;
+      private proto.Types.Block prev_;
       private com.google.protobuf.SingleFieldBuilderV3<
           proto.Types.Block, proto.Types.Block.Builder, proto.Types.BlockOrBuilder> prevBuilder_;
       /**
@@ -10735,11 +11042,13 @@ public final class Types {
         }
         return prevBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -10761,6 +11070,7 @@ public final class Types {
 
     private static final com.google.protobuf.Parser<ForkProof>
         PARSER = new com.google.protobuf.AbstractParser<ForkProof>() {
+      @java.lang.Override
       public ForkProof parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -10778,6 +11088,7 @@ public final class Types {
       return PARSER;
     }
 
+    @java.lang.Override
     public proto.Types.ForkProof getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -10829,9 +11140,7 @@ public final class Types {
       super(builder);
     }
     private RBMsg() {
-      type_ = 0;
       data_ = com.google.protobuf.ByteString.EMPTY;
-      sender_ = 0;
     }
 
     @java.lang.Override
@@ -10858,13 +11167,6 @@ public final class Types {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               proto.Types.Meta.Builder subBuilder = null;
               if (m_ != null) {
@@ -10893,6 +11195,13 @@ public final class Types {
               sender_ = input.readInt32();
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -10910,6 +11219,7 @@ public final class Types {
       return proto.Types.internal_static_proto_RBMsg_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return proto.Types.internal_static_proto_RBMsg_fieldAccessorTable
@@ -10966,6 +11276,7 @@ public final class Types {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -10975,6 +11286,7 @@ public final class Types {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (m_ != null) {
@@ -10992,6 +11304,7 @@ public final class Types {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -11028,20 +11341,19 @@ public final class Types {
       }
       proto.Types.RBMsg other = (proto.Types.RBMsg) obj;
 
-      boolean result = true;
-      result = result && (hasM() == other.hasM());
+      if (hasM() != other.hasM()) return false;
       if (hasM()) {
-        result = result && getM()
-            .equals(other.getM());
+        if (!getM()
+            .equals(other.getM())) return false;
       }
-      result = result && (getType()
-          == other.getType());
-      result = result && getData()
-          .equals(other.getData());
-      result = result && (getSender()
-          == other.getSender());
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (getType()
+          != other.getType()) return false;
+      if (!getData()
+          .equals(other.getData())) return false;
+      if (getSender()
+          != other.getSender()) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -11136,6 +11448,7 @@ public final class Types {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -11143,6 +11456,7 @@ public final class Types {
     public static Builder newBuilder(proto.Types.RBMsg prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -11166,6 +11480,7 @@ public final class Types {
         return proto.Types.internal_static_proto_RBMsg_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return proto.Types.internal_static_proto_RBMsg_fieldAccessorTable
@@ -11188,6 +11503,7 @@ public final class Types {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (mBuilder_ == null) {
@@ -11205,15 +11521,18 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return proto.Types.internal_static_proto_RBMsg_descriptor;
       }
 
+      @java.lang.Override
       public proto.Types.RBMsg getDefaultInstanceForType() {
         return proto.Types.RBMsg.getDefaultInstance();
       }
 
+      @java.lang.Override
       public proto.Types.RBMsg build() {
         proto.Types.RBMsg result = buildPartial();
         if (!result.isInitialized()) {
@@ -11222,6 +11541,7 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public proto.Types.RBMsg buildPartial() {
         proto.Types.RBMsg result = new proto.Types.RBMsg(this);
         if (mBuilder_ == null) {
@@ -11236,32 +11556,39 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof proto.Types.RBMsg) {
           return mergeFrom((proto.Types.RBMsg)other);
@@ -11290,10 +11617,12 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -11312,7 +11641,7 @@ public final class Types {
         return this;
       }
 
-      private proto.Types.Meta m_ = null;
+      private proto.Types.Meta m_;
       private com.google.protobuf.SingleFieldBuilderV3<
           proto.Types.Meta, proto.Types.Meta.Builder, proto.Types.MetaOrBuilder> mBuilder_;
       /**
@@ -11509,11 +11838,13 @@ public final class Types {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -11535,6 +11866,7 @@ public final class Types {
 
     private static final com.google.protobuf.Parser<RBMsg>
         PARSER = new com.google.protobuf.AbstractParser<RBMsg>() {
+      @java.lang.Override
       public RBMsg parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -11552,6 +11884,7 @@ public final class Types {
       return PARSER;
     }
 
+    @java.lang.Override
     public proto.Types.RBMsg getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -11601,7 +11934,7 @@ public final class Types {
               done = true;
               break;
             default: {
-              if (!parseUnknownFieldProto3(
+              if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
                 done = true;
               }
@@ -11624,6 +11957,7 @@ public final class Types {
       return proto.Types.internal_static_proto_Empty_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return proto.Types.internal_static_proto_Empty_fieldAccessorTable
@@ -11632,6 +11966,7 @@ public final class Types {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -11641,11 +11976,13 @@ public final class Types {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -11666,9 +12003,8 @@ public final class Types {
       }
       proto.Types.Empty other = (proto.Types.Empty) obj;
 
-      boolean result = true;
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -11753,6 +12089,7 @@ public final class Types {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -11760,6 +12097,7 @@ public final class Types {
     public static Builder newBuilder(proto.Types.Empty prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -11783,6 +12121,7 @@ public final class Types {
         return proto.Types.internal_static_proto_Empty_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return proto.Types.internal_static_proto_Empty_fieldAccessorTable
@@ -11805,20 +12144,24 @@ public final class Types {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return proto.Types.internal_static_proto_Empty_descriptor;
       }
 
+      @java.lang.Override
       public proto.Types.Empty getDefaultInstanceForType() {
         return proto.Types.Empty.getDefaultInstance();
       }
 
+      @java.lang.Override
       public proto.Types.Empty build() {
         proto.Types.Empty result = buildPartial();
         if (!result.isInitialized()) {
@@ -11827,38 +12170,46 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public proto.Types.Empty buildPartial() {
         proto.Types.Empty result = new proto.Types.Empty(this);
         onBuilt();
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof proto.Types.Empty) {
           return mergeFrom((proto.Types.Empty)other);
@@ -11875,10 +12226,12 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -11896,11 +12249,13 @@ public final class Types {
         }
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -11922,6 +12277,7 @@ public final class Types {
 
     private static final com.google.protobuf.Parser<Empty>
         PARSER = new com.google.protobuf.AbstractParser<Empty>() {
+      @java.lang.Override
       public Empty parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -11939,6 +12295,7 @@ public final class Types {
       return PARSER;
     }
 
+    @java.lang.Override
     public proto.Types.Empty getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -11985,8 +12342,6 @@ public final class Types {
       super(builder);
     }
     private WrbReq() {
-      height_ = 0;
-      sender_ = 0;
     }
 
     @java.lang.Override
@@ -12013,13 +12368,6 @@ public final class Types {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               proto.Types.Meta.Builder subBuilder = null;
               if (Meta_ != null) {
@@ -12043,6 +12391,13 @@ public final class Types {
               sender_ = input.readInt32();
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -12060,6 +12415,7 @@ public final class Types {
       return proto.Types.internal_static_proto_WrbReq_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return proto.Types.internal_static_proto_WrbReq_fieldAccessorTable
@@ -12107,6 +12463,7 @@ public final class Types {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -12116,6 +12473,7 @@ public final class Types {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (Meta_ != null) {
@@ -12130,6 +12488,7 @@ public final class Types {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -12162,18 +12521,17 @@ public final class Types {
       }
       proto.Types.WrbReq other = (proto.Types.WrbReq) obj;
 
-      boolean result = true;
-      result = result && (hasMeta() == other.hasMeta());
+      if (hasMeta() != other.hasMeta()) return false;
       if (hasMeta()) {
-        result = result && getMeta()
-            .equals(other.getMeta());
+        if (!getMeta()
+            .equals(other.getMeta())) return false;
       }
-      result = result && (getHeight()
-          == other.getHeight());
-      result = result && (getSender()
-          == other.getSender());
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (getHeight()
+          != other.getHeight()) return false;
+      if (getSender()
+          != other.getSender()) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -12266,6 +12624,7 @@ public final class Types {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -12273,6 +12632,7 @@ public final class Types {
     public static Builder newBuilder(proto.Types.WrbReq prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -12296,6 +12656,7 @@ public final class Types {
         return proto.Types.internal_static_proto_WrbReq_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return proto.Types.internal_static_proto_WrbReq_fieldAccessorTable
@@ -12318,6 +12679,7 @@ public final class Types {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (MetaBuilder_ == null) {
@@ -12333,15 +12695,18 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return proto.Types.internal_static_proto_WrbReq_descriptor;
       }
 
+      @java.lang.Override
       public proto.Types.WrbReq getDefaultInstanceForType() {
         return proto.Types.WrbReq.getDefaultInstance();
       }
 
+      @java.lang.Override
       public proto.Types.WrbReq build() {
         proto.Types.WrbReq result = buildPartial();
         if (!result.isInitialized()) {
@@ -12350,6 +12715,7 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public proto.Types.WrbReq buildPartial() {
         proto.Types.WrbReq result = new proto.Types.WrbReq(this);
         if (MetaBuilder_ == null) {
@@ -12363,32 +12729,39 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof proto.Types.WrbReq) {
           return mergeFrom((proto.Types.WrbReq)other);
@@ -12414,10 +12787,12 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -12436,7 +12811,7 @@ public final class Types {
         return this;
       }
 
-      private proto.Types.Meta Meta_ = null;
+      private proto.Types.Meta Meta_;
       private com.google.protobuf.SingleFieldBuilderV3<
           proto.Types.Meta, proto.Types.Meta.Builder, proto.Types.MetaOrBuilder> MetaBuilder_;
       /**
@@ -12604,11 +12979,13 @@ public final class Types {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -12630,6 +13007,7 @@ public final class Types {
 
     private static final com.google.protobuf.Parser<WrbReq>
         PARSER = new com.google.protobuf.AbstractParser<WrbReq>() {
+      @java.lang.Override
       public WrbReq parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -12647,6 +13025,7 @@ public final class Types {
       return PARSER;
     }
 
+    @java.lang.Override
     public proto.Types.WrbReq getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -12701,7 +13080,6 @@ public final class Types {
       super(builder);
     }
     private WrbRes() {
-      sender_ = 0;
     }
 
     @java.lang.Override
@@ -12728,13 +13106,6 @@ public final class Types {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               proto.Types.Meta.Builder subBuilder = null;
               if (m_ != null) {
@@ -12766,6 +13137,13 @@ public final class Types {
               sender_ = input.readInt32();
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -12783,6 +13161,7 @@ public final class Types {
       return proto.Types.internal_static_proto_WrbRes_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return proto.Types.internal_static_proto_WrbRes_fieldAccessorTable
@@ -12842,6 +13221,7 @@ public final class Types {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -12851,6 +13231,7 @@ public final class Types {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (m_ != null) {
@@ -12865,6 +13246,7 @@ public final class Types {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -12897,21 +13279,20 @@ public final class Types {
       }
       proto.Types.WrbRes other = (proto.Types.WrbRes) obj;
 
-      boolean result = true;
-      result = result && (hasM() == other.hasM());
+      if (hasM() != other.hasM()) return false;
       if (hasM()) {
-        result = result && getM()
-            .equals(other.getM());
+        if (!getM()
+            .equals(other.getM())) return false;
       }
-      result = result && (hasData() == other.hasData());
+      if (hasData() != other.hasData()) return false;
       if (hasData()) {
-        result = result && getData()
-            .equals(other.getData());
+        if (!getData()
+            .equals(other.getData())) return false;
       }
-      result = result && (getSender()
-          == other.getSender());
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (getSender()
+          != other.getSender()) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -13006,6 +13387,7 @@ public final class Types {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -13013,6 +13395,7 @@ public final class Types {
     public static Builder newBuilder(proto.Types.WrbRes prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -13036,6 +13419,7 @@ public final class Types {
         return proto.Types.internal_static_proto_WrbRes_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return proto.Types.internal_static_proto_WrbRes_fieldAccessorTable
@@ -13058,6 +13442,7 @@ public final class Types {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (mBuilder_ == null) {
@@ -13077,15 +13462,18 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return proto.Types.internal_static_proto_WrbRes_descriptor;
       }
 
+      @java.lang.Override
       public proto.Types.WrbRes getDefaultInstanceForType() {
         return proto.Types.WrbRes.getDefaultInstance();
       }
 
+      @java.lang.Override
       public proto.Types.WrbRes build() {
         proto.Types.WrbRes result = buildPartial();
         if (!result.isInitialized()) {
@@ -13094,6 +13482,7 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public proto.Types.WrbRes buildPartial() {
         proto.Types.WrbRes result = new proto.Types.WrbRes(this);
         if (mBuilder_ == null) {
@@ -13111,32 +13500,39 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof proto.Types.WrbRes) {
           return mergeFrom((proto.Types.WrbRes)other);
@@ -13162,10 +13558,12 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -13184,7 +13582,7 @@ public final class Types {
         return this;
       }
 
-      private proto.Types.Meta m_ = null;
+      private proto.Types.Meta m_;
       private com.google.protobuf.SingleFieldBuilderV3<
           proto.Types.Meta, proto.Types.Meta.Builder, proto.Types.MetaOrBuilder> mBuilder_;
       /**
@@ -13301,7 +13699,7 @@ public final class Types {
         return mBuilder_;
       }
 
-      private proto.Types.BlockHeader data_ = null;
+      private proto.Types.BlockHeader data_;
       private com.google.protobuf.SingleFieldBuilderV3<
           proto.Types.BlockHeader, proto.Types.BlockHeader.Builder, proto.Types.BlockHeaderOrBuilder> dataBuilder_;
       /**
@@ -13443,11 +13841,13 @@ public final class Types {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -13469,6 +13869,7 @@ public final class Types {
 
     private static final com.google.protobuf.Parser<WrbRes>
         PARSER = new com.google.protobuf.AbstractParser<WrbRes>() {
+      @java.lang.Override
       public WrbRes parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -13486,6 +13887,7 @@ public final class Types {
       return PARSER;
     }
 
+    @java.lang.Override
     public proto.Types.WrbRes getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -13532,8 +13934,6 @@ public final class Types {
       super(builder);
     }
     private EvidenceReq() {
-      height_ = 0;
-      sender_ = 0;
     }
 
     @java.lang.Override
@@ -13560,13 +13960,6 @@ public final class Types {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               proto.Types.Meta.Builder subBuilder = null;
               if (Meta_ != null) {
@@ -13590,6 +13983,13 @@ public final class Types {
               sender_ = input.readInt32();
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -13607,6 +14007,7 @@ public final class Types {
       return proto.Types.internal_static_proto_EvidenceReq_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return proto.Types.internal_static_proto_EvidenceReq_fieldAccessorTable
@@ -13654,6 +14055,7 @@ public final class Types {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -13663,6 +14065,7 @@ public final class Types {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (Meta_ != null) {
@@ -13677,6 +14080,7 @@ public final class Types {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -13709,18 +14113,17 @@ public final class Types {
       }
       proto.Types.EvidenceReq other = (proto.Types.EvidenceReq) obj;
 
-      boolean result = true;
-      result = result && (hasMeta() == other.hasMeta());
+      if (hasMeta() != other.hasMeta()) return false;
       if (hasMeta()) {
-        result = result && getMeta()
-            .equals(other.getMeta());
+        if (!getMeta()
+            .equals(other.getMeta())) return false;
       }
-      result = result && (getHeight()
-          == other.getHeight());
-      result = result && (getSender()
-          == other.getSender());
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (getHeight()
+          != other.getHeight()) return false;
+      if (getSender()
+          != other.getSender()) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -13813,6 +14216,7 @@ public final class Types {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -13820,6 +14224,7 @@ public final class Types {
     public static Builder newBuilder(proto.Types.EvidenceReq prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -13843,6 +14248,7 @@ public final class Types {
         return proto.Types.internal_static_proto_EvidenceReq_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return proto.Types.internal_static_proto_EvidenceReq_fieldAccessorTable
@@ -13865,6 +14271,7 @@ public final class Types {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (MetaBuilder_ == null) {
@@ -13880,15 +14287,18 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return proto.Types.internal_static_proto_EvidenceReq_descriptor;
       }
 
+      @java.lang.Override
       public proto.Types.EvidenceReq getDefaultInstanceForType() {
         return proto.Types.EvidenceReq.getDefaultInstance();
       }
 
+      @java.lang.Override
       public proto.Types.EvidenceReq build() {
         proto.Types.EvidenceReq result = buildPartial();
         if (!result.isInitialized()) {
@@ -13897,6 +14307,7 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public proto.Types.EvidenceReq buildPartial() {
         proto.Types.EvidenceReq result = new proto.Types.EvidenceReq(this);
         if (MetaBuilder_ == null) {
@@ -13910,32 +14321,39 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof proto.Types.EvidenceReq) {
           return mergeFrom((proto.Types.EvidenceReq)other);
@@ -13961,10 +14379,12 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -13983,7 +14403,7 @@ public final class Types {
         return this;
       }
 
-      private proto.Types.Meta Meta_ = null;
+      private proto.Types.Meta Meta_;
       private com.google.protobuf.SingleFieldBuilderV3<
           proto.Types.Meta, proto.Types.Meta.Builder, proto.Types.MetaOrBuilder> MetaBuilder_;
       /**
@@ -14151,11 +14571,13 @@ public final class Types {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -14177,6 +14599,7 @@ public final class Types {
 
     private static final com.google.protobuf.Parser<EvidenceReq>
         PARSER = new com.google.protobuf.AbstractParser<EvidenceReq>() {
+      @java.lang.Override
       public EvidenceReq parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -14194,6 +14617,7 @@ public final class Types {
       return PARSER;
     }
 
+    @java.lang.Override
     public proto.Types.EvidenceReq getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -14248,7 +14672,6 @@ public final class Types {
       super(builder);
     }
     private EvidenceRes() {
-      sender_ = 0;
     }
 
     @java.lang.Override
@@ -14275,13 +14698,6 @@ public final class Types {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               proto.Types.Meta.Builder subBuilder = null;
               if (m_ != null) {
@@ -14313,6 +14729,13 @@ public final class Types {
               sender_ = input.readInt32();
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -14330,6 +14753,7 @@ public final class Types {
       return proto.Types.internal_static_proto_EvidenceRes_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return proto.Types.internal_static_proto_EvidenceRes_fieldAccessorTable
@@ -14389,6 +14813,7 @@ public final class Types {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -14398,6 +14823,7 @@ public final class Types {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (m_ != null) {
@@ -14412,6 +14838,7 @@ public final class Types {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -14444,21 +14871,20 @@ public final class Types {
       }
       proto.Types.EvidenceRes other = (proto.Types.EvidenceRes) obj;
 
-      boolean result = true;
-      result = result && (hasM() == other.hasM());
+      if (hasM() != other.hasM()) return false;
       if (hasM()) {
-        result = result && getM()
-            .equals(other.getM());
+        if (!getM()
+            .equals(other.getM())) return false;
       }
-      result = result && (hasData() == other.hasData());
+      if (hasData() != other.hasData()) return false;
       if (hasData()) {
-        result = result && getData()
-            .equals(other.getData());
+        if (!getData()
+            .equals(other.getData())) return false;
       }
-      result = result && (getSender()
-          == other.getSender());
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (getSender()
+          != other.getSender()) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -14553,6 +14979,7 @@ public final class Types {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -14560,6 +14987,7 @@ public final class Types {
     public static Builder newBuilder(proto.Types.EvidenceRes prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -14583,6 +15011,7 @@ public final class Types {
         return proto.Types.internal_static_proto_EvidenceRes_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return proto.Types.internal_static_proto_EvidenceRes_fieldAccessorTable
@@ -14605,6 +15034,7 @@ public final class Types {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (mBuilder_ == null) {
@@ -14624,15 +15054,18 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return proto.Types.internal_static_proto_EvidenceRes_descriptor;
       }
 
+      @java.lang.Override
       public proto.Types.EvidenceRes getDefaultInstanceForType() {
         return proto.Types.EvidenceRes.getDefaultInstance();
       }
 
+      @java.lang.Override
       public proto.Types.EvidenceRes build() {
         proto.Types.EvidenceRes result = buildPartial();
         if (!result.isInitialized()) {
@@ -14641,6 +15074,7 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public proto.Types.EvidenceRes buildPartial() {
         proto.Types.EvidenceRes result = new proto.Types.EvidenceRes(this);
         if (mBuilder_ == null) {
@@ -14658,32 +15092,39 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof proto.Types.EvidenceRes) {
           return mergeFrom((proto.Types.EvidenceRes)other);
@@ -14709,10 +15150,12 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -14731,7 +15174,7 @@ public final class Types {
         return this;
       }
 
-      private proto.Types.Meta m_ = null;
+      private proto.Types.Meta m_;
       private com.google.protobuf.SingleFieldBuilderV3<
           proto.Types.Meta, proto.Types.Meta.Builder, proto.Types.MetaOrBuilder> mBuilder_;
       /**
@@ -14848,7 +15291,7 @@ public final class Types {
         return mBuilder_;
       }
 
-      private proto.Types.BlockHeader data_ = null;
+      private proto.Types.BlockHeader data_;
       private com.google.protobuf.SingleFieldBuilderV3<
           proto.Types.BlockHeader, proto.Types.BlockHeader.Builder, proto.Types.BlockHeaderOrBuilder> dataBuilder_;
       /**
@@ -14990,11 +15433,13 @@ public final class Types {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -15016,6 +15461,7 @@ public final class Types {
 
     private static final com.google.protobuf.Parser<EvidenceRes>
         PARSER = new com.google.protobuf.AbstractParser<EvidenceRes>() {
+      @java.lang.Override
       public EvidenceRes parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -15033,6 +15479,7 @@ public final class Types {
       return PARSER;
     }
 
+    @java.lang.Override
     public proto.Types.EvidenceRes getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -15095,10 +15542,7 @@ public final class Types {
       super(builder);
     }
     private subChainVersion() {
-      forkPoint_ = 0;
-      suggested_ = 0;
       v_ = java.util.Collections.emptyList();
-      sender_ = 0;
     }
 
     @java.lang.Override
@@ -15125,13 +15569,6 @@ public final class Types {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 8: {
 
               forkPoint_ = input.readInt32();
@@ -15143,7 +15580,7 @@ public final class Types {
               break;
             }
             case 26: {
-              if (!((mutable_bitField0_ & 0x00000004) == 0x00000004)) {
+              if (!((mutable_bitField0_ & 0x00000004) != 0)) {
                 v_ = new java.util.ArrayList<proto.Types.Block>();
                 mutable_bitField0_ |= 0x00000004;
               }
@@ -15156,6 +15593,13 @@ public final class Types {
               sender_ = input.readInt32();
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -15164,7 +15608,7 @@ public final class Types {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
-        if (((mutable_bitField0_ & 0x00000004) == 0x00000004)) {
+        if (((mutable_bitField0_ & 0x00000004) != 0)) {
           v_ = java.util.Collections.unmodifiableList(v_);
         }
         this.unknownFields = unknownFields.build();
@@ -15176,6 +15620,7 @@ public final class Types {
       return proto.Types.internal_static_proto_subChainVersion_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return proto.Types.internal_static_proto_subChainVersion_fieldAccessorTable
@@ -15247,6 +15692,7 @@ public final class Types {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -15256,6 +15702,7 @@ public final class Types {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (forkPoint_ != 0) {
@@ -15273,6 +15720,7 @@ public final class Types {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -15309,17 +15757,16 @@ public final class Types {
       }
       proto.Types.subChainVersion other = (proto.Types.subChainVersion) obj;
 
-      boolean result = true;
-      result = result && (getForkPoint()
-          == other.getForkPoint());
-      result = result && (getSuggested()
-          == other.getSuggested());
-      result = result && getVList()
-          .equals(other.getVList());
-      result = result && (getSender()
-          == other.getSender());
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (getForkPoint()
+          != other.getForkPoint()) return false;
+      if (getSuggested()
+          != other.getSuggested()) return false;
+      if (!getVList()
+          .equals(other.getVList())) return false;
+      if (getSender()
+          != other.getSender()) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -15414,6 +15861,7 @@ public final class Types {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -15421,6 +15869,7 @@ public final class Types {
     public static Builder newBuilder(proto.Types.subChainVersion prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -15444,6 +15893,7 @@ public final class Types {
         return proto.Types.internal_static_proto_subChainVersion_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return proto.Types.internal_static_proto_subChainVersion_fieldAccessorTable
@@ -15467,6 +15917,7 @@ public final class Types {
           getVFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         forkPoint_ = 0;
@@ -15484,15 +15935,18 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return proto.Types.internal_static_proto_subChainVersion_descriptor;
       }
 
+      @java.lang.Override
       public proto.Types.subChainVersion getDefaultInstanceForType() {
         return proto.Types.subChainVersion.getDefaultInstance();
       }
 
+      @java.lang.Override
       public proto.Types.subChainVersion build() {
         proto.Types.subChainVersion result = buildPartial();
         if (!result.isInitialized()) {
@@ -15501,6 +15955,7 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public proto.Types.subChainVersion buildPartial() {
         proto.Types.subChainVersion result = new proto.Types.subChainVersion(this);
         int from_bitField0_ = bitField0_;
@@ -15508,7 +15963,7 @@ public final class Types {
         result.forkPoint_ = forkPoint_;
         result.suggested_ = suggested_;
         if (vBuilder_ == null) {
-          if (((bitField0_ & 0x00000004) == 0x00000004)) {
+          if (((bitField0_ & 0x00000004) != 0)) {
             v_ = java.util.Collections.unmodifiableList(v_);
             bitField0_ = (bitField0_ & ~0x00000004);
           }
@@ -15522,32 +15977,39 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof proto.Types.subChainVersion) {
           return mergeFrom((proto.Types.subChainVersion)other);
@@ -15599,10 +16061,12 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -15677,7 +16141,7 @@ public final class Types {
       private java.util.List<proto.Types.Block> v_ =
         java.util.Collections.emptyList();
       private void ensureVIsMutable() {
-        if (!((bitField0_ & 0x00000004) == 0x00000004)) {
+        if (!((bitField0_ & 0x00000004) != 0)) {
           v_ = new java.util.ArrayList<proto.Types.Block>(v_);
           bitField0_ |= 0x00000004;
          }
@@ -15906,7 +16370,7 @@ public final class Types {
           vBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
               proto.Types.Block, proto.Types.Block.Builder, proto.Types.BlockOrBuilder>(
                   v_,
-                  ((bitField0_ & 0x00000004) == 0x00000004),
+                  ((bitField0_ & 0x00000004) != 0),
                   getParentForChildren(),
                   isClean());
           v_ = null;
@@ -15939,11 +16403,13 @@ public final class Types {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -15965,6 +16431,7 @@ public final class Types {
 
     private static final com.google.protobuf.Parser<subChainVersion>
         PARSER = new com.google.protobuf.AbstractParser<subChainVersion>() {
+      @java.lang.Override
       public subChainVersion parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -15982,6 +16449,7 @@ public final class Types {
       return PARSER;
     }
 
+    @java.lang.Override
     public proto.Types.subChainVersion getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -16044,13 +16512,6 @@ public final class Types {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               proto.Types.BlockHeader.Builder subBuilder = null;
               if (proof_ != null) {
@@ -16062,6 +16523,13 @@ public final class Types {
                 proof_ = subBuilder.buildPartial();
               }
 
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -16081,6 +16549,7 @@ public final class Types {
       return proto.Types.internal_static_proto_commReq_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return proto.Types.internal_static_proto_commReq_fieldAccessorTable
@@ -16110,6 +16579,7 @@ public final class Types {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -16119,6 +16589,7 @@ public final class Types {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (proof_ != null) {
@@ -16127,6 +16598,7 @@ public final class Types {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -16151,14 +16623,13 @@ public final class Types {
       }
       proto.Types.commReq other = (proto.Types.commReq) obj;
 
-      boolean result = true;
-      result = result && (hasProof() == other.hasProof());
+      if (hasProof() != other.hasProof()) return false;
       if (hasProof()) {
-        result = result && getProof()
-            .equals(other.getProof());
+        if (!getProof()
+            .equals(other.getProof())) return false;
       }
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -16247,6 +16718,7 @@ public final class Types {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -16254,6 +16726,7 @@ public final class Types {
     public static Builder newBuilder(proto.Types.commReq prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -16277,6 +16750,7 @@ public final class Types {
         return proto.Types.internal_static_proto_commReq_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return proto.Types.internal_static_proto_commReq_fieldAccessorTable
@@ -16299,6 +16773,7 @@ public final class Types {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (proofBuilder_ == null) {
@@ -16310,15 +16785,18 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return proto.Types.internal_static_proto_commReq_descriptor;
       }
 
+      @java.lang.Override
       public proto.Types.commReq getDefaultInstanceForType() {
         return proto.Types.commReq.getDefaultInstance();
       }
 
+      @java.lang.Override
       public proto.Types.commReq build() {
         proto.Types.commReq result = buildPartial();
         if (!result.isInitialized()) {
@@ -16327,6 +16805,7 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public proto.Types.commReq buildPartial() {
         proto.Types.commReq result = new proto.Types.commReq(this);
         if (proofBuilder_ == null) {
@@ -16338,32 +16817,39 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof proto.Types.commReq) {
           return mergeFrom((proto.Types.commReq)other);
@@ -16383,10 +16869,12 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -16405,7 +16893,7 @@ public final class Types {
         return this;
       }
 
-      private proto.Types.BlockHeader proof_ = null;
+      private proto.Types.BlockHeader proof_;
       private com.google.protobuf.SingleFieldBuilderV3<
           proto.Types.BlockHeader, proto.Types.BlockHeader.Builder, proto.Types.BlockHeaderOrBuilder> proofBuilder_;
       /**
@@ -16521,11 +17009,13 @@ public final class Types {
         }
         return proofBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -16547,6 +17037,7 @@ public final class Types {
 
     private static final com.google.protobuf.Parser<commReq>
         PARSER = new com.google.protobuf.AbstractParser<commReq>() {
+      @java.lang.Override
       public commReq parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -16564,6 +17055,7 @@ public final class Types {
       return PARSER;
     }
 
+    @java.lang.Override
     public proto.Types.commReq getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -16626,13 +17118,6 @@ public final class Types {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               proto.Types.Block.Builder subBuilder = null;
               if (b_ != null) {
@@ -16644,6 +17129,13 @@ public final class Types {
                 b_ = subBuilder.buildPartial();
               }
 
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -16663,6 +17155,7 @@ public final class Types {
       return proto.Types.internal_static_proto_commRes_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return proto.Types.internal_static_proto_commRes_fieldAccessorTable
@@ -16692,6 +17185,7 @@ public final class Types {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -16701,6 +17195,7 @@ public final class Types {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (b_ != null) {
@@ -16709,6 +17204,7 @@ public final class Types {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -16733,14 +17229,13 @@ public final class Types {
       }
       proto.Types.commRes other = (proto.Types.commRes) obj;
 
-      boolean result = true;
-      result = result && (hasB() == other.hasB());
+      if (hasB() != other.hasB()) return false;
       if (hasB()) {
-        result = result && getB()
-            .equals(other.getB());
+        if (!getB()
+            .equals(other.getB())) return false;
       }
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -16829,6 +17324,7 @@ public final class Types {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -16836,6 +17332,7 @@ public final class Types {
     public static Builder newBuilder(proto.Types.commRes prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -16859,6 +17356,7 @@ public final class Types {
         return proto.Types.internal_static_proto_commRes_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return proto.Types.internal_static_proto_commRes_fieldAccessorTable
@@ -16881,6 +17379,7 @@ public final class Types {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (bBuilder_ == null) {
@@ -16892,15 +17391,18 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return proto.Types.internal_static_proto_commRes_descriptor;
       }
 
+      @java.lang.Override
       public proto.Types.commRes getDefaultInstanceForType() {
         return proto.Types.commRes.getDefaultInstance();
       }
 
+      @java.lang.Override
       public proto.Types.commRes build() {
         proto.Types.commRes result = buildPartial();
         if (!result.isInitialized()) {
@@ -16909,6 +17411,7 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public proto.Types.commRes buildPartial() {
         proto.Types.commRes result = new proto.Types.commRes(this);
         if (bBuilder_ == null) {
@@ -16920,32 +17423,39 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof proto.Types.commRes) {
           return mergeFrom((proto.Types.commRes)other);
@@ -16965,10 +17475,12 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -16987,7 +17499,7 @@ public final class Types {
         return this;
       }
 
-      private proto.Types.Block b_ = null;
+      private proto.Types.Block b_;
       private com.google.protobuf.SingleFieldBuilderV3<
           proto.Types.Block, proto.Types.Block.Builder, proto.Types.BlockOrBuilder> bBuilder_;
       /**
@@ -17103,11 +17615,13 @@ public final class Types {
         }
         return bBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -17129,6 +17643,7 @@ public final class Types {
 
     private static final com.google.protobuf.Parser<commRes>
         PARSER = new com.google.protobuf.AbstractParser<commRes>() {
+      @java.lang.Override
       public commRes parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -17146,6 +17661,7 @@ public final class Types {
       return PARSER;
     }
 
+    @java.lang.Override
     public proto.Types.commRes getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -17174,7 +17690,6 @@ public final class Types {
       super(builder);
     }
     private startMsg() {
-      id_ = 0;
     }
 
     @java.lang.Override
@@ -17201,16 +17716,16 @@ public final class Types {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 8: {
 
               id_ = input.readInt32();
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -17230,6 +17745,7 @@ public final class Types {
       return proto.Types.internal_static_proto_startMsg_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return proto.Types.internal_static_proto_startMsg_fieldAccessorTable
@@ -17247,6 +17763,7 @@ public final class Types {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -17256,6 +17773,7 @@ public final class Types {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (id_ != 0) {
@@ -17264,6 +17782,7 @@ public final class Types {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -17288,11 +17807,10 @@ public final class Types {
       }
       proto.Types.startMsg other = (proto.Types.startMsg) obj;
 
-      boolean result = true;
-      result = result && (getId()
-          == other.getId());
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (getId()
+          != other.getId()) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -17379,6 +17897,7 @@ public final class Types {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -17386,6 +17905,7 @@ public final class Types {
     public static Builder newBuilder(proto.Types.startMsg prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -17409,6 +17929,7 @@ public final class Types {
         return proto.Types.internal_static_proto_startMsg_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return proto.Types.internal_static_proto_startMsg_fieldAccessorTable
@@ -17431,6 +17952,7 @@ public final class Types {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         id_ = 0;
@@ -17438,15 +17960,18 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return proto.Types.internal_static_proto_startMsg_descriptor;
       }
 
+      @java.lang.Override
       public proto.Types.startMsg getDefaultInstanceForType() {
         return proto.Types.startMsg.getDefaultInstance();
       }
 
+      @java.lang.Override
       public proto.Types.startMsg build() {
         proto.Types.startMsg result = buildPartial();
         if (!result.isInitialized()) {
@@ -17455,6 +17980,7 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public proto.Types.startMsg buildPartial() {
         proto.Types.startMsg result = new proto.Types.startMsg(this);
         result.id_ = id_;
@@ -17462,32 +17988,39 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof proto.Types.startMsg) {
           return mergeFrom((proto.Types.startMsg)other);
@@ -17507,10 +18040,12 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -17554,11 +18089,13 @@ public final class Types {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -17580,6 +18117,7 @@ public final class Types {
 
     private static final com.google.protobuf.Parser<startMsg>
         PARSER = new com.google.protobuf.AbstractParser<startMsg>() {
+      @java.lang.Override
       public startMsg parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -17597,6 +18135,7 @@ public final class Types {
       return PARSER;
     }
 
+    @java.lang.Override
     public proto.Types.startMsg getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -17630,8 +18169,6 @@ public final class Types {
       super(builder);
     }
     private suspected() {
-      id_ = 0;
-      tmo_ = 0;
     }
 
     @java.lang.Override
@@ -17658,13 +18195,6 @@ public final class Types {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 8: {
 
               id_ = input.readInt32();
@@ -17673,6 +18203,13 @@ public final class Types {
             case 16: {
 
               tmo_ = input.readInt32();
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -17692,6 +18229,7 @@ public final class Types {
       return proto.Types.internal_static_proto_suspected_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return proto.Types.internal_static_proto_suspected_fieldAccessorTable
@@ -17718,6 +18256,7 @@ public final class Types {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -17727,6 +18266,7 @@ public final class Types {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (id_ != 0) {
@@ -17738,6 +18278,7 @@ public final class Types {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -17766,13 +18307,12 @@ public final class Types {
       }
       proto.Types.suspected other = (proto.Types.suspected) obj;
 
-      boolean result = true;
-      result = result && (getId()
-          == other.getId());
-      result = result && (getTmo()
-          == other.getTmo());
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (getId()
+          != other.getId()) return false;
+      if (getTmo()
+          != other.getTmo()) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -17861,6 +18401,7 @@ public final class Types {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -17868,6 +18409,7 @@ public final class Types {
     public static Builder newBuilder(proto.Types.suspected prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -17891,6 +18433,7 @@ public final class Types {
         return proto.Types.internal_static_proto_suspected_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return proto.Types.internal_static_proto_suspected_fieldAccessorTable
@@ -17913,6 +18456,7 @@ public final class Types {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         id_ = 0;
@@ -17922,15 +18466,18 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return proto.Types.internal_static_proto_suspected_descriptor;
       }
 
+      @java.lang.Override
       public proto.Types.suspected getDefaultInstanceForType() {
         return proto.Types.suspected.getDefaultInstance();
       }
 
+      @java.lang.Override
       public proto.Types.suspected build() {
         proto.Types.suspected result = buildPartial();
         if (!result.isInitialized()) {
@@ -17939,6 +18486,7 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public proto.Types.suspected buildPartial() {
         proto.Types.suspected result = new proto.Types.suspected(this);
         result.id_ = id_;
@@ -17947,32 +18495,39 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof proto.Types.suspected) {
           return mergeFrom((proto.Types.suspected)other);
@@ -17995,10 +18550,12 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -18068,11 +18625,13 @@ public final class Types {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -18094,6 +18653,7 @@ public final class Types {
 
     private static final com.google.protobuf.Parser<suspected>
         PARSER = new com.google.protobuf.AbstractParser<suspected>() {
+      @java.lang.Override
       public suspected parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -18111,6 +18671,7 @@ public final class Types {
       return PARSER;
     }
 
+    @java.lang.Override
     public proto.Types.suspected getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
