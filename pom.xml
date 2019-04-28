@@ -37,6 +37,25 @@
                         </goals>
                         <configuration>
                             <outputDirectory>bin/src/main/resources</outputDirectory>
+                            <!--<outputDirectory>cbin/src/main/resources</outputDirectory>-->
+                            <resources>
+                                <resource>
+                                    <directory>src/main/resources</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-resources-c</id>
+                        <!-- here the phase you need -->
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <!--<outputDirectory>bin/src/main/resources</outputDirectory>-->
+                            <outputDirectory>cbin/src/main/resources</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>src/main/resources</directory>
@@ -60,6 +79,11 @@
                                     <filtering>true</filtering>
                                     <includes>run_single.sh</includes>
                                 </resource>
+                                <resource>
+                                    <directory>.</directory>
+                                    <filtering>true</filtering>
+                                    <includes>run_docker.sh</includes>
+                                </resource>
                             </resources>
                         </configuration>
                     </execution>
@@ -71,34 +95,35 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>bin_client</outputDirectory>
+                            <outputDirectory>cbin</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>.</directory>
                                     <filtering>true</filtering>
                                     <includes>run_client.sh</includes>
                                 </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>copy-docker-run-script</id>
-                        <!-- here the phase you need -->
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>bin</outputDirectory>
-                            <resources>
                                 <resource>
                                     <directory>.</directory>
                                     <filtering>true</filtering>
-                                    <includes>run_docker.sh</includes>
+                                    <includes>run_cdocker.sh</includes>
                                 </resource>
                             </resources>
                         </configuration>
                     </execution>
+                    <!--<execution>-->
+                        <!--<id>copy-docker-run-script</id>-->
+                        <!--&lt;!&ndash; here the phase you need &ndash;&gt;-->
+                        <!--<phase>validate</phase>-->
+                        <!--<goals>-->
+                            <!--<goal>copy-resources</goal>-->
+                        <!--</goals>-->
+                        <!--<configuration>-->
+                            <!--<outputDirectory>bin</outputDirectory>-->
+                            <!--<resources>-->
+
+                            <!--</resources>-->
+                        <!--</configuration>-->
+                    <!--</execution>-->
                 </executions>
             </plugin>
             <plugin>
@@ -139,12 +164,12 @@
 
                         <configuration>
                             <outputDirectory>
-                                bin_client/
+                                cbin/
                             </outputDirectory>
                             <archive>
                                 <manifest>
                                     <addClasspath>true</addClasspath>
-                                    <mainClass>app.ClientsAgent</mainClass>
+                                    <mainClass>app.ClientTester</mainClass>
                                 </manifest>
                             </archive>
                             <descriptorRefs>

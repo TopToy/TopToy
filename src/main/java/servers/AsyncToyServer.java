@@ -2,6 +2,7 @@ package servers;
 
 import blockchain.Blockchain;
 import blockchain.Utils;
+import blockchain.data.BCS;
 import communication.CommLayer;
 import config.Node;
 import das.ab.ABService;
@@ -51,7 +52,7 @@ public class AsyncToyServer extends ToyBaseServer {
         logger.debug(format("[#%d -C[%d]] prepare to disseminate a new block header for [height=%d] [cidSeries=%d ; cid=%d]",
                 getID(), worker, currHeight, cidSeries, cid));
 
-        WRB.WRBBroadcast(getHeaderForCurrentBlock(bc.getBlock(currHeight - 1).getHeader(),
+        WRB.WRBBroadcast(getHeaderForCurrentBlock(BCS.nbGetBlock(worker, currHeight - 1).getHeader(),
                 currHeight, cidSeries, cid));
         return null;
     }
@@ -66,20 +67,20 @@ public class AsyncToyServer extends ToyBaseServer {
         return getHeaderForCurrentBlock(null, currHeight + 1, cidSeries, cid + 1);
     }
 
-    @Override
-    public Blockchain initBC(int id, int channel) {
-        return createBlockchain(Utils.BCT.SGC, id, n, sPath);
-    }
+//    @Override
+//    public Blockchain initBC(int id, int channel) {
+//        return createBlockchain(Utils.BCT.SGC, id, n, sPath);
+//    }
 
-    @Override
-    public Blockchain getBC(int start, int end) {
-        return new Blockchain(this.bc, start, end);
-    }
-
-    @Override
-    public Blockchain getEmptyBC() {
-        return new Blockchain(this.getID());
-    }
+//    @Override
+//    public Blockchain getBC(int start, int end) {
+//        return new Blockchain(this.bc, start, end);
+//    }
+//
+//    @Override
+//    public Blockchain getEmptyBC() {
+//        return new Blockchain(this.getID());
+//    }
 
     @Override
     void potentialBehaviourForSync() throws InterruptedException {

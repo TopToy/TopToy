@@ -247,14 +247,14 @@ public class Cli {
             return JToy.s.addTransaction(data.getBytes(), clientID);
         }
 
-        private String txStatus(int channel, int pid, int bid, int tid) {
+        private String txStatus(int channel, int pid, int bid, int tid) throws InterruptedException {
             Types.txID txid = Types.txID.newBuilder()
                     .setProposerID(pid)
                     .setBid(bid)
                     .setTxNum(tid)
                     .setChannel(channel)
                     .build();
-            int stat = JToy.s.isTxPresent(txid);
+            int stat = JToy.s.status(txid, false);
 
             switch (stat) {
                 case -1: return "Not exist";
@@ -312,8 +312,8 @@ public class Cli {
                             .setTxNum(0)
                             .setProposerID(0)
                             .setChannel(0))
-                    .setClientTs(System.currentTimeMillis())
-                    .setServerTs(System.currentTimeMillis())
+//                    .setClientTs(System.currentTimeMillis())
+//                    .setServerTs(System.currentTimeMillis())
                     .build().getSerializedSize();
             int tSize = max(0, Config.getTxSize() - bareTxSize);
 
@@ -413,17 +413,17 @@ public class Cli {
 //            }
 //        }
 
-        boolean validateBC() {
-            return JToy.s.isValid();
-//            for (int i = 1 ; i < JToy.s.getBCSize() ; i++) {
-//                if (!validateBlockHash(JToy.s.nonBlockingDeliver(i - 1),
-//                        JToy.s.nonBlockingDeliver(i))) {
-//                    System.out.println(String.format("Invalid Blockchain!! [%d -> %d]", i-1, i));
-//                    return false;
-//                }
-//            }
-//            return true;
-        }
+//        boolean validateBC() {
+//            return JToy.s.isValid();
+////            for (int i = 1 ; i < JToy.s.getBCSize() ; i++) {
+////                if (!validateBlockHash(JToy.s.nonBlockingDeliver(i - 1),
+////                        JToy.s.nonBlockingDeliver(i))) {
+////                    System.out.println(String.format("Invalid Blockchain!! [%d -> %d]", i-1, i));
+////                    return false;
+////                }
+////            }
+////            return true;
+//        }
         void writeSummery(String pathString) {
             logger.info("Starting writeSummery");
             Path path = Paths.get(pathString,   String.valueOf(JToy.s.getID()), "summery.csv");

@@ -1,5 +1,6 @@
 package das.bbc;
 
+import blockchain.data.BCS;
 import config.Node;
 import crypto.blockDigSig;
 import crypto.sslUtils;
@@ -15,8 +16,6 @@ import proto.Types;
 import javax.net.ssl.SSLException;
 import java.io.IOException;
 import java.util.*;
-
-import static blockchain.data.BCS.bcs;
 import static das.data.Data.*;
 import static das.data.Data.bbcFastDec;
 import static io.grpc.Metadata.ASCII_STRING_MARSHALLER;
@@ -147,14 +146,14 @@ public class OBBCRpcs extends ObbcGrpc.ObbcImplBase {
         Types.BlockHeader nxt = msg.getNext();
 //        int sender = nxt.getBid().getPid();
         int cid = nxt.getM().getCid();
-        int channel = nxt.getM().getChannel();
+        int worker = nxt.getM().getChannel();
         int cidSeries = nxt.getM().getCidSeries();
         Types.Meta key = Types.Meta.newBuilder()
-                .setChannel(channel)
+                .setChannel(worker)
                 .setCidSeries(cidSeries)
                 .setCid(cid)
                 .build();
-        if (bcs[channel].contains(nxt.getHeight())) return;
+        if (BCS.contains(worker, nxt.getHeight())) return;
         Data.addToPendings(nxt, key);
     }
 
@@ -222,30 +221,30 @@ public class OBBCRpcs extends ObbcGrpc.ObbcImplBase {
         Types.BlockHeader msg;
         int cid = request.getMeta().getCid();
         int cidSeries = request.getMeta().getCidSeries();
-        int channel = request.getMeta().getChannel();
+        int worker = request.getMeta().getChannel();
         Types.Meta key =  Types.Meta.newBuilder()
-                .setChannel(channel)
+                .setChannel(worker)
                 .setCidSeries(cidSeries)
                 .setCid(cid)
                 .build();
 
-        msg = Data.pending[channel].get(key);
-        if (msg == null && bcs[channel].contains(request.getHeight())) {
-            msg = bcs[channel].getBlock(request.getHeight()).getHeader();
+        msg = Data.pending[worker].get(key);
+        if (msg == null && BCS.contains(worker, request.getHeight())) {
+            msg = BCS.nbGetBlock(worker, request.getHeight()).getHeader();
         }
         if (msg == null) {
             msg = Types.BlockHeader.getDefaultInstance();
             logger.debug(format("[#%d-C[%d]] has received evidence request message" +
                             " from [#%d] of [cidSeries=%d ; cid=%d] response with NULL",
-                    id, channel, request.getSender(), cidSeries, cid));
+                    id, worker, request.getSender(), cidSeries, cid));
 
         } else {
             logger.debug(format("[#%d-C[%d]] has received evidence request message from [#%d] of [cidSeries=%d ; cid=%d] responses with a value",
-                    id, channel, request.getSender(), cidSeries, cid));
+                    id, worker, request.getSender(), cidSeries, cid));
         }
 
         Types.Meta meta = Types.Meta.newBuilder().
-                setChannel(channel).
+                setChannel(worker).
                 setCid(cid).
                 setCidSeries(cidSeries).
                 build();

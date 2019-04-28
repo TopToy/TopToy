@@ -1,0 +1,12 @@
+syntax = "proto3";
+option java_package = "proto";
+package proto;
+//option java_multiple_files = true;
+
+import "types.proto";
+
+service clientService {
+    rpc write(Transaction) returns (txID) {};
+    rpc read(readReq) returns (Transaction) {};
+    rpc status(readReq) returns (txStatus) {};
+}

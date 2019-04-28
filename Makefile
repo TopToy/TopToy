@@ -1,9 +1,16 @@
-
+build:
+	./make_scripts/build.sh
 bin-build:
 	./make_scripts/bin-build.sh
 
+cbin-build:
+	./make_scripts/cbin-build.sh
+
 docker_build:
 	docker build -t toy:0.1 .
+
+cdocker_build:
+	docker build -f CDockerfile -t ctoy:0.1 .
 
 docker-composer:
 	./make_scripts/docker-composer.sh
@@ -12,10 +19,13 @@ docker-generate-configuration:
 	./make_scripts/generate_configuration.sh
 
 docker-full-build:
+	make build
+	make bin-build
+	make cbin-build
+	make docker_build
+	make cdocker_build
 	make docker-generate-configuration
 	make docker-composer
-	make bin-build
-	make docker_build
 
 docker-generate-run:
 	make docker-generate-configuration

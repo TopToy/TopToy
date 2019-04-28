@@ -1,7 +1,6 @@
 package app;
 
 import config.Config;
-import servers.server;
 import servers.Top;
 import utils.GEH;
 //import TmoUtils.derbyUtils;
@@ -20,9 +19,9 @@ import java.util.regex.Pattern;
 public class JToy {
     private static org.apache.log4j.Logger logger;
 //    static Config c = new Config();
-    static server s; // = new ToyServer(Config.getAddress(), Config.getPort(), Config.getID());
+    static Top s; // = new ToyServer(Config.getAddress(), Config.getPort(), Config.getID());
     static String type;
-    public static void main(String argv[]) {
+    public static void main(String[] argv) {
         mainImpl(argv);
 //
     }

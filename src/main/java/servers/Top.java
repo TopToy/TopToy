@@ -15,7 +15,6 @@ import io.grpc.stub.StreamObserver;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import proto.Types;
-import proto.blockchainServiceGrpc;
 import utils.DBUtils;
 import utils.DiskUtils;
 import utils.Statistics;
@@ -28,7 +27,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static java.lang.Math.min;
 import static java.lang.String.format;
 
-public class Top implements server {
+public class Top {
 
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Top.class);
     boolean up = false;
@@ -67,7 +66,7 @@ public class Top implements server {
         this.workers = workers;
         this.toys = new ToyBaseServer[workers];
         this.id = id;
-        new BCS(workers);
+        new BCS(id, n, f, workers);
         initProtocols(obbcCluster, wrbCluster, tmo, tmoInterval, serverCrt,
                 serverPrivKey, caRoot, commCluster, abConfig);
 
@@ -180,10 +179,10 @@ public class Top implements server {
                     .executor(executor)
                     .bossEventLoopGroup(gnio)
                     .workerEventLoopGroup(gnio)
-                    .addService(new TxServer(this))
+                    .addService(new ClientRpcsService(this))
                     .build()
                     .start();
-            logger.info("starting tx server");
+            logger.info("starting client RPCs server");
         } catch (IOException e) {
             logger.error("", e);
         }
@@ -218,27 +217,12 @@ public class Top implements server {
         return toys[worker].addTransaction(data, clientID);
     }
 
-    public int isTxPresent(Types.txID tid) {
-        return toys[tid.getChannel()].isTxPresent(tid);
+    public int status(Types.txID tid, boolean blocking) throws InterruptedException {
+        return toys[tid.getChannel()].status(tid, blocking);
     }
 
-    Types.approved getTransaction(Types.txID txID) throws InterruptedException {
-//        Types.Block b = null;
-//        synchronized (txMap) {
-//            while (!txMap.containsKey(txID)) {
-//                txMap.wait();
-//            }
-//        }
-//        if (txMap.containsKey(txID)) {
-//            b = nonBlockingDeliver(txMap.get(txID));
-//        }
-//        if (b == null) return Types.approved.getDefaultInstance();
-//        for (Types.Transaction t : b.getDataList()) {
-//            if (t.getId().equals(txID)) {
-//                return Types.approved.newBuilder().setSt(b.getSt()).setTx(t).build();
-//            }
-//        }
-        return Types.approved.getDefaultInstance();
+    public Types.Transaction getTransaction(Types.txID txID, boolean blocking) throws InterruptedException {
+        return toys[txID.getChannel()].getTx(txID, blocking);
     }
 
     public Types.Block deliver(int index) throws InterruptedException {
@@ -286,52 +270,15 @@ public class Top implements server {
 
     }
 
-    public int getBCSize() {
-        return minBcSize() * workers;
-    }
+//    public int getBCSize() {
+//        return BCS.size() *  workers;
+//    }
     
-    @Override
-    public boolean isValid() {
-        for (int i = 0 ; i < workers ; i++) {
-            if (!toys[i].isBcValid()) return false;
-        }
-        return true;
-    }
+//    public boolean isValid() {
+//        for (int i = 0 ; i < workers ; i++) {
+//            if (!toys[i].isBcValid()) return false;
+//        }
+//        return true;
+//    }
 
-    int minBcSize() {
-        int min = toys[0].bcSize();
-        for (int i = 1; i < workers ; i++) {
-            int s = toys[i].bcSize();
-            min = min(min, s);
-        }
-        return min;
-    }
-}
-class TxServer extends blockchainServiceGrpc.blockchainServiceImplBase {
-    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(TxServer.class);
-    Top server;
-
-    public TxServer(Top server) {
-        super();
-        this.server = server;
-    }
-    @Override
-    public void addTransaction(Types.Transaction request, StreamObserver<Types.accepted> responseObserver) {
-        boolean ac = true;
-        Types.txID id = server.addTransaction(request);
-        if (id == null) ac = false;
-        responseObserver.onNext(Types.accepted.newBuilder().setTxID(id).setAccepted(ac).build());
-        responseObserver.onCompleted();
-    }
-
-    @Override
-    public void getTransaction(Types.read request, StreamObserver<Types.approved> responseObserver) {
-        logger.info("receive read request");
-        try {
-            responseObserver.onNext(server.getTransaction(request.getTxID()));
-        } catch (InterruptedException e) {
-            logger.error("", e);
-        }
-        responseObserver.onCompleted();
-    }
 }

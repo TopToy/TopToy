@@ -74,8 +74,8 @@ message Transaction {
     int32 clientID = 1;
     txID id = 2;
     bytes data = 3; // generic data type
-    int64 clientTs = 4;
-    int64 serverTs = 5;
+//    int64 clientTs = 4;
+//    int64 serverTs = 5;
 }
 
 message accepted {
@@ -83,13 +83,21 @@ message accepted {
     txID txID = 2;
 }
 
-message approved {
-    Transaction tx = 1;
-//    blockStatistics st = 3;
-}
+//message approved {
+//    Transaction tx = 1;
+////    blockStatistics st = 3;
+//}
 
-message read {
-    txID txID = 1;
+//message read {
+//    txID txID = 1;
+//}
+message readReq {
+    txID tid = 1;
+    Transaction tx = 2;
+    bool blocking = 3;
+}
+message txStatus {
+    int32 res = 1;
 }
 
 message ForkProof {

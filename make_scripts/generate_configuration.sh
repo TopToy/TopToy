@@ -257,3 +257,4 @@ main ${cdest}
 main ${fbdest}
 main ${asdest}
 main ${byzdest}
+generate_config_toml ${cldest}

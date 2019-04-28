@@ -11,14 +11,14 @@ RUN export PATH="$PATH:${TOY_HOME}/bin"
 VOLUME /tmp/JToy
 VOLUME ${TOY_HOME}/bin/src/main/resources
 
-#exspose wrb port
-EXPOSE 30000
-##expose panic port
-EXPOSE 11000
-##expose sync port
-EXPOSE 13000
-##expose bbc port
-EXPOSE 12000
+##exspose wrb port
+#EXPOSE 30000
+###expose panic port
+#EXPOSE 11000
+###expose sync port
+#EXPOSE 13000
+###expose bbc port
+#EXPOSE 12000
 
 #expose Clients port
 #EXPOSE 14000

@@ -1,6 +1,6 @@
 package das.bbc;
 
-import blockchain.Utils;
+import blockchain.data.BCS;
 import com.google.protobuf.ByteString;
 import communication.CommLayer;
 import config.Node;
@@ -11,15 +11,11 @@ import das.data.BbcDecData;
 
 import das.data.Data;
 import das.data.VoteData;
-
-import io.grpc.*;
 import proto.ObbcGrpc;
 import proto.Types;
 import utils.Statistics;
 
 import java.util.ArrayList;
-
-import static blockchain.data.BCS.bcs;
 import static das.data.Data.*;
 import static java.lang.String.format;
 
@@ -122,7 +118,7 @@ public class OBBC extends ObbcGrpc.ObbcImplBase  {
             return v1;
         });
         bbcFastDec[worker].computeIfAbsent(key, k -> {
-            if (bcs[worker].contains(height)) {
+            if (BCS.contains(worker, height)) {
                 logger.info(format("[#%d-C[%d]] (reCons) found that a full bbc initialized and a block is exist, " +
                                 "thus propose [cidSeries=%d ; cid=%d; height=%d]",
                         id, worker, key.getCidSeries(),  key.getCid(), height));
