@@ -24,7 +24,7 @@ public class Clique implements CommLayer {
         this.id = id;
         this.n = n;
         new Data(n, workers);
-        rpcs = new CliqueRpcs(id, nodes, n);
+        rpcs = new CliqueRpcs(id, nodes, n, workers);
     }
 
     @Override

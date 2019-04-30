@@ -13,6 +13,7 @@ import proto.Types;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import static crypto.blockDigSig.verfiyBlockWRTheader;
 import static java.lang.String.format;
@@ -23,15 +24,41 @@ public class CliqueRpcs  extends CommunicationGrpc.CommunicationImplBase {
     class Peer {
         ManagedChannel channel;
         CommunicationGrpc.CommunicationStub stub;
+        AtomicInteger[] pending;
+        int maxPendings = 10;
 
-        Peer(String addr, int port) {
+        Peer(String addr, int port, int workers) {
             channel = ManagedChannelBuilder
                     .forAddress(addr, port)
                     .usePlaintext()
                     .maxInboundMessageSize(16 * 1024 * 1024)
                     .build();
-
+            pending = new AtomicInteger[workers];
+            for (int i = 0 ; i < workers ; i++) {
+                pending[i] = new AtomicInteger(0);
+            }
             stub = CommunicationGrpc.newStub(channel);
+        }
+
+        void send(Types.Comm comm, int w) {
+            if (pending[w].get() > maxPendings) return;
+            pending[w].incrementAndGet();
+            stub.dsm(comm, new StreamObserver<Types.Empty>() {
+                @Override
+                public void onNext(Types.Empty empty) {
+                    pending[w].decrementAndGet();
+                }
+
+                @Override
+                public void onError(Throwable throwable) {
+
+                }
+
+                @Override
+                public void onCompleted() {
+
+                }
+            });
         }
 
         void shutdown() {
@@ -45,11 +72,13 @@ public class CliqueRpcs  extends CommunicationGrpc.CommunicationImplBase {
     private List<Node> nodes;
     private int id;
     private int n;
+    private int workers;
 
-    CliqueRpcs(int id, ArrayList<Node> commCluster, int n) {
+    CliqueRpcs(int id, ArrayList<Node> commCluster, int n, int workers) {
         this.id = id;
         this.nodes = commCluster;
         this.n = n;
+        this.workers = workers;
     }
     // TODO: Re configure grpc server so it would be anble to handle mass of messages.
     public void start() {
@@ -69,7 +98,7 @@ public class CliqueRpcs  extends CommunicationGrpc.CommunicationImplBase {
         }
 
         for (Node n : nodes) {
-            peers.put(n.getID(), new Peer(n.getAddr(), n.getPort()));
+            peers.put(n.getID(), new Peer(n.getAddr(), n.getPort(), workers));
         }
         logger.debug("starting clique rpc server");
     }
