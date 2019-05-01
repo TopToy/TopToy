@@ -3,13 +3,13 @@ package das.data;
 import blockchain.data.BCS;
 import crypto.blockDigSig;
 import proto.Types;
+import utils.statistics.Statistics;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static blockchain.Utils.validateBlockHash;
 import static java.lang.String.format;
-import static utils.Statistics.updateHeaderProposed;
 
 public class Data {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Data.class);
@@ -87,11 +87,15 @@ public class Data {
             return;
         }
         if (BCS.contains(worker, height)) return;
-        updateHeaderProposed(request, worker);
         synchronized (pending[worker]) {
             pending[worker].putIfAbsent(key, request);
             pending[worker].notify();
         }
+        Statistics.addHeaderStat(request.getBid());
+        Statistics.updateHeaderSender(request.getBid(), request.getBid().getPid());
+        Statistics.updateHeaderWorker(request.getBid(), request.getM().getChannel());
+        Statistics.updateHeaderPT(request.getBid(), System.currentTimeMillis());
+        Statistics.updateHeaderHeight(request.getBid(), request.getHeight());
     }
 
 

@@ -8,6 +8,7 @@ import das.data.Data;
 import das.ms.BFD;
 import das.utils.TmoUtils;
 import proto.Types.*;
+import utils.statistics.Statistics;
 
 import java.util.*;
 
@@ -15,7 +16,7 @@ import static das.bbc.OBBC.setFastBbcVote;
 import static das.utils.TmoUtils.*;
 import static java.lang.Math.max;
 import static java.lang.String.format;
-import static utils.Statistics.*;
+import static utils.statistics.Statistics.*;
 
 public class WRB {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(WRB.class);
@@ -51,7 +52,7 @@ public class WRB {
 //        WRB.comm = comm;
         new TmoUtils(n, workers, tmo);
         new Data(workers);
-        new BFD(n, f, workers,1000 * tmo);
+        new BFD(n, f, workers,100 * tmo);
         BFD.activateAll();
         WRB.rpcs = new WrbRpcs(id, workers, n, f, wrbCluster, serverCrt, serverPrivKey, caRoot);
         logger.info(format("Initiated WRB: [id=%d; n=%d; f=%d; tmo=%d; tmoInterval=%d]", id, n, f, tmo,
@@ -95,7 +96,7 @@ public class WRB {
     static public BlockHeader WRBDeliver(int worker, int cidSeries, int cid, int sender, int height, BlockHeader next)
             throws InterruptedException {
 //        totalDeliveredTries.incrementAndGet();
-        updateTotalDec(worker);
+        Statistics.updateAll();
         Meta key = Meta.newBuilder()
                 .setChannel(worker)
                 .setCidSeries(cidSeries)
@@ -112,13 +113,13 @@ public class WRB {
 
             logger.debug(format("[#%d-C[%d]] bbc returned [%d] for [cidSeries=%d ; cid=%d]", id, worker, 0, cidSeries, cid));
 //            neg.getAndIncrement();
-            updateNegDec(worker);
+            Statistics.updateNeg();
             return null;
         }
 //        currentTmo[sender][worker] = tmo;
-        updatePosDec(worker);
+        Statistics.updatePos();
         if (dec.fv) {
-            updateOptimisitcDec(worker);
+            Statistics.updateOpt();
         }
         logger.debug(format("[#%d-C[%d]] bbc returned [%d] for [cidSeries=%d ; cid=%d]", id, worker, 1, cidSeries, cid));
 
@@ -138,7 +139,7 @@ public class WRB {
 
         int realTmo = TmoUtils.getTmo(sender, worker);
 
-        updateAvgTmo(worker, realTmo);
+        Statistics.updateTmo(realTmo);
         long startTime = System.currentTimeMillis();
         synchronized (Data.pending[worker]) {
             while (realTmo > 0 && !Data.pending[worker].containsKey(key)) {
@@ -155,8 +156,9 @@ public class WRB {
         updateTmo(sender, worker, (int) estimatedTime, Data.pending[worker].containsKey(key));
         logger.debug(format("[#%d-C[%d]] have waited [%d] ms for data msg [cidSeries=%d ; cid=%d]",
                 id, worker, estimatedTime, cidSeries, cid));
-        updateActTmo(worker, (int) estimatedTime);
-        updateMaxTmo(worker, (int) estimatedTime);
+
+        Statistics.updateActTmo((int) estimatedTime);
+        Statistics.updateMaxTmo((int) estimatedTime);
         if (Data.pending[worker].containsKey(key)) {
             BFD.activate(worker);
         }

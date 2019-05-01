@@ -48,10 +48,12 @@ progress-bar() {
 }
 start_aws_instances() {
     aws ec2 start-instances --instance-ids ${eids[*]}
+    sleep 30
 
 }
 stop_aws_instances() {
     aws ec2 stop-instances --instance-ids ${eids[*]}
+    sleep 30
 }
 load_server() {
     local s=${servers[${1}]}
@@ -114,8 +116,8 @@ run_remote_servers() {
         pids[${id}]=$!
         id=$((${id} + 1))
     done
-    sleep 20
-    t=$((${1} + 40))
+    sleep 10
+    t=$((${1}))
     echo "waits for more ${t} s"
     progress-bar ${t}
     for pid in ${pids[*]}; do
@@ -164,11 +166,11 @@ configure_servers() {
     echo "init" > ${inst}
 #    echo "wait 30" >> ${inst}
     echo "serve" >> ${inst}
-    echo "wait 30" >> ${inst}
+    echo "wait 10" >> ${inst}
     echo "stStart" >> ${inst}
     echo "wait ${1}" >> ${inst}
     echo "stStop" >> ${inst}
-    echo "wait 30" >> ${inst}
+    echo "wait 10" >> ${inst}
     echo "stop" >> ${inst}
     echo "quit" >> ${inst}
 }
@@ -342,11 +344,11 @@ collect_res_from_servers() {
     mkdir -p $tmp
     for s in "${servers[@]}"; do
         echo "getting files from server ${s}"
-        scp -o ConnectTimeout=30 -r ${s}:/tmp/JToy/logs/* $logs  > /dev/null
+#        scp -o ConnectTimeout=30 -r ${s}:/tmp/JToy/logs/* $logs  > /dev/null
         scp -o ConnectTimeout=30 -r ${s}:/tmp/JToy/res/* $tmp  > /dev/null
     done
 #    ./extract_workers_logs.sh $currOut/servers/logs ${channels}
-    echo "id,type,workers,tmo,actTmo,maxTmo,txSize,txInBlock,txTotal,duration,tps,nob,bps,avgTxInBlock,opt,opRate,pos,posRate,neg,negRate,avgNegTime,ATDT,APDT,T,P,syncEvents,suspected,tm,fm" >> $sum
+    echo "id,type,workers,tmo,actTmo,maxTmo,txSize,txInBlock,txTotal,duration,tps,nob,bps,avgTxInBlock,opt,opRate,pos,posRate,neg,negRate,avgNegTime,T,P,S,BP2T,BP2T,BP2DL,HP2T,HP2D,HP2DL,HD2DL,suspected" >> $sum
 
     for i in `seq 0 $((${#servers[@]} - 1))`; do
         echo "collecting results summery from server ${servers[$i]}"
@@ -747,30 +749,98 @@ main_byz() {
    run_byz_test ${1} ${2} ${3} ${4} ${currOut} ${5}
 }
 # ${1} - transaction size
-# ${2} - max transactions in block
-# ${3} - tmo
-# ${4} - channels to start
-# ${5} - channels to end
-# ${6} - interval
-# ${7} - f
-# ${8} - correct time
-# ${9} - test time
+# ${2} - transactions in block
+# ${3} - channel to start with
+# ${4} - max channel
+# ${5} - channel interval
+# ${6} - tmo
+# ${7} -tmo interval
+# ${8} - test time
 test1() {
-#    main_no_failures 0 0 1 10 1 10 10 300
 #
-#    main_no_failures 512 10 1 10 1 10 10 300
-#    main_no_failures 512 100 1 10 1 10 10 300
-#    main_no_failures 512 1000 1 10 1 10 10 300
+#    start_aws_instances
+#    main_no_failures 0 0 1 5 2 10 10 300
+#    stop_aws_instances
+    start_aws_instances
+#    main_no_failures 0 0 7 9 2 10 10 300
+    main_no_failures 0 0 10 10 1 10 10 60
+    stop_aws_instances
 
-#    main_no_failures 1024 10 1 10 1 10 10 300
-#    main_no_failures 1024 100 1 10 1 10 10 300
-    main_no_failures 1024 1000 8 8 2 10 10 300
+#    start_aws_instances
+#    main_no_failures 512 10 1 5 2 10 10 300
+#    stop_aws_instances
+#    start_aws_instances
+#    main_no_failures 512 10 7 9 2 10 10 300
+#    main_no_failures 512 10 10 10 1 10 10 300
+#    stop_aws_instances
 #
+#    start_aws_instances
+#    main_no_failures 512 100 1 5 2 10 10 300
+#    stop_aws_instances
+#    start_aws_instances
+#    main_no_failures 512 100 7 9 2 10 10 300
+#    main_no_failures 512 100 10 10 1 10 10 300
+#    stop_aws_instances
+#
+#    start_aws_instances
+#    main_no_failures 512 1000 1 5 2 10 10 300
+#    stop_aws_instances
+#    start_aws_instances
+#    main_no_failures 512 1000 7 9 2 10 10 300
+#    main_no_failures 512 1000 10 10 1 10 10 300
+#    stop_aws_instances
+#
+#    start_aws_instances
+#    main_no_failures 1024 10 1 5 2 10 10 300
+#    stop_aws_instances
+#    start_aws_instances
+#    main_no_failures 1024 10 7 9 2 10 10 300
+#    main_no_failures 1024 10 10 10 1 10 10 300
+#    stop_aws_instances
+#
+#    start_aws_instances
+#    main_no_failures 1024 100 1 5 2 10 10 300
+#    stop_aws_instances
+#    start_aws_instances
+#    main_no_failures 1024 100 7 9 2 10 10 300
+#    main_no_failures 1024 100 10 10 1 10 10 300
+#    stop_aws_instances
+#
+#    start_aws_instances
+#    main_no_failures 1024 1000 1 5 2 10 10 300
+#    stop_aws_instances
+#    start_aws_instances
+#    main_no_failures 1024 1000 7 9 2 10 10 300
+#    main_no_failures 1024 1000 10 10 1 10 10 300
+#    stop_aws_instances
+#
+#    start_aws_instances
+#    main_no_failures 4096 10 1 5 2 10 10 300
+#    stop_aws_instances
+#    start_aws_instances
+#    main_no_failures 4096 10 7 9 2 10 10 300
 #    main_no_failures 4096 10 10 10 1 10 10 300
-#    main_no_failures 4096 100 1 10 1 10 10 300
-#    main_no_failures 4096 1000 3 10 1 10 10 300
+#    stop_aws_instances
+#
+#    start_aws_instances
+#    main_no_failures 4096 100 1 5 2 10 10 300
+#    stop_aws_instances
+#    start_aws_instances
+#    main_no_failures 4096 100 7 9 2 10 10 300
+#    main_no_failures 4096 100 10 10 1 10 10 300
+#    stop_aws_instances
+#
+#    start_aws_instances
+#    main_no_failures 4096 1000 1 5 2 10 10 300
+#    stop_aws_instances
+#    start_aws_instances
+#    main_no_failures 4096 1000 7 9 2 10 10 300
+#    main_no_failures 4096 1000 10 10 1 10 10 300
+#    stop_aws_instances
+
 
 }
+
 test1
-stop_aws_instances
+
 #shutdown

@@ -11,13 +11,12 @@ import das.ms.Membership;
 import das.wrb.WRB;
 import io.grpc.Server;
 import io.grpc.netty.NettyServerBuilder;
-import io.grpc.stub.StreamObserver;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import proto.Types;
 import utils.DBUtils;
 import utils.DiskUtils;
-import utils.Statistics;
+import utils.statistics.Statistics;
 
 import java.io.IOException;
 import java.util.*;
@@ -100,7 +99,7 @@ public class Top {
         logger.info(format("[%d] has initiated ab service", id));
         new BBC(id, n, f, n - f);
         logger.info(format("[%d] has initiated BBC", id));
-        new OBBC(id, n, f, n - f, obbcCluster, comm, caRoot, serverCrt, serverPrivKey);
+        new OBBC(id, n, f, workers, n - f, obbcCluster, comm, caRoot, serverCrt, serverPrivKey);
         logger.info(format("[%d] has initiated OBBC service", id));
         new WRB(id, workers, n, f, tmo, tmoInterval, wrbCluster, serverCrt, serverPrivKey, caRoot);
         logger.info(format("[%d] has initiated WRB", id));
@@ -141,20 +140,20 @@ public class Top {
 
     public void shutdown() {
 //        updateStop();
-        txsServer.shutdown();
-        logger.info("shutdown txsServer");
-        for (int i = 0 ; i < workers ; i++) {
-            toys[i].shutdown();
-            logger.info(format("shutdown worker [%d]", i));
-        }
+        ABService.shutdown();
+        logger.info("shutdown AB");
         comm.leave();
         logger.info("leaving communication layer");
         WRB.shutdown();
         logger.info("shutdown WRB");
         OBBC.shutdown();
         logger.info("shutdown OBBC");
-        ABService.shutdown();
-        logger.info("shutdown AB");
+        txsServer.shutdown();
+        logger.info("shutdown txsServer");
+        for (int i = 0 ; i < workers ; i++) {
+            toys[i].shutdown();
+            logger.info(format("shutdown worker [%d]", i));
+        }
         DBUtils.shutdown();
         logger.info("shutdown DBUtils");
         DiskUtils.shutdown();

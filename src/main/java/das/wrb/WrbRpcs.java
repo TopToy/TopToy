@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static das.data.Data.addToPendings;
 import static io.grpc.Metadata.ASCII_STRING_MARSHALLER;
@@ -76,8 +77,10 @@ public class WrbRpcs extends WrbGrpc.WrbImplBase {
     class peer {
         ManagedChannel channel;
         WrbGrpc.WrbStub stub;
+        AtomicInteger[] pending;
+        int maxPending = 100;
 
-        peer(String addr, int port, String caRoot, String serverCrt, String serverPrivKey) {
+        peer(String addr, int port, int workers, String caRoot, String serverCrt, String serverPrivKey) {
             try {
                 channel = sslUtils.buildSslChannel(addr, port,
                         sslUtils.buildSslContextForClient(caRoot,
@@ -86,9 +89,32 @@ public class WrbRpcs extends WrbGrpc.WrbImplBase {
             } catch (SSLException e) {
                 logger.fatal(format("[#%d]", id), e);
             }
+            pending = new AtomicInteger[workers];
+            for (int i = 0 ; i < workers ; i++) {
+                pending[i] = new AtomicInteger(0);
+            }
             stub = WrbGrpc.newStub(channel);
         }
+        void send(Types.BlockHeader h, int w) {
+//            if (pending[w].get() > maxPending) return;
+//            pending[w].incrementAndGet();
+            stub.disseminateMessage(h, new StreamObserver<Types.Empty>() {
+                @Override
+                public void onNext(Types.Empty empty) {
+//                    pending[w].decrementAndGet();
+                }
 
+                @Override
+                public void onError(Throwable throwable) {
+
+                }
+
+                @Override
+                public void onCompleted() {
+
+                }
+            });
+        }
         void shutdown() {
             channel.shutdown();
         }
@@ -125,10 +151,11 @@ public class WrbRpcs extends WrbGrpc.WrbImplBase {
             Executor executor = Executors.newFixedThreadPool(n);
             EventLoopGroup weg = new NioEventLoopGroup(cores);
             wrbServer = NettyServerBuilder.
-                    forPort(nodes.get(id).getPort()).
-                    executor(executor)
+                    forPort(nodes.get(id).getPort())
+                    .executor(executor)
                     .workerEventLoopGroup(weg)
                     .bossEventLoopGroup(weg)
+//                    .maxConcurrentCallsPerConnection(100)
                     .sslContext(sslUtils.buildSslContextForServer(serverCrt,
                             caRoot, serverPrivKey)).
                             addService(this).
@@ -140,7 +167,7 @@ public class WrbRpcs extends WrbGrpc.WrbImplBase {
         }
 
         for (Node n : nodes) {
-            peers.put(n.getID(), new peer(n.getAddr(),n.getPort(), caRoot, serverCrt, serverPrivKey));
+            peers.put(n.getID(), new peer(n.getAddr(),n.getPort(), workers, caRoot, serverCrt, serverPrivKey));
         }
 
         logger.debug(format("[#%d] initiates wrbRpcs", id));
@@ -154,23 +181,8 @@ public class WrbRpcs extends WrbGrpc.WrbImplBase {
         wrbServer.shutdown();
     }
 
-    void sendDataMessage(WrbGrpc.WrbStub stub, Types.BlockHeader msg) {
-        stub.disseminateMessage(msg, new StreamObserver<>() {
-            @Override
-            public void onNext(Types.Empty ans) {
-
-            }
-
-            @Override
-            public void onError(Throwable throwable) {
-                logger.debug(throwable.getMessage());
-            }
-
-            @Override
-            public void onCompleted() {
-
-            }
-        });
+    void sendDataMessage(peer p, Types.BlockHeader msg) {
+        p.send(msg, msg.getM().getChannel());
     }
 
     private void sendReqMessage(WrbGrpc.WrbStub stub, Types.WrbReq req, int worker,
@@ -226,13 +238,13 @@ public class WrbRpcs extends WrbGrpc.WrbImplBase {
 
     void wrbSend(Types.BlockHeader msg, int[] recipients) {
         for (int i : recipients) {
-            sendDataMessage(peers.get(i).stub, msg);
+            sendDataMessage(peers.get(i), msg);
         }
 
     }
     void wrbBroadcast(Types.BlockHeader msg) {
         for (peer p : peers.values()) {
-            sendDataMessage(p.stub, msg);
+            sendDataMessage(p, msg);
         }
     }
 

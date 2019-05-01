@@ -41,11 +41,11 @@ message BbcMsg {
     int32 sender = 5;
 }
 
-message HeaderStatistics {
-    int64 proposed = 1; // propose ts
-    int64 TD = 2; // tentative decision
-    int64 PD = 3; // permanent decision
-}
+//message HeaderStatistics {
+//    int64 proposed = 1; // propose ts
+//    int64 TD = 2; // tentative decision
+//    int64 PD = 3; // permanent decision
+//}
 
 message Block {
     BlockHeader header = 1;

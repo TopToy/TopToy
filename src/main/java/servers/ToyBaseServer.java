@@ -25,9 +25,10 @@ import java.util.stream.Collectors;
 import static blockchain.Utils.*;
 import static java.lang.Math.max;
 import static java.lang.String.format;
-import static utils.Statistics.*;
+import static utils.statistics.Statistics.*;
 
 import proto.Types.*;
+import utils.statistics.Statistics;
 
 public abstract class ToyBaseServer {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ToyBaseServer.class);
@@ -222,7 +223,12 @@ public abstract class ToyBaseServer {
                             " ; height=%d ; pid=%d ; bid=%d]",
                     channel, h.getM().getCidSeries(), h.getM().getCid(), h.getHeight(), h.getBid().getPid(),
                     h.getBid().getBid()));
-            return Block.newBuilder().build();
+
+
+            Statistics.addBlockStat(h.getBid());
+            Statistics.updateBlockStatPT(h.getBid(), System.currentTimeMillis());
+
+            return Block.newBuilder().setId(h.getBid()).build();
         }
         return comm.recBlock(channel, h);
     }
@@ -306,9 +312,13 @@ public abstract class ToyBaseServer {
                         getID(), worker, currHeight, cidSeries, cid));
                 return true;
             }
+            Statistics.updateBlockStatSize(recBlock.getId(), recBlock.getDataCount());
             recBlock = recBlock.toBuilder().setHeader(recHeader).build();
-            updateHeaderTD(recHeader, worker);
-            updateT(worker);
+
+            Statistics.adjustHeaderStatAndBlockStat(recBlock.getId());
+            Statistics.updateHeaderTT(recBlock.getId(), System.currentTimeMillis());
+            Statistics.updateTentative(recBlock.getId());
+
             removeFromPendings(recHeader, recBlock);
 
             if (!BCS.validateBlockHash(worker, recBlock)) {
@@ -330,17 +340,15 @@ public abstract class ToyBaseServer {
 
             if (BCS.height(worker) > 0) {
                 Block permanent = BCS.nbGetBlock(worker, BCS.height(worker));
-                updateNob(worker);
-                updateTxCount(worker, permanent.getDataCount());
-                updateHeaderPD(permanent.getHeader(), worker);
-                updateHeaderStatus(permanent.getHeader(), worker);
-                updateP(worker);
-                if (permanent.getHeader().getHeight() % 1000 == 0) {
-                    logger.info(format("[#%d-C[%d]] Deliver [[height=%d], [sender=%d], [channel=%d], [size=%d]]",
+
+                Statistics.updateHeaderDT(permanent.getId(), System.currentTimeMillis());
+                Statistics.updateDefinite(permanent.getId());
+                Statistics.registerStats();
+
+                logger.info(format("[#%d-C[%d]] Deliver [[height=%d], [sender=%d], [channel=%d], [size=%d]]",
                             getID(), worker, permanent.getHeader().getHeight(), permanent.getHeader().getBid().getPid(),
                             permanent.getHeader().getM().getChannel(),
                             permanent.getDataCount()));
-                }
 
                 DBUtils.writeBlockToTable(permanent);
                 Data.evacuateOldData(worker, permanent.getHeader().getM());
@@ -485,13 +493,13 @@ public abstract class ToyBaseServer {
             }
         }
         synchronized (cbl) {
-            synchronized (blocksForPropose) {
-                if (blocksForPropose.isEmpty()) {
+//            synchronized (blocksForPropose) {
+//                if (blocksForPropose.isEmpty()) {
                     missingTxs = maxTransactionInBlock - currBLock.getDataCount();
-                }
-            }
+//                }
+//            }
         }
-        if (missingTxs !=  -1) {
+        if (missingTxs >  0) {
             for (int i = 0 ; i < missingTxs ; i++) {
 //                long ts = System.currentTimeMillis();
                 SecureRandom random = new SecureRandom();
@@ -552,7 +560,7 @@ public abstract class ToyBaseServer {
                 fp.put(forkPoint, false);
             }
 
-            updateSyncEvents(worker);
+            Statistics.updateSyncs();
             sync(forkPoint);
 
         }

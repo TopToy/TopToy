@@ -10,6 +10,7 @@ import io.grpc.netty.NettyServerBuilder;
 import io.grpc.stub.StreamObserver;
 import proto.CommunicationGrpc;
 import proto.Types;
+import utils.statistics.Statistics;
 
 import java.io.IOException;
 import java.util.*;
@@ -80,7 +81,7 @@ public class CliqueRpcs  extends CommunicationGrpc.CommunicationImplBase {
         this.n = n;
         this.workers = workers;
     }
-    // TODO: Re configure grpc server so it would be anble to handle mass of messages.
+    // TODO: Re configure grpc server so it would be enable to handle mass of messages.
     public void start() {
 //        Executor executor = Executors.newFixedThreadPool(n);
         rpcServer =
@@ -88,7 +89,7 @@ public class CliqueRpcs  extends CommunicationGrpc.CommunicationImplBase {
                 .forPort(nodes.get(id).getPort())
                 .addService(this)
                 .maxInboundMessageSize(16 * 1024 * 1024)
-//                .maxConcurrentCallsPerConnection(2 * n * workers)
+                .maxConcurrentCallsPerConnection(10)
 //                .executor(executor)
                 .build();
         try {
@@ -104,7 +105,7 @@ public class CliqueRpcs  extends CommunicationGrpc.CommunicationImplBase {
     }
 
     public void shutdown() {
-        rpcServer.shutdown();
+        rpcServer.shutdownNow();
         for (Peer p : peers.values()) {
             p.shutdown();
         }
@@ -122,21 +123,22 @@ public class CliqueRpcs  extends CommunicationGrpc.CommunicationImplBase {
     }
 
     private void sendImpl(Types.Comm msg, Peer p) {
-            p.stub.dsm(msg, new StreamObserver<Types.Empty>() {
-                @Override
-                public void onNext(Types.Empty empty) {
-
-                }
-
-                @Override
-                public void onError(Throwable throwable) {
-
-                }
-
-                @Override
-                public void onCompleted() {
-                }
-            });
+        p.send(msg, msg.getChannel());
+//            p.stub.dsm(msg, new StreamObserver<Types.Empty>() {
+//                @Override
+//                public void onNext(Types.Empty empty) {
+//
+//                }
+//
+//                @Override
+//                public void onError(Throwable throwable) {
+//
+//                }
+//
+//                @Override
+//                public void onCompleted() {
+//                }
+//            });
     }
 
     public void send(int worker, Types.Block data, int[] recipients) {
@@ -197,7 +199,10 @@ public class CliqueRpcs  extends CommunicationGrpc.CommunicationImplBase {
                         synchronized (Data.blocks[pid][channel]) {
                             Data.blocks[pid][channel].putIfAbsent(bid, new LinkedList<>());
                             Data.blocks[pid][channel].computeIfPresent(bid, (k, v) -> {
+                                if (v.size() > 0) return v;
                                 v.add(commRes.getB());
+                                Statistics.addBlockStat(commRes.getB().getId());
+                                Statistics.updateBlockStatPT(commRes.getB().getId(), System.currentTimeMillis());
                                 return v;
                             });
                             Data.blocks[pid][channel].notifyAll();
@@ -224,9 +229,12 @@ public class CliqueRpcs  extends CommunicationGrpc.CommunicationImplBase {
         Data.blocks[pid][c].putIfAbsent(request.getData().getId(), new LinkedList<>());
         synchronized (Data.blocks[pid][c]) {
             Data.blocks[pid][c].computeIfPresent(request.getData().getId(), (k, v) -> {
+                if (v.contains(request.getData())) return v;
                 Types.BlockID bid = request.getData().getId();
                 logger.debug(format("[%d-%d] received block [pid=%d ; bid=%d]", id, c, bid.getPid(), bid.getBid()));
                 v.add(request.getData());
+                Statistics.addBlockStat(request.getData().getId());
+                Statistics.updateBlockStatPT(request.getData().getId(), System.currentTimeMillis());
                 return v;
             });
             Data.blocks[pid][c].notifyAll();

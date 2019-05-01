@@ -128,11 +128,12 @@ public class Blockchain {
     }
 
     public int lastIndex() {
-        int li = 0;
-        for (Map.Entry<Integer, Block> e: blocks.entrySet()) {
-            li = Math.max(li, e.getKey());
-        }
-        return  li;
+        return Collections.max(blocks.keySet(), Comparator.comparingInt(integer -> integer));
+//        int li = 0;
+//        for (Map.Entry<Integer, Block> e: blocks.entrySet()) {
+//            li = Math.max(li, e.getKey());
+//        }
+//        return  li;
 //        return max(blocks.keys());
     }
 

@@ -13,7 +13,7 @@ import das.data.Data;
 import das.data.VoteData;
 import proto.ObbcGrpc;
 import proto.Types;
-import utils.Statistics;
+import utils.statistics.Statistics;
 
 import java.util.ArrayList;
 import static das.data.Data.*;
@@ -26,10 +26,10 @@ public class OBBC extends ObbcGrpc.ObbcImplBase  {
     private static OBBCRpcs rpcs;
     private static CommLayer comm;
 
-    public OBBC(int id, int n, int f, int qSize,  ArrayList<Node> obbcCluster, CommLayer comm, String caRoot, String serverCrt,
+    public OBBC(int id, int n, int f, int workers, int qSize,  ArrayList<Node> obbcCluster, CommLayer comm, String caRoot, String serverCrt,
                 String serverPrivKey) {
         OBBC.id = id;
-        rpcs = new OBBCRpcs(id, n, f, qSize, obbcCluster, caRoot, serverCrt, serverPrivKey);
+        rpcs = new OBBCRpcs(id, n, f, workers, qSize, obbcCluster, caRoot, serverCrt, serverPrivKey);
         OBBC.comm = comm;
         logger.info(format("Initiated OBBC: [id=%d]", id));
 
@@ -94,7 +94,7 @@ public class OBBC extends ObbcGrpc.ObbcImplBase  {
                 .setSender(id)
                 .build(), key);
         if (!dec.getDec()) {
-            Statistics.updateNegTime(worker, System.currentTimeMillis() - start);
+            Statistics.updateNegTime(System.currentTimeMillis() - start);
         }
 
         return dec;

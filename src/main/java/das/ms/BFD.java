@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.PriorityQueue;
 
 import static java.lang.Math.max;
+import static java.lang.Math.min;
 
 public class BFD {
 
@@ -29,6 +30,13 @@ public class BFD {
 
     }
 
+    static public int getSuspected() {
+        int ms = size(0);
+        for (int i = 0 ; i < workers ; i++) {
+            ms = min(ms, size(i));
+        }
+        return ms;
+    }
     static public void activateAll() {
         for (int i = 0 ; i < workers ; i++) {
             activate(i);

@@ -4,14 +4,14 @@ import config.Config;
 //import crypto.rmfDigSig;
 import crypto.DigestMethod;
 import crypto.blockDigSig;
+import das.ms.BFD;
 import org.apache.commons.cli.*;
 import org.apache.commons.lang.ArrayUtils;
 import proto.Types;
-import utils.Statistics;
+import utils.statistics.Statistics;
 import utils.CSVUtils;
-import utils.DBUtils;
-import utils.DiskUtils;
 
+import javax.print.DocFlavor;
 import java.io.FileWriter;
 import java.io.File;
 import java.io.IOException;
@@ -29,7 +29,7 @@ import static java.lang.Math.min;
 import static java.lang.StrictMath.max;
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
-import static utils.Statistics.*;
+import static utils.statistics.Statistics.*;
 
 public class Cli {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Cli.class);
@@ -437,49 +437,66 @@ public class Cli {
                 FileWriter writer = null;
                 writer = new FileWriter(path.toString(), true);
 
-
-                Statistics st = getStatistics();
-                int nob = st.getNob();
-                double time = ((double) getStop() - getStart()) / 1000;
+                int nob = Statistics.getH2() - Statistics.getH1();
+                double time = ((double) Statistics.getStop() - Statistics.getStart()) / 1000;
                 int tps = 0;
                 int bps = 0;
                 if (time > 0) {
-                    tps = ((int) (st.getTxCount() / time));
+                    tps = ((int) (Statistics.getTxCount() / time));
                     bps = (int) (nob / time);
                 }
-                int pos = st.getPosDec();
-                int neg = st.getNegDec();
-                int opt = st.getOptimisticDec();
+
+                int pos = Statistics.getPos();
+                int neg = Statistics.getNeg();
+                int opt = Statistics.getOpt();
+                int all = Statistics.getAll();
                 double opRate = 0;
                 double posRate = 0;
                 double negRate = 0;
                 double avgNegDecTime = 0;
-                int avgTmo = st.getAvgTmo();
-                int avgActTmo = 0;
-                if (st.getPosDec() > 0) {
-                    opRate = ((double) opt) / ((double) st.getPosDec());
+                long avgTmo = 0;
+                long avgActTmo = 0;
+
+                if (pos > 0) {
+                    opRate = ((double) opt) / ((double) pos);
                 }
-                if (st.getTotalDec() > 0) {
-                    posRate = ((double) pos) / ((double) st.getTotalDec());
-                    negRate = ((double) neg) / ((double) st.getTotalDec());
-                    avgTmo = st.getAvgTmo() / st.getTotalDec();
-                    avgActTmo = st.getAvgActTmo() / st.getTotalDec();
+                if (all > 0) {
+                    posRate = ((double) pos) / ((double) all);
+                    negRate = ((double) neg) / ((double) all);
+                    avgTmo = Statistics.getTmo() / all;
+                    avgActTmo = Statistics.getActTmo() / all;
                 }
                 if (neg > 0) {
-                    avgNegDecTime = ((double) st.getTotalNegTime() / (double) neg);
+
+                    avgNegDecTime = ((double) Statistics.getNegTime() / (double) neg);
                 }
 
-                int txCount = st.getTxCount();
-                int syncEvents = st.getSyncEnvents();
-                int totalT = st.getTotalT();
-                int totalP = st.getTotalP();
-                double ATDT = 0;
-                double APDT = 0;
+                int txCount = Statistics.getTxCount();
+                int syncEvents = Statistics.getSyncs();
+                int totalT = Statistics.getTentatives();
+                int totalD = Statistics.getDeinites();
+                double BP2T = 0;
+                double BP2D = 0;
+                double BP2DL = 0;
+
+                double HP2T = 0;
+                double HP2D = 0;
+                double HP2DL = 0;
+                double HT2D = 0;
+                double HD2DL = 0;
+
                 int avgTxInBlock = 0;
                 if (nob > 0) {
-                    avgTxInBlock = st.getTxCount() / nob;
-                    ATDT = ((double) st.getHeadersTotalTD() / (double) nob);
-                    APDT = ((double) st.getHeadersTtoalPD() / (double) nob);
+                    avgTxInBlock = Statistics.getTxCount() / nob;
+                    BP2T = ((double) Statistics.getBlocksP2T() / (double) nob);
+                    BP2D = ((double) Statistics.getBlocksP2D() / (double) nob);
+                    BP2DL = ((double) Statistics.getBlocksP2DL() / (double) nob);
+
+                    HP2T = ((double) Statistics.getHeadersP2T() / (double) nob);
+                    HP2D = ((double) Statistics.getHeadersP2D() / (double) nob);
+                    HP2DL = ((double) Statistics.getHeadersD2DL() / (double) nob);
+                    HT2D = ((double) Statistics.getHeadersT2D() / (double) nob);
+                    HD2DL = ((double) Statistics.getHeadersD2DL() / (double) nob);
                 }
 
                 DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy-HH:mm:ss");
@@ -487,10 +504,11 @@ public class Cli {
 //                        String.valueOf(validateBC())
 //                        , dateFormat.format(new Date())
                          String.valueOf(JToy.s.getID())
-                        , JToy.type, String.valueOf(Config.getC())
+                        , JToy.type
+                        , String.valueOf(Config.getC())
                         , String.valueOf(avgTmo)
                         , String.valueOf(avgActTmo)
-                        , String.valueOf(st.getMaxTmo())
+                        , String.valueOf(Statistics.getMaxTmo())
                         , String.valueOf(Config.getTxSize())
                         , String.valueOf(Config.getMaxTransactionsInBlock())
                         , String.valueOf(txCount)
@@ -506,12 +524,17 @@ public class Cli {
                         , String.valueOf(neg)
                         , String.valueOf(negRate)
                         , String.valueOf(avgNegDecTime)
-                        , String.valueOf(ATDT)
-                        , String.valueOf(APDT)
                         , String.valueOf(totalT)
-                        , String.valueOf(totalP)
+                        , String.valueOf(totalD)
                         , String.valueOf(syncEvents)
-                        , String.valueOf(st.getSuspected())
+                        , String.valueOf(BP2T)
+                        , String.valueOf(BP2T)
+                        , String.valueOf(BP2DL)
+                        , String.valueOf(HP2T)
+                        , String.valueOf(HP2D)
+                        , String.valueOf(HP2DL)
+                        , String.valueOf(HD2DL)
+                        , String.valueOf(BFD.getSuspected())
                 );
                 CSVUtils.writeLine(writer, row);
                 writer.flush();

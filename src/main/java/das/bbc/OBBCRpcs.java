@@ -16,6 +16,8 @@ import proto.Types;
 import javax.net.ssl.SSLException;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import static das.data.Data.*;
 import static das.data.Data.bbcFastDec;
 import static io.grpc.Metadata.ASCII_STRING_MARSHALLER;
@@ -72,8 +74,10 @@ public class OBBCRpcs extends ObbcGrpc.ObbcImplBase {
     class Peer {
         ManagedChannel channel;
         ObbcGrpc.ObbcStub stub;
+        AtomicInteger[] pending;
+        int maxPending = 1000;
 
-        Peer(String addr, int port, String caRoot, String serverCrt, String serverPrivKey) {
+        Peer(String addr, int port, int workers, String caRoot, String serverCrt, String serverPrivKey) {
             try {
                 channel = sslUtils.buildSslChannel(addr, port,
                         sslUtils.buildSslContextForClient(caRoot,
@@ -82,10 +86,33 @@ public class OBBCRpcs extends ObbcGrpc.ObbcImplBase {
             } catch (SSLException e) {
                 logger.fatal("", e);
             }
-
+            pending = new AtomicInteger[workers];
+            for (int i = 0 ; i < workers ; i++) {
+                pending[i] = new AtomicInteger(0);
+            }
             stub = ObbcGrpc.newStub(channel);
         }
 
+        void send(Types.BbcMsg msg, int w) {
+//            if (pending[w].get() > maxPending) return;
+//            pending[w].incrementAndGet();
+            stub.fastVote(msg, new StreamObserver<Types.Empty>() {
+                @Override
+                public void onNext(Types.Empty empty) {
+//                    pending[w].decrementAndGet();
+                }
+
+                @Override
+                public void onError(Throwable throwable) {
+
+                }
+
+                @Override
+                public void onCompleted() {
+
+                }
+            });
+        }
         void shutdown() {
             channel.shutdown();
         }
@@ -102,8 +129,8 @@ public class OBBCRpcs extends ObbcGrpc.ObbcImplBase {
     String caRoot;
     String serverCrt;
     String serverPrivKey;
-
-    public OBBCRpcs(int id, int n, int f, int qSize, ArrayList<Node> obbcCluster, String caRoot, String serverCrt,
+    int workers;
+    public OBBCRpcs(int id, int n, int f, int workers, int qSize, ArrayList<Node> obbcCluster, String caRoot, String serverCrt,
                     String serverPrivKey) {
         this.id = id;
         this.nodes = obbcCluster;
@@ -113,6 +140,7 @@ public class OBBCRpcs extends ObbcGrpc.ObbcImplBase {
         this.caRoot = caRoot;
         this.serverCrt = serverCrt;
         this.serverPrivKey = serverPrivKey;
+        this.workers = workers;
         logger.info(format("Initiated OBBCRpcs: [id=%d; n=%d; f=%d; qSize=%d]", id, n, f, qSize));
     }
 
@@ -124,6 +152,7 @@ public class OBBCRpcs extends ObbcGrpc.ObbcImplBase {
                             caRoot, serverPrivKey)).
                             addService(this).
                             intercept(new authInterceptor()).
+//                            maxConcurrentCallsPerConnection(1000).
                             build().
                             start();
         } catch (IOException e) {
@@ -131,7 +160,7 @@ public class OBBCRpcs extends ObbcGrpc.ObbcImplBase {
         }
 
         for (Node n : nodes) {
-            peers.put(n.getID(), new Peer(n.getAddr(), n.getPort(), caRoot, serverCrt, serverPrivKey));
+            peers.put(n.getID(), new Peer(n.getAddr(), n.getPort(), workers, caRoot, serverCrt, serverPrivKey));
         }
     }
 
@@ -256,28 +285,13 @@ public class OBBCRpcs extends ObbcGrpc.ObbcImplBase {
         responseObserver.onCompleted();
     }
 
-    private void sendFVMessage(ObbcGrpc.ObbcStub stub, Types.BbcMsg v) {
-        stub.fastVote(v, new StreamObserver<>() {
-            @Override
-            public void onNext(Types.Empty empty) {
-
-            }
-
-            @Override
-            public void onError(Throwable throwable) {
-
-            }
-
-            @Override
-            public void onCompleted() {
-
-            }
-        });
+    private void sendFVMessage(Peer p, Types.BbcMsg v) {
+        p.send(v, v.getM().getChannel());
     }
 
     void broadcastFVMessage(Types.BbcMsg v) {
         for (int p : peers.keySet()) {
-            sendFVMessage(peers.get(p).stub, v);
+            sendFVMessage(peers.get(p), v);
         }
     }
 
