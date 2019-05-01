@@ -4079,667 +4079,6 @@ public final class Types {
 
   }
 
-  public interface HeaderStatisticsOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:proto.HeaderStatistics)
-      com.google.protobuf.MessageOrBuilder {
-
-    /**
-     * <pre>
-     * propose ts
-     * </pre>
-     *
-     * <code>int64 proposed = 1;</code>
-     */
-    long getProposed();
-
-    /**
-     * <pre>
-     * tentative decision
-     * </pre>
-     *
-     * <code>int64 TD = 2;</code>
-     */
-    long getTD();
-
-    /**
-     * <pre>
-     * permanent decision
-     * </pre>
-     *
-     * <code>int64 PD = 3;</code>
-     */
-    long getPD();
-  }
-  /**
-   * Protobuf type {@code proto.HeaderStatistics}
-   */
-  public  static final class HeaderStatistics extends
-      com.google.protobuf.GeneratedMessageV3 implements
-      // @@protoc_insertion_point(message_implements:proto.HeaderStatistics)
-      HeaderStatisticsOrBuilder {
-  private static final long serialVersionUID = 0L;
-    // Use HeaderStatistics.newBuilder() to construct.
-    private HeaderStatistics(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
-      super(builder);
-    }
-    private HeaderStatistics() {
-    }
-
-    @java.lang.Override
-    public final com.google.protobuf.UnknownFieldSet
-    getUnknownFields() {
-      return this.unknownFields;
-    }
-    private HeaderStatistics(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      this();
-      if (extensionRegistry == null) {
-        throw new java.lang.NullPointerException();
-      }
-      int mutable_bitField0_ = 0;
-      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder();
-      try {
-        boolean done = false;
-        while (!done) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              done = true;
-              break;
-            case 8: {
-
-              proposed_ = input.readInt64();
-              break;
-            }
-            case 16: {
-
-              tD_ = input.readInt64();
-              break;
-            }
-            case 24: {
-
-              pD_ = input.readInt64();
-              break;
-            }
-            default: {
-              if (!parseUnknownField(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
-          }
-        }
-      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
-      } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e).setUnfinishedMessage(this);
-      } finally {
-        this.unknownFields = unknownFields.build();
-        makeExtensionsImmutable();
-      }
-    }
-    public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
-      return proto.Types.internal_static_proto_HeaderStatistics_descriptor;
-    }
-
-    @java.lang.Override
-    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-        internalGetFieldAccessorTable() {
-      return proto.Types.internal_static_proto_HeaderStatistics_fieldAccessorTable
-          .ensureFieldAccessorsInitialized(
-              proto.Types.HeaderStatistics.class, proto.Types.HeaderStatistics.Builder.class);
-    }
-
-    public static final int PROPOSED_FIELD_NUMBER = 1;
-    private long proposed_;
-    /**
-     * <pre>
-     * propose ts
-     * </pre>
-     *
-     * <code>int64 proposed = 1;</code>
-     */
-    public long getProposed() {
-      return proposed_;
-    }
-
-    public static final int TD_FIELD_NUMBER = 2;
-    private long tD_;
-    /**
-     * <pre>
-     * tentative decision
-     * </pre>
-     *
-     * <code>int64 TD = 2;</code>
-     */
-    public long getTD() {
-      return tD_;
-    }
-
-    public static final int PD_FIELD_NUMBER = 3;
-    private long pD_;
-    /**
-     * <pre>
-     * permanent decision
-     * </pre>
-     *
-     * <code>int64 PD = 3;</code>
-     */
-    public long getPD() {
-      return pD_;
-    }
-
-    private byte memoizedIsInitialized = -1;
-    @java.lang.Override
-    public final boolean isInitialized() {
-      byte isInitialized = memoizedIsInitialized;
-      if (isInitialized == 1) return true;
-      if (isInitialized == 0) return false;
-
-      memoizedIsInitialized = 1;
-      return true;
-    }
-
-    @java.lang.Override
-    public void writeTo(com.google.protobuf.CodedOutputStream output)
-                        throws java.io.IOException {
-      if (proposed_ != 0L) {
-        output.writeInt64(1, proposed_);
-      }
-      if (tD_ != 0L) {
-        output.writeInt64(2, tD_);
-      }
-      if (pD_ != 0L) {
-        output.writeInt64(3, pD_);
-      }
-      unknownFields.writeTo(output);
-    }
-
-    @java.lang.Override
-    public int getSerializedSize() {
-      int size = memoizedSize;
-      if (size != -1) return size;
-
-      size = 0;
-      if (proposed_ != 0L) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt64Size(1, proposed_);
-      }
-      if (tD_ != 0L) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt64Size(2, tD_);
-      }
-      if (pD_ != 0L) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt64Size(3, pD_);
-      }
-      size += unknownFields.getSerializedSize();
-      memoizedSize = size;
-      return size;
-    }
-
-    @java.lang.Override
-    public boolean equals(final java.lang.Object obj) {
-      if (obj == this) {
-       return true;
-      }
-      if (!(obj instanceof proto.Types.HeaderStatistics)) {
-        return super.equals(obj);
-      }
-      proto.Types.HeaderStatistics other = (proto.Types.HeaderStatistics) obj;
-
-      if (getProposed()
-          != other.getProposed()) return false;
-      if (getTD()
-          != other.getTD()) return false;
-      if (getPD()
-          != other.getPD()) return false;
-      if (!unknownFields.equals(other.unknownFields)) return false;
-      return true;
-    }
-
-    @java.lang.Override
-    public int hashCode() {
-      if (memoizedHashCode != 0) {
-        return memoizedHashCode;
-      }
-      int hash = 41;
-      hash = (19 * hash) + getDescriptor().hashCode();
-      hash = (37 * hash) + PROPOSED_FIELD_NUMBER;
-      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
-          getProposed());
-      hash = (37 * hash) + TD_FIELD_NUMBER;
-      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
-          getTD());
-      hash = (37 * hash) + PD_FIELD_NUMBER;
-      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
-          getPD());
-      hash = (29 * hash) + unknownFields.hashCode();
-      memoizedHashCode = hash;
-      return hash;
-    }
-
-    public static proto.Types.HeaderStatistics parseFrom(
-        java.nio.ByteBuffer data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static proto.Types.HeaderStatistics parseFrom(
-        java.nio.ByteBuffer data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static proto.Types.HeaderStatistics parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static proto.Types.HeaderStatistics parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static proto.Types.HeaderStatistics parseFrom(byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static proto.Types.HeaderStatistics parseFrom(
-        byte[] data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static proto.Types.HeaderStatistics parseFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input);
-    }
-    public static proto.Types.HeaderStatistics parseFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input, extensionRegistry);
-    }
-    public static proto.Types.HeaderStatistics parseDelimitedFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseDelimitedWithIOException(PARSER, input);
-    }
-    public static proto.Types.HeaderStatistics parseDelimitedFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
-    }
-    public static proto.Types.HeaderStatistics parseFrom(
-        com.google.protobuf.CodedInputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input);
-    }
-    public static proto.Types.HeaderStatistics parseFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input, extensionRegistry);
-    }
-
-    @java.lang.Override
-    public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder() {
-      return DEFAULT_INSTANCE.toBuilder();
-    }
-    public static Builder newBuilder(proto.Types.HeaderStatistics prototype) {
-      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
-    }
-    @java.lang.Override
-    public Builder toBuilder() {
-      return this == DEFAULT_INSTANCE
-          ? new Builder() : new Builder().mergeFrom(this);
-    }
-
-    @java.lang.Override
-    protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-      Builder builder = new Builder(parent);
-      return builder;
-    }
-    /**
-     * Protobuf type {@code proto.HeaderStatistics}
-     */
-    public static final class Builder extends
-        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:proto.HeaderStatistics)
-        proto.Types.HeaderStatisticsOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
-          getDescriptor() {
-        return proto.Types.internal_static_proto_HeaderStatistics_descriptor;
-      }
-
-      @java.lang.Override
-      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-          internalGetFieldAccessorTable() {
-        return proto.Types.internal_static_proto_HeaderStatistics_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                proto.Types.HeaderStatistics.class, proto.Types.HeaderStatistics.Builder.class);
-      }
-
-      // Construct using proto.Types.HeaderStatistics.newBuilder()
-      private Builder() {
-        maybeForceBuilderInitialization();
-      }
-
-      private Builder(
-          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-        super(parent);
-        maybeForceBuilderInitialization();
-      }
-      private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessageV3
-                .alwaysUseFieldBuilders) {
-        }
-      }
-      @java.lang.Override
-      public Builder clear() {
-        super.clear();
-        proposed_ = 0L;
-
-        tD_ = 0L;
-
-        pD_ = 0L;
-
-        return this;
-      }
-
-      @java.lang.Override
-      public com.google.protobuf.Descriptors.Descriptor
-          getDescriptorForType() {
-        return proto.Types.internal_static_proto_HeaderStatistics_descriptor;
-      }
-
-      @java.lang.Override
-      public proto.Types.HeaderStatistics getDefaultInstanceForType() {
-        return proto.Types.HeaderStatistics.getDefaultInstance();
-      }
-
-      @java.lang.Override
-      public proto.Types.HeaderStatistics build() {
-        proto.Types.HeaderStatistics result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(result);
-        }
-        return result;
-      }
-
-      @java.lang.Override
-      public proto.Types.HeaderStatistics buildPartial() {
-        proto.Types.HeaderStatistics result = new proto.Types.HeaderStatistics(this);
-        result.proposed_ = proposed_;
-        result.tD_ = tD_;
-        result.pD_ = pD_;
-        onBuilt();
-        return result;
-      }
-
-      @java.lang.Override
-      public Builder clone() {
-        return super.clone();
-      }
-      @java.lang.Override
-      public Builder setField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
-        return super.setField(field, value);
-      }
-      @java.lang.Override
-      public Builder clearField(
-          com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return super.clearField(field);
-      }
-      @java.lang.Override
-      public Builder clearOneof(
-          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return super.clearOneof(oneof);
-      }
-      @java.lang.Override
-      public Builder setRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, java.lang.Object value) {
-        return super.setRepeatedField(field, index, value);
-      }
-      @java.lang.Override
-      public Builder addRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
-        return super.addRepeatedField(field, value);
-      }
-      @java.lang.Override
-      public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof proto.Types.HeaderStatistics) {
-          return mergeFrom((proto.Types.HeaderStatistics)other);
-        } else {
-          super.mergeFrom(other);
-          return this;
-        }
-      }
-
-      public Builder mergeFrom(proto.Types.HeaderStatistics other) {
-        if (other == proto.Types.HeaderStatistics.getDefaultInstance()) return this;
-        if (other.getProposed() != 0L) {
-          setProposed(other.getProposed());
-        }
-        if (other.getTD() != 0L) {
-          setTD(other.getTD());
-        }
-        if (other.getPD() != 0L) {
-          setPD(other.getPD());
-        }
-        this.mergeUnknownFields(other.unknownFields);
-        onChanged();
-        return this;
-      }
-
-      @java.lang.Override
-      public final boolean isInitialized() {
-        return true;
-      }
-
-      @java.lang.Override
-      public Builder mergeFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
-        proto.Types.HeaderStatistics parsedMessage = null;
-        try {
-          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
-        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (proto.Types.HeaderStatistics) e.getUnfinishedMessage();
-          throw e.unwrapIOException();
-        } finally {
-          if (parsedMessage != null) {
-            mergeFrom(parsedMessage);
-          }
-        }
-        return this;
-      }
-
-      private long proposed_ ;
-      /**
-       * <pre>
-       * propose ts
-       * </pre>
-       *
-       * <code>int64 proposed = 1;</code>
-       */
-      public long getProposed() {
-        return proposed_;
-      }
-      /**
-       * <pre>
-       * propose ts
-       * </pre>
-       *
-       * <code>int64 proposed = 1;</code>
-       */
-      public Builder setProposed(long value) {
-        
-        proposed_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <pre>
-       * propose ts
-       * </pre>
-       *
-       * <code>int64 proposed = 1;</code>
-       */
-      public Builder clearProposed() {
-        
-        proposed_ = 0L;
-        onChanged();
-        return this;
-      }
-
-      private long tD_ ;
-      /**
-       * <pre>
-       * tentative decision
-       * </pre>
-       *
-       * <code>int64 TD = 2;</code>
-       */
-      public long getTD() {
-        return tD_;
-      }
-      /**
-       * <pre>
-       * tentative decision
-       * </pre>
-       *
-       * <code>int64 TD = 2;</code>
-       */
-      public Builder setTD(long value) {
-        
-        tD_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <pre>
-       * tentative decision
-       * </pre>
-       *
-       * <code>int64 TD = 2;</code>
-       */
-      public Builder clearTD() {
-        
-        tD_ = 0L;
-        onChanged();
-        return this;
-      }
-
-      private long pD_ ;
-      /**
-       * <pre>
-       * permanent decision
-       * </pre>
-       *
-       * <code>int64 PD = 3;</code>
-       */
-      public long getPD() {
-        return pD_;
-      }
-      /**
-       * <pre>
-       * permanent decision
-       * </pre>
-       *
-       * <code>int64 PD = 3;</code>
-       */
-      public Builder setPD(long value) {
-        
-        pD_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <pre>
-       * permanent decision
-       * </pre>
-       *
-       * <code>int64 PD = 3;</code>
-       */
-      public Builder clearPD() {
-        
-        pD_ = 0L;
-        onChanged();
-        return this;
-      }
-      @java.lang.Override
-      public final Builder setUnknownFields(
-          final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFields(unknownFields);
-      }
-
-      @java.lang.Override
-      public final Builder mergeUnknownFields(
-          final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.mergeUnknownFields(unknownFields);
-      }
-
-
-      // @@protoc_insertion_point(builder_scope:proto.HeaderStatistics)
-    }
-
-    // @@protoc_insertion_point(class_scope:proto.HeaderStatistics)
-    private static final proto.Types.HeaderStatistics DEFAULT_INSTANCE;
-    static {
-      DEFAULT_INSTANCE = new proto.Types.HeaderStatistics();
-    }
-
-    public static proto.Types.HeaderStatistics getDefaultInstance() {
-      return DEFAULT_INSTANCE;
-    }
-
-    private static final com.google.protobuf.Parser<HeaderStatistics>
-        PARSER = new com.google.protobuf.AbstractParser<HeaderStatistics>() {
-      @java.lang.Override
-      public HeaderStatistics parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new HeaderStatistics(input, extensionRegistry);
-      }
-    };
-
-    public static com.google.protobuf.Parser<HeaderStatistics> parser() {
-      return PARSER;
-    }
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<HeaderStatistics> getParserForType() {
-      return PARSER;
-    }
-
-    @java.lang.Override
-    public proto.Types.HeaderStatistics getDefaultInstanceForType() {
-      return DEFAULT_INSTANCE;
-    }
-
-  }
-
   public interface BlockOrBuilder extends
       // @@protoc_insertion_point(interface_extends:proto.Block)
       com.google.protobuf.MessageOrBuilder {
@@ -18655,11 +17994,6 @@ public final class Types {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_proto_BbcMsg_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_proto_HeaderStatistics_descriptor;
-  private static final 
-    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_proto_HeaderStatistics_fieldAccessorTable;
-  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_proto_Block_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -18774,39 +18108,37 @@ public final class Types {
       "lockID\022\r\n\005empty\030\007 \001(\010\"p\n\006BbcMsg\022\026\n\001m\030\001 \001" +
       "(\0132\013.proto.Meta\022\014\n\004vote\030\002 \001(\010\022 \n\004next\030\003 " +
       "\001(\0132\022.proto.BlockHeader\022\016\n\006height\030\004 \001(\005\022" +
-      "\016\n\006sender\030\005 \001(\005\"<\n\020HeaderStatistics\022\020\n\010p" +
-      "roposed\030\001 \001(\003\022\n\n\002TD\030\002 \001(\003\022\n\n\002PD\030\003 \001(\003\"i\n" +
-      "\005Block\022\"\n\006header\030\001 \001(\0132\022.proto.BlockHead" +
-      "er\022\032\n\002id\030\002 \001(\0132\016.proto.BlockID\022 \n\004data\030\003" +
-      " \003(\0132\022.proto.Transaction\"3\n\004Comm\022\017\n\007chan" +
-      "nel\030\001 \001(\005\022\032\n\004data\030\002 \001(\0132\014.proto.Block\"G\n" +
-      "\004txID\022\022\n\nproposerID\030\001 \001(\005\022\013\n\003bid\030\002 \001(\005\022\r" +
-      "\n\005txNum\030\003 \001(\005\022\017\n\007channel\030\004 \001(\005\"F\n\013Transa" +
-      "ction\022\020\n\010clientID\030\001 \001(\005\022\027\n\002id\030\002 \001(\0132\013.pr" +
-      "oto.txID\022\014\n\004data\030\003 \001(\014\"7\n\010accepted\022\020\n\010ac" +
-      "cepted\030\001 \001(\010\022\031\n\004txID\030\002 \001(\0132\013.proto.txID\"" +
-      "U\n\007readReq\022\030\n\003tid\030\001 \001(\0132\013.proto.txID\022\036\n\002" +
-      "tx\030\002 \001(\0132\022.proto.Transaction\022\020\n\010blocking" +
-      "\030\003 \001(\010\"\027\n\010txStatus\022\013\n\003res\030\001 \001(\005\"S\n\tForkP" +
-      "roof\022\016\n\006sender\030\001 \001(\005\022\032\n\004curr\030\002 \001(\0132\014.pro" +
-      "to.Block\022\032\n\004prev\030\003 \001(\0132\014.proto.Block\"K\n\005" +
-      "RBMsg\022\026\n\001m\030\001 \001(\0132\013.proto.Meta\022\014\n\004type\030\002 " +
-      "\001(\005\022\014\n\004data\030\003 \001(\014\022\016\n\006sender\030\004 \001(\005\"\007\n\005Emp" +
-      "ty\"D\n\006WrbReq\022\032\n\005_meta\030\001 \001(\0132\013.proto.Meta" +
-      "\022\016\n\006height\030\002 \001(\005\022\016\n\006sender\030\003 \001(\005\"R\n\006WrbR" +
-      "es\022\026\n\001m\030\001 \001(\0132\013.proto.Meta\022 \n\004data\030\002 \001(\013" +
-      "2\022.proto.BlockHeader\022\016\n\006sender\030\003 \001(\005\"I\n\013" +
-      "EvidenceReq\022\032\n\005_meta\030\001 \001(\0132\013.proto.Meta\022" +
-      "\016\n\006height\030\002 \001(\005\022\016\n\006sender\030\003 \001(\005\"W\n\013Evide" +
-      "nceRes\022\026\n\001m\030\001 \001(\0132\013.proto.Meta\022 \n\004data\030\002" +
-      " \001(\0132\022.proto.BlockHeader\022\016\n\006sender\030\003 \001(\005" +
-      "\"`\n\017subChainVersion\022\021\n\tforkPoint\030\001 \001(\005\022\021" +
-      "\n\tsuggested\030\002 \001(\005\022\027\n\001v\030\003 \003(\0132\014.proto.Blo" +
-      "ck\022\016\n\006sender\030\004 \001(\005\",\n\007commReq\022!\n\005proof\030\001" +
-      " \001(\0132\022.proto.BlockHeader\"\"\n\007commRes\022\027\n\001b" +
-      "\030\001 \001(\0132\014.proto.Block\"\026\n\010startMsg\022\n\n\002id\030\001" +
-      " \001(\005\"$\n\tsuspected\022\n\n\002id\030\001 \001(\005\022\013\n\003tmo\030\002 \001" +
-      "(\005B\007\n\005protob\006proto3"
+      "\016\n\006sender\030\005 \001(\005\"i\n\005Block\022\"\n\006header\030\001 \001(\013" +
+      "2\022.proto.BlockHeader\022\032\n\002id\030\002 \001(\0132\016.proto" +
+      ".BlockID\022 \n\004data\030\003 \003(\0132\022.proto.Transacti" +
+      "on\"3\n\004Comm\022\017\n\007channel\030\001 \001(\005\022\032\n\004data\030\002 \001(" +
+      "\0132\014.proto.Block\"G\n\004txID\022\022\n\nproposerID\030\001 " +
+      "\001(\005\022\013\n\003bid\030\002 \001(\005\022\r\n\005txNum\030\003 \001(\005\022\017\n\007chann" +
+      "el\030\004 \001(\005\"F\n\013Transaction\022\020\n\010clientID\030\001 \001(" +
+      "\005\022\027\n\002id\030\002 \001(\0132\013.proto.txID\022\014\n\004data\030\003 \001(\014" +
+      "\"7\n\010accepted\022\020\n\010accepted\030\001 \001(\010\022\031\n\004txID\030\002" +
+      " \001(\0132\013.proto.txID\"U\n\007readReq\022\030\n\003tid\030\001 \001(" +
+      "\0132\013.proto.txID\022\036\n\002tx\030\002 \001(\0132\022.proto.Trans" +
+      "action\022\020\n\010blocking\030\003 \001(\010\"\027\n\010txStatus\022\013\n\003" +
+      "res\030\001 \001(\005\"S\n\tForkProof\022\016\n\006sender\030\001 \001(\005\022\032" +
+      "\n\004curr\030\002 \001(\0132\014.proto.Block\022\032\n\004prev\030\003 \001(\013" +
+      "2\014.proto.Block\"K\n\005RBMsg\022\026\n\001m\030\001 \001(\0132\013.pro" +
+      "to.Meta\022\014\n\004type\030\002 \001(\005\022\014\n\004data\030\003 \001(\014\022\016\n\006s" +
+      "ender\030\004 \001(\005\"\007\n\005Empty\"D\n\006WrbReq\022\032\n\005_meta\030" +
+      "\001 \001(\0132\013.proto.Meta\022\016\n\006height\030\002 \001(\005\022\016\n\006se" +
+      "nder\030\003 \001(\005\"R\n\006WrbRes\022\026\n\001m\030\001 \001(\0132\013.proto." +
+      "Meta\022 \n\004data\030\002 \001(\0132\022.proto.BlockHeader\022\016" +
+      "\n\006sender\030\003 \001(\005\"I\n\013EvidenceReq\022\032\n\005_meta\030\001" +
+      " \001(\0132\013.proto.Meta\022\016\n\006height\030\002 \001(\005\022\016\n\006sen" +
+      "der\030\003 \001(\005\"W\n\013EvidenceRes\022\026\n\001m\030\001 \001(\0132\013.pr" +
+      "oto.Meta\022 \n\004data\030\002 \001(\0132\022.proto.BlockHead" +
+      "er\022\016\n\006sender\030\003 \001(\005\"`\n\017subChainVersion\022\021\n" +
+      "\tforkPoint\030\001 \001(\005\022\021\n\tsuggested\030\002 \001(\005\022\027\n\001v" +
+      "\030\003 \003(\0132\014.proto.Block\022\016\n\006sender\030\004 \001(\005\",\n\007" +
+      "commReq\022!\n\005proof\030\001 \001(\0132\022.proto.BlockHead" +
+      "er\"\"\n\007commRes\022\027\n\001b\030\001 \001(\0132\014.proto.Block\"\026" +
+      "\n\010startMsg\022\n\n\002id\030\001 \001(\005\"$\n\tsuspected\022\n\n\002i" +
+      "d\030\001 \001(\005\022\013\n\003tmo\030\002 \001(\005B\007\n\005protob\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -18850,122 +18182,116 @@ public final class Types {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_BbcMsg_descriptor,
         new java.lang.String[] { "M", "Vote", "Next", "Height", "Sender", });
-    internal_static_proto_HeaderStatistics_descriptor =
-      getDescriptor().getMessageTypes().get(5);
-    internal_static_proto_HeaderStatistics_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_proto_HeaderStatistics_descriptor,
-        new java.lang.String[] { "Proposed", "TD", "PD", });
     internal_static_proto_Block_descriptor =
-      getDescriptor().getMessageTypes().get(6);
+      getDescriptor().getMessageTypes().get(5);
     internal_static_proto_Block_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_Block_descriptor,
         new java.lang.String[] { "Header", "Id", "Data", });
     internal_static_proto_Comm_descriptor =
-      getDescriptor().getMessageTypes().get(7);
+      getDescriptor().getMessageTypes().get(6);
     internal_static_proto_Comm_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_Comm_descriptor,
         new java.lang.String[] { "Channel", "Data", });
     internal_static_proto_txID_descriptor =
-      getDescriptor().getMessageTypes().get(8);
+      getDescriptor().getMessageTypes().get(7);
     internal_static_proto_txID_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_txID_descriptor,
         new java.lang.String[] { "ProposerID", "Bid", "TxNum", "Channel", });
     internal_static_proto_Transaction_descriptor =
-      getDescriptor().getMessageTypes().get(9);
+      getDescriptor().getMessageTypes().get(8);
     internal_static_proto_Transaction_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_Transaction_descriptor,
         new java.lang.String[] { "ClientID", "Id", "Data", });
     internal_static_proto_accepted_descriptor =
-      getDescriptor().getMessageTypes().get(10);
+      getDescriptor().getMessageTypes().get(9);
     internal_static_proto_accepted_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_accepted_descriptor,
         new java.lang.String[] { "Accepted", "TxID", });
     internal_static_proto_readReq_descriptor =
-      getDescriptor().getMessageTypes().get(11);
+      getDescriptor().getMessageTypes().get(10);
     internal_static_proto_readReq_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_readReq_descriptor,
         new java.lang.String[] { "Tid", "Tx", "Blocking", });
     internal_static_proto_txStatus_descriptor =
-      getDescriptor().getMessageTypes().get(12);
+      getDescriptor().getMessageTypes().get(11);
     internal_static_proto_txStatus_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_txStatus_descriptor,
         new java.lang.String[] { "Res", });
     internal_static_proto_ForkProof_descriptor =
-      getDescriptor().getMessageTypes().get(13);
+      getDescriptor().getMessageTypes().get(12);
     internal_static_proto_ForkProof_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_ForkProof_descriptor,
         new java.lang.String[] { "Sender", "Curr", "Prev", });
     internal_static_proto_RBMsg_descriptor =
-      getDescriptor().getMessageTypes().get(14);
+      getDescriptor().getMessageTypes().get(13);
     internal_static_proto_RBMsg_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_RBMsg_descriptor,
         new java.lang.String[] { "M", "Type", "Data", "Sender", });
     internal_static_proto_Empty_descriptor =
-      getDescriptor().getMessageTypes().get(15);
+      getDescriptor().getMessageTypes().get(14);
     internal_static_proto_Empty_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_Empty_descriptor,
         new java.lang.String[] { });
     internal_static_proto_WrbReq_descriptor =
-      getDescriptor().getMessageTypes().get(16);
+      getDescriptor().getMessageTypes().get(15);
     internal_static_proto_WrbReq_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_WrbReq_descriptor,
         new java.lang.String[] { "Meta", "Height", "Sender", });
     internal_static_proto_WrbRes_descriptor =
-      getDescriptor().getMessageTypes().get(17);
+      getDescriptor().getMessageTypes().get(16);
     internal_static_proto_WrbRes_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_WrbRes_descriptor,
         new java.lang.String[] { "M", "Data", "Sender", });
     internal_static_proto_EvidenceReq_descriptor =
-      getDescriptor().getMessageTypes().get(18);
+      getDescriptor().getMessageTypes().get(17);
     internal_static_proto_EvidenceReq_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_EvidenceReq_descriptor,
         new java.lang.String[] { "Meta", "Height", "Sender", });
     internal_static_proto_EvidenceRes_descriptor =
-      getDescriptor().getMessageTypes().get(19);
+      getDescriptor().getMessageTypes().get(18);
     internal_static_proto_EvidenceRes_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_EvidenceRes_descriptor,
         new java.lang.String[] { "M", "Data", "Sender", });
     internal_static_proto_subChainVersion_descriptor =
-      getDescriptor().getMessageTypes().get(20);
+      getDescriptor().getMessageTypes().get(19);
     internal_static_proto_subChainVersion_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_subChainVersion_descriptor,
         new java.lang.String[] { "ForkPoint", "Suggested", "V", "Sender", });
     internal_static_proto_commReq_descriptor =
-      getDescriptor().getMessageTypes().get(21);
+      getDescriptor().getMessageTypes().get(20);
     internal_static_proto_commReq_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_commReq_descriptor,
         new java.lang.String[] { "Proof", });
     internal_static_proto_commRes_descriptor =
-      getDescriptor().getMessageTypes().get(22);
+      getDescriptor().getMessageTypes().get(21);
     internal_static_proto_commRes_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_commRes_descriptor,
         new java.lang.String[] { "B", });
     internal_static_proto_startMsg_descriptor =
-      getDescriptor().getMessageTypes().get(23);
+      getDescriptor().getMessageTypes().get(22);
     internal_static_proto_startMsg_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_startMsg_descriptor,
         new java.lang.String[] { "Id", });
     internal_static_proto_suspected_descriptor =
-      getDescriptor().getMessageTypes().get(24);
+      getDescriptor().getMessageTypes().get(23);
     internal_static_proto_suspected_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_suspected_descriptor,

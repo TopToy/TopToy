@@ -437,7 +437,7 @@ public class Cli {
                 FileWriter writer = null;
                 writer = new FileWriter(path.toString(), true);
 
-                int nob = Statistics.getH2() - Statistics.getH1();
+                int nob = Statistics.getNob();
                 double time = ((double) Statistics.getStop() - Statistics.getStart()) / 1000;
                 int tps = 0;
                 int bps = 0;
@@ -473,8 +473,8 @@ public class Cli {
 
                 int txCount = Statistics.getTxCount();
                 int syncEvents = Statistics.getSyncs();
-                int totalT = Statistics.getTentatives();
-                int totalD = Statistics.getDeinites();
+//                int totalT = Statistics.getTentatives();
+//                int totalD = Statistics.getDeinites();
                 double BP2T = 0;
                 double BP2D = 0;
                 double BP2DL = 0;
@@ -494,7 +494,7 @@ public class Cli {
 
                     HP2T = ((double) Statistics.getHeadersP2T() / (double) nob);
                     HP2D = ((double) Statistics.getHeadersP2D() / (double) nob);
-                    HP2DL = ((double) Statistics.getHeadersD2DL() / (double) nob);
+                    HP2DL = ((double) Statistics.getHeadersP2DL() / (double) nob);
                     HT2D = ((double) Statistics.getHeadersT2D() / (double) nob);
                     HD2DL = ((double) Statistics.getHeadersD2DL() / (double) nob);
                 }
@@ -515,6 +515,7 @@ public class Cli {
                         , String.valueOf(time)
                         , String.valueOf(tps)
                         , String.valueOf(nob)
+                        , String.valueOf(Statistics.getNoeb())
                         , String.valueOf(bps)
                         , String.valueOf(avgTxInBlock)
                         , String.valueOf(opt)
@@ -524,15 +525,16 @@ public class Cli {
                         , String.valueOf(neg)
                         , String.valueOf(negRate)
                         , String.valueOf(avgNegDecTime)
-                        , String.valueOf(totalT)
-                        , String.valueOf(totalD)
+//                        , String.valueOf(totalT)
+//                        , String.valueOf(totalD)
                         , String.valueOf(syncEvents)
                         , String.valueOf(BP2T)
-                        , String.valueOf(BP2T)
+                        , String.valueOf(BP2D)
                         , String.valueOf(BP2DL)
                         , String.valueOf(HP2T)
                         , String.valueOf(HP2D)
                         , String.valueOf(HP2DL)
+                        , String.valueOf(HT2D)
                         , String.valueOf(HD2DL)
                         , String.valueOf(BFD.getSuspected())
                 );

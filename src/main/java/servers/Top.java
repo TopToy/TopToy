@@ -107,8 +107,6 @@ public class Top {
         logger.info(format("[%d] has initiated Membership", id));
         new DBUtils(workers);
         logger.info(format("[%d] has initiated DB TmoUtils", id));
-        new Statistics(workers);
-
     }
 
 

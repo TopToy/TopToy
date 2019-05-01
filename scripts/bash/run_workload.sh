@@ -348,7 +348,7 @@ collect_res_from_servers() {
         scp -o ConnectTimeout=30 -r ${s}:/tmp/JToy/res/* $tmp  > /dev/null
     done
 #    ./extract_workers_logs.sh $currOut/servers/logs ${channels}
-    echo "id,type,workers,tmo,actTmo,maxTmo,txSize,txInBlock,txTotal,duration,tps,nob,bps,avgTxInBlock,opt,opRate,pos,posRate,neg,negRate,avgNegTime,T,P,S,BP2T,BP2T,BP2DL,HP2T,HP2D,HP2DL,HD2DL,suspected" >> $sum
+    echo "id,type,workers,tmo,actTmo,maxTmo,txSize,txInBlock,txTotal,duration,tps,nob,noeb,bps,avgTxInBlock,opt,opRate,pos,posRate,neg,negRate,avgNegTime,S,BP2T,BP2D,BP2DL,HP2T,HP2D,HP2DL,HT2D,HD2DL,suspected" >> $sum
 
     for i in `seq 0 $((${#servers[@]} - 1))`; do
         echo "collecting results summery from server ${servers[$i]}"

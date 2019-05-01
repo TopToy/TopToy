@@ -20,8 +20,8 @@ public class Statistics {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Statistics.class);
 
     // Note that due to late nodes this list may grow infinitely. Currently we assume that this is an uncommon case.
-    static ConcurrentHashMap<Types.BlockID, BlockHeaderStatistics> headerStats;
-    static ConcurrentHashMap<Types.BlockID, BlockStatistics> blockStats;
+    static ConcurrentHashMap<Types.BlockID, BlockHeaderStatistics> headerStats = new ConcurrentHashMap<>();
+    static ConcurrentHashMap<Types.BlockID, BlockStatistics> blockStats = new ConcurrentHashMap<>();
 
     static private long start;
     static private long stop;
@@ -54,7 +54,8 @@ public class Statistics {
     static private long headersP2DL = 0;
     static private int tentatives = 0;
     static private int definites = 0;
-    static private long nob;
+    static private int noeb = 0;
+    static private int nob = 0;
 
     static final private Object lock = new Object();
     static public void updateAll() {
@@ -90,7 +91,7 @@ public class Statistics {
     static public void updateTentative(Types.BlockID bid) {
         if (!active) return;
         if (!blockStats.containsKey(bid)) {
-            logger.error("Invalid BID");
+            logger.error("(updateTentative) Invalid BID");
         }
         blockStats.computeIfPresent(bid, (k, b) -> {
             b.getHeaderStatistics().updateTentative();
@@ -101,7 +102,7 @@ public class Statistics {
     static public void updateDefinite(Types.BlockID bid) {
         if (!active) return;
         if (!blockStats.containsKey(bid)) {
-            logger.error("Invalid BID");
+            logger.error("(updateDefinite) Invalid BID");
         }
         blockStats.computeIfPresent(bid, (k, b) -> {
             b.getHeaderStatistics().updateDefinite();
@@ -133,7 +134,8 @@ public class Statistics {
     static public void updateHeaderPT(Types.BlockID bid, long pt) {
         if (!active) return;
         if (!headerStats.containsKey(bid)) {
-            logger.error("Invalid BID");
+//            logger.error("(updateHeaderPT) Invalid BID");
+            return;
         }
         headerStats.computeIfPresent(bid, (k, h) -> {
             h.setProposedTime(pt);
@@ -144,7 +146,8 @@ public class Statistics {
     static public void updateHeaderSender(Types.BlockID bid, int sender) {
         if (!active) return;
         if (!headerStats.containsKey(bid)) {
-            logger.error("Invalid BID");
+//            logger.error("(updateHeaderSender) Invalid BID");
+            return;
         }
         headerStats.computeIfPresent(bid, (k, h) -> {
             h.setSender(sender);
@@ -155,7 +158,8 @@ public class Statistics {
     static public void updateHeaderWorker(Types.BlockID bid, int worker) {
         if (!active) return;
         if (!headerStats.containsKey(bid)) {
-            logger.error("Invalid BID");
+//            logger.error("(updateHeaderWorker) Invalid BID");
+                return;
         }
         headerStats.computeIfPresent(bid, (k, h) -> {
             h.setWorker(worker);
@@ -181,7 +185,8 @@ public class Statistics {
     static public void updateHeaderHeight(Types.BlockID bid, int height) {
         if (!active) return;
         if (!headerStats.containsKey(bid)) {
-            logger.error("Invalid BID");
+//            logger.error("(updateHeaderHeight) Invalid BID");
+            return;
         }
         headerStats.computeIfPresent(bid, (k, h) -> {
             h.setHeight(height);
@@ -198,7 +203,8 @@ public class Statistics {
     static public void updateBlockStatSize(Types.BlockID bid, int size) {
         if (!active) return;
         if (!blockStats.containsKey(bid)) {
-            logger.error("Invalid BID");
+//            logger.error("(updateBlockStatSize) Invalid BID");
+            return;
         }
         blockStats.computeIfPresent(bid, (k, b) -> {
             b.setDataSize(size);
@@ -209,7 +215,8 @@ public class Statistics {
     static public void updateBlockStatPT(Types.BlockID bid, long pt) {
         if (!active) return;
         if (!blockStats.containsKey(bid)) {
-            logger.error("Invalid BID");
+//            logger.error("(updateBlockStatPT) Invalid BID");
+            return;
         }
         blockStats.computeIfPresent(bid, (k, b) -> {
             b.setProposedTime(pt);
@@ -218,8 +225,10 @@ public class Statistics {
     }
 
     static public void updateHeaderTT(Types.BlockID bid, long tt) {
+        if (!active) return;
         if (!blockStats.containsKey(bid)) {
-            logger.error("Invalid BID");
+//            logger.error("(updateHeaderTT) Invalid BID");
+            return;
         }
         blockStats.computeIfPresent(bid, (k, b) -> {
             b.getHeaderStatistics().setTentativeTime(tt);
@@ -228,8 +237,10 @@ public class Statistics {
     }
 
     static public void updateHeaderDT(Types.BlockID bid, long dt) {
+        if (!active) return;
         if (!blockStats.containsKey(bid)) {
-            logger.error("Invalid BID");
+//            logger.error("(updateHeaderDT) Invalid BID");
+            return;
         }
         blockStats.computeIfPresent(bid, (k, b) -> {
             b.getHeaderStatistics().setPermanentTime(dt);
@@ -266,7 +277,7 @@ public class Statistics {
                     BlockHeaderStatistics bhs = bs.getHeaderStatistics();
 
                     if (bs.getDataSize() == 0) {
-                        nob++;
+                        noeb++;
                     }
 
                     txCount += bs.getDataSize();
@@ -287,6 +298,8 @@ public class Statistics {
                     if (bhs.getTentative()) {
                         tentatives++;
                     }
+
+                    nob++;
 
                 }
             }
@@ -369,8 +382,8 @@ public class Statistics {
         return headersT2D;
     }
 
-    public static long getNob() {
-        return nob;
+    public static long getNoeb() {
+        return noeb;
     }
 
     public static long getTmo() {
@@ -385,12 +398,16 @@ public class Statistics {
         return tentatives;
     }
 
-    public static int getDeinites() {
+    public static int getDefinites() {
         return definites;
     }
 
     public static int getSyncs() {
         return syncs.get();
+    }
+
+    public static int getNob() {
+        return nob;
     }
 
     public static long getNegTime() {

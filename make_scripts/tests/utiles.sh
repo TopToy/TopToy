@@ -8,8 +8,8 @@ serve
 wait 30
 stStart
 wait ${1}
-wait 30
 stStop
+wait 30
 stop
 quit" > ${2}/inst/input.inst
 }
