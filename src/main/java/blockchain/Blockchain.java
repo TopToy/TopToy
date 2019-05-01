@@ -63,7 +63,7 @@ public class Blockchain {
         return true;
     }
 
-    public void setBlocks(List<Block> Nblocks, int start) throws IOException {
+    public void setBlocks(List<Block> Nblocks, int start)  {
         for (int i = start ; i < start + Nblocks.size() ; i++) {
             if (i > lastIndex()) {
                 addBlock(Nblocks.get(i - start));
@@ -74,13 +74,18 @@ public class Blockchain {
         }
     }
 
-    public void setBlock(int index, Block b) throws IOException {
+    public void setBlock(int index, Block b) {
         if (blocks.keySet().contains(index)) {
             blocks.replace(index, b);
             return;
         }
-        DiskUtils.deleteBlockFile(index, swapPath);
-        DiskUtils.cutBlock(b, swapPath);
+        try {
+            DiskUtils.deleteBlockFile(index, swapPath);
+            DiskUtils.cutBlock(b, swapPath);
+        } catch (IOException e) {
+            logger.error(e);
+        }
+
     }
 
     public boolean validateBlockHash(Block b) {

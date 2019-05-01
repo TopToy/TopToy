@@ -200,9 +200,10 @@ public class CliqueRpcs  extends CommunicationGrpc.CommunicationImplBase {
                             Data.blocks[pid][channel].putIfAbsent(bid, new LinkedList<>());
                             Data.blocks[pid][channel].computeIfPresent(bid, (k, v) -> {
                                 if (v.size() > 0) return v;
-                                v.add(commRes.getB());
-                                Statistics.addBlockStat(commRes.getB().getId());
-                                Statistics.updateBlockStatPT(commRes.getB().getId(), System.currentTimeMillis());
+                                v.add(commRes.getB().toBuilder()
+                                .setBst(Types.blockStatistics.newBuilder()
+                                        .setProposeTime(System.currentTimeMillis()).build())
+                                .build());
                                 return v;
                             });
                             Data.blocks[pid][channel].notifyAll();
@@ -232,9 +233,8 @@ public class CliqueRpcs  extends CommunicationGrpc.CommunicationImplBase {
                 if (v.contains(request.getData())) return v;
                 Types.BlockID bid = request.getData().getId();
                 logger.debug(format("[%d-%d] received block [pid=%d ; bid=%d]", id, c, bid.getPid(), bid.getBid()));
-                v.add(request.getData());
-                Statistics.addBlockStat(request.getData().getId());
-                Statistics.updateBlockStatPT(request.getData().getId(), System.currentTimeMillis());
+                v.add(request.getData().toBuilder().setBst(Types.blockStatistics.newBuilder()
+                        .setProposeTime(System.currentTimeMillis()).build()).build());
                 return v;
             });
             Data.blocks[pid][c].notifyAll();

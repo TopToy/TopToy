@@ -327,7 +327,10 @@ public class OBBCRpcs extends ObbcGrpc.ObbcImplBase {
                         if (!Data.pending[worker].containsKey(key)) {
                             logger.debug(format("[#%d-C[%d]] has evidence received message from [#%d] for [cidSeries=%d ; cid=%d]",
                                     id, worker, res.getSender(), cidSeries, cid));
-                            Data.pending[worker].putIfAbsent(key, res.getData());
+                            Data.pending[worker].putIfAbsent(key, res.getData()
+                            .toBuilder().setHst(Types.headerStatistics.newBuilder()
+                                            .setProposeTime(System.currentTimeMillis()).build())
+                            .build());
                         }
                     } else if (res.getData().equals(Types.BlockHeader.getDefaultInstance())) {
                         logger.debug(format("[#%d-C[%d]] has evidence received NULL message from [#%d] for [cidSeries=%d ; cid=%d]",

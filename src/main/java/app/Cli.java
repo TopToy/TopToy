@@ -1,4 +1,6 @@
 package app;
+import blockchain.Blockchain;
+import blockchain.data.BCS;
 import com.google.protobuf.ByteString;
 import config.Config;
 //import crypto.rmfDigSig;
@@ -428,7 +430,7 @@ public class Cli {
 //        }
         void writeSummery(String pathString) {
             logger.info("Starting writeSummery");
-            Path path = Paths.get(pathString,   String.valueOf(JToy.s.getID()), "summery.csv");
+            Path path = Paths.get(pathString, String.valueOf(JToy.s.getID()), "summery.csv");
             File f = new File(path.toString());
 
             try {
@@ -439,12 +441,72 @@ public class Cli {
                 FileWriter writer = null;
                 writer = new FileWriter(path.toString(), true);
 
-                int nob = Statistics.getNob();
+                int nob = 0;
+                int noeb = 0;
+                int txCount = 0;
+                long txSize = 0;
+                int txInBlock = 0;
+                int h1 = Statistics.getH1();
+                int h2 = Statistics.getH2();
+                int avgTxInBlock = 0;
+                double acBP2T = 0;
+                double acBP2D = 0;
+
+                double acHP2T = 0;
+                double acHP2D = 0;
+                double acHT2D = 0;
+                long readTime = System.currentTimeMillis();
                 double time = ((double) Statistics.getStop() - Statistics.getStart()) / 1000;
+                for (int i = 0 ; i < Config.getC() ; i++) {
+                    for (Types.Block b : BCS.getBlocks(i, h1, h2)) {
+                        nob++;
+                        if (b.getDataCount() == 0) {
+                            noeb++;
+                        }
+                        txCount += b.getDataCount();
+                        for (Types.Transaction t : b.getDataList()) {
+                            txSize += t.getData().size();
+                        }
+                        acBP2T += b.getHeader().getHst().getTentativeTime() - b.getBst()
+                                .getProposeTime();
+                        acBP2D += b.getHeader().getHst().getDefiniteTime() - b.getBst()
+                                .getProposeTime();
+
+                        acHP2T += b.getHeader().getHst().getTentativeTime() - b.getHeader().getHst()
+                                .getProposeTime();
+                        acHP2D += b.getHeader().getHst().getDefiniteTime() - b.getHeader().getHst()
+                                .getProposeTime();
+                        acHT2D += b.getHeader().getHst().getDefiniteTime() - b.getHeader().getHst()
+                                .getTentativeTime();
+
+                    }
+                }
+                avgTxInBlock = txCount / nob;
+                if (txCount > 0) {
+                    txSize = txSize / txCount;
+                }
+                if (nob > 0) {
+                    txInBlock = txCount / nob;
+                }
+                double BP2T = 0;
+                double BP2D = 0;
+
+                double HP2T = 0;
+                double HP2D = 0;
+                double HT2D = 0;
+
+                if (nob > 0) {
+                    BP2T = acBP2T / nob;
+                    BP2D = acBP2D / nob;
+                    HP2T = acHP2T / nob;
+                    HP2D = acHP2D / nob;
+                    HT2D = acHT2D / nob;
+                }
+
                 int tps = 0;
                 int bps = 0;
                 if (time > 0) {
-                    tps = ((int) (Statistics.getTxCount() / time));
+                    tps = ((int) (txCount / time));
                     bps = (int) (nob / time);
                 }
 
@@ -452,6 +514,7 @@ public class Cli {
                 int neg = Statistics.getNeg();
                 int opt = Statistics.getOpt();
                 int all = Statistics.getAll();
+
                 double opRate = 0;
                 double posRate = 0;
                 double negRate = 0;
@@ -472,52 +535,25 @@ public class Cli {
 
                     avgNegDecTime = ((double) Statistics.getNegTime() / (double) neg);
                 }
-
-                int txCount = Statistics.getTxCount();
                 int syncEvents = Statistics.getSyncs();
-//                int totalT = Statistics.getTentatives();
-//                int totalD = Statistics.getDeinites();
-                double BP2T = 0;
-                double BP2D = 0;
-                double BP2DL = 0;
-
-                double HP2T = 0;
-                double HP2D = 0;
-                double HP2DL = 0;
-                double HT2D = 0;
-                double HD2DL = 0;
-
-                int avgTxInBlock = 0;
-                if (nob > 0) {
-                    avgTxInBlock = Statistics.getTxCount() / nob;
-                    BP2T = ((double) Statistics.getBlocksP2T() / (double) nob);
-                    BP2D = ((double) Statistics.getBlocksP2D() / (double) nob);
-                    BP2DL = ((double) Statistics.getBlocksP2DL() / (double) nob);
-
-                    HP2T = ((double) Statistics.getHeadersP2T() / (double) nob);
-                    HP2D = ((double) Statistics.getHeadersP2D() / (double) nob);
-                    HP2DL = ((double) Statistics.getHeadersP2DL() / (double) nob);
-                    HT2D = ((double) Statistics.getHeadersT2D() / (double) nob);
-                    HD2DL = ((double) Statistics.getHeadersD2DL() / (double) nob);
-                }
-
-                DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy-HH:mm:ss");
+                boolean valid = BCS.isValid();
+                readTime = (System.currentTimeMillis() - readTime) / 1000;
                 List<String> row = Arrays.asList(
-//                        String.valueOf(validateBC())
-//                        , dateFormat.format(new Date())
-                         String.valueOf(JToy.s.getID())
+                        String.valueOf(valid)
+                        , String.valueOf(readTime)
+                        , String.valueOf(JToy.s.getID())
                         , JToy.type
                         , String.valueOf(Config.getC())
                         , String.valueOf(avgTmo)
                         , String.valueOf(avgActTmo)
                         , String.valueOf(Statistics.getMaxTmo())
-                        , String.valueOf(Config.getTxSize())
-                        , String.valueOf(Config.getMaxTransactionsInBlock())
+                        , String.valueOf(txSize)
+                        , String.valueOf(txInBlock)
                         , String.valueOf(txCount)
                         , String.valueOf(time)
                         , String.valueOf(tps)
                         , String.valueOf(nob)
-                        , String.valueOf(Statistics.getNoeb())
+                        , String.valueOf(noeb)
                         , String.valueOf(bps)
                         , String.valueOf(avgTxInBlock)
                         , String.valueOf(opt)
@@ -527,17 +563,12 @@ public class Cli {
                         , String.valueOf(neg)
                         , String.valueOf(negRate)
                         , String.valueOf(avgNegDecTime)
-//                        , String.valueOf(totalT)
-//                        , String.valueOf(totalD)
                         , String.valueOf(syncEvents)
                         , String.valueOf(BP2T)
                         , String.valueOf(BP2D)
-                        , String.valueOf(BP2DL)
                         , String.valueOf(HP2T)
                         , String.valueOf(HP2D)
-                        , String.valueOf(HP2DL)
                         , String.valueOf(HT2D)
-                        , String.valueOf(HD2DL)
                         , String.valueOf(BFD.getSuspected())
                 );
                 CSVUtils.writeLine(writer, row);

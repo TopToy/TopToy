@@ -174,9 +174,8 @@ public class OBBC extends ObbcGrpc.ObbcImplBase  {
         Types.BlockHeader.Builder nextBuilder = next
                 .toBuilder()
                 .setPrev(ByteString
-                        .copyFrom(DigestMethod
-                                .hash(curr.toByteArray())));
-        String signature = blockDigSig.sign(next);
+                        .copyFrom(blockDigSig.hashHeader(curr)));
+        String signature = blockDigSig.sign(nextBuilder.build());
         return nextBuilder
                 .setProof(signature)
                 .build();

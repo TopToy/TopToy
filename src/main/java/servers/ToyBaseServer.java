@@ -219,16 +219,16 @@ public abstract class ToyBaseServer {
 
     Types.Block getBlockWRTheader(Types.BlockHeader h, int channel) throws InterruptedException {
         if (h.getEmpty()) {
-            logger.debug(format("received an empty block, returning a match [w=%d ; cidSereis=%d ; cid=%d" +
-                            " ; height=%d ; pid=%d ; bid=%d]",
-                    channel, h.getM().getCidSeries(), h.getM().getCid(), h.getHeight(), h.getBid().getPid(),
-                    h.getBid().getBid()));
+            logger.debug(format("received an empty block, returning a match [w=%d ; " +
+                            "cidSereis=%d ; cid=%d ; height=%d ; pid=%d ; bid=%d]",
+                    channel, h.getM().getCidSeries(), h.getM().getCid(), h.getHeight(),
+                    h.getBid().getPid(), h.getBid().getBid()));
 
-
-            Statistics.addBlockStat(h.getBid());
-            Statistics.updateBlockStatPT(h.getBid(), System.currentTimeMillis());
-
-            return Block.newBuilder().setId(h.getBid()).build();
+            return Block.newBuilder().setBst(
+                    blockStatistics.newBuilder()
+                            .setProposeTime(System.currentTimeMillis())
+                            .build()
+            ).build();
         }
         return comm.recBlock(channel, h);
     }
@@ -312,12 +312,9 @@ public abstract class ToyBaseServer {
                         getID(), worker, currHeight, cidSeries, cid));
                 return true;
             }
-            Statistics.updateBlockStatSize(recBlock.getId(), recBlock.getDataCount());
+
             recBlock = recBlock.toBuilder().setHeader(recHeader).build();
 
-            Statistics.adjustHeaderStatAndBlockStat(recBlock.getId());
-            Statistics.updateHeaderTT(recBlock.getId(), System.currentTimeMillis());
-            Statistics.updateTentative(recBlock.getId());
 
             removeFromPendings(recHeader, recBlock);
 
@@ -335,16 +332,23 @@ public abstract class ToyBaseServer {
 //                                .setChannelDecided(System.currentTimeMillis()))
 //                        .build();
 
-            BCS.addBlock(worker, recBlock);
+            BCS.addBlock(worker, recBlock.toBuilder()
+                        .setHeader(recBlock.getHeader().toBuilder()
+                                    .setHst(recBlock.getHeader().getHst().toBuilder()
+                                            .setTentativeTime(System.currentTimeMillis())
+                                            .setTentative(true)))
+                    .build());
 //            bc.addBlock(recBlock);
 
             if (BCS.height(worker) > 0) {
+
                 Block permanent = BCS.nbGetBlock(worker, BCS.height(worker));
-
-                Statistics.updateHeaderDT(permanent.getId(), System.currentTimeMillis());
-                Statistics.updateDefinite(permanent.getId());
-                Statistics.registerStats();
-
+                BCS.setBlock(worker, BCS.height(worker), permanent.toBuilder()
+                            .setHeader(permanent.getHeader().toBuilder()
+                                        .setHst(permanent.getHeader().getHst().toBuilder()
+                                                .setDefiniteTime(System.currentTimeMillis())
+                                                .setTentative(false)))
+                .build());
                 logger.info(format("[#%d-C[%d]] Deliver [[height=%d], [sender=%d], [channel=%d], [size=%d]]",
                             getID(), worker, permanent.getHeader().getHeight(), permanent.getHeader().getBid().getPid(),
                             permanent.getHeader().getM().getChannel(),

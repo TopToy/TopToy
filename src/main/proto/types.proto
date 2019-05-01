@@ -31,6 +31,7 @@ message BlockHeader {
     string proof = 5;
     BlockID bid = 6;
     bool empty = 7;
+    headerStatistics hst = 8;
 }
 
 message BbcMsg {
@@ -41,17 +42,22 @@ message BbcMsg {
     int32 sender = 5;
 }
 
-//message HeaderStatistics {
-//    int64 proposed = 1; // propose ts
-//    int64 TD = 2; // tentative decision
-//    int64 PD = 3; // permanent decision
-//}
+message headerStatistics {
+    int64 proposeTime = 1;
+    int64 tentativeTime = 2;
+    int64 definiteTime = 3;
+    bool tentative = 5;
+}
+
+message blockStatistics {
+    int64 proposeTime = 1;
+}
 
 message Block {
     BlockHeader header = 1;
     BlockID id = 2;
     repeated Transaction data = 3;
-//    blockStatistics st = 4;
+    blockStatistics bst = 4;
 }
 
 message Comm {

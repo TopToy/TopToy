@@ -3,7 +3,6 @@ package das.data;
 import blockchain.data.BCS;
 import crypto.blockDigSig;
 import proto.Types;
-import utils.statistics.Statistics;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -25,7 +24,6 @@ public class Data {
     public static ConcurrentHashMap<Types.Meta, BbcDecData>[] bbcFastDec;
     public static ConcurrentHashMap<Types.Meta, BbcDecData>[] bbcRegDec;
     public static ConcurrentHashMap<Types.Meta, Types.BlockHeader>[] pending;
-//    public static ConcurrentHashMap<Types.Meta, Types.BlockHeader>[] received;
     public static ConcurrentHashMap<Types.Meta, VoteData>[] bbcVotes;
     public static Queue<Types.ForkProof>[] forksRBData;
     public static HashMap<Integer, List<Types.subChainVersion>>[] syncRBData;
@@ -33,32 +31,26 @@ public class Data {
     public static ConcurrentHashMap<Types.Meta, VoteData>[] fvData;
     public static ArrayList<Types.Meta>[] preConsDone;
 
-//    static public Object[] preConsNotifyer;
-
     public Data(int channels) {
         bbcFastDec = new ConcurrentHashMap[channels];
         bbcRegDec = new ConcurrentHashMap[channels];
         pending = new ConcurrentHashMap[channels];
-//        received = new ConcurrentHashMap[channels];
         bbcVotes = new ConcurrentHashMap[channels];
         forksRBData = new Queue[channels];
         syncRBData = new HashMap[channels];
         fvData = new ConcurrentHashMap[channels];
         preConsVote = new ConcurrentHashMap[channels];
         preConsDone = new ArrayList[channels];
-//        this.preConsNotifyer = new Object[channels];
         for (int i = 0 ; i < channels ; i++) {
             bbcFastDec[i] = new ConcurrentHashMap<>();
             bbcRegDec[i] = new ConcurrentHashMap<>();
             pending[i] = new ConcurrentHashMap<>();
-//            received[i] = new ConcurrentHashMap<>();
             bbcVotes[i] = new ConcurrentHashMap<>();
             forksRBData[i] = new LinkedList<>();
             syncRBData[i] = new HashMap<>();
             fvData[i] = new ConcurrentHashMap<>();
             preConsVote[i] = new ConcurrentHashMap<>();
             preConsDone[i] = new ArrayList<>();
-//            preConsNotifyer[i] = new Object();
         }
     }
 
@@ -80,7 +72,7 @@ public class Data {
         int worker = key.getChannel();
         int height = request.getHeight();
         if (!blockDigSig.verifyHeader(request.getBid().getPid(), request)) {
-            logger.debug(format("invalid pgb message [w=%d ; cidSeries=%d ; cid=%d ; sender=%d, height=%b]",
+            logger.debug(format("invalid pgb message [w=%d ; cidSeries=%d ; cid=%d ; sender=%d, height=%d]",
                     request.getM().getChannel(), request.getM().getCidSeries(), request.getM().getCid()
                     , request.getBid().getPid(), request.getHeight()));
 
@@ -88,14 +80,12 @@ public class Data {
         }
         if (BCS.contains(worker, height)) return;
         synchronized (pending[worker]) {
-            pending[worker].putIfAbsent(key, request);
+            pending[worker].putIfAbsent(key, request.toBuilder().setHst(
+                    Types.headerStatistics.newBuilder()
+                            .setProposeTime(System.currentTimeMillis()).build())
+                    .build());
             pending[worker].notify();
         }
-        Statistics.addHeaderStat(request.getBid());
-        Statistics.updateHeaderSender(request.getBid(), request.getBid().getPid());
-        Statistics.updateHeaderWorker(request.getBid(), request.getM().getChannel());
-        Statistics.updateHeaderPT(request.getBid(), System.currentTimeMillis());
-        Statistics.updateHeaderHeight(request.getBid(), request.getHeight());
     }
 
 

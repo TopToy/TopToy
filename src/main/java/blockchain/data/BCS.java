@@ -50,10 +50,10 @@ public class BCS {
         bcs[w].removeBlock(h);
     }
 
-    public static void setBlocks(int w, List<Types.Block> blocks, int start) throws IOException {
+    public static void setBlocks(int w, List<Types.Block> blocks, int start) {
         bcs[w].setBlocks(blocks, start);
     }
-
+    
     public static void notifyOnNewDifiniteBlock(int w) {
         synchronized (bcs[w]) {
             bcs[w].notifyAll();
@@ -62,6 +62,10 @@ public class BCS {
 
     public static Types.Block nbGetBlock(int w, int h) {
         return bcs[w].getBlock(h);
+    }
+
+    public static void setBlock(int w, int h, Types.Block b) {
+        bcs[w].setBlock(h, b);
     }
 
     public static boolean contains(int w, int h) {
