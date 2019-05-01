@@ -3,10 +3,10 @@ package utils.statistics;
 import proto.Types;
 
 public class BlockStatistics {
-    BlockHeaderStatistics headerStatistics;
-    Types.BlockID bid;
-    int dataSize;
-    long proposedTime;
+    BlockHeaderStatistics headerStatistics = null;
+    Types.BlockID bid = null;
+    int dataSize = 0;
+    long proposedTime = 0;
 
     public BlockStatistics setHeaderStatistics(BlockHeaderStatistics headerStatistics) {
         this.headerStatistics = headerStatistics;

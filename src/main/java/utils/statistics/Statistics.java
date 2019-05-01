@@ -90,10 +90,9 @@ public class Statistics {
 
     static public void updateTentative(Types.BlockID bid) {
         if (!active) return;
-        if (!blockStats.containsKey(bid)) {
-            logger.error("(updateTentative) Invalid BID");
-        }
+
         blockStats.computeIfPresent(bid, (k, b) -> {
+            if (b.getHeaderStatistics() == null) return null;
             b.getHeaderStatistics().updateTentative();
             return b;
         });
@@ -101,10 +100,8 @@ public class Statistics {
 
     static public void updateDefinite(Types.BlockID bid) {
         if (!active) return;
-        if (!blockStats.containsKey(bid)) {
-            logger.error("(updateDefinite) Invalid BID");
-        }
         blockStats.computeIfPresent(bid, (k, b) -> {
+            if (b.getHeaderStatistics() == null) return null;
             b.getHeaderStatistics().updateDefinite();
             return b;
         });
@@ -133,10 +130,6 @@ public class Statistics {
 
     static public void updateHeaderPT(Types.BlockID bid, long pt) {
         if (!active) return;
-        if (!headerStats.containsKey(bid)) {
-//            logger.error("(updateHeaderPT) Invalid BID");
-            return;
-        }
         headerStats.computeIfPresent(bid, (k, h) -> {
             h.setProposedTime(pt);
             return h;
@@ -145,10 +138,6 @@ public class Statistics {
 
     static public void updateHeaderSender(Types.BlockID bid, int sender) {
         if (!active) return;
-        if (!headerStats.containsKey(bid)) {
-//            logger.error("(updateHeaderSender) Invalid BID");
-            return;
-        }
         headerStats.computeIfPresent(bid, (k, h) -> {
             h.setSender(sender);
             return h;
@@ -157,10 +146,6 @@ public class Statistics {
 
     static public void updateHeaderWorker(Types.BlockID bid, int worker) {
         if (!active) return;
-        if (!headerStats.containsKey(bid)) {
-//            logger.error("(updateHeaderWorker) Invalid BID");
-                return;
-        }
         headerStats.computeIfPresent(bid, (k, h) -> {
             h.setWorker(worker);
             return h;
@@ -184,10 +169,6 @@ public class Statistics {
 
     static public void updateHeaderHeight(Types.BlockID bid, int height) {
         if (!active) return;
-        if (!headerStats.containsKey(bid)) {
-//            logger.error("(updateHeaderHeight) Invalid BID");
-            return;
-        }
         headerStats.computeIfPresent(bid, (k, h) -> {
             h.setHeight(height);
             return h;
@@ -202,10 +183,6 @@ public class Statistics {
 
     static public void updateBlockStatSize(Types.BlockID bid, int size) {
         if (!active) return;
-        if (!blockStats.containsKey(bid)) {
-//            logger.error("(updateBlockStatSize) Invalid BID");
-            return;
-        }
         blockStats.computeIfPresent(bid, (k, b) -> {
             b.setDataSize(size);
             return b;
@@ -214,10 +191,6 @@ public class Statistics {
 
     static public void updateBlockStatPT(Types.BlockID bid, long pt) {
         if (!active) return;
-        if (!blockStats.containsKey(bid)) {
-//            logger.error("(updateBlockStatPT) Invalid BID");
-            return;
-        }
         blockStats.computeIfPresent(bid, (k, b) -> {
             b.setProposedTime(pt);
             return b;
@@ -226,11 +199,9 @@ public class Statistics {
 
     static public void updateHeaderTT(Types.BlockID bid, long tt) {
         if (!active) return;
-        if (!blockStats.containsKey(bid)) {
-//            logger.error("(updateHeaderTT) Invalid BID");
-            return;
-        }
+
         blockStats.computeIfPresent(bid, (k, b) -> {
+            if (b.getHeaderStatistics() == null) return null;
             b.getHeaderStatistics().setTentativeTime(tt);
             return b;
         });
@@ -238,11 +209,9 @@ public class Statistics {
 
     static public void updateHeaderDT(Types.BlockID bid, long dt) {
         if (!active) return;
-        if (!blockStats.containsKey(bid)) {
-//            logger.error("(updateHeaderDT) Invalid BID");
-            return;
-        }
+
         blockStats.computeIfPresent(bid, (k, b) -> {
+            if (b.getHeaderStatistics() == null) return null;
             b.getHeaderStatistics().setPermanentTime(dt);
             return b;
         });
@@ -260,7 +229,9 @@ public class Statistics {
 
     static public void adjustHeaderStatAndBlockStat(Types.BlockID bid) {
         if (!active) return;
+
         blockStats.computeIfPresent(bid, (k, b) -> {
+            if (!headerStats.containsKey(k)) return null;
             b.setHeaderStatistics(headerStats.get(bid));
             headerStats.remove(bid);
             return b;

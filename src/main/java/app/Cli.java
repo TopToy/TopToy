@@ -25,6 +25,7 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static crypto.blockDigSig.hashBlockData;
 import static java.lang.Math.min;
 import static java.lang.StrictMath.max;
 import static java.lang.String.format;
@@ -266,11 +267,12 @@ public class Cli {
             return null;
         }
         private void signBlockFromBuilder(Types.Block.Builder b) {
-            byte[] tHash = new byte[0];
-            for (Types.Transaction t : b.getDataList()) {
-                tHash = DigestMethod.hash(ArrayUtils.addAll(tHash, t.toByteArray()));
-            }
-            b.setHeader(b.getHeader().toBuilder().setProof(blockDigSig.sign(b.getHeader()))).build();
+            byte[] tHash = hashBlockData(b.build());
+//            for (Types.Transaction t : b.getDataList()) {
+//                tHash = DigestMethod.hash(ArrayUtils.addAll(tHash, t.toByteArray()));
+//            }
+            b.setHeader(b.getHeader().toBuilder()
+                    .setProof(blockDigSig.sign(b.getHeader()))).build();
         }
         private Types.Block.Builder createBlock(int txSize) {
             Types.Block.Builder bb = Types.Block.newBuilder();

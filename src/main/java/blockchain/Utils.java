@@ -11,6 +11,9 @@ import proto.Types;
 import java.nio.file.Path;
 import java.util.Objects;
 
+import static crypto.blockDigSig.hashBlockData;
+import static crypto.blockDigSig.hashHeader;
+
 public class Utils {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Utils.class);
 
@@ -19,7 +22,7 @@ public class Utils {
     }
 
     static public boolean validateBlockHash(Types.Block prev, Types.Block b) {
-        byte[] d = DigestMethod.hash(prev.getHeader().toByteArray());
+        byte[] d = hashHeader(prev.getHeader());
         return DigestMethod.validate(b.getHeader().getPrev().toByteArray(),
                 Objects.requireNonNull(d));
     }
@@ -28,15 +31,15 @@ public class Utils {
                                                          int creatorID, int height, int cidSeries, int cid,
                                                          int channel, Types.BlockID bid) {
 
-        byte[] tHash = new byte[0];
-        for (Types.Transaction t : b.getDataList()) {
-            tHash = DigestMethod.hash(ArrayUtils.addAll(tHash, t.toByteArray()));
-        }
+        byte[] tHash = hashBlockData(b);
+//        for (Types.Transaction t : b.getDataList()) {
+//            tHash = DigestMethod.hash(ArrayUtils.addAll(tHash, t.toByteArray()));
+//        }
 
 
-        byte[] headerArray = new byte[0];
+        byte[] headerHash = new byte[0];
         if (header != null) {
-            headerArray = header.toByteArray();
+            headerHash = hashHeader(header);
         }
         Types.BlockHeader h = Types.BlockHeader.newBuilder()
                 .setM(Types.Meta.newBuilder()
@@ -46,7 +49,7 @@ public class Utils {
                 .setHeight(height)
                 .setBid(bid)
                 .setTransactionHash(ByteString.copyFrom(tHash))
-                .setPrev(ByteString.copyFrom(DigestMethod.hash(headerArray)))
+                .setPrev(ByteString.copyFrom(headerHash))
                 .setEmpty(b.getDataCount() == 0)
                 .build();
 

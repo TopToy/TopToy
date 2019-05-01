@@ -344,7 +344,7 @@ collect_res_from_servers() {
     mkdir -p $tmp
     for s in "${servers[@]}"; do
         echo "getting files from server ${s}"
-#        scp -o ConnectTimeout=30 -r ${s}:/tmp/JToy/logs/* $logs  > /dev/null
+        scp -o ConnectTimeout=30 -r ${s}:/tmp/JToy/logs/* $logs  > /dev/null
         scp -o ConnectTimeout=30 -r ${s}:/tmp/JToy/res/* $tmp  > /dev/null
     done
 #    ./extract_workers_logs.sh $currOut/servers/logs ${channels}
@@ -765,6 +765,12 @@ test1() {
 #    main_no_failures 0 0 7 9 2 10 10 300
     main_no_failures 0 0 10 10 1 10 10 60
     stop_aws_instances
+
+    start_aws_instances
+#    main_no_failures 0 0 7 9 2 10 10 300
+    main_no_failures 512 1000 10 10 1 10 10 60
+    stop_aws_instances
+
 
 #    start_aws_instances
 #    main_no_failures 512 10 1 5 2 10 10 300
