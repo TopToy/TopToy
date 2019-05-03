@@ -13,8 +13,11 @@ import static java.lang.String.format;
 import static java.util.Collections.max;
 
 import proto.Types.*;
+import utils.statistics.BCStat;
+import utils.statistics.Statistics;
 
 public class Blockchain {
+
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Blockchain.class);
     private final int creatorID;
     private int swapSize = 0;
@@ -23,6 +26,8 @@ public class Blockchain {
     private boolean swapAble = false;
 //    private final ConcurrentLinkedQueue<Block> blocks = new ConcurrentLinkedQueue();
     private final ConcurrentHashMap<Integer, Block> blocks = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer, BCStat> bsts = new ConcurrentHashMap<>();
+
     private Queue<Future> finishedTasks = new LinkedList<>();
     private Queue<Integer> tasksIdx = new LinkedList<>();
 
@@ -75,6 +80,14 @@ public class Blockchain {
     }
 
     public void setBlock(int index, Block b) {
+        if (Statistics.isActive()) {
+            BCStat st = new BCStat();
+            st.bst = b.getBst();
+            st.hst = b.getHeader().getHst();
+            st.txCount = b.getDataCount();
+            bsts.putIfAbsent(b.getHeader().getHeight(), st);
+        }
+
         if (blocks.keySet().contains(index)) {
             blocks.replace(index, b);
             return;
@@ -85,6 +98,7 @@ public class Blockchain {
         } catch (IOException e) {
             logger.error(e);
         }
+
 
     }
 
@@ -110,6 +124,11 @@ public class Blockchain {
         blocks.putIfAbsent(b.getHeader().getHeight(), b);
     }
 
+    public BCStat getBlockSts(int index) {
+        BCStat st = bsts.get(index);
+        bsts.remove(index);
+        return st;
+    }
     public Block getBlock(int index) {
         if (blocks.isEmpty()) return null;
         if (index > lastIndex()) return null;

@@ -297,7 +297,8 @@ print_headers() {
 run_servers_channels() {
     for i in `seq ${1} ${3} ${2}`; do
         chan=${i}
-        echo "[${i} channels]"
+#        echo "id,type,channels,txSize,maxTxInBlock,actualTxInBlock,height,signaturePeriod,verificationPeriod,propose2tentative,tentative2permanent,channelPermanent2decide,propose2permanentchannel,propose2decide" >> $currOut/servers/res/blocksStat_${i}.csv
+        echo "TEST [w=${chan} ; tx_size=${5} ; block_size=${6}]"
         run_servers_instance_with_cahnnels ${i} ${4}
         collect_res_from_servers
     done
@@ -371,7 +372,7 @@ collect_res_from_servers() {
         scp -o ConnectTimeout=30 -r ${s}:/tmp/JToy/res/* $tmp  > /dev/null
     done
 #    ./extract_workers_logs.sh $currOut/servers/logs ${channels}
-    echo "valid,readTime,id,type,workers,tmo,actTmo,maxTmo,txSize,txInBlock,txTotal,duration,tps,nob,noeb,bps,avgTxInBlock,opt,opRate,pos,posRate,neg,negRate,avgNegTime,syncs,BP2T,BP2D,HP2T,HP2D,HT2D,suspected" >> $sum
+    echo "valid,id,type,workers,tmo,actTmo,maxTmo,txSize,txInBlock,txTotal,duration,tps,nob,noeb,bps,avgTxInBlock,opt,opRate,pos,posRate,neg,negRate,avgNegTime,syncs,BP2T,BP2D,BP2DL,HP2T,HP2D,HP2DL,HT2D,HD2DL,suspected" >> $sum
 
     for i in `seq 0 $((${#servers[@]} - 1))`; do
         echo "collecting results summery from server ${servers[$i]}"
@@ -566,7 +567,8 @@ run_no_failures_test() {
         install_server ${i}
         cat ${tconfig_rb} > ${config_rb}
     done
-    run_servers_channels ${3} ${4} ${5} ${8}
+
+    run_servers_channels ${3} ${4} ${5} ${8} ${1} ${2}
 }
 
 # ${1} - transaction size
@@ -773,91 +775,86 @@ main_byz() {
 # ${8} - test time
 test1() {
 #
+
 #    start_aws_instances
-#    main_no_failures 0 0 1 5 2 10 10 300
+#    main_no_failures 0 0 1 5 2 100 100 300
 #    stop_aws_instances
+#    start_aws_instances
+#    main_no_failures 0 0 7 9 2 100 100 300
+#    main_no_failures 0 0 10 10 1 100 100 300
+#    stop_aws_instances
+#
+#    start_aws_instances
+#    main_no_failures 512 10 1 5 2 100 100 300
+#    stop_aws_instances
+#    start_aws_instances
+#    main_no_failures 512 10 7 9 2 100 100 300
+#    main_no_failures 512 10 10 10 1 100 100 300
+#    stop_aws_instances
+#
+#    start_aws_instances
+#    main_no_failures 512 100 1 5 2 100 100 300
+#    stop_aws_instances
+#    start_aws_instances
+#    main_no_failures 512 100 7 9 2 100 100 300
+#    main_no_failures 512 100 10 10 1 100 100 300
+#    stop_aws_instances
+#
+#    start_aws_instances
+#    main_no_failures 512 1000 1 5 2 100 100 300
+#    stop_aws_instances
+#    start_aws_instances
+#    main_no_failures 512 1000 7 9 2 100 100 300
+#    main_no_failures 512 1000 10 10 1 100 100 300
+#    stop_aws_instances
+
     start_aws_instances
-#    main_no_failures 0 0 7 9 2 10 10 300
-    main_no_failures 0 0 10 10 1 10 10 60
+    main_no_failures 1024 10 1 5 2 100 100 300
+    stop_aws_instances
+    start_aws_instances
+    main_no_failures 1024 10 7 9 2 100 100 300
+    main_no_failures 1024 10 10 10 1 100 100 300
     stop_aws_instances
 
     start_aws_instances
-#    main_no_failures 0 0 7 9 2 10 10 300
-    main_no_failures 512 1000 10 10 1 10 10 60
+    main_no_failures 1024 100 1 5 2 100 100 300
+    stop_aws_instances
+    start_aws_instances
+    main_no_failures 1024 100 7 9 2 100 100 300
+    main_no_failures 1024 100 10 10 1 100 100 300
     stop_aws_instances
 
+    start_aws_instances
+    main_no_failures 1024 1000 1 5 2 100 100 300
+    stop_aws_instances
+    start_aws_instances
+    main_no_failures 1024 1000 7 9 2 100 100 300
+    main_no_failures 1024 1000 10 10 1 100 100 300
+    stop_aws_instances
 
-#    start_aws_instances
-#    main_no_failures 512 10 1 5 2 10 10 300
-#    stop_aws_instances
-#    start_aws_instances
-#    main_no_failures 512 10 7 9 2 10 10 300
-#    main_no_failures 512 10 10 10 1 10 10 300
-#    stop_aws_instances
-#
-#    start_aws_instances
-#    main_no_failures 512 100 1 5 2 10 10 300
-#    stop_aws_instances
-#    start_aws_instances
-#    main_no_failures 512 100 7 9 2 10 10 300
-#    main_no_failures 512 100 10 10 1 10 10 300
-#    stop_aws_instances
-#
-#    start_aws_instances
-#    main_no_failures 512 1000 1 5 2 10 10 300
-#    stop_aws_instances
-#    start_aws_instances
-#    main_no_failures 512 1000 7 9 2 10 10 300
-#    main_no_failures 512 1000 10 10 1 10 10 300
-#    stop_aws_instances
-#
-#    start_aws_instances
-#    main_no_failures 1024 10 1 5 2 10 10 300
-#    stop_aws_instances
-#    start_aws_instances
-#    main_no_failures 1024 10 7 9 2 10 10 300
-#    main_no_failures 1024 10 10 10 1 10 10 300
-#    stop_aws_instances
-#
-#    start_aws_instances
-#    main_no_failures 1024 100 1 5 2 10 10 300
-#    stop_aws_instances
-#    start_aws_instances
-#    main_no_failures 1024 100 7 9 2 10 10 300
-#    main_no_failures 1024 100 10 10 1 10 10 300
-#    stop_aws_instances
-#
-#    start_aws_instances
-#    main_no_failures 1024 1000 1 5 2 10 10 300
-#    stop_aws_instances
-#    start_aws_instances
-#    main_no_failures 1024 1000 7 9 2 10 10 300
-#    main_no_failures 1024 1000 10 10 1 10 10 300
-#    stop_aws_instances
-#
-#    start_aws_instances
-#    main_no_failures 4096 10 1 5 2 10 10 300
-#    stop_aws_instances
-#    start_aws_instances
-#    main_no_failures 4096 10 7 9 2 10 10 300
-#    main_no_failures 4096 10 10 10 1 10 10 300
-#    stop_aws_instances
-#
-#    start_aws_instances
-#    main_no_failures 4096 100 1 5 2 10 10 300
-#    stop_aws_instances
-#    start_aws_instances
-#    main_no_failures 4096 100 7 9 2 10 10 300
-#    main_no_failures 4096 100 10 10 1 10 10 300
-#    stop_aws_instances
-#
-#    start_aws_instances
-#    main_no_failures 4096 1000 1 5 2 10 10 300
-#    stop_aws_instances
-#    start_aws_instances
-#    main_no_failures 4096 1000 7 9 2 10 10 300
-#    main_no_failures 4096 1000 10 10 1 10 10 300
-#    stop_aws_instances
+    start_aws_instances
+    main_no_failures 4096 10 1 5 2 100 100 300
+    stop_aws_instances
+    start_aws_instances
+    main_no_failures 4096 10 7 9 2 100 100 300
+    main_no_failures 4096 10 10 10 1 100 100 300
+    stop_aws_instances
+
+    start_aws_instances
+    main_no_failures 4096 100 1 5 2 100 100 300
+    stop_aws_instances
+    start_aws_instances
+    main_no_failures 4096 100 7 9 2 100 100 300
+    main_no_failures 4096 100 10 10 1 100 100 300
+    stop_aws_instances
+
+    start_aws_instances
+    main_no_failures 4096 1000 1 5 2 100 100 300
+    stop_aws_instances
+    start_aws_instances
+    main_no_failures 4096 1000 7 9 2 100 100 300
+    main_no_failures 4096 1000 10 10 1 100 100 300
+    stop_aws_instances
 
 
 }

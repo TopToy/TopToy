@@ -349,10 +349,13 @@ public abstract class ToyBaseServer {
                                                 .setDefiniteTime(System.currentTimeMillis())
                                                 .setTentative(false)))
                 .build());
-                logger.info(format("[#%d-C[%d]] Deliver [[height=%d], [sender=%d], [channel=%d], [size=%d]]",
+                if (permanent.getHeader().getHeight() % 1000 == 0) {
+                    logger.info(format("[#%d-C[%d]] Deliver [[height=%d], [sender=%d], [channel=%d], [size=%d]]",
                             getID(), worker, permanent.getHeader().getHeight(), permanent.getHeader().getBid().getPid(),
                             permanent.getHeader().getM().getChannel(),
                             permanent.getDataCount()));
+                }
+
 
                 DBUtils.writeBlockToTable(permanent);
                 Data.evacuateOldData(worker, permanent.getHeader().getM());
@@ -362,6 +365,7 @@ public abstract class ToyBaseServer {
                     Data.evacuateAllOldData(worker, permanent.getHeader().getM());
                     communication.data.Data.evacuateAllOldData(worker, permanent.getId());
                 }
+                BCS.notifyOnNewDifiniteBlock(worker);
             }
 
             logger.debug(String.format("[#%d-C[%d]] adds new Block with [height=%d] [cidSeries=%d ;" +
@@ -370,7 +374,7 @@ public abstract class ToyBaseServer {
                             .getDataCount()));
 
 //                newBlockNotifyer.notifyAll();
-            BCS.notifyOnNewDifiniteBlock(worker);
+
 
             updateLeaderAndHeight();
             BCS.writeNextToDiskAsync(worker);

@@ -3,6 +3,7 @@ package blockchain.data;
 import blockchain.Blockchain;
 import blockchain.Utils;
 import proto.Types;
+import utils.statistics.BCStat;
 
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -12,10 +13,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import static blockchain.Utils.createBlockchain;
 import static com.google.common.primitives.Ints.min;
 import static com.google.common.primitives.Ints.reverse;
+import static java.lang.Integer.max;
 
 public class BCS {
     static private Blockchain[] bcs;
-    final static Object lock = new Object();
+    final static Object newBlockNotifier = new Object();
     static int n;
     static int f;
     static int workers;
@@ -25,7 +27,7 @@ public class BCS {
         BCS.workers = workers;
         bcs = new Blockchain[workers];
         for (int i = 0 ; i < workers ; i++) {
-            bcs[i] = createBlockchain(Utils.BCT.SGC, id, n,
+            bcs[i] = createBlockchain(Utils.BCT.SGC, id, max(f + 2, 10), // TODO: check the cache size
                     Paths.get("blocks", String.valueOf(i)));
         }
     }
@@ -55,8 +57,8 @@ public class BCS {
     }
     
     public static void notifyOnNewDifiniteBlock(int w) {
-        synchronized (bcs[w]) {
-            bcs[w].notifyAll();
+        synchronized (newBlockNotifier) {
+            newBlockNotifier.notifyAll();
         }
     }
 
@@ -76,10 +78,19 @@ public class BCS {
         return bcs[w].getBlocks(low, high);
     }
 
-    public static Types.Block bGetBlock(int w, int h) throws InterruptedException {
-        synchronized (bcs[w]) {
+    public static BCStat bGetBCStat(int w, int h) throws InterruptedException {
+        synchronized (newBlockNotifier) {
             while (height() < h) {
-                bcs[w].wait();
+                newBlockNotifier.wait();
+            }
+            return bcs[w].getBlockSts(h);
+        }
+    }
+
+    public static Types.Block bGetBlock(int w, int h) throws InterruptedException {
+        synchronized (newBlockNotifier) {
+            while (height() < h) {
+                newBlockNotifier.wait();
             }
             return bcs[w].getBlock(h);
         }

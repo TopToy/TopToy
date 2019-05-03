@@ -441,66 +441,53 @@ public class Cli {
                 FileWriter writer = null;
                 writer = new FileWriter(path.toString(), true);
 
-                int nob = 0;
-                int noeb = 0;
-                int txCount = 0;
-                long txSize = 0;
-                int txInBlock = 0;
-                int h1 = Statistics.getH1();
-                int h2 = Statistics.getH2();
+                int nob = Statistics.getNob();
+                int noeb = Statistics.getNeb();
+                int txCount = Statistics.getTxCount();
+                long txSize = Config.getTxSize();
+                int txInBlock = Statistics.getTxInBlock();
+//                int h1 = Statistics.getH1();
+//                int h2 = Statistics.getH2();
                 int avgTxInBlock = 0;
-                double acBP2T = 0;
-                double acBP2D = 0;
+                double acBP2T = Statistics.getAcBP2T();
+                double acBP2D = Statistics.getAcBP2D();
+                double acBP2DL = Statistics.getAcBP2DL();
 
-                double acHP2T = 0;
-                double acHP2D = 0;
-                double acHT2D = 0;
-                long readTime = System.currentTimeMillis();
-                double time = ((double) Statistics.getStop() - Statistics.getStart()) / 1000;
-                for (int i = 0 ; i < Config.getC() ; i++) {
-                    for (Types.Block b : BCS.getBlocks(i, h1, h2)) {
-                        nob++;
-                        if (b.getDataCount() == 0) {
-                            noeb++;
-                        }
-                        txCount += b.getDataCount();
-                        for (Types.Transaction t : b.getDataList()) {
-                            txSize += t.getData().size();
-                        }
-                        acBP2T += b.getHeader().getHst().getTentativeTime() - b.getBst()
-                                .getProposeTime();
-                        acBP2D += b.getHeader().getHst().getDefiniteTime() - b.getBst()
-                                .getProposeTime();
+                double acHP2T = Statistics.getAcHP2T();
+                double acHP2D = Statistics.getAcHP2D();
+                double acHT2D = Statistics.getAcHT2D();
+                double acHP2DL = Statistics.getAcHP2DL();
+                double acHD2DL = Statistics.getAcHD2DL();
 
-                        acHP2T += b.getHeader().getHst().getTentativeTime() - b.getHeader().getHst()
-                                .getProposeTime();
-                        acHP2D += b.getHeader().getHst().getDefiniteTime() - b.getHeader().getHst()
-                                .getProposeTime();
-                        acHT2D += b.getHeader().getHst().getDefiniteTime() - b.getHeader().getHst()
-                                .getTentativeTime();
+                long time = (Statistics.getStop() - Statistics.getStart()) / 1000;
+                if (nob > 0) {
+                    avgTxInBlock = txCount / nob;
 
-                    }
                 }
-                avgTxInBlock = txCount / nob;
-                if (txCount > 0) {
-                    txSize = txSize / txCount;
-                }
+
                 if (nob > 0) {
                     txInBlock = txCount / nob;
                 }
                 double BP2T = 0;
                 double BP2D = 0;
+                double BP2DL = 0;
 
                 double HP2T = 0;
                 double HP2D = 0;
                 double HT2D = 0;
+                double HP2DL = 0;
+                double HD2DL = 0;
 
                 if (nob > 0) {
                     BP2T = acBP2T / nob;
                     BP2D = acBP2D / nob;
+                    BP2DL = acBP2DL / nob;
+
                     HP2T = acHP2T / nob;
                     HP2D = acHP2D / nob;
                     HT2D = acHT2D / nob;
+                    HP2DL = acHP2DL / nob;
+                    HD2DL = acHD2DL / nob;
                 }
 
                 int tps = 0;
@@ -536,11 +523,10 @@ public class Cli {
                     avgNegDecTime = ((double) Statistics.getNegTime() / (double) neg);
                 }
                 int syncEvents = Statistics.getSyncs();
-                boolean valid = BCS.isValid();
-                readTime = (System.currentTimeMillis() - readTime) / 1000;
+                boolean valid = true; //BCS.isValid();
+
                 List<String> row = Arrays.asList(
                         String.valueOf(valid)
-                        , String.valueOf(readTime)
                         , String.valueOf(JToy.s.getID())
                         , JToy.type
                         , String.valueOf(Config.getC())
@@ -566,9 +552,12 @@ public class Cli {
                         , String.valueOf(syncEvents)
                         , String.valueOf(BP2T)
                         , String.valueOf(BP2D)
+                        , String.valueOf(BP2DL)
                         , String.valueOf(HP2T)
                         , String.valueOf(HP2D)
+                        , String.valueOf(HP2DL)
                         , String.valueOf(HT2D)
+                        , String.valueOf(HD2DL)
                         , String.valueOf(BFD.getSuspected())
                 );
                 CSVUtils.writeLine(writer, row);

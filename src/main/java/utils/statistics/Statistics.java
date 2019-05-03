@@ -1,6 +1,7 @@
 package utils.statistics;
 
 import blockchain.data.BCS;
+import config.Config;
 import das.ms.BFD;
 import org.h2.mvstore.ConcurrentArrayList;
 import proto.Types;
@@ -9,6 +10,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -18,7 +22,7 @@ import static java.lang.String.format;
 
 public class Statistics {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Statistics.class);
-
+    static ExecutorService worker = Executors.newSingleThreadExecutor();
     static private long start;
     static private long stop;
 
@@ -36,62 +40,86 @@ public class Statistics {
     static private AtomicLong negTime = new AtomicLong(0);
 
 
-    static private boolean active = false;
+    static private AtomicBoolean active = new AtomicBoolean(false);
+
+    static int txCount = 0;
+    static int nob = 0;
+    static int neb = 0;
+    static int txSize = 0;
+    static int txInBlock = 0;
+
+    static double acBP2T = 0;
+    static double acBP2D = 0;
+    static double acBP2DL = 0;
+
+    static double acHP2T = 0;
+    static double acHP2D = 0;
+    static double acHT2D = 0;
+    static double acHP2DL = 0;
+    static double acHD2DL = 0;
 
     static public void updateAll() {
-        if (!active) return;
+        if (!active.get()) return;
         all.incrementAndGet();
     }
 
     static public void updateOpt() {
-        if (!active) return;
+        if (!active.get()) return;
         opt.incrementAndGet();
     }
 
     static public void updatePos() {
-        if (!active) return;
+        if (!active.get()) return;
         pos.incrementAndGet();
     }
 
     static public void updateNeg() {
-        if (!active) return;
+        if (!active.get()) return;
         neg.incrementAndGet();
     }
 
     static public void updateSyncs() {
-        if (!active) return;
+        if (!active.get()) return;
         syncs.incrementAndGet();
     }
 
     static public void updateNegTime(long time) {
-        if (!active) return;
+        if (!active.get()) return;
         negTime.addAndGet(time);
     }
 
     static public void activate() {
-        active = true;
+        active.set(true);
         h1 = BCS.height();
         start = System.currentTimeMillis();
+        worker.submit(() -> {
+            try {
+                collectReasults();
+            } catch (InterruptedException e) {
+                logger.error(e);
+            }
+        });
     }
 
     static public void deactivate() {
-        active = false;
+        active.set(false);
         h2 = BCS.height();
         stop = System.currentTimeMillis();
+        worker.shutdownNow();
     }
 
     static public void updateTmo(int newTmo) {
-        if (!active) return;
+        if (!active.get()) return;
         tmo.addAndGet(newTmo);
     }
 
     static public void updateActTmo(int newActTmo) {
-        if (!active) return;
+        if (!active.get()) return;
         tmo.addAndGet(newActTmo);
     }
 
     static public void updateMaxTmo(int newMaxTmo) {
-        if (!active) return;
+        if (!active.get()) return;
         maxTmo.set(max(maxTmo.get(), newMaxTmo));
     }
 
@@ -145,6 +173,102 @@ public class Statistics {
 
     public static long getNegTime() {
         return negTime.get();
+    }
+
+    public static int getTxCount() {
+        return txCount;
+    }
+
+    public static double getAcBP2D() {
+        return acBP2D;
+    }
+
+    public static double getAcBP2T() {
+        return acBP2T;
+    }
+
+    public static double getAcHP2D() {
+        return acHP2D;
+    }
+
+    public static double getAcHP2T() {
+        return acHP2T;
+    }
+
+    public static double getAcHT2D() {
+        return acHT2D;
+    }
+
+    public static int getNeb() {
+        return neb;
+    }
+
+    public static int getNob() {
+        return nob;
+    }
+
+    public static int getTxInBlock() {
+        return txInBlock;
+    }
+
+//    public static int getTxSize() {
+//        return txSize;
+//    }
+
+    public static double getAcBP2DL() {
+        return acBP2DL;
+    }
+
+    public static double getAcHD2DL() {
+        return acHD2DL;
+    }
+
+    public static double getAcHP2DL() {
+        return acHP2DL;
+    }
+
+    public static boolean isActive() {
+        return active.get();
+    }
+
+    static void collectForBlock(BCStat b) {
+        long curr = System.currentTimeMillis();
+        nob++;
+        if (b.txCount == 0) {
+            neb++;
+        }
+        txCount += b.txCount;
+//        for (Types.Transaction t : b.getDataList()) {
+//            txSize += t.getData().size();
+//        }
+        acBP2T += b.hst.getTentativeTime() - b.bst
+                .getProposeTime();
+        acBP2D += b.hst.getDefiniteTime() - b.bst
+                .getProposeTime();
+
+        acBP2DL += curr - b.bst.getProposeTime();
+
+        acHP2T += b.hst.getTentativeTime() - b.hst
+                .getProposeTime();
+        acHP2D += b.hst.getDefiniteTime() - b.hst
+                .getProposeTime();
+        acHT2D += b.hst.getDefiniteTime() - b.hst
+                .getTentativeTime();
+        acHP2DL += curr - b.hst.getProposeTime();
+        acHD2DL += curr - b.hst.getDefiniteTime();
+    }
+
+    static void collectReasults() throws InterruptedException {
+        int workers = Config.getC();
+        int h = getH1();
+        while (active.get()) {
+            for (int i = 0 ; i < workers ; i++) {
+                BCStat b = BCS.bGetBCStat(i, h);
+                if (b == null) continue;
+                collectForBlock(b);
+            }
+            h++;
+        }
     }
 
 }
