@@ -413,6 +413,7 @@ public abstract class ToyBaseServer {
     public txID addTransaction(Transaction tx) {
         if (getTxPoolSize() > txPoolMax) return null;
         synchronized (cbl) {
+            if (currBLock.getDataCount() + 1 > maxTransactionInBlock) return null;
             int cbid = currBLock.getId().getBid();
             int txnum = currBLock.getDataCount();
             Transaction ntx = tx.toBuilder()
@@ -426,7 +427,7 @@ public abstract class ToyBaseServer {
             if (validateTransactionWRTBlock(currBLock, ntx, v)) {
                 currBLock.addData(ntx);
             }
-            if (currBLock.getDataCount() >= maxTransactionInBlock) {
+            if (currBLock.getDataCount() == maxTransactionInBlock) {
                 synchronized (blocksForPropose) {
                     blocksForPropose.add(currBLock.build());
                     currBLock = configureNewBlock();
@@ -468,7 +469,7 @@ public abstract class ToyBaseServer {
         if (txCache.contains(tid)) {
             return txCache.get(tid);
         }
-        int height = DBUtils.getBlockRecord(tid.getChannel(), tid.getProposerID(), tid.getBid());
+        int height = DBUtils.getBlockRecord(tid.getChannel(), tid.getProposerID(), tid.getBid(), blocking);
         if (height == -1) return null;
         Block b;
         if (blocking) {
@@ -524,6 +525,24 @@ public abstract class ToyBaseServer {
             if (testing) {
                 createTxToBlock();
             }
+    }
+
+    void sendCurrentBlockIfNeeded() {
+        synchronized (cbl) {
+            if (currBLock.getDataCount() == 0) return;
+            synchronized (proposedBlocks) {
+                if (proposedBlocks.size() > 0) return;
+            }
+            synchronized (blocksForPropose) {
+                if (blocksForPropose.size() > 0) return;
+                logger.debug(format("Sending block [bid=%d:%d ; size=%d]",
+                        currBLock.getId().getPid(), currBLock.getId().getBid(), currBLock.getDataCount()));
+                blocksForPropose.add(currBLock.build());
+                currBLock = configureNewBlock();
+                blocksForPropose.notifyAll();
+            }
+        }
+
     }
 
     private void mainFork() throws InterruptedException, IOException {

@@ -101,6 +101,7 @@ message readReq {
     txID tid = 1;
     Transaction tx = 2;
     bool blocking = 3;
+    int32 cid = 4;
 }
 message txStatus {
     int32 res = 1;

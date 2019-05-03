@@ -4,6 +4,7 @@ import com.google.protobuf.ByteString;
 import config.Config;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import io.grpc.stub.StreamObserver;
 import proto.Types;
 import proto.clientServiceGrpc;
 import utils.CSVUtils;
@@ -18,6 +19,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.lang.String.format;
 
@@ -27,7 +29,7 @@ public class ClientTester {
 
     static int clientID;
     static String serverIP;
-    static int serverPort = 9876;
+    static int serverPort = 30100;
     static int testTXS = 0;
     static int latency = 0;
     static int txNum = 0;
@@ -36,8 +38,27 @@ public class ClientTester {
     static long  testTime = 0;
     static Queue<Integer> txTimes = new LinkedList<>();
     static Queue<Types.txID> txIds = new LinkedList<>();
+    static AtomicBoolean recorded = new AtomicBoolean(false);
+
 
     public static void main(String[] argv) {
+//        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+//            if (!recorded.get()) {
+//                try {
+//                    collectResults();
+//                    collectSummery();
+//                } catch (IOException e) {
+//                    logger.error(e);
+//                }
+//
+//            }
+////
+//        }));
+        try {
+            Thread.sleep(30 * 1000);
+        } catch (InterruptedException e) {
+            logger.error(e);
+        }
         clientID = Integer.parseInt(argv[0]);
         serverID = Integer.parseInt(argv[1]);
         testTXS = Integer.parseInt(argv[2]);
@@ -54,6 +75,7 @@ public class ClientTester {
         } catch (IOException e) {
             logger.error(e);
         }
+        System.out.println("Client goodbye :)");
 
     }
 
@@ -75,7 +97,7 @@ public class ClientTester {
                     .setData(ByteString.copyFrom(tx))
                     .setClientID(clientID)
                     .build());
-            Types.txStatus sts = stub.status(Types.readReq.newBuilder().setTid(tid)
+            Types.txStatus sts = stub.status(Types.readReq.newBuilder().setCid(clientID).setTid(tid)
                     .setBlocking(true).build());
             if (sts.getRes() != 0) {
                 logger.info("An uncommitted transaction");
@@ -93,7 +115,7 @@ public class ClientTester {
 
     static void collectResults() throws IOException {
         String pathString = "/tmp/JToy/res/";
-        Path path = Paths.get(pathString,   String.valueOf(JToy.s.getID()), "csummery.csv");
+        Path path = Paths.get(pathString,   String.valueOf(clientID), "csummery.csv");
         File f = new File(path.toString());
         if (!f.exists()) {
             f.getParentFile().mkdirs();
@@ -111,7 +133,6 @@ public class ClientTester {
                 , String.valueOf(serverID)
                 , String.valueOf(txSize)
                 , String.valueOf(testTime / 1000)
-                , String.valueOf(latency)
                 , String.valueOf(txNum)
                 , String.valueOf(tlatency)
         );
@@ -122,7 +143,7 @@ public class ClientTester {
 
     static void collectSummery() throws IOException {
         String pathString = "/tmp/JToy/res/";
-        Path path = Paths.get(pathString,   String.valueOf(JToy.s.getID()), "ctsummery.csv");
+        Path path = Paths.get(pathString,   String.valueOf(clientID), "ctsummery.csv");
         File f = new File(path.toString());
         if (!f.exists()) {
             f.getParentFile().mkdirs();
@@ -143,6 +164,7 @@ public class ClientTester {
                     , String.valueOf(txSize)
                     , String.valueOf(txTime)
             ));
+            n++;
         }
 
         CSVUtils.writeLines(writer, data);

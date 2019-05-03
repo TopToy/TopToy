@@ -17,6 +17,7 @@ public class DBUtils {
     static private ExecutorService worker = Executors.newSingleThreadExecutor();
     private static HashMap<Integer, Connection> rc = new HashMap<>();
     private static HashMap<Integer, Connection> wc = new HashMap<>();
+    private static final Object newWriteNotifier = new Object();
     public DBUtils(int workers) {
         try {
             Class.forName("org.h2.Driver");
@@ -112,15 +113,19 @@ public class DBUtils {
 
     static private void writeBlockToTable(int channel, int pid, int bid, int height) {
 //        createWriteConn(channel);
-        try {
-            Statement stmt = wc.get(channel).createStatement();
-            stmt.executeUpdate(format("INSERT INTO %s VALUES(%d, %d, %d)", getTableName(channel),
-                    pid, bid, height));
-            stmt.close();
+        synchronized (newWriteNotifier) {
+            try {
+                Statement stmt = wc.get(channel).createStatement();
+                stmt.executeUpdate(format("INSERT INTO %s VALUES(%d, %d, %d)", getTableName(channel),
+                        pid, bid, height));
+                stmt.close();
 //            System.out.println(format("insert [%d, %d, %d]", pid, bid, height));
-        } catch (SQLException e) {
-            logger.error(format("unable to create statement for tx [channel=%d]", channel), e);
+            } catch (SQLException e) {
+                logger.error(format("unable to create statement for tx [channel=%d]", channel), e);
+            }
+            newWriteNotifier.notifyAll();
         }
+
     }
 
     static public void writeBlockToTable(Types.Block b) {
@@ -149,16 +154,29 @@ public class DBUtils {
 //        }
 //    }
 
-    static public int getBlockRecord(int channel, int pid, int bid) {
+    static public int getBlockRecord(int worker, int pid, int bid, boolean blocking) throws InterruptedException {
+        if (!blocking) return getBlockRecord(worker, pid, bid);
+        int h = getBlockRecord(worker, pid, bid);
+        synchronized (newWriteNotifier) {
+            while (h == -1) {
+                newWriteNotifier.wait();
+                h = getBlockRecord(worker, pid, bid);
+            }
+        }
+        return h;
+
+    }
+
+    static private int getBlockRecord(int worker, int pid, int bid) {
 //        createReadConn(channel);
         try {
-            Statement stmt = rc.get(channel).createStatement();
+            Statement stmt = rc.get(worker).createStatement();
             ResultSet rs = stmt.executeQuery(format("SELECT height FROM %s WHERE pid=%d AND bid=%d",
-                    getTableName(channel), pid, bid));
+                    getTableName(worker), pid, bid));
             if (!rs.next()) return -1;
             return rs.getInt("height");
         } catch (SQLException e) {
-            logger.error(format("unable to create statement for read [channel=%d]", channel), e);
+            logger.error(format("unable to create statement for read [channel=%d]", worker), e);
             return -1;
         }
     }

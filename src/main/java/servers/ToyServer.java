@@ -36,6 +36,7 @@ public class ToyServer extends ToyBaseServer {
 
     BlockHeader leaderImpl() {
         addTransactionsToCurrBlock();
+        sendCurrentBlockIfNeeded();
         if (!configuredFastMode) {
             return normalLeaderPhase();
         }

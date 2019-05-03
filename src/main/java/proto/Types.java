@@ -9563,6 +9563,11 @@ public final class Types {
      * <code>bool blocking = 3;</code>
      */
     boolean getBlocking();
+
+    /**
+     * <code>int32 cid = 4;</code>
+     */
+    int getCid();
   }
   /**
    * <pre>
@@ -9638,6 +9643,11 @@ public final class Types {
             case 24: {
 
               blocking_ = input.readBool();
+              break;
+            }
+            case 32: {
+
+              cid_ = input.readInt32();
               break;
             }
             default: {
@@ -9723,6 +9733,15 @@ public final class Types {
       return blocking_;
     }
 
+    public static final int CID_FIELD_NUMBER = 4;
+    private int cid_;
+    /**
+     * <code>int32 cid = 4;</code>
+     */
+    public int getCid() {
+      return cid_;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -9746,6 +9765,9 @@ public final class Types {
       if (blocking_ != false) {
         output.writeBool(3, blocking_);
       }
+      if (cid_ != 0) {
+        output.writeInt32(4, cid_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -9766,6 +9788,10 @@ public final class Types {
       if (blocking_ != false) {
         size += com.google.protobuf.CodedOutputStream
           .computeBoolSize(3, blocking_);
+      }
+      if (cid_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(4, cid_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -9794,6 +9820,8 @@ public final class Types {
       }
       if (getBlocking()
           != other.getBlocking()) return false;
+      if (getCid()
+          != other.getCid()) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -9816,6 +9844,8 @@ public final class Types {
       hash = (37 * hash) + BLOCKING_FIELD_NUMBER;
       hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
           getBlocking());
+      hash = (37 * hash) + CID_FIELD_NUMBER;
+      hash = (53 * hash) + getCid();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -9969,6 +9999,8 @@ public final class Types {
         }
         blocking_ = false;
 
+        cid_ = 0;
+
         return this;
       }
 
@@ -10006,6 +10038,7 @@ public final class Types {
           result.tx_ = txBuilder_.build();
         }
         result.blocking_ = blocking_;
+        result.cid_ = cid_;
         onBuilt();
         return result;
       }
@@ -10062,6 +10095,9 @@ public final class Types {
         }
         if (other.getBlocking() != false) {
           setBlocking(other.getBlocking());
+        }
+        if (other.getCid() != 0) {
+          setCid(other.getCid());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -10348,6 +10384,32 @@ public final class Types {
       public Builder clearBlocking() {
         
         blocking_ = false;
+        onChanged();
+        return this;
+      }
+
+      private int cid_ ;
+      /**
+       * <code>int32 cid = 4;</code>
+       */
+      public int getCid() {
+        return cid_;
+      }
+      /**
+       * <code>int32 cid = 4;</code>
+       */
+      public Builder setCid(int value) {
+        
+        cid_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int32 cid = 4;</code>
+       */
+      public Builder clearCid() {
+        
+        cid_ = 0;
         onChanged();
         return this;
       }
@@ -19547,29 +19609,29 @@ public final class Types {
       "\005txNum\030\003 \001(\005\022\017\n\007channel\030\004 \001(\005\"F\n\013Transac" +
       "tion\022\020\n\010clientID\030\001 \001(\005\022\027\n\002id\030\002 \001(\0132\013.pro" +
       "to.txID\022\014\n\004data\030\003 \001(\014\"7\n\010accepted\022\020\n\010acc" +
-      "epted\030\001 \001(\010\022\031\n\004txID\030\002 \001(\0132\013.proto.txID\"U" +
+      "epted\030\001 \001(\010\022\031\n\004txID\030\002 \001(\0132\013.proto.txID\"b" +
       "\n\007readReq\022\030\n\003tid\030\001 \001(\0132\013.proto.txID\022\036\n\002t" +
       "x\030\002 \001(\0132\022.proto.Transaction\022\020\n\010blocking\030" +
-      "\003 \001(\010\"\027\n\010txStatus\022\013\n\003res\030\001 \001(\005\"S\n\tForkPr" +
-      "oof\022\016\n\006sender\030\001 \001(\005\022\032\n\004curr\030\002 \001(\0132\014.prot" +
-      "o.Block\022\032\n\004prev\030\003 \001(\0132\014.proto.Block\"K\n\005R" +
-      "BMsg\022\026\n\001m\030\001 \001(\0132\013.proto.Meta\022\014\n\004type\030\002 \001" +
-      "(\005\022\014\n\004data\030\003 \001(\014\022\016\n\006sender\030\004 \001(\005\"\007\n\005Empt" +
-      "y\"D\n\006WrbReq\022\032\n\005_meta\030\001 \001(\0132\013.proto.Meta\022" +
-      "\016\n\006height\030\002 \001(\005\022\016\n\006sender\030\003 \001(\005\"R\n\006WrbRe" +
-      "s\022\026\n\001m\030\001 \001(\0132\013.proto.Meta\022 \n\004data\030\002 \001(\0132" +
-      "\022.proto.BlockHeader\022\016\n\006sender\030\003 \001(\005\"I\n\013E" +
-      "videnceReq\022\032\n\005_meta\030\001 \001(\0132\013.proto.Meta\022\016" +
-      "\n\006height\030\002 \001(\005\022\016\n\006sender\030\003 \001(\005\"W\n\013Eviden" +
-      "ceRes\022\026\n\001m\030\001 \001(\0132\013.proto.Meta\022 \n\004data\030\002 " +
-      "\001(\0132\022.proto.BlockHeader\022\016\n\006sender\030\003 \001(\005\"" +
-      "`\n\017subChainVersion\022\021\n\tforkPoint\030\001 \001(\005\022\021\n" +
-      "\tsuggested\030\002 \001(\005\022\027\n\001v\030\003 \003(\0132\014.proto.Bloc" +
-      "k\022\016\n\006sender\030\004 \001(\005\",\n\007commReq\022!\n\005proof\030\001 " +
-      "\001(\0132\022.proto.BlockHeader\"\"\n\007commRes\022\027\n\001b\030" +
-      "\001 \001(\0132\014.proto.Block\"\026\n\010startMsg\022\n\n\002id\030\001 " +
-      "\001(\005\"$\n\tsuspected\022\n\n\002id\030\001 \001(\005\022\013\n\003tmo\030\002 \001(" +
-      "\005B\007\n\005protob\006proto3"
+      "\003 \001(\010\022\013\n\003cid\030\004 \001(\005\"\027\n\010txStatus\022\013\n\003res\030\001 " +
+      "\001(\005\"S\n\tForkProof\022\016\n\006sender\030\001 \001(\005\022\032\n\004curr" +
+      "\030\002 \001(\0132\014.proto.Block\022\032\n\004prev\030\003 \001(\0132\014.pro" +
+      "to.Block\"K\n\005RBMsg\022\026\n\001m\030\001 \001(\0132\013.proto.Met" +
+      "a\022\014\n\004type\030\002 \001(\005\022\014\n\004data\030\003 \001(\014\022\016\n\006sender\030" +
+      "\004 \001(\005\"\007\n\005Empty\"D\n\006WrbReq\022\032\n\005_meta\030\001 \001(\0132" +
+      "\013.proto.Meta\022\016\n\006height\030\002 \001(\005\022\016\n\006sender\030\003" +
+      " \001(\005\"R\n\006WrbRes\022\026\n\001m\030\001 \001(\0132\013.proto.Meta\022 " +
+      "\n\004data\030\002 \001(\0132\022.proto.BlockHeader\022\016\n\006send" +
+      "er\030\003 \001(\005\"I\n\013EvidenceReq\022\032\n\005_meta\030\001 \001(\0132\013" +
+      ".proto.Meta\022\016\n\006height\030\002 \001(\005\022\016\n\006sender\030\003 " +
+      "\001(\005\"W\n\013EvidenceRes\022\026\n\001m\030\001 \001(\0132\013.proto.Me" +
+      "ta\022 \n\004data\030\002 \001(\0132\022.proto.BlockHeader\022\016\n\006" +
+      "sender\030\003 \001(\005\"`\n\017subChainVersion\022\021\n\tforkP" +
+      "oint\030\001 \001(\005\022\021\n\tsuggested\030\002 \001(\005\022\027\n\001v\030\003 \003(\013" +
+      "2\014.proto.Block\022\016\n\006sender\030\004 \001(\005\",\n\007commRe" +
+      "q\022!\n\005proof\030\001 \001(\0132\022.proto.BlockHeader\"\"\n\007" +
+      "commRes\022\027\n\001b\030\001 \001(\0132\014.proto.Block\"\026\n\010star" +
+      "tMsg\022\n\n\002id\030\001 \001(\005\"$\n\tsuspected\022\n\n\002id\030\001 \001(" +
+      "\005\022\013\n\003tmo\030\002 \001(\005B\007\n\005protob\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -19660,7 +19722,7 @@ public final class Types {
     internal_static_proto_readReq_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_readReq_descriptor,
-        new java.lang.String[] { "Tid", "Tx", "Blocking", });
+        new java.lang.String[] { "Tid", "Tx", "Blocking", "Cid", });
     internal_static_proto_txStatus_descriptor =
       getDescriptor().getMessageTypes().get(13);
     internal_static_proto_txStatus_fieldAccessorTable = new

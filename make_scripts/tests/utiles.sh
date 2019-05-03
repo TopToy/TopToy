@@ -72,6 +72,10 @@ configure_tmo()  {
     sed -i 's/tmo =.*/tmo = '${1}'/g' ${2}/config.toml
 }
 
+configure_testing()  {
+    sed -i 's/testing =.*/testing = '${1}'/g' ${2}/config.toml
+}
+
 run_dockers(){
     docker-compose -f ${1} up
 }

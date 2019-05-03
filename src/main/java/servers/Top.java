@@ -41,8 +41,8 @@ public class Top {
     private AtomicBoolean stopped = new AtomicBoolean(false);
     private int maxTx;
     private Server txsServer;
-    private ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(1);
-    private EventLoopGroup gnio = new NioEventLoopGroup(2);
+//    private ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(1);
+//    private EventLoopGroup gnio = new NioEventLoopGroup(2);
 
 
     public Top(int id, int n, int f, int workers, int tmo, int tmoInterval,
@@ -172,11 +172,12 @@ public class Top {
 
         try {
             txsServer = NettyServerBuilder
-                    .forPort(9876)
-                    .executor(executor)
-                    .bossEventLoopGroup(gnio)
-                    .workerEventLoopGroup(gnio)
+                    .forPort(30100)
+//                    .executor(executor)
+//                    .bossEventLoopGroup(gnio)
+//                    .workerEventLoopGroup(gnio)
                     .addService(new ClientRpcsService(this))
+//                    .maxConcurrentCallsPerConnection(5) // TODO: Inspect this limit
                     .build()
                     .start();
             logger.info("starting client RPCs server");

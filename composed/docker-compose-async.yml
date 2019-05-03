@@ -49,8 +49,9 @@ services:
             toy_net:
                 ipv4_address: 172.18.0.6
 networks:
-    toy_net:
+    composed_toy_net:
         driver: bridge
+        external: true
         ipam:
             driver: default
             config:

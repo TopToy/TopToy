@@ -25,7 +25,7 @@ echo \
         - ${out}:/tmp/JToy
         - ${conf}:/JToy/bin/src/main/resources
         networks:
-            toy_net:
+            composed_toy_net:
                 ipv4_address: 172.18.0.$((${id} + 3))" \
             >> ${5}
 }
@@ -42,13 +42,15 @@ echo \
         environment:
         - CID=${id}
         - SID=${id}
-        - TXS=1000
+        - TXS=10
         volumes:
         - ${out}:/tmp/JToy
         - ${conf}:/JToy/bin/src/main/resources
+        depends_on:
+        - TS${id}
         networks:
-            toy_net:
-                ipv4_address: 172.18.1.$((${id} + 3))" \
+            composed_toy_net:
+                ipv4_address: 172.18.0.$((${id} + ${C} + 3))" \
             >> ${5}
 }
 
@@ -118,8 +120,9 @@ echo \
 compose_footer(){
     echo \
 "networks:
-    toy_net:
+    composed_toy_net:
         driver: bridge
+        external: true
         ipam:
             driver: default
             config:
@@ -167,7 +170,7 @@ compose_async_dockers() {
     done
 }
 
-compose_correct_dockers_with_clients() {
+compose_clients() {
     containers_n=$((${C} - 1))
     for i in `seq 0 ${containers_n}`; do
         compose_correct_server $i ${docker_image} ${cdest} ${docker_out} ${compose_file_correct_with_clients}
@@ -175,7 +178,7 @@ compose_correct_dockers_with_clients() {
     done
     for i in `seq 0 ${containers_n}`; do
 #        compose_correct_server $i ${docker_image} ${cdest} ${docker_out} ${compose_file_correct_with_clients}
-        compose_client $i ${cdocker_image} ${cldest} ${docker_out} ${compose_file_correct_with_clients}
+        compose_client $i ${cdocker_image} ${cldest} ${cdocker_out} ${compose_file_correct_with_clients}
     done
 }
 
@@ -189,7 +192,7 @@ main_correct(){
 main_correct_with_clients(){
     compose_header ${compose_file_correct_with_clients}
 #    compose_benign_network ${C} ${F}
-    compose_correct_dockers_with_clients
+    compose_clients
     compose_footer ${compose_file_correct_with_clients}
 }
 

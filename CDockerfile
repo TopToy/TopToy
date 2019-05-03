@@ -11,11 +11,10 @@ RUN export PATH="$PATH:${TOY_HOME}/bin"
 VOLUME /tmp/JToy
 VOLUME ${TOY_HOME}/bin/src/main/resources
 
-#expose Clients port
-#EXPOSE 14000
 ENV CID=0
 ENV SID=0
 ENV TXS=100
+
 #Copy configuration
 COPY cbin $TOY_HOME/bin
 
