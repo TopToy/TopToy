@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-home=/home/yoni/github.com/JToy
+home=~/JToy
 user=toy
 conf=${home}/configurations
 sbin=${home}/bin
@@ -19,4 +19,4 @@ servers_aws_ids=${data_dir}/awsInstanceIds.txt
 n=4
 f=1
 
-. ${utils_dir}/*.sh
+#source ${utils_dir}/*.sh

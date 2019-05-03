@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+source $PWD/utils/*.sh
+source $PWD/definitions.sh
 
 # ${1} tx size
 # ${2} max tx/block

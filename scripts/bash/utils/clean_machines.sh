@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+source $PWD/definitions.sh
+
 kill_clients() {
     local clients
     readarray -t clients < ${clients_ips}

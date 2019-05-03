@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+source $PWD/definitions.sh
+
 configure_tx_size() {
     sed -i 's/txSize = .*/txSize = '${1}'/g' ${2}
 }

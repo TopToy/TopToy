@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+source $PWD/utils/*.sh
+source $PWD/definitions.sh
 
 # ${1} tx size
 # ${2} max tx/block
@@ -120,11 +122,11 @@ configure_servers_workers() {
     readarray -t servers < ${servers_ips}
     local config_toml=${conf}/config.toml
     for s in "${servers[*]}"; do
-            configure_workers ${i} ${config_toml}
-            update_config_toml ${s} ${sbin} ${config_toml}
+        configure_workers ${i} ${config_toml}
+        update_config_toml ${s} ${sbin} ${config_toml}
     done
 
 }
 
-test_correct_tps_servers_over_workers 0 0 1 1 1 100 300
+test_clients_latency_over_workers 0 0 1 1 1 100 300
 

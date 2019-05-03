@@ -1,10 +1,14 @@
 #!/usr/bin/env bash
 
+source $PWD/utils/config_utils.sh
+source $PWD/definitions.sh
+
 start_aws_instances() {
     local servers
     readarray -t servers < ${servers_aws_ids}
     aws ec2 start-instances --instance-ids ${servers[*]}
     sleep 30
+
 }
 
 stop_aws_instances() {

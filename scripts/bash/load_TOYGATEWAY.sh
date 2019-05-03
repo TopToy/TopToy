@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
 tDir=$PWD/../../
-#config=${tDir}/Configurations/aws/4Servers2
-#config=${tDir}/Configurations/aws/1Servers
-#config=${tDir}/Configurations/aws/4ServersGD
-#config=${tDir}/Configurations/aws/7ServersGD
-#config=${tDir}/Configurations/aws/10ServersGD
-config=${tDir}/Configurations/aws/4Servers
-#config=${tDir}/Configurations/aws/7Servers
-#config=${tDir}/Configurations/aws/10Servers
-#config=${tDir}/Configurations/aws/49Servers
-#config=${tDir}/Configurations/aws/100Servers
-#config=${tDir}/Configurations/4Servers/remote
+#config=${tDir}/configurations/aws/4Servers2
+#config=${tDir}/configurations/aws/1Servers
+#config=${tDir}/configurations/aws/4ServersGD
+#config=${tDir}/configurations/aws/7ServersGD
+#config=${tDir}/configurations/aws/10ServersGD
+config=${tDir}/configurations/aws/4Servers
+#config=${tDir}/configurations/aws/7Servers
+#config=${tDir}/configurations/aws/10Servers
+#config=${tDir}/configurations/aws/49Servers
+#config=${tDir}/configurations/aws/100Servers
+#config=${tDir}/configurations/4Servers/remote
 readarray -t gate < ./data/gateway.txt
 mvn install -f ${tDir}/pom.xml -DskipTests
 if [[ "$?" -ne 0 ]] ; then

@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+source $PWD/definitions.sh
+
 progress-bar() {
   local duration=$((${1} / 10))
     already_done() { for ((done=0; done<$elapsed; done++)); do printf "▇"; done }
