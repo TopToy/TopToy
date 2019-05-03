@@ -24,6 +24,8 @@ compose_file_byz=${BASE_DIR}/composed/docker-compose-byz.yml
 compose_file_correct_with_clients=${BASE_DIR}/composed/docker-compose-correct-with-clients.yml
 
 docker_out=/home/yoni/Desktop/dtoy/curr/
+cdocker_out=/home/yoni/Desktop/dtoy/ccurr/
+
 output=/home/yoni/Desktop/dtoy/out
 test_dir=${make_script_dir}/tests
 tests_conf=${test_dir}/tests_conf.txt

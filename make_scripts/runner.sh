@@ -2,24 +2,12 @@
 
 source /home/yoni/github.com/JToy/definitions.sh
 
-run() {
-    for t in ${test_dir}/active/*.sh; do
-        echo "running ${t}..."
-        sudo chmod 777 $t
-        local outputDir=${output}/$(date '+%F-%H:%M:%S')
-        mkdir -p ${outputDir}/servers
-        print_headers ${outputDir}
-        ${t}
-        collect_res_from_servers ${outputDir}
-        sudo rm -r -f ${docker_out}/*
-        echo "done..."
-    done
-}
-
 run2() {
     while read -r line; do
-        rm -r ${docker_out}
+        sudo rm -r -f ${docker_out}
+        sudo rm -r -f ${cdocker_out}
         mkdir -p ${docker_out}
+        mkdir -p ${cdocker_out}
         local name=`echo $line | cut -f 1 -d " "`
         local t=`echo $line | cut -f 2 -d " "`
 
@@ -30,15 +18,19 @@ run2() {
             sudo chmod 777 ${test_dir}/$t.sh
             local outputDir=${output}/$(date '+%F-%H:%M:%S').${name}
             mkdir -p ${outputDir}/servers
+            mkdir -p ${outputDir}/clients
             print_headers ${outputDir}
             ${test_dir}/${t}.sh
             collect_res_from_servers ${outputDir}
+            collect_res_from_clients ${outputDir}
             sudo rm -r -f ${docker_out}/*
+            sudo rm -r -f ${cdocker_out}/*
             echo "done..."
         fi
     done < "${tests_conf}"
 
 }
+
 collect_res_from_servers() {
     local currOut=${1}
     mkdir -p ${currOut}/servers/logs
@@ -49,17 +41,34 @@ collect_res_from_servers() {
         cat ${summery} >> ${currOut}/servers/summery.csv
     done
 
-#    for sigsummery in ${docker_out}/**/sig_summery.csv ; do
-#        cat ${sigsummery} >> ${currOut}/servers/sig_summery.csv
-#    done
     shopt -u globstar
 }
+
+collect_res_from_clients() {
+    local currOut=${1}
+    mkdir -p ${currOut}/clients/logs
+    shopt -s globstar
+
+    cp -r ${cdocker_out}/logs/* ${currOut}/clients/logs/
+    for csummery in ${cdocker_out}/**/csummery.csv ; do
+        cat ${csummery} >> ${currOut}/clients/summery.csv
+    done
+
+    for txsummery in ${cdocker_out}/**/ctsummery.csv ; do
+        cat ${txsummery} >> ${currOut}/clients/transactions.csv
+    done
+
+    shopt -u globstar
+}
+
 
 print_headers() {
     local currOut=${1}
     echo "valid,readTime,id,type,workers,tmo,actTmo,maxTmo,txSize,txInBlock,txTotal,duration,tps,nob,noeb,bps,avgTxInBlock,opt,opRate,pos,posRate,neg,negRate,avgNegTime,syncs,BP2T,BP2D,HP2T,HP2D,HT2D,suspected" >> $currOut/servers/summery.csv
-#    echo "id,type,channels,txSize,maxTxInBlock,signaturePeriod,verificationPeriod,propose2tentative,tentative2permanent,channelPermanent2decide,propose2permanentchannel,propose2decide" >> $currOut/servers/blocksStatSummery.csv
-#    echo "channels,txInBlock,ts,id,txSize,txCount,clientLatency,serverLatency,clientOnly" >> ${currOut}/clients/summery.csv
+
+    echo "cid,sid,txSize,duration,txNum,avgLatency" > $currOut/clients/summery.csv
+
+    echo "n,cid,sid,txID,txSize,txLatency" > $currOut/clients/transactions.csv
 }
 
 run2

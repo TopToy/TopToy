@@ -9,7 +9,7 @@ readarray -t eids < ./awsInstanceIds.txt
 tDir=./../..
 configDir=${tDir}/Configurations
 binDir=${tDir}/bin
-clientBinDir=${tDir}/bin_client
+clientBinDir=${tDir}/cbin
 inst=${configDir}/inst/input.inst
 config_toml=${configDir}/config.toml
 config_rb=${configDir}/ABConfig/hosts.config
@@ -75,6 +75,22 @@ load_clients() {
         ssh ${c} 'mkdir -p ~/JToy'
         scp -r ${clientBinDir} ${c}:~/JToy > /dev/null
     done
+}
+
+load_client() {
+    local c=${clients[${1}]}
+    echo "copy cbin to ${c}..."
+    ssh ${c} 'rm -r -f ~/JToy'
+    ssh ${c} 'mkdir -p ~/JToy'
+    scp -r ${clientBinDir} ${c}:~/JToy > /dev/null
+
+}
+
+install_client() {
+    rm -r -f ${clientBinDir}/src/main/resources/*
+    cp -r $configDir/* ${clientBinDir}/src/main/resources/
+    load_client ${1}
+
 }
 
 kill_clients() {
@@ -175,6 +191,14 @@ configure_servers() {
     echo "quit" >> ${inst}
 }
 
+configure_long_run_servers() {
+    echo "init" > ${inst}
+    echo "serve" >> ${inst}
+    echo "wait 3600" >> ${inst}
+    echo "stop" >> ${inst}
+    echo "quit" >> ${inst}
+}
+
 configure_byz_servers() {
     bef=$((${1}/2))
     echo "waits for ${bef}"
@@ -212,9 +236,7 @@ configure_tx_size() {
     sed -i 's/txSize = .*/txSize = '${1}'/g' ${config_toml}
 }
 
-configure_cutter_batch() {
-    sed -i 's/cutterBatch = .*/cutterBatch = '${1}'/g' ${config_toml}
-}
+
 configure_max_tx_in_block() {
    sed -i 's/maxTransactionInBlock = .*/maxTransactionInBlock = '${1}'/g' ${config_toml}
 }
@@ -229,6 +251,10 @@ configure_channels()  {
 
 configure_tmo()  {
     sed -i 's/tmo =.*/tmo = '${1}'/g' ${config_toml}
+}
+
+configure_testing()  {
+    sed -i 's/testing =.*/testing = '${1}'/g' ${config_toml}
 }
 
 configure_server_files() {
@@ -269,13 +295,10 @@ print_headers() {
 # ${3} - interval
 # ${4} - output directory
 run_servers_channels() {
-#    print_headers ${currOut}
     for i in `seq ${1} ${3} ${2}`; do
         chan=${i}
-#        echo "id,type,channels,txSize,maxTxInBlock,actualTxInBlock,height,signaturePeriod,verificationPeriod,propose2tentative,tentative2permanent,channelPermanent2decide,propose2permanentchannel,propose2decide" >> $currOut/servers/res/blocksStat_${i}.csv
         echo "[${i} channels]"
         run_servers_instance_with_cahnnels ${i} ${4}
-#        sleep 10
         collect_res_from_servers
     done
 }
@@ -425,22 +448,20 @@ run_async_test() {
 # ${7} - tmo
 run_latency_test() {
     for i in `seq 0 $((${#servers[@]} - 1))`; do
-        cat ${config_bbc} > ${tconfig_bbc}
         cat ${config_rb} > ${tconfig_rb}
-#        cat ${config_panic} > ${tconfig_panic}
-#        cat ${config_sync} > ${tconfig_sync}
+
         configure_tx_size ${1}
         configure_max_tx_in_block ${2}
         configure_tmo ${7}
-        configure_servers 1200
+        configure_testing "false"
+        configure_long_run_servers
         configure_server_files ${i}
         install_server ${i}
-        cat ${tconfig_bbc} > ${config_bbc}
+        install_client ${i}
+
         cat ${tconfig_rb} > ${config_rb}
-#        cat ${tconfig_panic} > ${config_panic}
-#        cat ${tconfig_sync} > ${config_sync}
     done
-    load_clients
+
     run_servers_channels ${3} ${4} ${5} ${6} &
     run_clients_instance ${1} ${3} ${4} ${5} 600 ${6} ${2}
 
@@ -534,11 +555,8 @@ run_byz_test() {
 # ${7} - tmo interval
 # ${8} - test time
 run_no_failures_test() {
-    for i in `seq 0 $((${#servers[@]} - 1))`; do
-#        cat ${config_bbc} > ${tconfig_bbc}
+    for i in `seq 0 $((${servers[@]} - 1))`; do
         cat ${config_rb} > ${tconfig_rb}
-#        cat ${config_panic} > ${tconfig_panic}
-#        cat ${config_sync} > ${tconfig_sync}
         configure_tx_size ${1}
         configure_max_tx_in_block ${2}
         configure_tmo ${6}
@@ -546,10 +564,7 @@ run_no_failures_test() {
         configure_servers ${8}
         configure_server_files ${i}
         install_server ${i}
-#        cat ${tconfig_bbc} > ${config_bbc}
         cat ${tconfig_rb} > ${config_rb}
-#        cat ${tconfig_panic} > ${config_panic}
-#        cat ${tconfig_sync} > ${config_sync}
     done
     run_servers_channels ${3} ${4} ${5} ${8}
 }

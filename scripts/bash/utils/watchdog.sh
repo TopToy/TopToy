@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-sleep 420
+sleep ${1}
 echo "watchdog activated"
-./clean_machines.sh
-sleep 10
+./clean_ma chines.sh

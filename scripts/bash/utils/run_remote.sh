@@ -8,8 +8,6 @@ mkdir -p /tmp/JToy/res
 
 cd ${toyHome}
 
-#mvn install -DskipTests
-
 find ./bin -type f -name 'currentView' -delete
 sudo -S chmod 777 ./bin/run_single.sh
 rm -r -f ./bin/blocks

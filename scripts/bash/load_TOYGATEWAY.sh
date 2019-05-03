@@ -11,7 +11,7 @@ config=${tDir}/Configurations/aws/4Servers
 #config=${tDir}/Configurations/aws/49Servers
 #config=${tDir}/Configurations/aws/100Servers
 #config=${tDir}/Configurations/4Servers/remote
-readarray -t gate < ./gateway.txt
+readarray -t gate < ./data/gateway.txt
 mvn install -f ${tDir}/pom.xml -DskipTests
 if [[ "$?" -ne 0 ]] ; then
   echo 'could compile the project'; exit $1
