@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-source $PWD/utils/*.sh
+source $PWD/utils/aws_utils.sh
+source $PWD/utils/config_utils.sh
+source $PWD/utils/utils.sh
 source $PWD/definitions.sh
 
 # ${1} tx size
@@ -17,13 +19,14 @@ test_correct_tps_servers_over_workers() {
     configure_correct_servers "$@"
 
     for i in `seq ${3} ${5} ${4}`; do
+        echo "run [[txSize:${1}] [txInBlock:${2}] [workers:${i}]]"
+        local w=${i}
+        configure_servers_workers ${w}
 
-        configure_servers_workers
-
-        ./${utils_dir}/watchdog.sh 420
+        ${utils_dir}/watchdog.sh 420 &
         local wdipd=$!
 
-        run_servers
+        run_servers $7
 
         kill -9 $wdipd
 
@@ -34,23 +37,13 @@ test_correct_tps_servers_over_workers() {
 }
 
 configure_correct_servers() {
-    local servers
-    readarray -t servers < ${servers_ips}
 
-    local pips
-    readarray -t pips < ${servers_pip}
+    configure_tx_size ${1} ${config_toml}
+    configure_max_tx_in_block ${2} ${config_toml}
+    configure_tmo ${6} ${config_toml}
+    configure_inst_with_statistics 30 ${7} 30 ${inst}
 
-    local config_rb=${conf}/ABConfig/hosts.config
-    local config_toml=${conf}/config.toml
-    local inst=${conf}/inst/input.inst
-
-    mkdir -p
-    for i in `seq 0 $((${servers[@]} - 1))`; do
-
-        configure_tx_size ${1} ${config_toml}
-        configure_max_tx_in_block ${2} ${config_toml}
-        configure_tmo ${6} ${config_toml}
-        configure_inst_with_statistics 30 ${7} 30 ${inst}
+    for i in `seq 0 $((${#servers[@]} - 1))`; do
 
         copy_data_to_tmp ${config_rb}
         local public_ip=`echo "${servers[${i}]}" | sed 's/'${user}'\@//g'`
@@ -66,87 +59,84 @@ configure_correct_servers() {
 
 run_servers() {
 
-    local servers
-    readarray -t servers < ${servers_ips}
     local pids=[]
-    for i in `seq 0 $((${servers[@]} - 1))`; do
-        local pid=$((run_remote_server ${servers[${i}]} ${i} "r"))
-        pids[${i}]=${pid}
+    for i in `seq 0 $((${#servers[@]} - 1))`; do
+        local id=${i}
+        run_remote_server ${servers[${id}]} ${id} "r"
+        pids[${id}]=$!
     done
-
     sleep 30
-    t=$((${7} - 30))
+    t=$((${1} - 30))
     echo "waits for more ${t} s"
     progress-bar ${t}
 
-    for pid in ${pids[*]}; do
-        wait $pid
+    for pid in "${pids[@]}"; do
+        wait ${pid}
     done
 
 }
 
 configure_servers_workers() {
-    local servers
-    readarray -t servers < ${servers_ips}
-    local config_toml=${conf}/config.toml
-    for s in "${servers[*]}"; do
-        configure_workers ${i} ${config_toml}
-        update_config_toml ${s} ${sbin} ${config_toml}
+
+    for s in "${servers[@]}"; do
+        configure_workers ${1} ${config_toml}
+        sr=${s}
+        update_config_toml ${sr} ${sbin} ${config_toml}
     done
 
 }
 
-##########################0#############################
-test_correct_tps_servers_over_workers 0 0 1 5 2 100 300
-test_correct_tps_servers_over_workers 0 0 7 9 2 100 300
-test_correct_tps_servers_over_workers 0 0 10 10 1 100 300
-
-#########################512#############################
-########################512x10###########################
-test_correct_tps_servers_over_workers 512 10 1 5 2 100 300
-test_correct_tps_servers_over_workers 512 10 7 9 2 100 300
-test_correct_tps_servers_over_workers 512 10 10 10 1 100 300
-
-#######################512x100###########################
-test_correct_tps_servers_over_workers 512 100 1 5 2 100 300
-test_correct_tps_servers_over_workers 512 100 7 9 2 100 300
-test_correct_tps_servers_over_workers 512 100 10 10 1 100 300
-
-#######################512x1000###########################
-test_correct_tps_servers_over_workers 512 1000 1 5 2 100 300
-test_correct_tps_servers_over_workers 512 1000 7 9 2 100 300
-test_correct_tps_servers_over_workers 512 1000 10 10 1 100 300
-
-#########################1024#############################
-########################1024x10###########################
-test_correct_tps_servers_over_workers 512 10 1 5 2 100 300
-test_correct_tps_servers_over_workers 512 10 7 9 2 100 300
-test_correct_tps_servers_over_workers 512 10 10 10 1 100 300
-
-#######################1024x100###########################
-test_correct_tps_servers_over_workers 512 100 1 5 2 100 300
-test_correct_tps_servers_over_workers 512 100 7 9 2 100 300
-test_correct_tps_servers_over_workers 512 100 10 10 1 100 300
-
-#######################1024x1000###########################
-test_correct_tps_servers_over_workers 512 1000 1 5 2 100 300
-test_correct_tps_servers_over_workers 512 1000 7 9 2 100 300
-test_correct_tps_servers_over_workers 512 1000 10 10 1 100 300
-
-#########################4096#############################
-########################4096x10###########################
-test_correct_tps_servers_over_workers 512 10 1 5 2 100 300
-test_correct_tps_servers_over_workers 512 10 7 9 2 100 300
-test_correct_tps_servers_over_workers 512 10 10 10 1 100 300
-
-#######################4096x100###########################
-test_correct_tps_servers_over_workers 512 100 1 5 2 100 300
-test_correct_tps_servers_over_workers 512 100 7 9 2 100 300
-test_correct_tps_servers_over_workers 512 100 10 10 1 100 300
-
-#######################4096x1000###########################
-test_correct_tps_servers_over_workers 512 1000 1 5 2 100 300
-test_correct_tps_servers_over_workers 512 1000 7 9 2 100 300
-test_correct_tps_servers_over_workers 512 1000 10 10 1 100 300
+###########################0#############################
+#test_correct_tps_servers_over_workers 0 0 1 5 2 100 300
+#test_correct_tps_servers_over_workers 0 0 7 9 2 100 300
+#test_correct_tps_servers_over_workers 0 0 10 10 1 100 300
+#
+##########################512#############################
+#########################512x10###########################
+#test_correct_tps_servers_over_workers 512 10 1 5 2 100 300
+#test_correct_tps_servers_over_workers 512 10 7 9 2 100 300
+#test_correct_tps_servers_over_workers 512 10 10 10 1 100 300
+#
+########################512x100###########################
+#test_correct_tps_servers_over_workers 512 100 1 5 2 100 300
+#test_correct_tps_servers_over_workers 512 100 7 9 2 100 300
+#test_correct_tps_servers_over_workers 512 100 10 10 1 100 300
+#
+########################512x1000###########################
+#test_correct_tps_servers_over_workers 512 1000 1 5 2 100 300
+#test_correct_tps_servers_over_workers 512 1000 7 9 2 100 300
+#test_correct_tps_servers_over_workers 512 1000 10 10 1 100 300
+#
+##########################1024#############################
+#########################1024x10###########################
+#test_correct_tps_servers_over_workers 1024 10 1 5 2 100 300
+#test_correct_tps_servers_over_workers 1024 10 7 9 2 100 300
+#test_correct_tps_servers_over_workers 1024 10 10 10 1 100 300
+#
+########################1024x100###########################
+#test_correct_tps_servers_over_workers 1024 100 3 3 2 100 300
+test_correct_tps_servers_over_workers 1024 100 9 9 2 100 300
+##test_correct_tps_servers_over_workers 1024 100 10 10 1 100 300
+##
+#########################1024x1000###########################
+##test_correct_tps_servers_over_workers 1024 1000 1 5 2 100 300
+##test_correct_tps_servers_over_workers 1024 1000 7 9 2 100 300
+##test_correct_tps_servers_over_workers 1024 1000 10 10 1 100 300
+##
+###########################4096#############################
+##########################4096x10###########################
+##test_correct_tps_servers_over_workers 4096 10 1 5 2 100 300
+##test_correct_tps_servers_over_workers 4096 10 7 9 2 100 300
+#test_correct_tps_servers_over_workers 4096 9 10 10 1 100 300
+##
+#########################4096x100###########################
+##test_correct_tps_servers_over_workers 4096 100 1 5 2 100 300
+##test_correct_tps_servers_over_workers 4096 100 7 9 2 100 300
+##test_correct_tps_servers_over_workers 4096 100 10 10 1 100 300
+##
+#########################4096x1000###########################
+##test_correct_tps_servers_over_workers 4096 1000 1 5 2 100 300
+##test_correct_tps_servers_over_workers 4096 1000 7 9 2 100 300
+#test_correct_tps_servers_over_workers 4096 1000 9 9 1 100 300
 
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source ~/JToy/scripts/bash/definitions.sh
+source ~/toy/scripts/bash/definitions.sh
 
 run() {
     while read -r line; do

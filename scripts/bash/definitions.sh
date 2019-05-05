@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-home=~/JToy
+home=~/toy
 user=toy
 conf=${home}/configurations
 sbin=${home}/bin
@@ -15,6 +15,17 @@ servers_ips=${data_dir}/servers.txt
 clients_ips=${data_dir}/clients.txt
 servers_pip=${data_dir}/servers_privates.txt
 servers_aws_ids=${data_dir}/awsInstanceIds.txt
+
+readarray -t servers < ${servers_ips}
+readarray -t clients < ${clients_ips}
+readarray -t pips < ${servers_pip}
+readarray -t servers_aids < ${servers_aws_ids}
+
+config_rb=${conf}/ABConfig/hosts.config
+config_toml=${conf}/config.toml
+inst=${conf}/inst/input.inst
+
+
 
 n=4
 f=1

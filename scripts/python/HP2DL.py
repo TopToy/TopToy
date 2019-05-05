@@ -34,13 +34,13 @@ def bps(dirs, oPath):
         files = glob.glob(d + "/summeries/*.csv")
         df = csvs2df(files)
         df = df[(df.txSize == 0) & (df.txInBlock == 0)]
-        df = df[['workers', 'bps']]
+        df = df[['workers', 'HP2DL']]
         m = 0
 
         mark = markers[m]
         m += 1
-        data = df[['workers', 'bps']].groupby(df.workers).mean()
-        plt.plot(data['workers'], data['bps'], "-" + mark, markerfacecolor=face_c,
+        data = df[['workers', 'HP2DL']].groupby(df.workers).mean()
+        plt.plot(data['workers'], data['HP2DL'], "-" + mark, markerfacecolor=face_c,
                  markersize=marker_s, linewidth=line_w) #, markevery=markers_on)
     plt.title("Blocks per Second", fontsize='large')
     plt.xticks(np.arange(0, 11, step=2), fontsize=fs)
@@ -63,11 +63,11 @@ def bps(dirs, oPath):
                )
     # plt.setp(leg.get_title(), fontsize='xx-small')
     fig.text(0.51, 0.06, "$\\omega$", ha="center", va="center", fontsize=fs)
-    fig.text(0.025, 0.5, "BPS ($\\frac{blocks}{sec}$)", ha="center", va="center", fontsize=fs, rotation=90)
+    fig.text(0.025, 0.5, "Latency (ms)", ha="center", va="center", fontsize=fs, rotation=90)
     fig.tight_layout(rect=[0.02, 0.04, 1, 1.03])
     for d in oPath:
-        plt.savefig(d + '/bps.pdf')
-        plt.savefig(d + '/bps')
+        plt.savefig(d + '/hLatency.pdf')
+        plt.savefig(d + '/hLatency')
 
 if __name__ == "__main__":
     bps(["/home/yoni/toy/correct/4",

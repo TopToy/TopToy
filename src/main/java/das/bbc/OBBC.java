@@ -59,7 +59,7 @@ public class OBBC extends ObbcGrpc.ObbcImplBase  {
             return bbcFastDec[worker].get(key);
         }
         long start = System.currentTimeMillis();
-        logger.info(format("C[%d] unable to decide fast, start full BBC phase [cidSeries=%d ; cid=%d ; height=%d", worker, key.getCidSeries(), key.getCid(), height));
+        logger.info(format("C[%d] unable to decide fast, start full BBC phase [cidSeries=%d ; cid=%d ; height=%d]", worker, key.getCidSeries(), key.getCid(), height));
         pending[worker].computeIfAbsent(key, k -> {
             logger.debug(format("C[%d] broadcast evidence request [cidSeries=%d ; cid=%d ; height=%d]", worker, key.getCidSeries(), key.getCid(), height));
             rpcs.broadcastEvidenceReq(Types.EvidenceReq.newBuilder()

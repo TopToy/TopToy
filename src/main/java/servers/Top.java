@@ -172,15 +172,15 @@ public class Top {
 
         try {
             txsServer = NettyServerBuilder
-                    .forPort(30100)
-//                    .executor(executor)
+                    .forPort(9876)
+//                    .executor(Executors.newFixedThreadPool(2))
 //                    .bossEventLoopGroup(gnio)
 //                    .workerEventLoopGroup(gnio)
                     .addService(new ClientRpcsService(this))
 //                    .maxConcurrentCallsPerConnection(5) // TODO: Inspect this limit
                     .build()
                     .start();
-            logger.info("starting client RPCs server");
+            logger.info("starting client RPCs server, listening on port 30100");
         } catch (IOException e) {
             logger.error("", e);
         }

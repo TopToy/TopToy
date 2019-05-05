@@ -19,59 +19,86 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import static java.lang.StrictMath.max;
 import static java.lang.String.format;
 
 public class ClientTester {
     private static org.apache.log4j.Logger logger;
-    static clientServiceGrpc.clientServiceBlockingStub stub;
+    static clientServiceGrpc.clientServiceBlockingStub[] stubs;
 
     static int clientID;
-    static String serverIP;
-    static int serverPort = 30100;
+    static int serverPort = 9876;
     static int testTXS = 0;
-    static int latency = 0;
-    static int txNum = 0;
+    static AtomicInteger latency = new AtomicInteger(0);
+    static AtomicInteger txNum = new AtomicInteger(0);
+    static AtomicInteger maxLatency = new AtomicInteger(0);
     static int txSize = 0;
-    static int serverID = 0;
     static long  testTime = 0;
-    static Queue<Integer> txTimes = new LinkedList<>();
-    static Queue<Types.txID> txIds = new LinkedList<>();
+    static int n;
+    static ConcurrentLinkedQueue<Integer> txTimes = new ConcurrentLinkedQueue<>();
+    static ConcurrentLinkedQueue<Types.txID> txIds = new ConcurrentLinkedQueue<>();
+    static ExecutorService clients;
+
     static AtomicBoolean recorded = new AtomicBoolean(false);
+    static Object notifier;
 
 
     public static void main(String[] argv) {
-//        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-//            if (!recorded.get()) {
-//                try {
-//                    collectResults();
-//                    collectSummery();
-//                } catch (IOException e) {
-//                    logger.error(e);
-//                }
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            if (!recorded.get()) {
+                try {
+                    collectResults();
+                    collectSummery();
+                } catch (IOException e) {
+                    logger.error(e);
+                }
+
+            }
 //
-//            }
-////
-//        }));
-        try {
-            Thread.sleep(30 * 1000);
-        } catch (InterruptedException e) {
-            logger.error(e);
-        }
+        }));
+//        try {
+//            Thread.sleep(30 * 1000);
+//        } catch (InterruptedException e) {
+//            logger.error(e);
+//        }
         clientID = Integer.parseInt(argv[0]);
-        serverID = Integer.parseInt(argv[1]);
+//        serverID = Integer.parseInt(argv[1]);
         testTXS = Integer.parseInt(argv[2]);
         Config.setConfig(null, clientID);
         logger = org.apache.log4j.Logger.getLogger(ClientTester.class);
-        serverIP = Config.getIP(serverID);
+//        serverIP = Config.getIP(serverID);
         txSize = Config.getTxSize();
+        n = Config.getN();
+        clients = Executors.newFixedThreadPool(n);
+        notifier = new Object();
 
         start();
-        test();
+        testTime = System.currentTimeMillis();
+        for (int i = 0 ; i < n ; i++) {
+            int finalI = i;
+            clients.submit(() -> test(stubs[finalI], finalI));
+
+        }
+        synchronized (notifier) {
+            try {
+                while (txNum.get() < testTXS) {
+                    notifier.wait();
+                }
+            } catch (Exception e) {
+                logger.error(e);
+            }
+
+        }
+
+        clients.shutdownNow();
         try {
             collectResults();
             collectSummery();
+            recorded.set(true);
         } catch (IOException e) {
             logger.error(e);
         }
@@ -81,14 +108,25 @@ public class ClientTester {
 
 
     static void start() {
-        stub = clientServiceGrpc.newBlockingStub(
-                ManagedChannelBuilder.forAddress(serverIP, serverPort).usePlaintext().build()
-        );
+        logger.info("init clients");
+        stubs = new clientServiceGrpc.clientServiceBlockingStub[n];
+        for (int i = 0 ; i < n ; i++) {
+            stubs[i] = clientServiceGrpc.newBlockingStub(
+                    ManagedChannelBuilder
+                            .forAddress(Config.getIP(i), serverPort)
+                            .usePlaintext()
+                            .build());
+        }
     }
 
-    static void test() {
-        testTime = System.currentTimeMillis();
-        while(txNum < testTXS) {
+    static void test(clientServiceGrpc.clientServiceBlockingStub stub, int server) {
+        logger.info("Start cient for " + server);
+        stub.write(Types.Transaction.newBuilder() // This meant to remove the effect of connecting to the server
+                .setData(ByteString.copyFrom(new byte[0]))
+                .setClientID(clientID)
+                .build());
+
+        while(txNum.get() < testTXS) {
             long txStart = System.currentTimeMillis();
             SecureRandom random = new SecureRandom();
             byte[] tx = new byte[txSize];
@@ -106,14 +144,19 @@ public class ClientTester {
             int txLatency = (int) (System.currentTimeMillis() - txStart);
             txIds.add(tid);
             txTimes.add(txLatency);
-            latency += txLatency;
-            txNum++;
+            latency.addAndGet(txLatency);
+            maxLatency.set(max(maxLatency.get() , txLatency));
+            txNum.incrementAndGet();
 
         }
-        testTime = System.currentTimeMillis() - testTime;
+        synchronized (notifier) {
+            notifier.notifyAll();
+        }
+        logger.info("Client " + server +" is done");
     }
 
     static void collectResults() throws IOException {
+        testTime = System.currentTimeMillis() - testTime;
         String pathString = "/tmp/JToy/res/";
         Path path = Paths.get(pathString,   String.valueOf(clientID), "csummery.csv");
         File f = new File(path.toString());
@@ -125,16 +168,18 @@ public class ClientTester {
         writer = new FileWriter(path.toString(), true);
 
         double tlatency = 0;
-        if (txNum > 0) {
-            tlatency = (double) (latency / txNum);
+        if (txNum.get() > 0) {
+            tlatency = (double) (latency.get() / txNum.get());
         }
         List<String> row = Arrays.asList(
-                String.valueOf(clientID)
-                , String.valueOf(serverID)
+                String.valueOf(Config.getC())
+                , String.valueOf(Config.getMaxTransactionsInBlock())
+                , String.valueOf(clientID)
                 , String.valueOf(txSize)
                 , String.valueOf(testTime / 1000)
                 , String.valueOf(txNum)
                 , String.valueOf(tlatency)
+                , String.valueOf(maxLatency.get())
         );
         CSVUtils.writeLine(writer, row);
         writer.flush();
@@ -158,8 +203,9 @@ public class ClientTester {
             int txTime = txTimes.remove();
             data.add(Arrays.asList(
                     String.valueOf(n)
+                    , String.valueOf(Config.getC())
+                    , String.valueOf(Config.getMaxTransactionsInBlock())
                     , String.valueOf(clientID)
-                    , String.valueOf(serverID)
                     , format("[%d%d%d%d]", tid.getChannel(), tid.getProposerID(), tid.getBid(), tid.getTxNum())
                     , String.valueOf(txSize)
                     , String.valueOf(txTime)

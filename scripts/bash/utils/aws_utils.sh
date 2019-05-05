@@ -4,17 +4,14 @@ source $PWD/utils/config_utils.sh
 source $PWD/definitions.sh
 
 start_aws_instances() {
-    local servers
-    readarray -t servers < ${servers_aws_ids}
-    aws ec2 start-instances --instance-ids ${servers[*]}
+    aws ec2 start-instances --instance-ids ${servers_aids[@]}
     sleep 30
 
 }
 
 stop_aws_instances() {
-    local servers
-    readarray -t servers < ${servers_aws_ids}
-    aws ec2 stop-instances --instance-ids ${servers[*]}
+
+    aws ec2 stop-instances --instance-ids ${servers_aids[@]}
     sleep 30
 }
 
@@ -23,7 +20,7 @@ stop_aws_instances() {
 # ${3} configuration directory
 update_resources_and_load() {
     update_resources ${2} ${3}
-    echo "copy ${2} to ${1}..."
+    echo "copy $(basename ${2}) to ${1}..."
     ssh ${1} 'rm -r -f ~/JToy'
     ssh ${1} 'mkdir ~/JToy'
     scp -r ${2} ${1}:~/JToy  > /dev/null
@@ -31,11 +28,11 @@ update_resources_and_load() {
 
 # ${1} connection string
 # ${2} bin directory
-# ${3} update config.toml
+# ${3} updated config.toml
 update_config_toml() {
     echo "Updating configuration of ${1}..."
-    ssh ${1} 'rm -r -f ~/JToy/${2}/src/main/resources/config.toml'
-    scp ${3} ${1}:~/JToy/${2}/src/main/resources/  > /dev/null
+    ssh ${1} "rm -r -f ~/JToy/$(basename ${2})/src/main/resources/config.toml"
+    scp ${3} ${1}:~/JToy/$(basename ${2})/src/main/resources/  > /dev/null
 }
 
 # ${1} connection string
@@ -43,7 +40,6 @@ update_config_toml() {
 # ${3} type
 run_remote_server() {
     cat ${utils_dir}/run_remote.sh | sed 's/${2}/'${2}'/g' | sed 's/${3}/'${3}'/g' | ssh ${1} bash &
-    echo $!
 }
 
 # ${1} connection string
@@ -52,7 +48,6 @@ run_remote_server() {
 # ${4} tx num
 run_remote_client() {
     cat ${utils_dir}/run_remote_client.sh | sed 's/${1}/'${2}'/g' | sed 's/${2}/'${3}'/g' | sed 's/${3}/'${4}'/g' | ssh ${1} bash &
-    echo $!
 }
 
 # ${1} connection string
@@ -83,14 +78,65 @@ collect_res_from_servers() {
     mkdir -p $tmp
 
     print_servers_summery_header ${sum}
-    local servers
-    readarray -t servers < ${servers_ips}
 
     local id=0
-    for s in $"{[servers[*]}"; do
+    for s in "${servers[@]}"; do
         collect_res_from_server ${s} ${id} ${logs} ${tmp} ${sum}
     id=$((${id} + 1))
     done
 
     rm -r -f ${tmp}
+}
+
+collect_res_from_client() {
+    local logs=${3}
+    local tmp=${4}
+    local csum=${5}
+    local txsum=${6}
+
+    echo "getting files from client ${1}"
+    scp -o ConnectTimeout=30 -r ${1}:/tmp/JToy/logs/* $logs  > /dev/null
+    scp -o ConnectTimeout=30 -r ${1}:/tmp/JToy/res/* $tmp  > /dev/null
+
+    echo "collecting results from client ${1}"
+    cat $tmp/${2}/csummery.csv >> $csum
+    cat $tmp/${2}/ctsummery.csv >> $txsum
+
+}
+
+collect_res_from_clients() {
+    local dt=$(date '+%F-%H:%M:%S')
+    local logs=${home}/out/clogs/$dt
+    local tmp=${home}/out/ctmp
+    local csum=${home}/out/csummeries/$dt.csv
+    local txsum=${home}/out/csummeries/transactions/$dt.csv
+    mkdir -p ${home}/out/csummeries/transactions
+    mkdir -p $logs
+    mkdir -p $tmp
+
+    print_clients_summery_header ${csum} ${txsum}
+
+    local id=0
+    for c in "${clients[@]}"; do
+        collect_res_from_client ${c} ${id} ${logs} ${tmp} ${csum} ${txsum}
+    id=$((${id} + 1))
+    done
+
+    rm -r -f ${tmp}
+}
+
+kill_clients() {
+    for c in "${clients[@]}"; do
+        echo "kill ${c}..."
+        ssh ${c} "pkill -u ${user}"
+    done
+
+}
+
+kill_servers() {
+    for s in "${servers[@]}"; do
+        echo "kill ${s}..."
+        ssh ${s} "pkill -u ${user}"
+    done
+
 }

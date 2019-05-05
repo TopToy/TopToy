@@ -42,19 +42,18 @@ configure_inst_with_statistics() {
 configure_inst() {
     echo "init" > ${2}
     echo "serve" >> ${2}
-    echo "wait ${2}" >> ${2}
+    echo "wait ${1}" >> ${2}
     echo "stop" >> ${2}
     echo "quit" >> ${2}
 }
 
 copy_data_to_tmp() {
-    mkdir -p ${1}.tmp
     cat ${1} > ${1}.tmp
 }
 
 restore_data_from_tmp() {
     cat ${1}.tmp > ${1}
-    rm -r -f ${1}.tmp
+    rm -f ${1}.tmp
 }
 
 # ${1} bin directory
@@ -73,5 +72,10 @@ replace_ips() {
 
 # ${1} servers summery file
 print_servers_summery_header() {
-     echo "valid,readTime,id,type,workers,tmo,actTmo,maxTmo,txSize,txInBlock,txTotal,duration,tps,nob,noeb,bps,avgTxInBlock,opt,opRate,pos,posRate,neg,negRate,avgNegTime,syncs,BP2T,BP2D,HP2T,HP2D,HT2D,suspected" >> ${1}
+     echo "valid,id,type,workers,tmo,actTmo,maxTmo,txSize,txInBlock,txTotal,duration,tps,nob,noeb,bps,avgTxInBlock,opt,opRate,pos,posRate,neg,negRate,avgNegTime,syncs,BP2T,BP2D,BP2DL,HP2T,HP2D,HP2DL,HT2D,HD2DL,suspected" >> ${1}
+}
+
+print_clients_summery_header() {
+    echo "w,beta,cid,txSize,duration,txNum,avgLatency,maxLatency" > ${1}
+    echo "n,w,beta,cid,txID,txSize,txLatency" > ${2}
 }

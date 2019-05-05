@@ -18,13 +18,13 @@ if [[ "$?" -ne 0 ]] ; then
 fi
 ssh ${gate} "rm -r -f ./toy"
 ssh ${gate} "mkdir -p ./toy/scripts"
-ssh ${gate} "mkdir -p ./toy/Configurations"
+ssh ${gate} "mkdir -p ./toy/configurations"
 
 echo "copy bin to ${gate}..."
 scp  -r ${tDir}/bin ${gate}:./toy > /dev/null
-#echo "copy bin_client to ${gate}..."
-#scp  -r ${tDir}/bin_client ${gate}:./toy > /dev/null
-echo "copy Configuration to ${gate}..."
-scp  -r ${config}/* ${gate}:./toy/Configurations > /dev/null
+echo "copy cbin to ${gate}..."
+scp  -r ${tDir}/cbin ${gate}:./toy > /dev/null
+echo "copy configurations to ${gate}..."
+scp  -r ${config}/* ${gate}:./toy/configurations > /dev/null
 echo "copy scripts to ${gate}..."
 scp  -r ${tDir}/scripts/bash ${gate}:./toy/scripts > /dev/null

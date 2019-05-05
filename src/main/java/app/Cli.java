@@ -445,7 +445,7 @@ public class Cli {
                 int noeb = Statistics.getNeb();
                 int txCount = Statistics.getTxCount();
                 long txSize = Config.getTxSize();
-                int txInBlock = Statistics.getTxInBlock();
+                int txInBlock = Config.getMaxTransactionsInBlock();
 //                int h1 = Statistics.getH1();
 //                int h2 = Statistics.getH2();
                 int avgTxInBlock = 0;

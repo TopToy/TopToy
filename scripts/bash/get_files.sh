@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-out_path_t=/home/yoni/toy/correct/7
-readarray -t gate < ./gateway.txt
+out_path_t=/home/yoni/toy/latency/4
+readarray -t gate < ./data/gateway.txt
 
 mkdir -p ${out_path_t}
 while sleep 5; do
