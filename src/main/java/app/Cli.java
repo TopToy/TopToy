@@ -112,6 +112,10 @@ public class Cli {
                     System.out.println("Serving... [OK]");
                     return;
                 }
+            if (args[0].equals("writeBlocks")) {
+                writeBlocks();
+                return;
+            }
                 if (args[0].equals("stop")) {
                     stop();
 //                    totalRT = System.currentTimeMillis() - totalRT;
@@ -427,6 +431,57 @@ public class Cli {
 ////            }
 ////            return true;
 //        }
+
+        void writeBlocks() {
+            logger.info("Starting writeBlocks");
+            String pathString = "/tmp/JToy/res/";
+            Path path = Paths.get(pathString, String.valueOf(JToy.s.getID()), "bsummery.csv");
+            File f = new File(path.toString());
+
+            try {
+                if (!f.exists()) {
+                    f.getParentFile().mkdirs();
+                    f.createNewFile();
+                }
+                FileWriter writer = null;
+                writer = new FileWriter(path.toString(), true);
+                List<List<String>> rows = new ArrayList<>();
+                int cw = 0;
+                for (int i = Statistics.getH1() ; i < Statistics.getH2() ; i++) {
+                    for (int  j = 0 ; j < Config.getC() ; j++) {
+                        Types.Block b = BCS.nbGetBlock(j, i);
+                        long pt = b.getBst().getProposeTime();
+                        long tt = b.getHeader().getHst().getTentativeTime();
+                        long dt = b.getHeader().getHst().getDefiniteTime();
+                        long dlt = Statistics.getDltByHeight(i, j);
+                        if (dlt == -1) {
+                            logger.info(format("Un registered block [h=%d ; w=%d]", i, j));
+                            continue;
+                        }
+                        rows.add(Arrays.asList(
+                                    String.valueOf(j)
+                                    , String.valueOf(b.getId().getPid())
+                                    , String.valueOf(b.getId().getBid())
+                                    , String.valueOf(b.getHeader().getHeight())
+                                    , String.valueOf(b.getDataCount())
+                                    , String.valueOf(tt - pt)
+                                    , String.valueOf(dt - pt)
+                                    , String.valueOf(dlt - pt)
+                                    , String.valueOf(dt - tt)
+                                    , String.valueOf(dlt - dt)
+                                )
+
+                        );
+                    }
+                }
+                CSVUtils.writeLines(writer, rows);
+                writer.flush();
+                writer.close();
+                logger.info("ended writeBlocks");
+            } catch (Exception e) {
+                logger.error(e);
+            }
+        }
         void writeSummery(String pathString) {
             logger.info("Starting writeSummery");
             Path path = Paths.get(pathString, String.valueOf(JToy.s.getID()), "summery.csv");

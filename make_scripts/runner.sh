@@ -64,11 +64,11 @@ collect_res_from_clients() {
 
 print_headers() {
     local currOut=${1}
-    echo "valid,readTime,id,type,workers,tmo,actTmo,maxTmo,txSize,txInBlock,txTotal,duration,tps,nob,noeb,bps,avgTxInBlock,opt,opRate,pos,posRate,neg,negRate,avgNegTime,syncs,BP2T,BP2D,HP2T,HP2D,HT2D,suspected" >> $currOut/servers/summery.csv
+    echo "valid,id,type,workers,tmo,actTmo,maxTmo,txSize,txInBlock,txTotal,duration,tps,nob,noeb,bps,avgTxInBlock,opt,opRate,pos,posRate,neg,negRate,avgNegTime,syncs,BP2T,BP2D,BP2DL,HP2T,HP2D,HP2DL,HT2D,HD2DL,suspected" >> $currOut/servers/summery.csv
 
-    echo "cid,sid,txSize,duration,txNum,avgLatency" > $currOut/clients/summery.csv
+    echo "w,beta,cid,txSize,duration,txNum,avgLatency,maxLatency" > $currOut/clients/summery.csv
 
-    echo "n,cid,sid,txID,txSize,txLatency" > $currOut/clients/transactions.csv
+    echo "n,w,beta,cid,txID,txSize,txLatency"  > $currOut/clients/transactions.csv
 }
 
 run2

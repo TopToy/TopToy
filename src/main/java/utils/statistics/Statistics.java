@@ -6,6 +6,7 @@ import das.ms.BFD;
 import org.h2.mvstore.ConcurrentArrayList;
 import proto.Types;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -38,6 +39,7 @@ public class Statistics {
     static private AtomicInteger maxTmo = new AtomicInteger(0);
     static private AtomicInteger syncs = new AtomicInteger(0);
     static private AtomicLong negTime = new AtomicLong(0);
+    static private HashMap<Integer[], Long> dlt = new HashMap<>();
 
 
     static private AtomicBoolean active = new AtomicBoolean(false);
@@ -235,7 +237,7 @@ public class Statistics {
         return active.get();
     }
 
-    static void collectForBlock(BCStat b) {
+    static void collectForBlock(BCStat b, int h, int worker) {
         long curr = System.currentTimeMillis();
         nob++;
         if (b.txCount == 0) {
@@ -260,6 +262,7 @@ public class Statistics {
                 .getTentativeTime();
         acHP2DL += curr - b.hst.getProposeTime();
         acHD2DL += curr - b.hst.getDefiniteTime();
+        dlt.put(new Integer[]{h, worker}, curr);
     }
 
     static void collectReasults() throws InterruptedException {
@@ -269,10 +272,17 @@ public class Statistics {
             for (int i = 0 ; i < workers ; i++) {
                 BCStat b = BCS.bGetBCStat(i, h);
                 if (b == null) continue;
-                collectForBlock(b);
+                collectForBlock(b, h, i);
             }
             h++;
         }
+    }
+
+    static public long getDltByHeight(int height, int w) {
+        Integer[] key = new Integer[]{height, w};
+        if (!dlt.containsKey(key)) return -1;
+        return dlt.get(new Integer[]{height, w});
+
     }
 
 }
