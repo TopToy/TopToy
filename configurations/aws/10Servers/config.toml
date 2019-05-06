@@ -35,7 +35,7 @@ title = "configuration"
     
       [cluster.s1]
             id = 1
-            ip = "172.31.27.93"
+            ip = "172.31.3.111"
             wrbPort = 30000
             commPort = 30010
             obbcPort = 30020

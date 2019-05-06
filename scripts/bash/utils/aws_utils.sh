@@ -5,6 +5,29 @@ source $PWD/definitions.sh
 
 start_aws_instances() {
     aws ec2 start-instances --instance-ids ${servers_aids[@]}
+#    aws ec2 wait instance-running --instance-ids ${servers_aids[@]}
+    sleep 30
+
+}
+
+start_aws_instances_with_regions() {
+    for i in `seq 0 $((${#servers_aids[@]} - 1))`; do
+        region=${aws_regions[${i}]}
+        sid=${servers_aids[${i}]}
+        aws ec2 start-instances --region ${region} --instance-ids ${sid}
+     done
+#    aws ec2 wait instance-running --instance-ids ${servers_aids[@]}
+    sleep 30
+
+}
+
+stop_aws_instances_with_regions() {
+    for i in `seq 0 $((${#servers_aids[@]} - 1))`; do
+        region=${aws_regions[${i}]}
+        sid=${servers_aids[${i}]}
+        aws ec2 stop-instances --region ${region} --instance-ids ${sid}
+     done
+#    aws ec2 wait instance-running --instance-ids ${servers_aids[@]}
     sleep 30
 
 }
@@ -12,6 +35,7 @@ start_aws_instances() {
 stop_aws_instances() {
 
     aws ec2 stop-instances --instance-ids ${servers_aids[@]}
+#    aws ec2 wait instance-stopped --instance-ids ${servers_aids[@]}
     sleep 30
 }
 

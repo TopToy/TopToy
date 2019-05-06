@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from utiles import csvs2df
-fs=12
+fs=14
 
 line_w=1
 marker_s=5
@@ -71,7 +71,7 @@ def tps(dirs, oPath):
                 data = data[['workers', 'tps']].groupby(df.workers).mean()
                 plt.plot(data['workers'], data['tps'] / 1000, "-" + mark, markerfacecolor=face_c,
                              markersize=marker_s, linewidth=line_w) #, markevery=markers_on)
-            plt.title(names[n], fontsize='large')
+            plt.title(names[n], fontsize=fs)
             plt.xticks(np.arange(0, 11, step=2), fontsize=fs)
             plt.yticks(getYrange(index), fontsize=fs)
             plt.grid(True)

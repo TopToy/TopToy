@@ -89,6 +89,8 @@ public class Statistics {
     }
 
     static public void activate() {
+        if (active.get()) return;
+        logger.info("Start statistics");
         active.set(true);
         h1 = BCS.height();
         start = System.currentTimeMillis();
@@ -102,6 +104,8 @@ public class Statistics {
     }
 
     static public void deactivate() {
+        if (!active.get()) return;
+        logger.info("stop statistics");
         active.set(false);
         h2 = BCS.height();
         stop = System.currentTimeMillis();

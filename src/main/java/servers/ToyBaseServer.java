@@ -62,7 +62,6 @@ public abstract class ToyBaseServer {
     private final Queue<Block> proposedBlocks = new LinkedList<>();
     private Block.Builder currBLock;
     private final Object cbl = new Object();
-    private CacheUtils txCache = new CacheUtils(0);
     private boolean intCatched = false;
     CommLayer comm;
     private Validator v = new Tvalidator();
@@ -470,8 +469,8 @@ public abstract class ToyBaseServer {
 //    }
 
     public Transaction getTx(txID tid, boolean blocking) throws InterruptedException {
-        if (txCache.contains(tid)) {
-            return txCache.get(tid);
+        if (CacheUtils.contains(tid)) {
+            return CacheUtils.get(tid);
         }
         int height = DBUtils.getBlockRecord(tid.getChannel(), tid.getProposerID(), tid.getBid(), blocking);
         if (height == -1) return null;
@@ -485,7 +484,7 @@ public abstract class ToyBaseServer {
         if (b == null) return null;
         Transaction tx = b.getData(tid.getTxNum());
         if (tx.getId().equals(tid)) {
-            txCache.add(tx);
+            CacheUtils.add(tx.toBuilder().build());
             return tx;
         } else {
             logger.error(format("Invalid tx [w=%d ; pid=%d ; bid=%d ; tid=%d]",
@@ -616,7 +615,7 @@ public abstract class ToyBaseServer {
 //            }
 //        }
         Block b = BCS.bGetBlock(worker, index);
-        txCache.addBlock(b);
+        CacheUtils.addBlock(b);
         return b;
     }
 
@@ -627,7 +626,7 @@ public abstract class ToyBaseServer {
 //            }
 //        }
         Block b = BCS.nbGetBlock(worker, index);
-        txCache.addBlock(b);
+        CacheUtils.addBlock(b);
         return b;
     }
 

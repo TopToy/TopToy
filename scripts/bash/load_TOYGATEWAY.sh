@@ -2,10 +2,10 @@
 tDir=$PWD/../../
 #config=${tDir}/configurations/aws/4Servers2
 #config=${tDir}/configurations/aws/1Servers
-#config=${tDir}/configurations/aws/4ServersGD
+config=${tDir}/configurations/aws/gd/4Servers
 #config=${tDir}/configurations/aws/7ServersGD
 #config=${tDir}/configurations/aws/10ServersGD
-config=${tDir}/configurations/aws/4Servers
+#config=${tDir}/configurations/aws/4Servers
 #config=${tDir}/configurations/aws/7Servers
 #config=${tDir}/configurations/aws/10Servers
 #config=${tDir}/configurations/aws/49Servers

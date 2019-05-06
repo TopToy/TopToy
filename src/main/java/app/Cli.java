@@ -73,6 +73,7 @@ public class Cli {
 
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 if (!recorded.get()) {
+                    Statistics.deactivate();
                     writeSummery(outPath);
 ////                writeToScv(outPath);
 ////                writeBlocksStatistics(outPath);
@@ -180,14 +181,12 @@ public class Cli {
                 }
 
             if (args[0].equals("stStart")) {
-                logger.info("Start statistics");
                Statistics.activate();
                 return;
 
             }
 
             if (args[0].equals("stStop")) {
-                logger.info("stop statistics");
                 Statistics.deactivate();
                 return;
 

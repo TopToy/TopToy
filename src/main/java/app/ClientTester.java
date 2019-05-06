@@ -120,7 +120,7 @@ public class ClientTester {
     }
 
     static void test(clientServiceGrpc.clientServiceBlockingStub stub, int server) {
-        logger.info("Start cient for " + server);
+        logger.info("Start client for " + server);
         stub.write(Types.Transaction.newBuilder() // This meant to remove the effect of connecting to the server
                 .setData(ByteString.copyFrom(new byte[0]))
                 .setClientID(clientID)

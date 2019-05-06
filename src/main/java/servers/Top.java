@@ -14,6 +14,7 @@ import io.grpc.netty.NettyServerBuilder;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import proto.Types;
+import utils.CacheUtils;
 import utils.DBUtils;
 import utils.DiskUtils;
 import utils.statistics.Statistics;
@@ -105,8 +106,11 @@ public class Top {
         logger.info(format("[%d] has initiated WRB", id));
         new Membership(n);
         logger.info(format("[%d] has initiated Membership", id));
+        new CacheUtils(0, workers);
+        logger.info(format("[%d] has initiated Cache utils", id));
         new DBUtils(workers);
-        logger.info(format("[%d] has initiated DB TmoUtils", id));
+        logger.info(format("[%d] has initiated DB Utils", id));
+
     }
 
 

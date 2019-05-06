@@ -18,6 +18,7 @@ public class DBUtils {
     private static HashMap<Integer, Connection> rc = new HashMap<>();
     private static HashMap<Integer, Connection> wc = new HashMap<>();
     private static final Object newWriteNotifier = new Object();
+    private static final Object newCacheWriteNotifier = new Object();
     public DBUtils(int workers) {
         try {
             Class.forName("org.h2.Driver");
@@ -133,6 +134,7 @@ public class DBUtils {
         int bid = b.getId().getBid();
         int height = b.getHeader().getHeight();
         int channel = b.getHeader().getM().getChannel();
+//        CacheUtils.add(Types.BlockID.newBuilder().setPid(pid).setBid(bid).build(), channel, height);
         worker.execute(() -> {
             writeBlockToTable(channel, pid, bid, height);
             logger.debug(format("have write to DB [c=%d, h=%d, pid=%d, bid=%d", channel, height, pid, bid));
@@ -168,7 +170,12 @@ public class DBUtils {
     }
 
     static private int getBlockRecord(int worker, int pid, int bid) {
-//        createReadConn(channel);
+//        Types.BlockID bd = Types.BlockID.newBuilder().setBid(bid).setPid(pid).build();
+//        if (CacheUtils.contains(bd, worker)) {
+//            Integer res = CacheUtils.get(bd, worker);
+//            if (res == null) return -1;
+//            return (int) res;
+//        }
         try {
             Statement stmt = rc.get(worker).createStatement();
             ResultSet rs = stmt.executeQuery(format("SELECT height FROM %s WHERE pid=%d AND bid=%d",

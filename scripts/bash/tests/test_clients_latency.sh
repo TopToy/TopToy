@@ -24,7 +24,7 @@ test_clients_latency_over_workers() {
         configure_servers_workers
         configure_clients_workers
 
-        ${utils_dir}/watchdog.sh 600 &
+        ${utils_dir}/watchdog.sh 900 &
         local wdipd=$!
 
         run_servers
@@ -51,7 +51,7 @@ configure_correct_servers() {
         configure_tx_size ${1} ${config_toml}
         configure_max_tx_in_block ${2} ${config_toml}
         configure_tmo ${6} ${config_toml}
-        configure_testing "false" ${config_toml}
+        configure_testing "true" ${config_toml}
         configure_inst 1200 ${inst}
 
         copy_data_to_tmp ${config_rb}
@@ -72,7 +72,7 @@ configure_clients() {
 
         configure_tx_size ${1} ${config_toml}
         configure_max_tx_in_block ${2} ${config_toml}
-        configure_testing "false" ${config_toml}
+        configure_testing "true" ${config_toml}
         update_resources_and_load ${clients[${i}]} ${cbin} ${conf}
 
     done
@@ -123,19 +123,19 @@ configure_clients_workers() {
 # ${7} tx num
 
 ########################### 10 tx/block ###########################
-#test_clients_latency_over_workers 512 10 1 1 1 100 2500
-test_clients_latency_over_workers 512 10 5 5 1 100 2500
-#test_clients_latency_over_workers 512 10 10 10 1 100 2500
-#
-############################ 100 tx/block ###########################
-#test_clients_latency_over_workers 512 100 1 1 1 100 2500
-#test_clients_latency_over_workers 512 100 5 5 1 100 2500
-#test_clients_latency_over_workers 512 100 10 10 1 100 2500
-#
-############################ 1000 tx/block ###########################
-#test_clients_latency_over_workers 512 1000 1 1 1 100 2500
-#test_clients_latency_over_workers 512 1000 5 5 1 100 2500
-#test_clients_latency_over_workers 512 1000 10 10 1 100 2500
+#test_clients_latency_over_workers 512 10 1 1 1 100 1000
+#test_clients_latency_over_workers 512 10 5 5 1 100 1000
+#test_clients_latency_over_workers 512 10 10 10 1 100 1000
+
+########################### 100 tx/block ###########################
+#test_clients_latency_over_workers 512 100 1 1 1 100 1000
+#test_clients_latency_over_workers 512 100 5 5 1 100 1000
+#test_clients_latency_over_workers 512 100 10 10 1 100 1000
+
+########################### 1000 tx/block ###########################
+#test_clients_latency_over_workers 512 1000 1 1 1 100 1000
+#test_clients_latency_over_workers 512 1000 5 5 1 100 1000
+test_clients_latency_over_workers 512 1000 10 10 1 100 1000
 
 
 

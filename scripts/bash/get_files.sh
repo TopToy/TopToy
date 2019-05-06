@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-out_path_t=/home/yoni/toy/latency/4
+out_path_t=/home/yoni/toy/gd/4
 readarray -t gate < ./data/gateway.txt
 
 mkdir -p ${out_path_t}

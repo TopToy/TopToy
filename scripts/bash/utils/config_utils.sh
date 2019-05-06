@@ -42,7 +42,9 @@ configure_inst_with_statistics() {
 configure_inst() {
     echo "init" > ${2}
     echo "serve" >> ${2}
+    echo "stStart" >> ${2}
     echo "wait ${1}" >> ${2}
+    echo "stStop" >> ${2}
     echo "stop" >> ${2}
     echo "quit" >> ${2}
 }
