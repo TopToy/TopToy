@@ -39,7 +39,7 @@ public class Statistics {
     static private AtomicInteger maxTmo = new AtomicInteger(0);
     static private AtomicInteger syncs = new AtomicInteger(0);
     static private AtomicLong negTime = new AtomicLong(0);
-    static private HashMap<Integer[], Long> dlt = new HashMap<>();
+//    static private HashMap<Integer[], Long> dlt = new HashMap<>();
 
 
     static private AtomicBoolean active = new AtomicBoolean(false);
@@ -262,7 +262,7 @@ public class Statistics {
                 .getTentativeTime();
         acHP2DL += curr - b.hst.getProposeTime();
         acHD2DL += curr - b.hst.getDefiniteTime();
-        dlt.put(new Integer[]{h, worker}, curr);
+//        dlt.put(new Integer[]{h, worker}, curr);
     }
 
     static void collectReasults() throws InterruptedException {
@@ -278,11 +278,11 @@ public class Statistics {
         }
     }
 
-    static public long getDltByHeight(int height, int w) {
-        Integer[] key = new Integer[]{height, w};
-        if (!dlt.containsKey(key)) return -1;
-        return dlt.get(new Integer[]{height, w});
-
-    }
+//    static public long getDltByHeight(int height, int w) {
+//        Integer[] key = new Integer[]{height, w};
+//        if (!dlt.containsKey(key)) return -1;
+//        return dlt.get(new Integer[]{height, w});
+//
+//    }
 
 }

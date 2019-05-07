@@ -484,7 +484,7 @@ public abstract class ToyBaseServer {
         if (b == null) return null;
         Transaction tx = b.getData(tid.getTxNum());
         if (tx.getId().equals(tid)) {
-            CacheUtils.add(tx.toBuilder().build());
+            CacheUtils.add(tx);
             return tx;
         } else {
             logger.error(format("Invalid tx [w=%d ; pid=%d ; bid=%d ; tid=%d]",

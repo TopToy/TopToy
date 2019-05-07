@@ -2,11 +2,11 @@
 tDir=$PWD/../../
 #config=${tDir}/configurations/aws/4Servers2
 #config=${tDir}/configurations/aws/1Servers
-config=${tDir}/configurations/aws/gd/4Servers
+#config=${tDir}/configurations/aws/gd/4Servers
 #config=${tDir}/configurations/aws/7ServersGD
 #config=${tDir}/configurations/aws/10ServersGD
 #config=${tDir}/configurations/aws/4Servers
-#config=${tDir}/configurations/aws/7Servers
+config=${tDir}/configurations/aws/7Servers
 #config=${tDir}/configurations/aws/10Servers
 #config=${tDir}/configurations/aws/49Servers
 #config=${tDir}/configurations/aws/100Servers
@@ -22,8 +22,8 @@ ssh ${gate} "mkdir -p ./toy/configurations"
 
 echo "copy bin to ${gate}..."
 scp  -r ${tDir}/bin ${gate}:./toy > /dev/null
-echo "copy cbin to ${gate}..."
-scp  -r ${tDir}/cbin ${gate}:./toy > /dev/null
+#echo "copy cbin to ${gate}..."
+#scp  -r ${tDir}/cbin ${gate}:./toy > /dev/null
 echo "copy configurations to ${gate}..."
 scp  -r ${config}/* ${gate}:./toy/configurations > /dev/null
 echo "copy scripts to ${gate}..."

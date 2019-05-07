@@ -17,8 +17,7 @@ public class DBUtils {
     static private ExecutorService worker = Executors.newSingleThreadExecutor();
     private static HashMap<Integer, Connection> rc = new HashMap<>();
     private static HashMap<Integer, Connection> wc = new HashMap<>();
-    private static final Object newWriteNotifier = new Object();
-    private static final Object newCacheWriteNotifier = new Object();
+//    private static final Object newWriteNotifier = new Object();
     public DBUtils(int workers) {
         try {
             Class.forName("org.h2.Driver");
@@ -114,7 +113,7 @@ public class DBUtils {
 
     static private void writeBlockToTable(int channel, int pid, int bid, int height) {
 //        createWriteConn(channel);
-        synchronized (newWriteNotifier) {
+//        synchronized (newWriteNotifier) {
             try {
                 Statement stmt = wc.get(channel).createStatement();
                 stmt.executeUpdate(format("INSERT INTO %s VALUES(%d, %d, %d)", getTableName(channel),
@@ -124,8 +123,8 @@ public class DBUtils {
             } catch (SQLException e) {
                 logger.error(format("unable to create statement for tx [channel=%d]", channel), e);
             }
-            newWriteNotifier.notifyAll();
-        }
+//            newWriteNotifier.notifyAll();
+//        }
 
     }
 
@@ -157,15 +156,16 @@ public class DBUtils {
 //    }
 
     static public int getBlockRecord(int worker, int pid, int bid, boolean blocking) throws InterruptedException {
-        if (!blocking) return getBlockRecord(worker, pid, bid);
-        int h = getBlockRecord(worker, pid, bid);
-        synchronized (newWriteNotifier) {
-            while (h == -1) {
-                newWriteNotifier.wait();
-                h = getBlockRecord(worker, pid, bid);
-            }
-        }
-        return h;
+        return getBlockRecord(worker, pid, bid);
+//        int h = getBlockRecord(worker, pid, bid);
+//        synchronized (newWriteNotifier) {
+//            while (h == -1) {
+//                newWriteNotifier.wait();
+//                h = getBlockRecord(worker, pid, bid);
+//            }
+//        }
+//        return h;
+
 
     }
 

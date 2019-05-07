@@ -105,7 +105,9 @@ configure_servers_workers() {
 ########################512x1000###########################
 #test_correct_tps_servers_over_workers 512 1000 1 5 2 100 300
 #test_correct_tps_servers_over_workers 512 1000 7 9 2 100 300
-test_correct_tps_servers_over_workers 512 1000 10 10 1 100 300
+test_correct_tps_servers_over_workers 512 1000 7 7 1 100 300
+test_correct_tps_servers_over_workers 512 1000 7 7 1 100 60
+
 #
 ##########################1024#############################
 #########################1024x10###########################

@@ -26,6 +26,7 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import static crypto.blockDigSig.hashBlockData;
 import static java.lang.Math.min;
@@ -447,17 +448,24 @@ public class Cli {
                 writer = new FileWriter(path.toString(), true);
                 List<List<String>> rows = new ArrayList<>();
                 int cw = 0;
+                int workers = Config.getC();
                 for (int i = Statistics.getH1() ; i < Statistics.getH2() ; i++) {
-                    for (int  j = 0 ; j < Config.getC() ; j++) {
-                        Types.Block b = BCS.nbGetBlock(j, i);
+                    List<Types.Block> rBlocks = new ArrayList<>();
+                    for (int  j = 0 ; j < workers ; j++) {
+                        rBlocks.add(BCS.nbGetBlock(j, i));
+
+                    }
+                    long dlt = Collections.max(rBlocks.stream().map(b ->
+                            b.getHeader().getHst().getDefiniteTime()).collect(Collectors.toList()));
+                    for (int j = 0 ; j < workers ; j++) {
+                        Types.Block b = rBlocks.get(j);
                         long pt = b.getBst().getProposeTime();
                         long tt = b.getHeader().getHst().getTentativeTime();
                         long dt = b.getHeader().getHst().getDefiniteTime();
-                        long dlt = Statistics.getDltByHeight(i, j);
-                        if (dlt == -1) {
-                            logger.info(format("Un registered block [h=%d ; w=%d]", i, j));
-                            continue;
-                        }
+//                        if (dlt == -1) {
+//                            logger.info(format("Un registered block [h=%d ; w=%d]", i, j));
+//                            continue;
+//                        }
                         rows.add(Arrays.asList(
                                     String.valueOf(j)
                                     , String.valueOf(b.getId().getPid())

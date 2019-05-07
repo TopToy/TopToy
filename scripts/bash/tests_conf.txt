@@ -1,4 +1,4 @@
 #correct_tps test_no_failures
 #clients_latency test_clients_latency
-correct_tps_gd test_no_failures_gd
+#correct_tps_gd test_no_failures_gd
 
