@@ -6,12 +6,14 @@ tDir=$PWD/../../
 #config=${tDir}/configurations/aws/7ServersGD
 #config=${tDir}/configurations/aws/10ServersGD
 #config=${tDir}/configurations/aws/4Servers
-config=${tDir}/configurations/aws/7Servers
+#config=${tDir}/configurations/aws/7Servers
 #config=${tDir}/configurations/aws/10Servers
 #config=${tDir}/configurations/aws/49Servers
 #config=${tDir}/configurations/aws/100Servers
 #config=${tDir}/configurations/4Servers/remote
-readarray -t gate < ./data/gateway.txt
+gate=${1}
+config=${2}
+#readarray -t gate < ./data/gateway.txt
 mvn install -f ${tDir}/pom.xml -DskipTests
 if [[ "$?" -ne 0 ]] ; then
   echo 'could compile the project'; exit $1

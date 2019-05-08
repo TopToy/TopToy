@@ -76,6 +76,7 @@ public class Cli {
                 if (!recorded.get()) {
                     Statistics.deactivate();
                     writeSummery(outPath);
+                    writeBlocks();
 ////                writeToScv(outPath);
 ////                writeBlocksStatistics(outPath);
 //                    writeBlocksStatisticsSummery(outPath);
@@ -125,6 +126,7 @@ public class Cli {
                 }
                 if (args[0].equals("quit")) {
                     writeSummery(outPath);
+                    writeBlocks();
 //                    writeBlocksStatisticsSummery(outPath);
 
                     recorded.set(true);
@@ -434,6 +436,7 @@ public class Cli {
 //        }
 
         void writeBlocks() {
+            if (Config.getTxSize() != 512) return;
             logger.info("Starting writeBlocks");
             String pathString = "/tmp/JToy/res/";
             Path path = Paths.get(pathString, String.valueOf(JToy.s.getID()), "bsummery.csv");
@@ -447,7 +450,6 @@ public class Cli {
                 FileWriter writer = null;
                 writer = new FileWriter(path.toString(), true);
                 List<List<String>> rows = new ArrayList<>();
-                int cw = 0;
                 int workers = Config.getC();
                 for (int i = Statistics.getH1() ; i < Statistics.getH2() ; i++) {
                     List<Types.Block> rBlocks = new ArrayList<>();
@@ -467,7 +469,10 @@ public class Cli {
 //                            continue;
 //                        }
                         rows.add(Arrays.asList(
-                                    String.valueOf(j)
+                                    String.valueOf(Config.getMaxTransactionsInBlock())
+                                    , String.valueOf(Config.getTxSize())
+                                    , String.valueOf(workers)
+                                    , String.valueOf(j)
                                     , String.valueOf(b.getId().getPid())
                                     , String.valueOf(b.getId().getBid())
                                     , String.valueOf(b.getHeader().getHeight())

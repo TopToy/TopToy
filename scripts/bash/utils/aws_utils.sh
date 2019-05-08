@@ -83,6 +83,7 @@ collect_res_from_server() {
     local logs=${3}
     local tmp=${4}
     local sum=${5}
+    local blocks=${6}
 
     echo "getting files from server ${1}"
     scp -o ConnectTimeout=30 -r ${1}:/tmp/JToy/logs/* $logs  > /dev/null
@@ -90,6 +91,7 @@ collect_res_from_server() {
 
     echo "collecting results summery from server ${1}"
     cat $tmp/${2}/summery.csv >> $sum
+    cat $tmp/${2}/bsummery.csv >> $blocks
 }
 
 collect_res_from_servers() {
@@ -97,15 +99,16 @@ collect_res_from_servers() {
     local logs=${home}/out/logs/$dt
     local tmp=${home}/out/tmp
     local sum=${home}/out/summeries/$dt.csv
-    mkdir -p ${home}/out/summeries
+    local blocks=${home}/out/summeries/blocks/$dt.csv
+    mkdir -p ${home}/out/summeries/blocks
     mkdir -p $logs
     mkdir -p $tmp
 
-    print_servers_summery_header ${sum}
+    print_servers_summery_header ${sum} ${blocks}
 
     local id=0
     for s in "${servers[@]}"; do
-        collect_res_from_server ${s} ${id} ${logs} ${tmp} ${sum}
+        collect_res_from_server ${s} ${id} ${logs} ${tmp} ${sum} ${blocks}
     id=$((${id} + 1))
     done
 

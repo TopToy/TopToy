@@ -26,7 +26,7 @@ title = "configuration"
 [[cluster]]
       [cluster.s0]
             id = 0
-            ip = "172.31.18.74"
+            ip = "172.31.26.52"
             wrbPort = 30000
             commPort = 30010
             obbcPort = 30020
@@ -35,7 +35,7 @@ title = "configuration"
     
       [cluster.s1]
             id = 1
-            ip = "172.31.30.184"
+            ip = "172.31.25.5"
             wrbPort = 30000
             commPort = 30010
             obbcPort = 30020
@@ -44,7 +44,7 @@ title = "configuration"
     
       [cluster.s2]
             id = 2
-            ip = "172.31.31.96"
+            ip = "172.31.22.186"
             wrbPort = 30000
             commPort = 30010
             obbcPort = 30020
@@ -53,7 +53,7 @@ title = "configuration"
     
       [cluster.s3]
             id = 3
-            ip = "172.31.19.75"
+            ip = "172.31.23.35"
             wrbPort = 30000
             commPort = 30010
             obbcPort = 30020
@@ -62,7 +62,7 @@ title = "configuration"
     
       [cluster.s4]
             id = 4
-            ip = "172.31.17.108"
+            ip = "172.31.22.6"
             wrbPort = 30000
             commPort = 30010
             obbcPort = 30020
@@ -71,7 +71,7 @@ title = "configuration"
     
       [cluster.s5]
             id = 5
-            ip = "172.31.30.234"
+            ip = "172.31.23.177"
             wrbPort = 30000
             commPort = 30010
             obbcPort = 30020
@@ -80,7 +80,7 @@ title = "configuration"
     
       [cluster.s6]
             id = 6
-            ip = "172.31.24.30"
+            ip = "172.31.22.83"
             wrbPort = 30000
             commPort = 30010
             obbcPort = 30020

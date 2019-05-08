@@ -75,6 +75,7 @@ replace_ips() {
 # ${1} servers summery file
 print_servers_summery_header() {
      echo "valid,id,type,workers,tmo,actTmo,maxTmo,txSize,txInBlock,txTotal,duration,tps,nob,noeb,bps,avgTxInBlock,opt,opRate,pos,posRate,neg,negRate,avgNegTime,syncs,BP2T,BP2D,BP2DL,HP2T,HP2D,HP2DL,HT2D,HD2DL,suspected" >> ${1}
+     echo "maxTxInBlock,txSize,workers,w,height,pid,bid,blockSize,timeToTentative,TimeToDefinite,TimeToDeliver,TentativeToDefinite,DefiniteToDeliver" >> ${2}
 }
 
 print_clients_summery_header() {
