@@ -29,7 +29,7 @@ public class Statistics {
 
     static private int h1 = 0;
     static private int h2 = 0;
-
+    static private int id = -1;
     static private AtomicInteger all = new AtomicInteger(0);
     static private AtomicInteger pos = new AtomicInteger(0);
     static private AtomicInteger opt = new AtomicInteger(0);
@@ -49,6 +49,7 @@ public class Statistics {
     static int neb = 0;
     static int txSize = 0;
     static int txInBlock = 0;
+    static int stBlockNum = 0;
 
     static double acBP2T = 0;
     static double acBP2D = 0;
@@ -90,9 +91,10 @@ public class Statistics {
         negTime.addAndGet(time);
     }
 
-    static public void activate() {
+    static public void activate(int id) {
         if (active.get()) return;
         logger.info("Start statistics");
+        Statistics.id = id;
         active.set(true);
         h1 = BCS.height();
         start = System.currentTimeMillis();
@@ -217,7 +219,11 @@ public class Statistics {
         return txInBlock;
     }
 
-//    public static int getTxSize() {
+    public static int getStBlockNum() {
+        return stBlockNum;
+    }
+
+    //    public static int getTxSize() {
 //        return txSize;
 //    }
 
@@ -237,7 +243,7 @@ public class Statistics {
         return active.get();
     }
 
-    static void collectForBlock(BCStat b, int h, int worker) {
+    static void collectForBlock(BCStat b) {
         long curr = System.currentTimeMillis();
         nob++;
         if (b.txCount == 0) {
@@ -247,21 +253,25 @@ public class Statistics {
 //        for (Types.Transaction t : b.getDataList()) {
 //            txSize += t.getData().size();
 //        }
-        acBP2T += b.hst.getTentativeTime() - b.bst
-                .getProposeTime();
-        acBP2D += b.hst.getDefiniteTime() - b.bst
-                .getProposeTime();
+        if (b.pid == id) {
+            stBlockNum++;
+            acBP2T += b.hst.getTentativeTime() - b.bst
+                    .getProposeTime();
+            acBP2D += b.hst.getDefiniteTime() - b.bst
+                    .getProposeTime();
 
-        acBP2DL += curr - b.bst.getProposeTime();
+            acBP2DL += curr - b.bst.getProposeTime();
 
-        acHP2T += b.hst.getTentativeTime() - b.hst
-                .getProposeTime();
-        acHP2D += b.hst.getDefiniteTime() - b.hst
-                .getProposeTime();
-        acHT2D += b.hst.getDefiniteTime() - b.hst
-                .getTentativeTime();
-        acHP2DL += curr - b.hst.getProposeTime();
-        acHD2DL += curr - b.hst.getDefiniteTime();
+            acHP2T += b.hst.getTentativeTime() - b.hst
+                    .getProposeTime();
+            acHP2D += b.hst.getDefiniteTime() - b.hst
+                    .getProposeTime();
+            acHT2D += b.hst.getDefiniteTime() - b.hst
+                    .getTentativeTime();
+            acHP2DL += curr - b.hst.getProposeTime();
+            acHD2DL += curr - b.hst.getDefiniteTime();
+        }
+
 //        dlt.put(new Integer[]{h, worker}, curr);
     }
 
@@ -272,7 +282,7 @@ public class Statistics {
             for (int i = 0 ; i < workers ; i++) {
                 BCStat b = BCS.bGetBCStat(i, h);
                 if (b == null) continue;
-                collectForBlock(b, h, i);
+                collectForBlock(b);
             }
             h++;
         }

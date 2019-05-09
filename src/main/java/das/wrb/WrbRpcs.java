@@ -182,7 +182,10 @@ public class WrbRpcs extends WrbGrpc.WrbImplBase {
     }
 
     void sendDataMessage(peer p, Types.BlockHeader msg) {
-        p.send(msg, msg.getM().getChannel());
+        p.send(msg.toBuilder()
+                .setHst(Types.headerStatistics.newBuilder()
+                        .setProposeTime(System.currentTimeMillis()).build())
+                .build(), msg.getM().getChannel());
     }
 
     private void sendReqMessage(WrbGrpc.WrbStub stub, Types.WrbReq req, int worker,
@@ -209,10 +212,7 @@ public class WrbRpcs extends WrbGrpc.WrbImplBase {
                     logger.debug(format("[#%d-C[%d]] has received response message from [#%d] for [cidSeries=%d ; cid=%d]",
                             id, worker, res.getSender(), cidSeries, cid));
                     synchronized (Data.pending[worker]) {
-                        Data.pending[worker].putIfAbsent(key, res.getData().toBuilder()
-                        .setHst(Types.headerStatistics.newBuilder()
-                                .setProposeTime(System.currentTimeMillis()).build())
-                        .build());
+                        Data.pending[worker].putIfAbsent(key, res.getData());
                         Data.pending[worker].notify();
                     }
                 }

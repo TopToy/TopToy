@@ -116,7 +116,8 @@ public class CliqueRpcs  extends CommunicationGrpc.CommunicationImplBase {
         for (Peer p : peers.values()) {
             sendImpl(Types.Comm.newBuilder()
                     .setChannel(worker)
-                    .setData(data)
+                    .setData(data.toBuilder().setBst(Types.blockStatistics.newBuilder()
+                            .setProposeTime(System.currentTimeMillis()).build()).build())
                     .build(), p);
             }
 
@@ -146,7 +147,8 @@ public class CliqueRpcs  extends CommunicationGrpc.CommunicationImplBase {
             Peer p = peers.get(i);
            sendImpl(Types.Comm.newBuilder()
                    .setChannel(worker)
-                   .setData(data)
+                   .setData(data.toBuilder().setBst(Types.blockStatistics.newBuilder()
+                           .setProposeTime(System.currentTimeMillis()).build()).build())
                    .build(), p);
 
         }
@@ -200,10 +202,7 @@ public class CliqueRpcs  extends CommunicationGrpc.CommunicationImplBase {
                             Data.blocks[pid][channel].putIfAbsent(bid, new LinkedList<>());
                             Data.blocks[pid][channel].computeIfPresent(bid, (k, v) -> {
                                 if (v.size() > 0) return v;
-                                v.add(commRes.getB().toBuilder()
-                                .setBst(Types.blockStatistics.newBuilder()
-                                        .setProposeTime(System.currentTimeMillis()).build())
-                                .build());
+                                v.add(commRes.getB());
                                 return v;
                             });
                             Data.blocks[pid][channel].notifyAll();
@@ -233,8 +232,7 @@ public class CliqueRpcs  extends CommunicationGrpc.CommunicationImplBase {
                 if (v.contains(request.getData())) return v;
                 Types.BlockID bid = request.getData().getId();
                 logger.debug(format("[%d-%d] received block [pid=%d ; bid=%d]", id, c, bid.getPid(), bid.getBid()));
-                v.add(request.getData().toBuilder().setBst(Types.blockStatistics.newBuilder()
-                        .setProposeTime(System.currentTimeMillis()).build()).build());
+                v.add(request.getData());
                 return v;
             });
             Data.blocks[pid][c].notifyAll();

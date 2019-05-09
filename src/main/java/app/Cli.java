@@ -188,7 +188,7 @@ public class Cli {
                 }
 
             if (args[0].equals("stStart")) {
-               Statistics.activate();
+               Statistics.activate(JToy.s.getID());
                 return;
 
             }
@@ -461,6 +461,7 @@ public class Cli {
                             b.getHeader().getHst().getDefiniteTime()).collect(Collectors.toList()));
                     for (int j = 0 ; j < workers ; j++) {
                         Types.Block b = rBlocks.get(j);
+                        if (b.getId().getPid() != JToy.s.getID()) continue;
                         long pt = b.getBst().getProposeTime();
                         long tt = b.getHeader().getHst().getTentativeTime();
                         long dt = b.getHeader().getHst().getDefiniteTime();
@@ -511,6 +512,7 @@ public class Cli {
                 int nob = Statistics.getNob();
                 int noeb = Statistics.getNeb();
                 int txCount = Statistics.getTxCount();
+                int stBlockNum = Statistics.getStBlockNum();
                 long txSize = Config.getTxSize();
                 int txInBlock = Config.getMaxTransactionsInBlock();
 //                int h1 = Statistics.getH1();
@@ -545,16 +547,16 @@ public class Cli {
                 double HP2DL = 0;
                 double HD2DL = 0;
 
-                if (nob > 0) {
-                    BP2T = acBP2T / nob;
-                    BP2D = acBP2D / nob;
-                    BP2DL = acBP2DL / nob;
+                if (stBlockNum > 0) {
+                    BP2T = acBP2T / stBlockNum;
+                    BP2D = acBP2D / stBlockNum;
+                    BP2DL = acBP2DL / stBlockNum;
 
-                    HP2T = acHP2T / nob;
-                    HP2D = acHP2D / nob;
-                    HT2D = acHT2D / nob;
-                    HP2DL = acHP2DL / nob;
-                    HD2DL = acHD2DL / nob;
+                    HP2T = acHP2T / stBlockNum;
+                    HP2D = acHP2D / stBlockNum;
+                    HT2D = acHT2D / stBlockNum;
+                    HP2DL = acHP2DL / stBlockNum;
+                    HD2DL = acHD2DL / stBlockNum;
                 }
 
                 int tps = 0;

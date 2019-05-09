@@ -85,6 +85,7 @@ public class Blockchain {
             st.bst = b.getBst();
             st.hst = b.getHeader().getHst();
             st.txCount = b.getDataCount();
+            st.pid = b.getId().getPid();
             bsts.putIfAbsent(b.getHeader().getHeight(), st);
         }
 

@@ -80,10 +80,7 @@ public class Data {
         }
         if (BCS.contains(worker, height)) return;
         synchronized (pending[worker]) {
-            pending[worker].putIfAbsent(key, request.toBuilder().setHst(
-                    Types.headerStatistics.newBuilder()
-                            .setProposeTime(System.currentTimeMillis()).build())
-                    .build());
+            pending[worker].putIfAbsent(key, request);
             pending[worker].notify();
         }
     }
