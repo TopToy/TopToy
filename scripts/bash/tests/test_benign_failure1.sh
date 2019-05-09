@@ -14,9 +14,9 @@ source $PWD/definitions.sh
 # ${6} tmo
 # ${7} test time
 # ${8} f
-test_correct_tps_servers_over_workers() {
+test_benign_tps_servers_over_workers() {
 
-    echo "running test_correct_tps_servers_over_workers"
+    echo "running test_benign_tps_servers_over_workers"
 
     configure_correct_servers "$@"
 
@@ -48,10 +48,10 @@ configure_correct_servers() {
 
     for i in `seq 0 $((${#servers[@]} - 1))`; do
 
-        if [ $i -le ${8} ]; then
-            configure_inst_with_statistics 1 1 1 ${inst}
+        if (( $i < ${8} )); then
+            configure_inst_with_statistics 30 0 0 ${inst}
         else
-            configure_inst_with_statistics 1 ${7} 1 ${inst}
+            configure_inst_with_statistics 30 ${7} 1 ${inst}
         fi
 
         copy_data_to_tmp ${config_rb}
@@ -96,18 +96,19 @@ configure_servers_workers() {
 }
 start_aws_instances
 
+#test_benign_tps_servers_over_workers 512 10 1 1 2 100 60 1
 
 ########################512x10###########################
-test_correct_tps_servers_over_workers 512 10 1 9 2 100 180 1
-test_correct_tps_servers_over_workers 512 10 10 10 1 100 180 1
+test_benign_tps_servers_over_workers 512 10 1 9 2 100 180 1
+test_benign_tps_servers_over_workers 512 10 10 10 1 100 180 1
 
 #######################512x100###########################
-test_correct_tps_servers_over_workers 512 100 1 9 2 100 180 1
-test_correct_tps_servers_over_workers 512 100 10 10 1 100 180 1
+test_benign_tps_servers_over_workers 512 100 1 9 2 100 180 1
+test_benign_tps_servers_over_workers 512 100 10 10 1 100 180 1
 
 #######################512x1000###########################
-test_correct_tps_servers_over_workers 512 1000 1 9 2 100 180 1
-test_correct_tps_servers_over_workers 512 1000 10 10 1 100 180 1
+test_benign_tps_servers_over_workers 512 1000 1 9 2 100 180 1
+test_benign_tps_servers_over_workers 512 1000 10 10 1 100 180 1
 
 
 

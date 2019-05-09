@@ -115,7 +115,7 @@ public class Cli {
                     return;
                 }
             if (args[0].equals("writeBlocks")) {
-                writeBlocks();
+//                writeBlocks();
                 return;
             }
                 if (args[0].equals("stop")) {

@@ -51,6 +51,7 @@ public class Utils {
                 .setTransactionHash(ByteString.copyFrom(tHash))
                 .setPrev(ByteString.copyFrom(headerHash))
                 .setEmpty(b.getDataCount() == 0)
+                .setHst(Types.headerStatistics.newBuilder().setProposeTime(System.currentTimeMillis()).build())
                 .build();
 
 //        if (creatorID == -1) {

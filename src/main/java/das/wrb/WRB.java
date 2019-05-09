@@ -52,7 +52,7 @@ public class WRB {
 //        WRB.comm = comm;
         new TmoUtils(n, workers, tmo);
         new Data(workers);
-        new BFD(n, f, workers,100 * tmo);
+        new BFD(n, f, workers,20 * tmo);
         BFD.activateAll();
         WRB.rpcs = new WrbRpcs(id, workers, n, f, wrbCluster, serverCrt, serverPrivKey, caRoot);
         logger.info(format("Initiated WRB: [id=%d; n=%d; f=%d; tmo=%d; tmoInterval=%d]", id, n, f, tmo,

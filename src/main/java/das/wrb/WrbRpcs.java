@@ -182,10 +182,7 @@ public class WrbRpcs extends WrbGrpc.WrbImplBase {
     }
 
     void sendDataMessage(peer p, Types.BlockHeader msg) {
-        p.send(msg.toBuilder()
-                .setHst(Types.headerStatistics.newBuilder()
-                        .setProposeTime(System.currentTimeMillis()).build())
-                .build(), msg.getM().getChannel());
+        p.send(msg, msg.getM().getChannel());
     }
 
     private void sendReqMessage(WrbGrpc.WrbStub stub, Types.WrbReq req, int worker,
