@@ -61,10 +61,11 @@ def tps(dirs, oPath):
             plt.subplot(sb)
             files = glob.glob(d + "/summeries/*.csv")
             df = csvs2df(files)
+            m = 0
             for ts in txSize:
                 data = df[(df.txSize == ts) & (df.txInBlock == bs)]
                 data = data[['workers', 'tps']]
-                m = 0
+
 
                 mark = markers[m]
                 m += 1
@@ -91,15 +92,13 @@ def tps(dirs, oPath):
                      )
     # plt.setp(leg.get_title(), fontsize='xx-small')
     fig.text(0.51, 0.06, "$\\omega$", ha="center", va="center", fontsize=fs)
-    fig.text(0.025, 0.5, "TPS ($\\frac{transactions}{sec}$)", ha="center", va="center", fontsize=fs, rotation=90)
+    fig.text(0.025, 0.5, "KTPS ($\\frac{Ktransactions}{sec}$)", ha="center", va="center", fontsize=fs, rotation=90)
     fig.tight_layout(rect=[0.02, 0.04, 1, 1.03])
     for d in oPath:
-        plt.savefig(d + '/tps.pdf')
-        plt.savefig(d + '/tps')
+        plt.savefig(d + '/tps2.pdf')
+        plt.savefig(d + '/tps2')
 
 if __name__ == "__main__":
-    tps(["/home/yoni/toy/correct/4",
-         "/home/yoni/toy/correct/7",
-         "/home/yoni/toy/correct/10"
+    tps(["/home/yoni/toy/m5/correct/4"
          ],
-        ["/home/yoni/toy/figures", "/home/yoni/Dropbox/paper/draws"])
+        ["/home/yoni/toy/figures", "/home/yoni/Dropbox/paper/figures"])

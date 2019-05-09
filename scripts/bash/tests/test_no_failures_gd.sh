@@ -13,7 +13,6 @@ source $PWD/definitions.sh
 # ${6} tmo
 # ${7} test time
 test_correct_tps_servers_over_workers() {
-    start_aws_instances_with_regions
     echo "running test_correct_tps_servers_over_workers"
 
     configure_correct_servers "$@"
@@ -33,7 +32,7 @@ test_correct_tps_servers_over_workers() {
         collect_res_from_servers
 
     done
-    stop_aws_instances_with_regions
+
 }
 
 configure_correct_servers() {
@@ -84,27 +83,24 @@ configure_servers_workers() {
     done
 
 }
+start_aws_instances_with_regions
 
 ##########################0#############################
-test_correct_tps_servers_over_workers 0 0 1 5 2 1000 300
-test_correct_tps_servers_over_workers 0 0 7 9 2 1000 300
-test_correct_tps_servers_over_workers 0 0 10 10 1 1000 300
+test_correct_tps_servers_over_workers 0 0 1 9 2 1000 180
+test_correct_tps_servers_over_workers 0 0 10 10 1 1000 180
 
 #########################512#############################
 ########################512x10###########################
-test_correct_tps_servers_over_workers 512 10 1 5 2 1000 300
-test_correct_tps_servers_over_workers 512 10 7 9 2 1000 300
-test_correct_tps_servers_over_workers 512 10 10 10 1 1000 300
+test_correct_tps_servers_over_workers 512 10 1 9 2 1000 180
+test_correct_tps_servers_over_workers 512 10 10 10 1 1000 180
 
 #######################512x100###########################
-test_correct_tps_servers_over_workers 512 100 1 5 2 1000 300
-test_correct_tps_servers_over_workers 512 100 7 9 2 1000 300
-test_correct_tps_servers_over_workers 512 100 10 10 1 1000 300
+test_correct_tps_servers_over_workers 512 100 1 9 2 1000 180
+test_correct_tps_servers_over_workers 512 100 10 10 1 1000 180
 
 #######################512x1000###########################
-test_correct_tps_servers_over_workers 512 1000 1 5 2 1000 300
-test_correct_tps_servers_over_workers 512 1000 7 9 2 1000 300
-test_correct_tps_servers_over_workers 512 1000 10 10 1 1000 300
+test_correct_tps_servers_over_workers 512 1000 1 9 2 1000 180
+test_correct_tps_servers_over_workers 512 1000 10 10 1 1000 180
 
-
+stop_aws_instances_with_regions
 

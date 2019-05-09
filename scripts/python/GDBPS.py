@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from utiles import csvs2df
-fs=14
+fs=15
 
 line_w=1
 marker_s=5
@@ -27,6 +27,7 @@ def bps(dirs, oPath):
     r, c = 0, 0
     lines = []
     markers_on = [0, 3, 6, 9]
+    m = 0
     for d in dirs:
         sb = str(rows) + str(cols) + str(index)
         sb = int(sb)
@@ -35,7 +36,7 @@ def bps(dirs, oPath):
         df = csvs2df(files)
         df = df[(df.txSize == 0) & (df.txInBlock == 0)]
         df = df[['workers', 'bps']]
-        m = 0
+
 
         mark = markers[m]
         m += 1
@@ -44,7 +45,7 @@ def bps(dirs, oPath):
                  markersize=marker_s, linewidth=line_w) #, markevery=markers_on)
     plt.title("Blocks Generation Rate", fontsize=fs)
     plt.xticks(np.arange(0, 11, step=2), fontsize=fs)
-    plt.yticks(np.arange(0, 1801, step=300), fontsize=fs)
+    plt.yticks(np.arange(0, 131, step=30), fontsize=fs)
     plt.grid(True)
     n += 1
     index += 1
@@ -62,15 +63,15 @@ def bps(dirs, oPath):
                #  title = "Tx size\n(Bytes)"
                )
     # plt.setp(leg.get_title(), fontsize='xx-small')
-    fig.text(0.57, 0.12, "$\\omega$", ha="center", va="center", fontsize=fs)
+    fig.text(0.57, 0.1, "$\\omega$", ha="center", va="center", fontsize=fs)
     fig.text(0.045, 0.5, "BPS ($\\frac{blocks}{sec}$)", ha="center", va="center", fontsize=fs, rotation=90)
     fig.tight_layout(rect=[0.04, 0.06, 1, 1.03])
     for d in oPath:
-        plt.savefig(d + '/bps2.pdf')
-        plt.savefig(d + '/bps2')
+        plt.savefig(d + '/gdbps2.pdf')
+        plt.savefig(d + '/gdbps2')
 
 if __name__ == "__main__":
-    bps(["/home/yoni/toy/m5/correct/4",
-
+    bps(["/home/yoni/toy/m5/gd/correct/4",
+         "/home/yoni/toy/m5/gd/correct/7"
          ],
         ["/home/yoni/toy/figures", "/home/yoni/Dropbox/paper/figures"])
