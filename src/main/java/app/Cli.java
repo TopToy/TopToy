@@ -75,7 +75,11 @@ public class Cli {
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 if (!recorded.get()) {
                     Statistics.deactivate();
-                    writeSummery(outPath);
+                    if (Statistics.getSyncs() == 0) {
+                        writeSummery(outPath);
+                    } else {
+                        writeByzSummery(outPath);
+                    }
                     writeBlocks();
 ////                writeToScv(outPath);
 ////                writeBlocksStatistics(outPath);
@@ -125,7 +129,12 @@ public class Cli {
                     return;
                 }
                 if (args[0].equals("quit")) {
-                    writeSummery(outPath);
+                    if (Statistics.getSyncs() == 0) {
+                        writeSummery(outPath);
+                    } else {
+                        writeByzSummery(outPath);
+                    }
+
                     writeBlocks();
 //                    writeBlocksStatisticsSummery(outPath);
 
@@ -166,7 +175,7 @@ public class Cli {
 //                        logger.debug("Unable to set byzantine behaviour to non async server");
 //                        return;
 //                    }
-                    setByzSetting(args);
+                    setByzSetting();
                     return;
                 }
 
@@ -451,6 +460,7 @@ public class Cli {
                 writer = new FileWriter(path.toString(), true);
                 List<List<String>> rows = new ArrayList<>();
                 int workers = Config.getC();
+                if (Statistics.getH1() < 0 || Statistics.getH2() > 0) return;
                 for (int i = Statistics.getH1() ; i < Statistics.getH2() ; i++) {
                     List<Types.Block> rBlocks = new ArrayList<>();
                     for (int  j = 0 ; j < workers ; j++) {
@@ -639,6 +649,131 @@ public class Cli {
 
         }
 
+    void writeByzSummery(String pathString) {
+        logger.info("Starting writeSummery");
+        Path path = Paths.get(pathString, String.valueOf(JToy.s.getID()), "summery.csv");
+        File f = new File(path.toString());
+
+        try {
+            if (!f.exists()) {
+                f.getParentFile().mkdirs();
+                f.createNewFile();
+            }
+            FileWriter writer = null;
+            writer = new FileWriter(path.toString(), true);
+            int workers = Config.getC();
+
+            int nob = 0;
+            int noeb = 0;
+            int txCount = 0;
+//            System.out.println(Statistics.getH1() + ":" + Statistics.getH2());
+            for (int i = Statistics.getH1() ; i < Statistics.getH2() ; i++) {
+                for (int j = 0 ; j < workers ; j++) {
+//                    System.out.println(j + ":" + i);
+                    Types.Block b = BCS.nbGetBlock(j, i);
+                        nob++;
+                        noeb++;
+                        txCount += b.getDataCount();
+
+                }
+            }
+
+            long txSize = Config.getTxSize();
+            int txInBlock = Config.getMaxTransactionsInBlock();
+//                int h1 = Statistics.getH1();
+//                int h2 = Statistics.getH2();
+            int avgTxInBlock = 0;
+
+            long time = (Statistics.getStop() - Statistics.getStart()) / 1000;
+            if (nob > 0) {
+                avgTxInBlock = txCount / nob;
+
+            }
+
+            if (nob > 0) {
+                txInBlock = txCount / nob;
+            }
+
+            int tps = 0;
+            int bps = 0;
+            if (time > 0) {
+                tps = ((int) (txCount / time));
+                bps = (int) (nob / time);
+            }
+
+            int pos = Statistics.getPos();
+            int neg = Statistics.getNeg();
+            int opt = Statistics.getOpt();
+            int all = Statistics.getAll();
+
+            double opRate = 0;
+            double posRate = 0;
+            double negRate = 0;
+            double avgNegDecTime = 0;
+            long avgTmo = 0;
+            long avgActTmo = 0;
+
+            if (pos > 0) {
+                opRate = ((double) opt) / ((double) pos);
+            }
+            if (all > 0) {
+                posRate = ((double) pos) / ((double) all);
+                negRate = ((double) neg) / ((double) all);
+                avgTmo = Statistics.getTmo() / all;
+                avgActTmo = Statistics.getActTmo() / all;
+            }
+            if (neg > 0) {
+
+                avgNegDecTime = ((double) Statistics.getNegTime() / (double) neg);
+            }
+            int syncEvents = Statistics.getSyncs();
+            boolean valid = true; //BCS.isValid();
+
+            List<String> row = Arrays.asList(
+                    String.valueOf(valid)
+                    , String.valueOf(JToy.s.getID())
+                    , JToy.type
+                    , String.valueOf(Config.getC())
+                    , String.valueOf(avgTmo)
+                    , String.valueOf(avgActTmo)
+                    , String.valueOf(Statistics.getMaxTmo())
+                    , String.valueOf(txSize)
+                    , String.valueOf(txInBlock)
+                    , String.valueOf(txCount)
+                    , String.valueOf(time)
+                    , String.valueOf(tps)
+                    , String.valueOf(nob)
+                    , String.valueOf(noeb)
+                    , String.valueOf(bps)
+                    , String.valueOf(avgTxInBlock)
+                    , String.valueOf(opt)
+                    , String.valueOf(opRate)
+                    , String.valueOf(pos)
+                    , String.valueOf(posRate)
+                    , String.valueOf(neg)
+                    , String.valueOf(negRate)
+                    , String.valueOf(avgNegDecTime)
+                    , String.valueOf(syncEvents)
+                    , String.valueOf(0)
+                    , String.valueOf(0)
+                    , String.valueOf(0)
+                    , String.valueOf(0)
+                    , String.valueOf(0)
+                    , String.valueOf(0)
+                    , String.valueOf(0)
+                    , String.valueOf(0)
+                    , String.valueOf(BFD.getSuspected())
+            );
+            CSVUtils.writeLine(writer, row);
+            writer.flush();
+            writer.close();
+            logger.info("ended writeSummery");
+        } catch (IOException e) {
+            logger.error(e);
+        }
+
+    }
+
 //    void writeBlocksStatisticsSummery(String pathString)  {
 //        Path path = Paths.get(pathString,   String.valueOf(JToy.s.getID()), "blocksStatSummery.csv");
 //        try {
@@ -758,21 +893,21 @@ public class Cli {
 //            }
 //        }
 
-        private void setByzSetting(String[] args) {
+        private void setByzSetting() {
             System.out.println("Setting byz");
-            boolean fullByz = Integer.parseInt(args[1]) == 1;
-            List<List<Integer>> groups = new ArrayList<>();
-            int i = 2;
-            while (i < args.length) {
-                i++;
-                List<Integer> group = new ArrayList<>();
-                while (i < args.length && !args[i].equals("-g")) {
-                    group.add(Integer.parseInt(args[i]));
-                    i++;
-                }
-                groups.add(group);
-            }
-            JToy.s.setByzSetting(fullByz, groups);
+//            boolean fullByz = Integer.parseInt(args[1]) == 1;
+//            List<List<Integer>> groups = new ArrayList<>();
+//            int i = 2;
+//            while (i < args.length) {
+//                i++;
+//                List<Integer> group = new ArrayList<>();
+//                while (i < args.length && !args[i].equals("-g")) {
+//                    group.add(Integer.parseInt(args[i]));
+//                    i++;
+//                }
+//                groups.add(group);
+//            }
+            JToy.s.setByzSetting();
         }
 
         private void asyncPeriod(int sec, int duration) throws InterruptedException {

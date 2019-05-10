@@ -31,6 +31,11 @@ import proto.Types.*;
 import utils.statistics.Statistics;
 
 public abstract class ToyBaseServer {
+    enum syncStates {
+        ACCEPTED,
+        RECEIVED_VERSIONS,
+        DONE
+    }
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ToyBaseServer.class);
 
 //    WrbNode wrbServer;
@@ -42,13 +47,13 @@ public abstract class ToyBaseServer {
     int currLeader;
     protected AtomicBoolean stopped = new AtomicBoolean(false);
 //    private final Object newBlockNotifyer = new Object();
-    private int maxTransactionInBlock;
+     int maxTransactionInBlock;
     private Thread mainThread;
     private Thread panicThread;
     private Thread commSendThread;
     int cid = 0;
     int cidSeries = 0;
-    private final HashMap<Integer, Boolean> fp;
+    private final HashMap<Integer, syncStates> fp;
     boolean configuredFastMode;
     boolean fastMode;
     int worker;
@@ -192,7 +197,7 @@ public abstract class ToyBaseServer {
 
     private boolean checkSyncEvent() {
         synchronized (fp) {
-            if (fp.containsKey(currHeight) && fp.get(currHeight)) {
+            if (fp.containsKey(currHeight) && fp.get(currHeight) == syncStates.RECEIVED_VERSIONS) {
                 try {
                     adoptSubVersion(currHeight);
                     return true;
@@ -564,7 +569,7 @@ public abstract class ToyBaseServer {
     }
     private void handleFork(int forkPoint) throws IOException, InterruptedException {
         synchronized (fp) {
-            if (fp.containsKey(forkPoint) && fp.get(forkPoint))
+            if (fp.containsKey(forkPoint) && fp.get(forkPoint) == syncStates.DONE)
             {
                 logger.debug(format("[#%d-C[%d]] already synchronized for this point [r=%d]",
                         getID(), worker, forkPoint));
@@ -583,7 +588,7 @@ public abstract class ToyBaseServer {
             }
 
             if (!fp.containsKey(forkPoint)) {
-                fp.put(forkPoint, false);
+                fp.put(forkPoint, syncStates.ACCEPTED);
             }
 
             Statistics.updateSyncs();
@@ -683,7 +688,7 @@ public abstract class ToyBaseServer {
             }
         }
 
-        fp.replace(forkPoint, true);
+        fp.replace(forkPoint, syncStates.RECEIVED_VERSIONS);
 
         if (forkPoint - (f + 1) > currHeight) {
             logger.debug(format("[#%d-C[%d]] is too far to participate [r=%d, curr=%d]"
@@ -691,6 +696,7 @@ public abstract class ToyBaseServer {
             return;
         }
         adoptSubVersion(forkPoint);
+
         mainThread = new Thread(this::intMain);
         mainThread.start();
     }
@@ -704,8 +710,10 @@ public abstract class ToyBaseServer {
                 ArrayList<subChainVersion> ret = new ArrayList<>();
                 ret.add(subChainVersion.getDefaultInstance());
                 if (v1.stream().noneMatch(v -> v.getVCount() > 0)) {
+                    // A Byzantine nodes may trigger fork while all correct nodes are unable to send
+                    // a valid versions.
                     noMatch.set(true);
-                    logger.error(format("all versions are empties (might happen due to fast mode) [fp=%d] ", forkPoint));
+                    logger.error(format("all versions are empties) [fp=%d] ", forkPoint));
                     return ret;
                 }
                 int max = v1.
@@ -718,9 +726,11 @@ public abstract class ToyBaseServer {
                         filter(v -> v.getVCount() > 0).
                         filter(v -> v.getV(v.getVCount() - 1).getHeader().getHeight() == max
                                 && validateBlockHash(BCS.nbGetBlock(worker, forkPoint - (f + 2)), v.getV(0))).collect(Collectors.toList());
+
                 if (valid.size() == 0) {
+                    // A Byzantine nodes may trigger fork while all correct nodes are unable to send
+                    // a valid versions.
                     noMatch.set(true);
-                    logger.error(format("No version is valid (might happen due to fast mode) [fp=%d]", forkPoint));
                     return ret;
                 }
                 choosen[0] = (subChainVersion) valid.stream().
@@ -752,6 +762,19 @@ public abstract class ToyBaseServer {
         cidSeries++;
         logger.debug(format("[#%d-C[%d]] post sync: [cHeight=%d] [cLeader=%d] [cidSeries=%d]"
                 , getID(), worker, currHeight, currLeader, cidSeries));
+
+        fp.replace(forkPoint, syncStates.DONE);
+        synchronized (Data.syncRBData[worker]) {
+            for (Iterator<Map.Entry<Integer, List<subChainVersion>>> it =
+                 Data.syncRBData[worker].entrySet().iterator();
+                 it.hasNext(); ) {
+                int p = it.next().getKey();
+                if (fp.containsKey(p) && fp.get(p) == syncStates.DONE) {
+                    logger.info(format("Removing versions of fp=%d]", p));
+                    it.remove();
+                }
+            }
+        }
 
 
     }

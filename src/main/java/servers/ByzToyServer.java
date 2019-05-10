@@ -12,6 +12,8 @@ import proto.Types;
 
 import java.security.SecureRandom;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static blockchain.Utils.createBlockHeader;
 import static blockchain.Utils.createBlockchain;
@@ -106,14 +108,24 @@ public class ByzToyServer extends ToyBaseServer {
     }
 
 
-    public void setByzSetting(boolean fullByz, List<List<Integer>> groups) {
+    public void setByzSetting() {
+        LinkedList<Integer> ids = new LinkedList<>();
+        for (int i =  0 ; i < n ; i++) {
+            ids.add(i);
+        }
+        logger.info("Setting byz");
         synchronized (byzProposed) {
-            if (!fullByz && groups.size() > 2) {
-                logger.debug("On non full byzantine behavior there is at most two send groups");
-                return;
+            this.fullByz = true;
+            groups = new ArrayList<>();
+            groups.add(new ArrayList<>());
+            Random rand = new Random();
+            for (int i = 0 ; i < n/2 ; i++) {
+                int index = rand.nextInt(ids.size());
+                groups.get(0).add(ids.get(index));
+                ids.remove(index);
             }
-            this.fullByz = fullByz;
-            this.groups = groups;
+            this.groups.add(ids);
+            logger.info("Byzantine group are " + groups);
             while (byzProposed.poll() != null);
         }
     }
@@ -127,21 +139,25 @@ public class ByzToyServer extends ToyBaseServer {
         SecureRandom random = new SecureRandom();
         byte[] byzTx = new byte[40];
         int bid = random.nextInt();
-        random.nextBytes(byzTx);
-        return Types.Block.newBuilder()
+
+        Types.Block.Builder b = Types.Block.newBuilder()
                 .setId(Types.BlockID.newBuilder()
                         .setBid(bid)
                         .setPid(getID())
-                        .build())
-                .addData(Types.Transaction.newBuilder()
-                        .setId(Types.txID.newBuilder()
-                                .setProposerID(getID())
-                                .setBid(bid)
-                                .setTxNum(1)
-                                .setChannel(worker))
+                        .build());
+        for (int i = 0 ; i < maxTransactionInBlock ; i++) {
+            random.nextBytes(byzTx);
+             b.addData(Types.Transaction.newBuilder()
+                    .setId(Types.txID.newBuilder()
+                            .setProposerID(getID())
+                            .setBid(bid)
+                            .setTxNum(1)
+                            .setChannel(worker))
 //                        .setServerTs(System.currentTimeMillis())
-                        .build())
-                .build();
+                    .build());
+        }
+
+                return b.build();
     }
 
 //    @Override

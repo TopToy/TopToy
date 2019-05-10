@@ -70,7 +70,7 @@ echo \
         - ${out}:/tmp/JToy
         - ${conf}:/JToy/bin/src/main/resources
         networks:
-            toy_net:
+            composed_toy_net:
                 ipv4_address: 172.18.0.$((${id} + 3))" \
             >> ${5}
 }
@@ -91,7 +91,7 @@ echo \
         - ${out}:/tmp/JToy
         - ${conf}:/JToy/bin/src/main/resources
         networks:
-            toy_net:
+            composed_toy_net:
                 ipv4_address: 172.18.0.$((${id} + 3))" \
             >> ${5}
 }
@@ -112,7 +112,7 @@ echo \
         - ${out}:/tmp/JToy
         - ${conf}:/JToy/bin/src/main/resources
         networks:
-            toy_net:
+            composed_toy_net:
                 ipv4_address: 172.18.0.$((${id} + 3))" \
             >> ${5}
 }

@@ -20,8 +20,8 @@ echo \
 serve
 stStart
 async ${1} ${2}
-stop
 stStop
+stop
 quit" > ${3}/inst/input.inst
 }
 
@@ -32,7 +32,7 @@ echo \
 serve
 stStart
 wait ${tme}
-byz 1 -g 0 2 -g 1 3
+byz
 wait ${tme}
 stStop
 stop
@@ -46,7 +46,7 @@ echo \
 serve
 stStart
 wait ${tme}
-byz 1 -g 0 2 -g 1 3
+byz
 async ${2} ${tme}
 stStop
 stop

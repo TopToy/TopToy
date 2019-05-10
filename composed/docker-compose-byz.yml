@@ -10,7 +10,7 @@ services:
         - /home/yoni/Desktop/dtoy/curr/:/tmp/JToy
         - /home/yoni/Desktop/dtoy/configurations/byz:/JToy/bin/src/main/resources
         networks:
-            toy_net:
+            composed_toy_net:
                 ipv4_address: 172.18.0.3
    TS1:
         image: toy:0.1
@@ -22,7 +22,7 @@ services:
         - /home/yoni/Desktop/dtoy/curr/:/tmp/JToy
         - /home/yoni/Desktop/dtoy/configurations/async:/JToy/bin/src/main/resources
         networks:
-            toy_net:
+            composed_toy_net:
                 ipv4_address: 172.18.0.4
    TS2:
         image: toy:0.1
@@ -34,7 +34,7 @@ services:
         - /home/yoni/Desktop/dtoy/curr/:/tmp/JToy
         - /home/yoni/Desktop/dtoy/configurations/async:/JToy/bin/src/main/resources
         networks:
-            toy_net:
+            composed_toy_net:
                 ipv4_address: 172.18.0.5
    TS3:
         image: toy:0.1
@@ -46,7 +46,7 @@ services:
         - /home/yoni/Desktop/dtoy/curr/:/tmp/JToy
         - /home/yoni/Desktop/dtoy/configurations/async:/JToy/bin/src/main/resources
         networks:
-            toy_net:
+            composed_toy_net:
                 ipv4_address: 172.18.0.6
 networks:
     composed_toy_net:

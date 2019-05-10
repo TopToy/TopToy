@@ -102,7 +102,7 @@ public class BCS {
 
 
     public static int height(int w) {
-        return lastIndex(w) - (f + 2);
+        return max(0, lastIndex(w) - (f + 2));
     }
 
     public static int height() {

@@ -243,13 +243,13 @@ public class Top {
         return id;
     }
 
-    public void setByzSetting(boolean fullByz, List<List<Integer>> groups) {
+    public void setByzSetting() {
         if (!type.equals("b")) {
             logger.debug("Unable to set byzantine behaviour to non byzantine node");
             return;
         }
         for (int i = 0 ; i < workers ; i++) {
-            ((ByzToyServer) toys[i]).setByzSetting(fullByz, groups);
+            ((ByzToyServer) toys[i]).setByzSetting();
         }
     }
 
