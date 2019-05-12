@@ -21,6 +21,7 @@ public class JToy {
 //    static Config c = new Config();
     static Top s; // = new ToyServer(Config.getAddress(), Config.getPort(), Config.getID());
     static String type;
+    static int serverID;
     public static void main(String[] argv) {
         mainImpl(argv);
 //
@@ -42,21 +43,13 @@ public class JToy {
                 config = Paths.get(argv[2]);
             }
 
-            int serverID = Integer.parseInt(argv[0]);
+            serverID = Integer.parseInt(argv[0]);
             Config.setConfig(config, serverID);
             logger = org.apache.log4j.Logger.getLogger(JToy.class);
             Thread.setDefaultUncaughtExceptionHandler(new GEH());
             type = argv[1];
             logger.debug("type is " + type);
-            switch (type) {
-                default:
-                    s = new Top(serverID, Config.getN(), Config.getF(), Config.getC(), Config.getTMO(),
-                            Config.getTMOInterval(), Config.getMaxTransactionsInBlock(), Config.getFastMode(),
-                            Config.getObbcCluster(), Config.getWrbCluster(), Config.getCommCluster(),
-                            Config.getABConfigHome(), type, Config.getServerCrtPath(), Config.getServerPrivKeyPath(),
-                            Config.getCaRootPath());
-                    break;
-            }
+
 
             Cli parser = new Cli();
             Scanner scan = new Scanner(System.in).useDelimiter("\\n");
@@ -76,5 +69,17 @@ public class JToy {
 //            logger.error("", ex);
 //            System.exit(0);
 //        }
+    }
+
+    static void init() {
+        switch (type) {
+            default:
+                s = new Top(serverID, Config.getN(), Config.getF(), Config.getC(), Config.getTMO(),
+                        Config.getTMOInterval(), Config.getMaxTransactionsInBlock(), Config.getFastMode(),
+                        Config.getObbcCluster(), Config.getWrbCluster(), Config.getCommCluster(),
+                        Config.getABConfigHome(), type, Config.getServerCrtPath(), Config.getServerPrivKeyPath(),
+                        Config.getCaRootPath());
+                break;
+        }
     }
 }

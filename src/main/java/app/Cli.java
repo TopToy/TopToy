@@ -191,7 +191,8 @@ public class Cli {
 
                 if (args[0].equals("sigTest")) {
                     logger.info("Accepted sigTest");
-                    sigTets(outPath);
+                    int time = Integer.parseInt(args[1]);
+                    sigTest(outPath, time);
                     return;
 
                 }
@@ -241,6 +242,7 @@ public class Cli {
         }
 
         private void init() {
+            JToy.init();
             JToy.s.start();
         }
 
@@ -284,12 +286,11 @@ public class Cli {
             return null;
         }
         private void signBlockFromBuilder(Types.Block.Builder b) {
-            byte[] tHash = hashBlockData(b.build());
-//            for (Types.Transaction t : b.getDataList()) {
-//                tHash = DigestMethod.hash(ArrayUtils.addAll(tHash, t.toByteArray()));
-//            }
-            b.setHeader(b.getHeader().toBuilder()
-                    .setProof(blockDigSig.sign(b.getHeader()))).build();
+            Types.Block.Builder b1 = b.setHeader(b.getHeader()
+                    .toBuilder()
+                    .setTransactionHash(ByteString.copyFrom(hashBlockData(b.build()))));
+            b1.setHeader(b.getHeader().toBuilder()
+                    .setProof(blockDigSig.sign(b1.getHeader()))).build();
         }
         private Types.Block.Builder createBlock(int txSize) {
             Types.Block.Builder bb = Types.Block.newBuilder();
@@ -301,7 +302,8 @@ public class Cli {
                         .setId(Types.txID.newBuilder()
                                 .setTxNum(0)
                                 .setProposerID(0)
-                                .setChannel(0))
+                                .setChannel(0)
+                                .setBid(0))
                         .setClientID(0)
                         .setData(ByteString.copyFrom(tx))
                         .build());
@@ -315,38 +317,24 @@ public class Cli {
                     .setM(Types.Meta.newBuilder()
                             .setChannel(0)
                             .setCidSeries(0)
-                            .setCid(0).build())
+                            .setCid(0))
                     .setHeight(0)
                     .setBid(Types.BlockID.newBuilder().setBid(0).setPid(0).build())
                     .setPrev(ByteString.copyFrom(tx)));
 
 
         }
-        private void sigTets(String pathString) throws IOException, InterruptedException {
+        private void sigTest(String pathString, int time) throws IOException, InterruptedException {
             logger.info(format("Starting sigTest [%d, %d]", Config.getTxSize(), Config.getMaxTransactionsInBlock()));
             ExecutorService executor = Executors.newFixedThreadPool(Config.getC());
-            int bareTxSize = Types.Transaction.newBuilder()
-                    .setClientID(0)
-                    .setId(Types.txID.newBuilder()
-                            .setTxNum(0)
-                            .setProposerID(0)
-                            .setChannel(0))
-//                    .setClientTs(System.currentTimeMillis())
-//                    .setServerTs(System.currentTimeMillis())
-                    .build().getSerializedSize();
-            int tSize = max(0, Config.getTxSize() - bareTxSize);
-
             CountDownLatch latch1 = new CountDownLatch(Config.getC());
             AtomicInteger avgSig = new AtomicInteger(0);
             AtomicBoolean stop = new AtomicBoolean(false);
-            long start = System.currentTimeMillis();
-            Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
             for (int c = 0 ; c < Config.getC() ; c++) {
                 int finalC = c;
                 (executor).submit(() -> {
-                    Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
                     int sigCount = 0;
-                    Types.Block.Builder b = createBlock(tSize);
+                    Types.Block.Builder b = createBlock(Config.getTxSize());
                     while (!stop.get()) {
                         signBlockFromBuilder(b);
                         sigCount++;
@@ -357,15 +345,12 @@ public class Cli {
                 });
             }
             logger.info(format("Await termination 1"));
-            Thread.sleep(60 * 1000);
+            Thread.sleep(time * 1000);
             stop.set(true);
 //            executor.awaitTermination(120, TimeUnit.SECONDS);
             latch1.await();
-            int total = (int) ((System.currentTimeMillis() - start) / 1000);
             executor.shutdownNow();
-            logger.info(format("res [%d, %d]",  avgSig.get(), total));
-            int sigPerSec = avgSig.get() / total;
-            int verPerSec = 0; //avgVer.get() / Config.getC();
+            int sigPerSec = avgSig.get() / time;
             Path path = Paths.get(pathString,   String.valueOf(0), "sig_summery.csv");
             File f = new File(path.toString());
             if (!f.exists()) {
@@ -375,11 +360,13 @@ public class Cli {
             logger.info(format("Collecting results"));
             FileWriter writer = new FileWriter(path.toString(), true);
             DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy-HH:mm:ss");
-            List<String> row = Arrays.asList(dateFormat.format(new Date()),
-                    String.valueOf(Config.getC()),
-                    String.valueOf(bareTxSize + tSize),
-                    String.valueOf(Config.getMaxTransactionsInBlock()),
-                    String.valueOf(sigPerSec));
+            List<String> row = Arrays.asList(
+                    String.valueOf(Config.getC())
+                    , String.valueOf(time)
+                    , String.valueOf(Config.getTxSize())
+                    , String.valueOf(Config.getMaxTransactionsInBlock())
+                    , String.valueOf(sigPerSec)
+            );
             CSVUtils.writeLine(writer, row);
             writer.flush();
             writer.close();
