@@ -83,24 +83,27 @@ configure_servers_workers() {
     done
 
 }
+for i in `seq 0 2`; do
 start_aws_instances_with_regions
 
 ##########################0#############################
-test_correct_tps_servers_over_workers 0 0 1 9 2 1000 180
-test_correct_tps_servers_over_workers 0 0 10 10 1 1000 180
+#test_correct_tps_servers_over_workers 0 0 1 9 2 1000 180
+#test_correct_tps_servers_over_workers 0 0 10 10 1 1000 180
 
 #########################512#############################
 ########################512x10###########################
-test_correct_tps_servers_over_workers 512 10 1 9 2 1000 180
+test_correct_tps_servers_over_workers 512 10 1 5 4 1000 180
 test_correct_tps_servers_over_workers 512 10 10 10 1 1000 180
 
 #######################512x100###########################
-test_correct_tps_servers_over_workers 512 100 1 9 2 1000 180
-test_correct_tps_servers_over_workers 512 100 10 10 1 1000 180
+#test_correct_tps_servers_over_workers 512 100 1 5 4 1000 180
+#test_correct_tps_servers_over_workers 512 100 10 10 1 1000 180
 
 #######################512x1000###########################
-test_correct_tps_servers_over_workers 512 1000 1 9 2 1000 180
-test_correct_tps_servers_over_workers 512 1000 10 10 1 1000 180
+#test_correct_tps_servers_over_workers 512 1000 1 5 4 1000 180
+#test_correct_tps_servers_over_workers 512 1000 10 10 1 1000 180
 
 stop_aws_instances_with_regions
+
+done
 

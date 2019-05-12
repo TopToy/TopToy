@@ -88,49 +88,63 @@ configure_servers_workers() {
 }
 start_aws_instances
 
-##########################0#############################
+#########################512#############################
+########################512x10###########################
+test_correct_tps_servers_over_workers 512 10 3 3 4 100 180
+#test_correct_tps_servers_over_workers 512 10 10 10 1 100 180
+#
+########################512x100###########################
+#test_correct_tps_servers_over_workers 512 100 1 5 4 100 180
+#test_correct_tps_servers_over_workers 512 100 10 10 1 100 180
+#
+########################512x1000###########################
+#test_correct_tps_servers_over_workers 512 1000 1 5 4 100 180
+#test_correct_tps_servers_over_workers 512 1000 10 10 1 100 180
+
+
+###########################0#############################
 #test_correct_tps_servers_over_workers 0 0 1 9 2 100 180
 #test_correct_tps_servers_over_workers 0 0 10 10 1 100 180
 
-#########################512#############################
-########################512x10###########################
-test_correct_tps_servers_over_workers 512 10 1 9 2 100 180
-test_correct_tps_servers_over_workers 512 10 10 10 1 100 180
-
-#######################512x100###########################
-test_correct_tps_servers_over_workers 512 100 1 9 2 100 180
-test_correct_tps_servers_over_workers 512 100 10 10 1 100 180
-
-#######################512x1000###########################
-test_correct_tps_servers_over_workers 512 1000 1 9 2 100 180
-test_correct_tps_servers_over_workers 512 1000 10 10 1 100 180
-
-
-#########################1024#############################
-########################1024x10###########################
-test_correct_tps_servers_over_workers 1024 10 1 9 2 100 180
-test_correct_tps_servers_over_workers 1024 10 10 10 1 100 180
-
-#######################1024x100###########################
-test_correct_tps_servers_over_workers 1024 100 1 9 2 100 180
-test_correct_tps_servers_over_workers 1024 100 10 10 1 100 180
-
-#######################1024x1000###########################
-test_correct_tps_servers_over_workers 1024 1000 1 9 2 100 180
-test_correct_tps_servers_over_workers 1024 1000 10 10 1 100 180
-
-#########################4096#############################
-########################4096x10###########################
-test_correct_tps_servers_over_workers 4096 10 1 9 2 100 180
-test_correct_tps_servers_over_workers 4096 9 10 10 1 100 180
-
-#######################4096x100###########################
-test_correct_tps_servers_over_workers 4096 100 1 9 2 100 180
-test_correct_tps_servers_over_workers 4096 100 10 10 1 100 180
-
-#######################4096x1000###########################
-test_correct_tps_servers_over_workers 4096 1000 1 9 2 100 180
-test_correct_tps_servers_over_workers 4096 1000 10 10 1 100 180
+##########################512#############################
+#########################512x10###########################
+#test_correct_tps_servers_over_workers 512 10 1 9 2 100 180
+#test_correct_tps_servers_over_workers 512 10 10 10 1 100 180
+#
+########################512x100###########################
+#test_correct_tps_servers_over_workers 512 100 1 9 2 100 180
+#test_correct_tps_servers_over_workers 512 100 10 10 1 100 180
+#
+########################512x1000###########################
+#test_correct_tps_servers_over_workers 512 1000 1 9 2 100 180
+#test_correct_tps_servers_over_workers 512 1000 10 10 1 100 180
+#
+#
+##########################1024#############################
+#########################1024x10###########################
+#test_correct_tps_servers_over_workers 1024 10 1 9 2 100 180
+#test_correct_tps_servers_over_workers 1024 10 10 10 1 100 180
+#
+########################1024x100###########################
+#test_correct_tps_servers_over_workers 1024 100 1 9 2 100 180
+#test_correct_tps_servers_over_workers 1024 100 10 10 1 100 180
+#
+########################1024x1000###########################
+#test_correct_tps_servers_over_workers 1024 1000 1 9 2 100 180
+#test_correct_tps_servers_over_workers 1024 1000 10 10 1 100 180
+#
+##########################4096#############################
+#########################4096x10###########################
+#test_correct_tps_servers_over_workers 4096 10 1 9 2 100 180
+#test_correct_tps_servers_over_workers 4096 9 10 10 1 100 180
+#
+########################4096x100###########################
+#test_correct_tps_servers_over_workers 4096 100 1 9 2 100 180
+#test_correct_tps_servers_over_workers 4096 100 10 10 1 100 180
+#
+########################4096x1000###########################
+#test_correct_tps_servers_over_workers 4096 1000 1 9 2 100 180
+#test_correct_tps_servers_over_workers 4096 1000 10 10 1 100 180
 
 stop_aws_instances
 
