@@ -6,26 +6,32 @@ import numpy as np
 
 from utiles import csvs2df
 
-fs=12
+fs=14
 line_w=1
 marker_s=5
 face_c='none'
 markers=['s', 'x', '+', '^']
 
-# def calcCDFX(index):
-#     if index == 1:
-#         return np.arange(0, 2501, 500)
-#     if index == 2:
-#         return np.arange(0, 7001, 1000)
-#     if index == 3:
-#         return np.arange(0, 3001, 500)
-#     if index == 4:
-#         return np.arange(0, 9001, 1000)
-#     if index == 5:
-#         return np.arange(0, 6001, 1000)
-#     if index == 6:
-#         return np.arange(0, 11001, 1000)
-#
+def calcCDFX(index):
+    if index == 1:
+        return np.arange(0, 2001, 500)
+    if index == 2:
+        return np.arange(0, 3001, 1000)
+    if index == 3:
+        return np.arange(0, 6001, 2000)
+    if index == 4:
+        return np.arange(0, 2001, 500)
+    if index == 5:
+        return np.arange(0, 3001, 1000)
+    if index == 6:
+        return np.arange(0, 8001, 2000)
+    if index == 7:
+        return np.arange(0, 2501, 500)
+    if index == 8:
+        return np.arange(0, 5001, 1000)
+    if index == 9:
+        return np.arange(0, 8001, 2000)
+
 def latency(dirs, oPath):
 
     names = ['$n=4, \\beta=10$', '$n=4, \\beta=100$', '$n=4, \\beta=1000$',
@@ -42,17 +48,17 @@ def latency(dirs, oPath):
     lines = []
     for dir in dirs:
         m=0
-        files = glob.glob(dir + "/csummeries/transactions/*.csv")
+        files = glob.glob(dir + "/summeries/blocks/*.csv")
         df = csvs2df(files)
         for b in beta:
             sb = str(rows) + str(cols) + str(index)
             sb = int(sb)
             plt.subplot(sb)
-            data=df[(df.beta == b)]
+            data=df[(df.maxTxInBlock == b)]
             for w in workers:
                 mark = markers[m]
-                wdata=data[data.w == w]
-                wdata=wdata['txLatency']
+                wdata=data[data.workers == w]
+                wdata=wdata['TimeToDeliver']
                 print("[w= " + str(w) + " ; beta= " + str(b) + " ; input=" + dir + "]")
                 print("max: " + str(wdata.max()))
                 print("min: " + str(wdata.min()))
@@ -64,8 +70,8 @@ def latency(dirs, oPath):
                 plt.plot(bin_edges[1:], cdf / cdf[-1], "-" + mark, markerfacecolor=face_c,
                          markersize=6, linewidth=line_w, markevery=markers_on)
             plt.title(names[n], fontsize=fs)
-            # plt.xticks(calcCDFX(index) / 1000, fontsize=fs)
-            # plt.yticks(np.arange(0, 1.01, 0.2), fontsize=fs)
+            plt.xticks(calcCDFX(index) / 1000, fontsize=fs)
+            plt.yticks(np.arange(0, 1.01, 0.2), fontsize=fs)
             plt.grid(True)
             n += 1
             index += 1
@@ -91,5 +97,9 @@ def latency(dirs, oPath):
         plt.savefig(d + '/cdf_single_cloud')
 
 if __name__ == "__main__":
-    latency(["/home/yoni/toy/latency/4"]
-            , ["/home/yoni/toy/figures", "/home/yoni/Dropbox/paper/draws"])
+    latency([
+            "/home/yoni/toy/m5/correct/4"
+             ,"/home/yoni/toy/m5/correct/7"
+             ,"/home/yoni/toy/m5/correct/10"
+             ]
+            , ["/home/yoni/toy/figures", "/home/yoni/Dropbox/paper/figures"])

@@ -146,7 +146,7 @@ def plotHM(dirs, oPath, transpos):
     if transpos == True:
         plotT(dirs, oPath)
 if __name__ == "__main__":
-    plotHM(["/home/yoni/toy/old/latency/4Servers"
-                 , "/home/yoni/toy/old/latency/7Servers"
-                 , "/home/yoni/toy/old/latency/10Servers"]
+    plotHM(["/home/yoni/toy/oldold/old/latency/4Servers"
+                 , "/home/yoni/toy/oldold/old/latency/7Servers"
+                 , "/home/yoni/toy/oldold/old/latency/10Servers"]
              , ["/home/yoni/toy/figures", "/home/yoni/Dropbox/paper/draws"], False)

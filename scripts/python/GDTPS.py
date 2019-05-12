@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from utiles import csvs2df
-fs=14
+fs=18
 
 line_w=1
 marker_s=5
@@ -17,9 +17,9 @@ def getYrange(index):
     if index == 1:
         return np.arange(0, 16001, 4000)
     if index == 2:
-        return np.arange(0, 24001, 4000)
+        return np.arange(0, 25001, 5000)
     if index == 3:
-        return np.arange(0, 210, 40)
+        return np.arange(0, 32001, 6000)
     if index == 4:
         return np.arange(0, 21, 5)
     if index == 5:
@@ -45,7 +45,7 @@ def tps(dirs, oPath):
     n = 0
     txSize = [512]
     blockSize = [10, 100, 1000]
-    fig, ax = plt.subplots(nrows=rows, ncols=cols, figsize=(7, 2.1))
+    fig, ax = plt.subplots(nrows=rows, ncols=cols, figsize=(8, 2.5))
     plt.subplots_adjust(wspace=0.2, hspace=0.5)
     r, c = 0, 0
     lines = []
@@ -64,7 +64,7 @@ def tps(dirs, oPath):
 
             mark = markers[m]
             m += 1
-            data = data[['workers', 'tps']].groupby(df.workers).mean()
+            data = data[['workers', 'tps']].groupby(data.workers).mean()
             plt.plot(data['workers'], data['tps'], "-" + mark, markerfacecolor=face_c,
                              markersize=marker_s, linewidth=line_w) #, markevery=markers_on)
 
@@ -87,14 +87,16 @@ def tps(dirs, oPath):
                      #  title = "Tx size\n(Bytes)"
                      )
     # plt.setp(leg.get_title(), fontsize='xx-small')
-    fig.text(0.51, 0.1, "$\\omega$", ha="center", va="center", fontsize=fs)
-    fig.text(0.025, 0.5, "TPS ($\\frac{transactions}{sec}$)", ha="center", va="center", fontsize=fs, rotation=90)
-    fig.tight_layout(rect=[0.02, 0.07, 1, 1.03])
+    fig.text(0.51, 0.12, "$\\omega$", ha="center", va="center", fontsize=fs)
+    fig.text(0.019, 0.5, "TPS ($\\frac{transactions}{sec}$)", ha="center", va="center", fontsize=fs, rotation=90)
+    fig.tight_layout(rect=[0.02, 0.1, 1, 1.03])
     for d in oPath:
         plt.savefig(d + '/gdtps2.pdf')
         plt.savefig(d + '/gdtps2')
 
 if __name__ == "__main__":
-    tps(["/home/yoni/toy/m5/gd/correct/4", "/home/yoni/toy/m5/gd/correct/7"
+    tps(["/home/yoni/toy/m5/gd/correct/4",
+         "/home/yoni/toy/m5/gd/correct/7",
+         "/home/yoni/toy/m5/gd/correct/10"
          ],
         ["/home/yoni/toy/figures", "/home/yoni/Dropbox/paper/figures"])

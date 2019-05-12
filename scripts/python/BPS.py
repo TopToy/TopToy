@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from utiles import csvs2df
-fs=14
+fs=12
 
 line_w=1
 marker_s=5
@@ -58,7 +58,8 @@ def bps(dirs, oPath):
                fontsize=fs,
                 ncol=3,
                frameon=False,
-               bbox_to_anchor=(0.5, -0.1),
+                     columnspacing=0.6,
+               bbox_to_anchor=(0.5, -0.07),
                #  title = "Tx size\n(Bytes)"
                )
     # plt.setp(leg.get_title(), fontsize='xx-small')
@@ -70,7 +71,9 @@ def bps(dirs, oPath):
         plt.savefig(d + '/bps2')
 
 if __name__ == "__main__":
-    bps(["/home/yoni/toy/m5/correct/4",
-
+    bps([
+        "/home/yoni/toy/m5/correct/4"
+        , "/home/yoni/toy/m5/correct/7"
+        , "/home/yoni/toy/m5/correct/10"
          ],
         ["/home/yoni/toy/figures", "/home/yoni/Dropbox/paper/figures"])

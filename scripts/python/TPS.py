@@ -15,23 +15,23 @@ markers=['s', 'x', '+', '^']
 
 def getYrange(index):
     if index == 1:
-        return np.arange(0, 21, 5)
+        return np.arange(0, 17, 4)
     if index == 2:
-        return np.arange(0, 130, 30)
+        return np.arange(0, 81, 20)
     if index == 3:
-        return np.arange(0, 210, 40)
+        return np.arange(0, 161, 40)
     if index == 4:
-        return np.arange(0, 21, 5)
+        return np.arange(0, 17, 4)
     if index == 5:
-        return np.arange(0, 130, 30)
+        return np.arange(0, 81, 20)
     if index == 6:
-        return np.arange(0, 210, 40)
+        return np.arange(0, 161, 40)
     if index == 7:
-        return np.arange(0, 21, 5)
+        return np.arange(0, 17, 4)
     if index == 8:
-        return np.arange(0, 130, 30)
+        return np.arange(0, 81, 20)
     if index == 9:
-        return np.arange(0, 210, 40)
+        return np.arange(0, 161, 40)
 
 def tps(dirs, oPath):
     rows = 3
@@ -100,5 +100,6 @@ def tps(dirs, oPath):
 
 if __name__ == "__main__":
     tps(["/home/yoni/toy/m5/correct/4"
-         ],
+         ,"/home/yoni/toy/m5/correct/7"
+         ,"/home/yoni/toy/m5/correct/10"],
         ["/home/yoni/toy/figures", "/home/yoni/Dropbox/paper/figures"])

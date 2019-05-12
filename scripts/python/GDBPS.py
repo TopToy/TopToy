@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from utiles import csvs2df
-fs=15
+fs=12
 
 line_w=1
 marker_s=5
@@ -57,13 +57,15 @@ def bps(dirs, oPath):
                loc="lower center",  # Position of legend
                # borderaxespad=0.01,  # Small spacing around legend box
                fontsize=fs,
+                # mode="expand",
+                     columnspacing=0.6,
                 ncol=3,
                frameon=False,
-               bbox_to_anchor=(0.5, -0.1),
+               bbox_to_anchor=(0.5, -0.08),
                #  title = "Tx size\n(Bytes)"
                )
     # plt.setp(leg.get_title(), fontsize='xx-small')
-    fig.text(0.57, 0.1, "$\\omega$", ha="center", va="center", fontsize=fs)
+    fig.text(0.57, 0.12, "$\\omega$", ha="center", va="center", fontsize=fs)
     fig.text(0.045, 0.5, "BPS ($\\frac{blocks}{sec}$)", ha="center", va="center", fontsize=fs, rotation=90)
     fig.tight_layout(rect=[0.04, 0.06, 1, 1.03])
     for d in oPath:
@@ -72,6 +74,6 @@ def bps(dirs, oPath):
 
 if __name__ == "__main__":
     bps(["/home/yoni/toy/m5/gd/correct/4",
-         "/home/yoni/toy/m5/gd/correct/7"
-         ],
+         "/home/yoni/toy/m5/gd/correct/7",
+         "/home/yoni/toy/m5/gd/correct/10"],
         ["/home/yoni/toy/figures", "/home/yoni/Dropbox/paper/figures"])
