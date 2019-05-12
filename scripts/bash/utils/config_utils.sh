@@ -49,6 +49,13 @@ configure_inst() {
     echo "quit" >> ${2}
 }
 
+ # ${1} test time
+ # ${2} inst file
+configure_inst_for_sig_test() {
+    echo "sigTest ${1}" >> ${2}
+    echo "quit" >> ${2}
+}
+
 copy_data_to_tmp() {
     cat ${1} > ${1}.tmp
 }
@@ -81,4 +88,8 @@ print_servers_summery_header() {
 print_clients_summery_header() {
     echo "w,beta,cid,txSize,duration,txNum,avgLatency,maxLatency" > ${1}
     echo "n,w,beta,cid,txID,txSize,txLatency" > ${2}
+}
+
+print_sig_test_headers() {
+    echo "workers,time,txSize,blockSize,sps" >> ${1}
 }
