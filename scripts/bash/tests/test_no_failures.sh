@@ -19,18 +19,18 @@ test_correct_tps_servers_over_workers() {
     configure_correct_servers "$@"
 
     for i in `seq ${3} ${5} ${4}`; do
-        sleep 10
+
         echo "run [[txSize:${1}] [txInBlock:${2}] [workers:${i}]]"
         local w=${i}
         configure_servers_workers ${w}
 
-        ${utils_dir}/watchdog.sh 420 &
+        ${utils_dir}/watchdog.sh 240 &
         local wdipd=$!
 
         run_servers $7
 
         kill -9 $wdipd
-
+        sleep 10
         collect_res_from_servers
 
     done
@@ -87,26 +87,27 @@ configure_servers_workers() {
 
 }
 start_aws_instances
+sleep 60
+##########################0#############################
+#test_correct_tps_servers_over_workers 0 0 1 9 2 1000 60
+#test_correct_tps_servers_over_workers 0 0 10 10 1 1000 120
 
 #########################512#############################
 ########################512x10###########################
-test_correct_tps_servers_over_workers 512 10 3 3 4 100 180
-#test_correct_tps_servers_over_workers 512 10 10 10 1 100 180
-#
-########################512x100###########################
-#test_correct_tps_servers_over_workers 512 100 1 5 4 100 180
-#test_correct_tps_servers_over_workers 512 100 10 10 1 100 180
-#
-########################512x1000###########################
-#test_correct_tps_servers_over_workers 512 1000 1 5 4 100 180
-#test_correct_tps_servers_over_workers 512 1000 10 10 1 100 180
+#test_correct_tps_servers_over_workers 512 10 1 9 2 1000 120
+#test_correct_tps_servers_over_workers 512 10 10 10 1 1000 120
+
+#######################512x100###########################
+#test_correct_tps_servers_over_workers 512 100 3 7 4 1000 120
+#test_correct_tps_servers_over_workers 512 100 9 10 1 1000 120
+
+#######################512x1000###########################
+test_correct_tps_servers_over_workers 512 1000 1 5 2 1000 120
+#test_correct_tps_servers_over_workers 512 1000 10 10 1 1000 120
 
 
-###########################0#############################
-#test_correct_tps_servers_over_workers 0 0 1 9 2 100 180
-#test_correct_tps_servers_over_workers 0 0 10 10 1 100 180
 
-##########################512#############################
+#########################512#############################
 #########################512x10###########################
 #test_correct_tps_servers_over_workers 512 10 1 9 2 100 180
 #test_correct_tps_servers_over_workers 512 10 10 10 1 100 180
@@ -118,13 +119,13 @@ test_correct_tps_servers_over_workers 512 10 3 3 4 100 180
 ########################512x1000###########################
 #test_correct_tps_servers_over_workers 512 1000 1 9 2 100 180
 #test_correct_tps_servers_over_workers 512 1000 10 10 1 100 180
-#
-#
+
+
 ##########################1024#############################
 #########################1024x10###########################
 #test_correct_tps_servers_over_workers 1024 10 1 9 2 100 180
 #test_correct_tps_servers_over_workers 1024 10 10 10 1 100 180
-#
+##
 ########################1024x100###########################
 #test_correct_tps_servers_over_workers 1024 100 1 9 2 100 180
 #test_correct_tps_servers_over_workers 1024 100 10 10 1 100 180

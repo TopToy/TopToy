@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from utiles import csvs2df
 
-fs=14
+fs=16
 
 line_w=1
 marker_s=4

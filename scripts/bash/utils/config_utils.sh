@@ -27,9 +27,27 @@ configure_testing()  {
  # ${4} inst file
 configure_inst_with_statistics() {
     echo "init" > ${4}
+    echo "wait 30" >> ${4}
     echo "serve" >> ${4}
     echo "wait ${1}" >> ${4}
     echo "stStart" >> ${4}
+    echo "wait ${2}" >> ${4}
+    echo "stStop" >> ${4}
+    echo "wait ${3}" >> ${4}
+    echo "stop" >> ${4}
+    echo "quit" >> ${4}
+}
+
+ # ${1} before
+ # ${2} test time
+ # ${3} after
+ # ${4} inst file
+configure_byz_inst_with_statistics() {
+    echo "init" > ${4}
+    echo "serve" >> ${4}
+    echo "wait ${1}" >> ${4}
+    echo "stStart" >> ${4}
+    echo "byz" >> ${4}
     echo "wait ${2}" >> ${4}
     echo "stStop" >> ${4}
     echo "wait ${3}" >> ${4}

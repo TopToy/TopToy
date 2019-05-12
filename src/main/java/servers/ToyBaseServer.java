@@ -353,12 +353,12 @@ public abstract class ToyBaseServer {
                                                 .setDefiniteTime(System.currentTimeMillis())
                                                 .setTentative(false)))
                 .build());
-                if (permanent.getHeader().getHeight() % 1000 == 0) {
+//                if (permanent.getHeader().getHeight() % 1000 == 0) {
                     logger.info(format("[#%d-C[%d]] Deliver [[height=%d], [sender=%d], [channel=%d], [size=%d]]",
                             getID(), worker, permanent.getHeader().getHeight(), permanent.getHeader().getBid().getPid(),
                             permanent.getHeader().getM().getChannel(),
                             permanent.getDataCount()));
-                }
+//                }
 
 
                 DBUtils.writeBlockToTable(permanent);
@@ -501,7 +501,7 @@ public abstract class ToyBaseServer {
     void createTxToBlock() {
         int missingTxs = -1;
         synchronized (proposedBlocks) {
-            if (proposedBlocks.size() > 5) {
+            if (proposedBlocks.size() > 2) {
                 return;
             }
         }
@@ -770,7 +770,7 @@ public abstract class ToyBaseServer {
                  it.hasNext(); ) {
                 int p = it.next().getKey();
                 if (fp.containsKey(p) && fp.get(p) == syncStates.DONE) {
-                    logger.info(format("Removing versions of fp=%d]", p));
+                    logger.info(format("C[%d] Removing versions of fp=%d]", worker, p));
                     it.remove();
                 }
             }
@@ -787,6 +787,8 @@ public abstract class ToyBaseServer {
         logger.debug(format("received FORK message on channel [%d]", channel));
         ForkProof p = ForkProof.parseFrom(msg.getData());
         if (!Data.validateForkProof(p)) return;
+        BFD.reportByzActivity(channel);
+        logger.info(format("C[%d] received valid fork message and thus deactivate BFD", channel));
         synchronized (Data.forksRBData[channel]) {
             Data.forksRBData[channel].add(p);
             Data.forksRBData[channel].notifyAll();

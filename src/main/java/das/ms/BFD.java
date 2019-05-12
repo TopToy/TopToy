@@ -1,11 +1,14 @@
 package das.ms;
 import proto.Types;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.PriorityQueue;
+import java.util.stream.Collectors;
 
 import static java.lang.Math.max;
 import static java.lang.Math.min;
+import static java.lang.Math.subtractExact;
 
 public class BFD {
 
@@ -15,6 +18,7 @@ public class BFD {
     static private PriorityQueue<Types.suspected>[] sus;
     static private int threshold;
     static private boolean[] active;
+    static private boolean[] byzActivity;
 
     public BFD(int n, int f, int workers, int threshold) {
         BFD.n = n;
@@ -22,9 +26,11 @@ public class BFD {
         BFD.workers = workers;
         BFD.threshold = threshold;
         BFD.active = new boolean[workers];
+        BFD.byzActivity = new boolean[workers];
         BFD.sus = new PriorityQueue[workers];
         for (int i = 0 ; i < workers ; i++) {
             BFD.active[i] = false;
+            BFD.byzActivity[i] = false;
             BFD.sus[i] = new PriorityQueue(max(f, 1), Comparator.comparing(Types.suspected::getTmo).reversed());
         }
 
@@ -56,8 +62,12 @@ public class BFD {
         active[w] = false;
     }
 
+    static public void reportByzActivity(int w) {
+        byzActivity[w] = true;
+    }
+
     static public boolean isSuspected(int id, int w) {
-        return active[w] && sus[w].stream().anyMatch(s -> s.getId() == id);
+        return active[w] && !byzActivity[w] && sus[w].stream().anyMatch(s -> s.getId() == id);
     }
 
     static public boolean isExceedsThreshold(int tmo) {
@@ -67,6 +77,7 @@ public class BFD {
     static public void suspect(int id, int w, int tmo) {
         if (tmo  < threshold) return;
         if (sus[w].size() > f) {
+            if (tmo <= sus[w].peek().getTmo()) return;
             sus[w].remove();
         }
         sus[w].add(Types.suspected.newBuilder().setId(id).setTmo(tmo).build());
