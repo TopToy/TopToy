@@ -96,19 +96,19 @@ configure_servers_workers() {
 }
 start_aws_instances
 
-#test_benign_tps_servers_over_workers 512 10 1 1 2 100 60 1
+#test_benign_tps_servers_over_workers 512 10 3 3 2 100 60 1
 
 ########################512x10###########################
-test_benign_tps_servers_over_workers 512 10 1 9 2 100 180 1
-test_benign_tps_servers_over_workers 512 10 10 10 1 100 180 1
+test_benign_tps_servers_over_workers 512 10 1 9 2 100 180 3
+test_benign_tps_servers_over_workers 512 10 10 10 1 100 180 3
 
 #######################512x100###########################
-test_benign_tps_servers_over_workers 512 100 1 9 2 100 180 1
-test_benign_tps_servers_over_workers 512 100 10 10 1 100 180 1
+test_benign_tps_servers_over_workers 512 100 1 9 2 100 180 3
+test_benign_tps_servers_over_workers 512 100 10 10 1 100 180 3
 
 #######################512x1000###########################
-test_benign_tps_servers_over_workers 512 1000 1 9 2 100 180 1
-test_benign_tps_servers_over_workers 512 1000 10 10 1 100 180 1
+test_benign_tps_servers_over_workers 512 1000 1 9 2 100 180 3
+test_benign_tps_servers_over_workers 512 1000 10 10 1 100 180 3
 
 
 
