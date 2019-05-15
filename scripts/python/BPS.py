@@ -27,6 +27,7 @@ def bps(dirs, oPath):
     r, c = 0, 0
     lines = []
     markers_on = [0, 3, 6, 9]
+    m = 0
     for d in dirs:
         sb = str(rows) + str(cols) + str(index)
         sb = int(sb)
@@ -35,7 +36,7 @@ def bps(dirs, oPath):
         df = csvs2df(files)
         df = df[(df.txSize == 0) & (df.txInBlock == 0)]
         df = df[['workers', 'bps']]
-        m = 0
+
 
         mark = markers[m]
         m += 1

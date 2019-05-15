@@ -47,10 +47,11 @@ def tps(dirs, oPath):
         sb = str(rows) + str(cols) + str(index)
         sb = int(sb)
         plt.subplot(sb)
+        m = 0
         for d in dirs:
             files = glob.glob(d + "/summeries/*.csv")
             df = csvs2df(files)
-            m = 0
+
             for ts in txSize:
                 data = df[(df.txSize == ts) & (df.txInBlock == bs)]
                 data = data[['workers', 'tps']]

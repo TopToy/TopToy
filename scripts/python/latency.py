@@ -47,7 +47,7 @@ def latency(dirs, oPath):
     workers=[1, 5, 10]
     lines = []
     for dir in dirs:
-        m=0
+
         files = glob.glob(dir + "/summeries/blocks/*.csv")
         df = csvs2df(files)
         for b in beta:
@@ -55,8 +55,10 @@ def latency(dirs, oPath):
             sb = int(sb)
             plt.subplot(sb)
             data=df[(df.maxTxInBlock == b)]
+            m = 0
             for w in workers:
                 mark = markers[m]
+                m += 1
                 wdata=data[data.workers == w]
                 wdata=wdata['TimeToDeliver']
                 print("[w= " + str(w) + " ; beta= " + str(b) + " ; input=" + dir + "]")
