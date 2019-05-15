@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from utiles import csvs2df
-fs=12
+fs=16
 
 line_w=1
 marker_s=5
@@ -43,7 +43,7 @@ def bps(dirs, oPath):
         data = df[['workers', 'bps']].groupby(df.workers).mean()
         plt.plot(data['workers'], data['bps'], "-" + mark, markerfacecolor=face_c,
                  markersize=marker_s, linewidth=line_w) #, markevery=markers_on)
-    plt.title("Blocks Generation Rate", fontsize=fs)
+    plt.title("$\\beta=0$", fontsize=fs)
     plt.xticks(np.arange(0, 11, step=2), fontsize=fs)
     plt.yticks(np.arange(0, 131, step=30), fontsize=fs)
     plt.grid(True)
@@ -56,7 +56,7 @@ def bps(dirs, oPath):
                labels=['$n=4$', '$n=7$', '$n=10$'],  # The labels for each line
                loc="lower center",  # Position of legend
                # borderaxespad=0.01,  # Small spacing around legend box
-               fontsize=fs,
+               fontsize=12,
                 # mode="expand",
                      columnspacing=0.6,
                 ncol=3,
@@ -66,8 +66,8 @@ def bps(dirs, oPath):
                )
     # plt.setp(leg.get_title(), fontsize='xx-small')
     fig.text(0.57, 0.12, "$\\omega$", ha="center", va="center", fontsize=fs)
-    fig.text(0.045, 0.5, "BPS ($\\frac{blocks}{sec}$)", ha="center", va="center", fontsize=fs, rotation=90)
-    fig.tight_layout(rect=[0.04, 0.06, 1, 1.03])
+    fig.text(0.06, 0.5, "BPS ($\\frac{blocks}{sec}$)", ha="center", va="center", fontsize=fs, rotation=90)
+    fig.tight_layout(rect=[0.06, 0.06, 1, 1.03])
     for d in oPath:
         plt.savefig(d + '/gdbps2.pdf')
         plt.savefig(d + '/gdbps2')

@@ -3,10 +3,11 @@ import glob
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.patches import Rectangle
 
 from utiles import csvs2df
 
-fs=14
+fs=13.5
 
 line_w=1
 marker_s=4
@@ -16,16 +17,18 @@ markers=['s', 'x', '+', '^']
 def plotNormal(dirs, oPath):
 
     xlab=['1','5','10']
-    names=['$n=4$', '$n=7$', '$n=10$']
+    names=['$n=4, \\beta=10$', '$n=7, \\beta=10$', '$n=10, \\beta=10$'
+           , '$n=4, \\beta=100$', '$n=7, \\beta=100$', '$n=10, \\beta=100$'
+           , '$n=4, \\beta=1000$', '$n=7, \\beta=1000$', '$n=10, \\beta=1000$']
     labels = ['A-B', 'B-C', 'C-D', 'D-E']
     realLabels = ['BP2T','BP2D','BP2DL','HP2T','HP2D','HP2DL','HT2D','HD2DL']
-    rows = 1
+    rows = 3
     cols = 3
     index = 1
     n = 0
-    fig, ax = plt.subplots(nrows=rows, ncols=cols)
-    plt.subplots_adjust(wspace=0.1, hspace=0.5)
-    beta = [1000]
+    fig, ax = plt.subplots(nrows=rows, ncols=cols) #, figsize=(4, 4))
+    plt.subplots_adjust(wspace=0.2, hspace=0)
+    beta = [10, 100, 1000]
     workers = [1, 5, 10]
 
     for d in dirs:
@@ -49,65 +52,46 @@ def plotNormal(dirs, oPath):
                     , wdata['HD2DL'].mean()/ wdata['BP2DL'].mean()
                     ]
                 ]
-            im = ax2.imshow(zip(*ndata), cmap='Reds')
-            ax2.set_xticks(np.arange(len(xlab)))
-            ax2.set_yticks(np.arange(len(labels)))
+            im = ax2.imshow(ndata, cmap='Reds')
+            ax2.set_xticks(np.arange(len(labels)))
+            ax2.set_yticks(np.arange(len(xlab)))
+            #
+            ax2.set_yticklabels(xlab, fontsize=14)
+            if index == 1 or index == 4 or index == 7:
 
-            ax2.set_xticklabels(xlab, fontsize=fs)
-            if index == 1:
-
-                ax2.set_yticklabels(labels, fontsize=fs)
+                ax2.set_yticklabels(xlab, fontsize=16)
             else:
                 plt.yticks([])
+            #
+            if index == 7 or index == 8 or index == 9:
 
-
-
-            ax2.set_xticks(np.arange(len(xlab) + 1) - .5, minor=True)
-            ax2.set_yticks(np.arange(len(labels) + 1) - .5, minor=True)
-
+                ax2.set_xticklabels(labels, fontsize=16)
+            else:
+                plt.xticks([])
+            #
+            #
+            #
+            ax2.set_xticks(np.arange(len(labels) + 1) - .5, minor=True)
+            ax2.set_yticks(np.arange(len(xlab) + 1) - .5, minor=True)
+            #
             for edge, spine in ax2.spines.items():
                 spine.set_visible(False)
-
-            ax2.grid(which="minor", color="black", linestyle='-', linewidth=3)
+            #
+            ax2.grid(which="minor", color="black", linestyle='-', linewidth=2)
             ax2.tick_params(which="minor", bottom=False, left=False)
             plt.setp(ax2.get_xticklabels(),
-                     rotation_mode="anchor", fontsize=fs)
+                     rotation_mode="anchor", fontsize=16)
             for i in range(len(xlab)):
                 for j in range(len(labels)):
                     clr='black'
-                    if round(ndata[i][j], 2) >= 0.45:
+                    if round(ndata[i][j], 2) >= 0.3:
                         clr='white'
-                    text = ax2.text(i, j, str(round(ndata[i][j], 2)),
+                    text = ax2.text(j, i, str(round(ndata[i][j], 2)),
                                    ha="center", va="center", color=clr, fontsize=fs)
             plt.title(names[index-1], fontsize=fs)
             index+=1
-    fig.text(0.5, 0.22, "$\\omega$", ha="center", fontsize=fs, va="center")
-    # cbaxes = fig.add_axes([0, 0.1, 0.03, 0.8])
-    # cbar = plt.colorbar(im, cax=cbaxes, fraction=0.0258, pad=0.04)
-
-
-
-
-    # cbar.ax.set_location("bottom")
-    # cbar.ax.set_ylabel("Relative execution time", rotation=0, va="bottom", fontsize=fs)
-    # cbar = plt.colorbar(im, fraction=0.28, pad=0.15, orientation='horizontal')
-    # fig.text(0.53, 0, "Relative execution time", ha="center", fontsize=fs, va="center")
-    # for edge, spine in ax.spines.items():
-    #     spine.set_visible(False)
-    #
-    # ax.grid(which="minor", color="black", linestyle='-', linewidth=3)
-    # ax.tick_params(which="minor", bottom=False, left=False)
-    # plt.setp(ax.get_xticklabels(),
-    #          rotation_mode="anchor", fontsize=fs)
-    # for i in range(len(chan)):
-    #     for j in range(len(labels)):
-    #         clr='black'
-    #         if round(normData[i][j], 2) >= 0.45:
-    #             clr='white'
-    #         text = ax.text(i, j, str(round(normData[i][j], 2)),
-    #                        ha="center", va="center", color=clr, fontsize=fs)
-    # fig.text(0.53, 0.08, "$n(\\omega)$", ha="center", fontsize=fs, va="center")
-    fig.tight_layout(rect=[0.02, 0.065, 1, 1.02])
+    fig.text(0.015, 0.76, "$\\omega$", ha="center", fontsize=fs, va="center", rotation=-90)
+    fig.tight_layout(rect=[0, 0.2, 1, 1.3])
     for d in oPath:
         plt.savefig(d + '/heatmap2.pdf', bbox_inches='tight')
         plt.savefig(d + '/heatmap2', bbox_inches='tight')

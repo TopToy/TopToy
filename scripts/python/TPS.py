@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from utiles import csvs2df
-fs=14
+fs=16
 
 line_w=1
 marker_s=5
@@ -87,12 +87,12 @@ def tps(dirs, oPath):
                      fontsize=fs,
                      ncol=3,
                      frameon=False,
-                     bbox_to_anchor=(0.5, -0.03),
+                     bbox_to_anchor=(0.5, -0.05),
                      #  title = "Tx size\n(Bytes)"
                      )
     # plt.setp(leg.get_title(), fontsize='xx-small')
-    fig.text(0.51, 0.06, "$\\omega$", ha="center", va="center", fontsize=fs)
-    fig.text(0.025, 0.5, "KTPS ($\\frac{Ktransactions}{sec}$)", ha="center", va="center", fontsize=fs, rotation=90)
+    fig.text(0.51, 0.05, "$\\omega$", ha="center", va="center", fontsize=fs)
+    fig.text(0.02, 0.5, "KTPS ($\\frac{Ktransactions}{sec}$)", ha="center", va="center", fontsize=fs, rotation=90)
     fig.tight_layout(rect=[0.02, 0.04, 1, 1.03])
     for d in oPath:
         plt.savefig(d + '/tps2.pdf')

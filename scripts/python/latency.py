@@ -6,7 +6,7 @@ import numpy as np
 
 from utiles import csvs2df
 
-fs=14
+fs=15
 line_w=1
 marker_s=5
 face_c='none'
@@ -14,19 +14,19 @@ markers=['s', 'x', '+', '^']
 
 def calcCDFX(index):
     if index == 1:
-        return np.arange(0, 2001, 500)
+        return np.arange(0, 1801, 600)
     if index == 2:
         return np.arange(0, 3001, 1000)
     if index == 3:
         return np.arange(0, 6001, 2000)
     if index == 4:
-        return np.arange(0, 2001, 500)
+        return np.arange(0, 1801, 600)
     if index == 5:
         return np.arange(0, 3001, 1000)
     if index == 6:
         return np.arange(0, 8001, 2000)
     if index == 7:
-        return np.arange(0, 2501, 500)
+        return np.arange(0, 2501, 800)
     if index == 8:
         return np.arange(0, 5001, 1000)
     if index == 9:
@@ -71,7 +71,7 @@ def latency(dirs, oPath):
                          markersize=6, linewidth=line_w, markevery=markers_on)
             plt.title(names[n], fontsize=fs)
             plt.xticks(calcCDFX(index) / 1000, fontsize=fs)
-            plt.yticks(np.arange(0, 1.01, 0.2), fontsize=fs)
+            plt.yticks(np.arange(0, 1.01, 0.25), fontsize=fs)
             plt.grid(True)
             n += 1
             index += 1
@@ -83,7 +83,7 @@ def latency(dirs, oPath):
                      fontsize=fs,
                      frameon=False,
                      ncol=4,
-                     bbox_to_anchor=(0.5, -0.02),
+                     bbox_to_anchor=(0.5, -0.04),
                      )
     plt.setp(leg.get_title(), fontsize=fs)
     # fig.text(0.5, 0.04, "Latency (seconds)", ha="center", va="center")

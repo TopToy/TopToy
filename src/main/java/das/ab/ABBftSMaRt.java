@@ -110,7 +110,7 @@ public class ABBftSMaRt extends DefaultSingleRecoverable {
 
             @Override
             public void replyReceived(RequestContext context, TOMMessage reply) {
-
+//                ABProxy.cleanAsynchRequest(context.getReqId());
             }
         }, TOMMessageType.ORDERED_REQUEST);
     }

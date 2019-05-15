@@ -39,7 +39,7 @@ public class BFD {
     static public int getSuspected() {
         int ms = size(0);
         for (int i = 0 ; i < workers ; i++) {
-            ms = min(ms, size(i));
+            ms = min(ms, BFD.size(i));
         }
         return ms;
     }
@@ -75,8 +75,9 @@ public class BFD {
     }
 
     static public void suspect(int id, int w, int tmo) {
+        if (!active[w] || byzActivity[w]) return;
         if (tmo  < threshold) return;
-        if (sus[w].size() > f) {
+        if (sus[w].size() >= f) {
             if (tmo <= sus[w].peek().getTmo()) return;
             sus[w].remove();
         }

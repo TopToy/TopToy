@@ -10,6 +10,7 @@ import config.Config;
 import das.ab.ABService;
 import das.data.Data;
 import das.ms.BFD;
+import das.utils.TmoUtils;
 import das.wrb.WRB;
 import proto.Types;
 import utils.CacheUtils;
@@ -23,6 +24,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import static blockchain.Utils.*;
+import static das.utils.TmoUtils.updateTmo;
 import static java.lang.Math.max;
 import static java.lang.String.format;
 import static utils.statistics.Statistics.*;
@@ -54,8 +56,8 @@ public abstract class ToyBaseServer {
     int cid = 0;
     int cidSeries = 0;
     private final HashMap<Integer, syncStates> fp;
-    boolean configuredFastMode;
-    boolean fastMode;
+//    boolean configuredFastMode;
+    boolean fastMode = false;
     int worker;
     private boolean testing = Config.getTesting();
     private int txPoolMax = 10000;
@@ -63,14 +65,15 @@ public abstract class ToyBaseServer {
     private int cID = new Random().nextInt(10000);
 //    Path sPath;
     private int bid = 0;
-    private final Queue<Block> blocksForPropose = new LinkedList<>();
-    private final Queue<Block> proposedBlocks = new LinkedList<>();
+    final Queue<Block> blocksForPropose = new LinkedList<>();
+    final Queue<Block> proposedBlocks = new LinkedList<>();
     private Block.Builder currBLock;
     private final Object cbl = new Object();
     private boolean intCatched = false;
     CommLayer comm;
     private Validator v = new Tvalidator();
     CountDownLatch startLatch = new CountDownLatch(3);
+    private final Object handlingForkLock = new Object();
 
     void initThreads() {
         mainThread = new Thread(this::intMain);
@@ -125,8 +128,8 @@ public abstract class ToyBaseServer {
         this.maxTransactionInBlock = maxTx;
         fp = new HashMap<>();
         initThreads();
-        this.configuredFastMode = n != 1 && fastMode;
-        this.fastMode = fastMode;
+//        this.configuredFastMode = n != 1 && fastMode;
+        this.fastMode = false;
         this.worker = worker;
 //        wrbServer = wrb;
         currLeader = worker % n;
@@ -173,15 +176,19 @@ public abstract class ToyBaseServer {
 //        storageWorker.shutdownNow();
 
         try {
-            logger.info(format("[#%d-C[%d]] interrupt main thread", getID(), worker));
-            mainThread.interrupt();
-            mainThread.join();
+
+
             logger.info(format("[#%d-C[%d]] interrupt panic thread", getID(), worker));
             panicThread.interrupt();
             panicThread.join();
             logger.info(format("[#%d-C[%d]] interrupt commSendThread thread", getID(), worker));
             commSendThread.interrupt();
             commSendThread.join();
+            logger.info(format("[#%d-C[%d]] interrupt main thread", getID(), worker));
+            if (!mainThread.isInterrupted()) {
+                mainThread.interrupt();
+                mainThread.join();
+            }
         } catch (InterruptedException e) {
             logger.error(format("[#%d-C[%d]]", getID(), worker), e);
 
@@ -213,6 +220,10 @@ public abstract class ToyBaseServer {
     private void intMain() {
         startLatch.countDown();
         if (mainLoop()) {
+            fastMode = false;
+//            for (int i = 0 ; i < n ; i++) {
+//                TmoUtils.updateTmo(i, worker, Config.getTMO(), false);
+//            }
             synchronized (fp) {
                 intCatched = true;
                 fp.notifyAll();
@@ -268,8 +279,8 @@ public abstract class ToyBaseServer {
             if (Thread.interrupted()) return true;
             checkSyncEvent();
             while (!BCS.validateCurrentLeader(worker, currLeader, f)) {
-                logger.debug(format("[#%d-C[%d]] invalid leader [l=%d, h=%d]",
-                        getID(), worker, currHeight, currHeight));
+                logger.info(format("[#%d-C[%d]] invalid leader [l=%d, h=%d]",
+                        getID(), worker, currLeader, currHeight));
                 currLeader = (currLeader + 1) % n;
                 fastMode = false;
                 cid += 1;
@@ -300,8 +311,10 @@ public abstract class ToyBaseServer {
                 return true;
             }
 
-            fastMode = configuredFastMode;
+            fastMode = true;
             if (recHeader == null) {
+                logger.info(format("C[%d] unable to deliver header " +
+                        "[height=%d; leader=%d; cidSeries=%d ; cid=%d]", worker, currHeight, currLeader, cidSeries, cid));
                 currLeader = (currLeader + 1) % n;
                 fastMode = false;
                 cid += 2;
@@ -394,7 +407,7 @@ public abstract class ToyBaseServer {
 //                    blocksForPropose.remove();
 //                }
             synchronized (proposedBlocks) {
-                proposedBlocks.remove();
+                proposedBlocks.poll();
             }
         }
     }
@@ -501,7 +514,7 @@ public abstract class ToyBaseServer {
     void createTxToBlock() {
         int missingTxs = -1;
         synchronized (proposedBlocks) {
-            if (proposedBlocks.size() > 2) {
+            if (proposedBlocks.size() > 5) {
                 return;
             }
         }
@@ -563,7 +576,10 @@ public abstract class ToyBaseServer {
                 forkPoint = Objects.requireNonNull(Data.forksRBData[worker].poll())
                         .getCurr().getHeader().getHeight();
             }
-            handleFork(forkPoint);
+//            synchronized (handlingForkLock) {
+                handleFork(forkPoint);
+//            }
+
 
         }
     }
@@ -575,9 +591,10 @@ public abstract class ToyBaseServer {
                         getID(), worker, forkPoint));
                 return;
             }
+            logger.info(format("C[%d] starting handle fork [fp=%d]", worker, forkPoint));
 
             if (forkPoint - (f + 1) <= currHeight) {
-                logger.debug(format("[#%d-C[%d]] interrupting main thread [r=%d]"
+                logger.info(format("[#%d-C[%d]] interrupting main thread [r=%d]"
                         , getID(),worker, forkPoint));
                 mainThread.interrupt();
                 while (!intCatched) { // TODO: deadlock alert!!
@@ -611,6 +628,8 @@ public abstract class ToyBaseServer {
                 .setCid(cid)
                 .build();
         ABService.broadcast(p.toByteArray(), key, Data.RBTypes.FORK);
+        logger.info(format("[#%d-C[%d]] done announce fork [height=%d]",
+                getID(), worker, currHeight));
     }
 
     Block deliver(int index) throws InterruptedException {
@@ -668,7 +687,7 @@ public abstract class ToyBaseServer {
     abstract void potentialBehaviourForSync() throws InterruptedException;
 
     private void sync(int forkPoint) throws InterruptedException, IOException {
-        logger.debug(format("[#%d-C[%d]] start sync method with [r=%d]", getID(),worker, forkPoint));
+        logger.info(format("[#%d-C[%d]] starts sync method with [r=%d]", getID(),worker, forkPoint));
         potentialBehaviourForSync();
 
         logger.debug(format("[#%d-C[%d]] proposeVersion for [r=%d]"
@@ -687,7 +706,7 @@ public abstract class ToyBaseServer {
                 Data.syncRBData[worker].wait();
             }
         }
-
+        logger.info(format("C[%d] done waiting to sub versions", worker));
         fp.replace(forkPoint, syncStates.RECEIVED_VERSIONS);
 
         if (forkPoint - (f + 1) > currHeight) {
@@ -775,8 +794,33 @@ public abstract class ToyBaseServer {
                 }
             }
         }
+        resetState();
 
 
+
+
+
+
+    }
+
+    void resetState() {
+        logger.debug(format("C[%d] - removing old data", worker));
+        Data.evacuateAllOldData(worker, Meta.newBuilder()
+                .setChannel(worker)
+                .setCidSeries(cidSeries)
+                .setCid(cid).build());
+        BlockID bid;
+        synchronized (cbl) {
+            bid = currBLock.getId();
+            currBLock = configureNewBlock();
+        }
+        communication.data.Data.evacuateAllOldData(worker, bid);
+        synchronized (blocksForPropose) {
+            blocksForPropose.clear();
+            synchronized (proposedBlocks) {
+                proposedBlocks.clear();
+            }
+        }
     }
 
 //    boolean isBcValid() {

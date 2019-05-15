@@ -27,7 +27,7 @@ configure_testing()  {
  # ${4} inst file
 configure_inst_with_statistics() {
     echo "init" > ${4}
-    echo "wait 30" >> ${4}
+#    echo "wait 30" >> ${4}
     echo "serve" >> ${4}
     echo "wait ${1}" >> ${4}
     echo "stStart" >> ${4}

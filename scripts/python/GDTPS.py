@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from utiles import csvs2df
-fs=18
+fs=20
 
 line_w=1
 marker_s=5
@@ -83,13 +83,13 @@ def tps(dirs, oPath):
                      fontsize=fs,
                      ncol=3,
                      frameon=False,
-                     bbox_to_anchor=(0.5, -0.1),
+                     bbox_to_anchor=(0.5, -0.11),
                      #  title = "Tx size\n(Bytes)"
                      )
     # plt.setp(leg.get_title(), fontsize='xx-small')
-    fig.text(0.51, 0.12, "$\\omega$", ha="center", va="center", fontsize=fs)
-    fig.text(0.019, 0.5, "TPS ($\\frac{transactions}{sec}$)", ha="center", va="center", fontsize=fs, rotation=90)
-    fig.tight_layout(rect=[0.02, 0.1, 1, 1.03])
+    fig.text(0.51, 0.14, "$\\omega$", ha="center", va="center", fontsize=fs)
+    fig.text(0.03, 0.5, "TPS ($\\frac{transactions}{sec}$)", ha="center", va="center", fontsize=fs, rotation=90)
+    fig.tight_layout(rect=[0.04, 0.12, 1, 1.03])
     for d in oPath:
         plt.savefig(d + '/gdtps2.pdf')
         plt.savefig(d + '/gdtps2')

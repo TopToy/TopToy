@@ -170,6 +170,9 @@ public class WRB {
 
     static private BlockHeader postDeliverLogic(Meta key, int channel, int cidSeries, int cid, int sender, int height) throws InterruptedException {
         requestData(channel, cidSeries, cid, sender, height);
+        if (!Data.pending[channel].containsKey(key)) {
+            logger.error(format("header was not found [cidSeries=d ; cid=%d]"));
+        }
         return Data.pending[channel].get(key);
     }
 

@@ -21,18 +21,18 @@ test_byz_tps_servers_over_workers() {
     configure_servers "$@"
 
     for i in `seq ${3} ${5} ${4}`; do
-        sleep 10
+
         echo "run [[txSize:${1}] [txInBlock:${2}] [workers:${i}]]"
         local w=${i}
         configure_servers_workers ${w}
 
-        ${utils_dir}/watchdog.sh 180 &
+        ${utils_dir}/watchdog.sh 120 &
         local wdipd=$!
 
         run_servers $7 $8
 
         kill -9 $wdipd
-
+        sleep 10
         collect_res_from_servers
 
     done
@@ -101,19 +101,19 @@ configure_servers_workers() {
 }
 start_aws_instances
 
-test_byz_tps_servers_over_workers 512 10 3 3 2 100 60 1
+#test_byz_tps_servers_over_workers 512 10 3 3 2 100 60 1
 
-#########################512x10###########################
-#test_byz_tps_servers_over_workers 512 10 1 9 2 100 180 3
-#test_byz_tps_servers_over_workers 512 10 10 10 1 100 180 3
-#
+#######################512x10###########################
+test_byz_tps_servers_over_workers 512 10 1 5 2 100 60 3
+#test_byz_tps_servers_over_workers 512 10 7 10 3 100 120 2
+
 ########################512x100###########################
-#test_byz_tps_servers_over_workers 512 100 1 9 2 100 180 3
-#test_byz_tps_servers_over_workers 512 100 10 10 1 100 180 3
+test_byz_tps_servers_over_workers 512 100 1 5 2 100 60 3
+#test_byz_tps_servers_over_workers 512 100 10 10 1 100 120 1
 #
 ########################512x1000###########################
-#test_byz_tps_servers_over_workers 512 1000 1 9 2 100 180 3
-#test_byz_tps_servers_over_workers 512 1000 10 10 1 100 180 3
+test_byz_tps_servers_over_workers 512 1000 1 5 2 100 60 3
+#test_byz_tps_servers_over_workers 512 1000 10 10 1 100 120 1
 
 
 

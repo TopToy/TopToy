@@ -37,12 +37,13 @@ public class ToyServer extends ToyBaseServer {
     BlockHeader leaderImpl() {
         addTransactionsToCurrBlock();
         sendCurrentBlockIfNeeded();
-        if (!configuredFastMode) {
-            return normalLeaderPhase();
-        }
-        if (currHeight == 1 || !fastMode) {
-            normalLeaderPhase();
-        }
+        if (!fastMode) normalLeaderPhase();
+//        if (!configuredFastMode) {
+//            return normalLeaderPhase();
+//        }
+//        if (currHeight == 1 || !fastMode) {
+//            normalLeaderPhase();
+//        }
         return fastModePhase();
     }
 
@@ -51,7 +52,7 @@ public class ToyServer extends ToyBaseServer {
         if (currLeader != getID()) {
             return null;
         }
-        logger.debug(format("[#%d-C[%d]] prepare to disseminate a new block header for [height=%d] [cidSeries=%d ; cid=%d]",
+        logger.info(format("[#%d-C[%d]] prepare to disseminate a new block header for [height=%d] [cidSeries=%d ; cid=%d]",
                 getID(), worker, currHeight, cidSeries, cid));
 //        broadcastEmptyIfNeeded();
         WRB.WRBBroadcast(getHeaderForCurrentBlock(BCS.nbGetBlock(worker, currHeight - 1).getHeader(),
@@ -64,7 +65,7 @@ public class ToyServer extends ToyBaseServer {
             return null;
         }
 //        broadcastEmptyIfNeeded();
-        logger.debug(format("[#%d-C[%d]] prepare fast mode phase for [height=%d] [cidSeries=%d ; cid=%d]",
+        logger.info(format("[#%d-C[%d]] prepare fast mode phase for [height=%d] [cidSeries=%d ; cid=%d]",
                 getID(), worker, currHeight + 1, cidSeries, cid + 1));
         return getHeaderForCurrentBlock(null, currHeight + 1, cidSeries, cid + 1);
     }

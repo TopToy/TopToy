@@ -4,6 +4,7 @@ import blockchain.Blockchain;
 
 import blockchain.Utils;
 import blockchain.data.BCS;
+import com.google.protobuf.ByteString;
 import communication.CommLayer;
 import das.ab.ABService;
 
@@ -25,7 +26,8 @@ public class ByzToyServer extends ToyBaseServer {
     private boolean fullByz = false;
     List<List<Integer>> groups = new ArrayList<>();
     private int delayTime;
-    final Queue<List<Types.Block>> byzProposed = new LinkedList<>();
+    final Queue<Types.Block> byzProposed = new LinkedList<>();
+
 
     public ByzToyServer(int id, int worker, int n, int f, int maxTx, boolean fastMode,
                           CommLayer comm) {
@@ -39,24 +41,54 @@ public class ByzToyServer extends ToyBaseServer {
     @Override
     void commSendLogic() throws InterruptedException {
         while (!stopped.get()) {
-            Thread.sleep(100);
-            synchronized (byzProposed) {
-                sendByzLogic();
+            Types.Block b1;
+            Types.Block b2;
+            synchronized (blocksForPropose) {
+                while (blocksForPropose.isEmpty()) {
+                    blocksForPropose.wait();
+                }
+                b1 = blocksForPropose.poll();
+                if (b1.getDataCount() == 0) continue;
+                b2 = getByzBlock(b1);
+                synchronized (byzProposed) {
+                    synchronized (proposedBlocks) {
+                        comm.send(worker, b1, groups.get(0).stream().mapToInt(i->i).toArray());
+                        proposedBlocks.add(b1);
+                        if (groups.size() > 1) {
+                            comm.send(worker, b2, groups.get(1).stream().mapToInt(i->i).toArray());
+                            byzProposed.add(b2);
+                        }
+
+
+                    }
+                }
+
             }
 
-
         }
     }
 
-    void sendByzLogic() {
-        ArrayList<Types.Block> byzs = new ArrayList<>();
-        for (List<Integer> g : groups) {
-            Types.Block byz = getByzBlock();
-            comm.send(worker, byz, g.stream().mapToInt(i->i).toArray());
-            byzs.add(byz);
-        }
-        byzProposed.add(byzs);
-    }
+//    @Override
+//    void commSendLogic() throws InterruptedException {
+//        while (!stopped.get()) {
+//            Thread.sleep(200);
+//            synchronized (byzProposed) {
+//                sendByzLogic();
+//            }
+//
+//
+//        }
+//    }
+
+//    void sendByzLogic() {
+//        ArrayList<Types.Block> byzs = new ArrayList<>();
+//        for (List<Integer> g : groups) {
+//            Types.Block byz = getByzBlock();
+//            comm.send(worker, byz, g.stream().mapToInt(i->i).toArray());
+//            byzs.add(byz);
+//        }
+//        byzProposed.add(byzs);
+//    }
 
 //    Types.BlockHeader leaderImpl() {
 //        addTransactionsToCurrBlock();
@@ -70,6 +102,8 @@ public class ByzToyServer extends ToyBaseServer {
 //    }
 
     Types.BlockHeader leaderImpl() throws InterruptedException {
+        addTransactionsToCurrBlock();
+
         if (currLeader != getID()) {
             return null;
         }
@@ -81,15 +115,14 @@ public class ByzToyServer extends ToyBaseServer {
             Thread.sleep(x);
         }
         synchronized (byzProposed) {
-            if (byzProposed.isEmpty()) {
-                sendByzLogic();
-            }
-            int i = 0;
-            for (List<Integer> g : groups) {
-                Types.Block byz = byzProposed.element().get(i);
-                i++;
+            WRB.WRBSend(getHeaderForCurrentBlock(BCS.nbGetBlock(worker, currHeight - 1).getHeader(),
+                    currHeight, cidSeries, cid), groups.get(0).stream().mapToInt(i->i).toArray());
+
+
+            if (groups.size() > 1 && byzProposed.size() > 0) {
+                Types.Block byz = byzProposed.element();
                 WRB.WRBSend(createBlockHeader(byz, BCS.nbGetBlock(worker, currHeight - 1).getHeader(), getID(),
-                        currHeight, cidSeries, cid, worker, byz.getId()),  g.stream().mapToInt(j->j).toArray());
+                        currHeight, cidSeries, cid, worker, byz.getId()),  groups.get(1).stream().mapToInt(j->j).toArray());
             }
         }
 
@@ -98,12 +131,21 @@ public class ByzToyServer extends ToyBaseServer {
 
     @Override
     void removeFromPendings(Types.BlockHeader recHeader, Types.Block recBlock) {
+        super.removeFromPendings(recHeader, recBlock);
         if (currLeader == getID() && !recHeader.getEmpty()) {
-            logger.debug(format("[#%d-C[%d]] nullifies currBlock [sender=%d] [height=%d] [cidSeries=%d ; cid=%d]",
+            logger.debug(format("[#%d-C[%d]] byz nullifies currBlock [sender=%d] [height=%d] [cidSeries=%d ; cid=%d]",
                     getID(), worker, recBlock.getHeader().getBid().getPid(), currHeight, cidSeries, cid));
             synchronized (byzProposed) {
                 byzProposed.poll();
             }
+        }
+    }
+
+    @Override
+    void resetState() {
+        super.resetState();
+        synchronized (byzProposed) {
+            while (byzProposed.poll() != null);
         }
     }
 
@@ -126,6 +168,9 @@ public class ByzToyServer extends ToyBaseServer {
             }
             this.groups.add(ids);
             logger.info("Byzantine group are " + groups);
+            synchronized (proposedBlocks) {
+                while (proposedBlocks.poll() != null);
+            }
             while (byzProposed.poll() != null);
         }
     }
@@ -135,29 +180,37 @@ public class ByzToyServer extends ToyBaseServer {
 
     }
 
-    Types.Block getByzBlock() {
+    Types.Block getByzBlock(Types.Block b) {
         SecureRandom random = new SecureRandom();
         byte[] byzTx = new byte[40];
         int bid = random.nextInt();
-
-        Types.Block.Builder b = Types.Block.newBuilder()
-                .setId(Types.BlockID.newBuilder()
+        return b.toBuilder().addData(Types.Transaction.newBuilder()
+                .setId(Types.txID.newBuilder()
+                        .setProposerID(getID())
                         .setBid(bid)
-                        .setPid(getID())
-                        .build());
-        for (int i = 0 ; i < maxTransactionInBlock ; i++) {
-            random.nextBytes(byzTx);
-             b.addData(Types.Transaction.newBuilder()
-                    .setId(Types.txID.newBuilder()
-                            .setProposerID(getID())
-                            .setBid(bid)
-                            .setTxNum(1)
-                            .setChannel(worker))
+                        .setTxNum(1)
+                        .setChannel(worker))
+                        .setData(ByteString.copyFrom(byzTx))
 //                        .setServerTs(System.currentTimeMillis())
-                    .build());
-        }
-
-                return b.build();
+                .build()).build();
+//        Types.Block.Builder b = Types.Block.newBuilder()
+//                .setId(Types.BlockID.newBuilder()
+//                        .setBid(bid)
+//                        .setPid(getID())
+//                        .build());
+//        for (int i = 0 ; i < maxTransactionInBlock ; i++) {
+//            random.nextBytes(byzTx);
+//             b.addData(Types.Transaction.newBuilder()
+//                    .setId(Types.txID.newBuilder()
+//                            .setProposerID(getID())
+//                            .setBid(bid)
+//                            .setTxNum(1)
+//                            .setChannel(worker))
+////                        .setServerTs(System.currentTimeMillis())
+//                    .build());
+//        }
+//
+//                return b.build();
     }
 
 //    @Override

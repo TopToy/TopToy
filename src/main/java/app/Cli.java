@@ -531,9 +531,9 @@ public class Cli {
 
                 }
 
-                if (nob > 0) {
-                    txInBlock = txCount / nob;
-                }
+//                if (nob > 0) {
+//                    txInBlock = txCount / nob;
+//                }
                 double BP2T = 0;
                 double BP2D = 0;
                 double BP2DL = 0;
@@ -659,7 +659,9 @@ public class Cli {
 //                    System.out.println(j + ":" + i);
                     Types.Block b = BCS.nbGetBlock(j, i);
                         nob++;
-                        noeb++;
+                        if (b.getDataCount() == 0) {
+                            noeb++;
+                        }
                         txCount += b.getDataCount();
 
                 }
@@ -677,9 +679,9 @@ public class Cli {
 
             }
 
-            if (nob > 0) {
-                txInBlock = txCount / nob;
-            }
+//            if (nob > 0) {
+//                txInBlock = txCount / nob;
+//            }
 
             int tps = 0;
             int bps = 0;

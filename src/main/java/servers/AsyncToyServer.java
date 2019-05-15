@@ -34,12 +34,13 @@ public class AsyncToyServer extends ToyBaseServer {
             Thread.sleep(x);
         }
         addTransactionsToCurrBlock();
-        if (!configuredFastMode) {
-            return normalLeaderPhase();
-        }
-        if (currHeight == 1 || !fastMode) {
-            normalLeaderPhase();
-        }
+//        if (!configuredFastMode) {
+//            return normalLeaderPhase();
+//        }
+//        if (currHeight == 1 || !fastMode) {
+//            normalLeaderPhase();
+//        }
+        if (!fastMode) normalLeaderPhase();
         return fastModePhase();
     }
 

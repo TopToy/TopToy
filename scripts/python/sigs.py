@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from utiles import csvs2df
-fs=18
+fs=20
 
 line_w=1
 marker_s=5
@@ -67,7 +67,7 @@ def tps(dirs, oPath):
                      fontsize=fs,
                      ncol=3,
                      frameon=False,
-                     bbox_to_anchor=(0.5, -0.1),
+                     bbox_to_anchor=(0.5, -0.13),
                      #  title = "Tx size\n(Bytes)"
                      )
     # plt.setp(leg.get_title(), fontsize='xx-small')

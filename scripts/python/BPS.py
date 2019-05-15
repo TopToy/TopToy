@@ -42,7 +42,7 @@ def bps(dirs, oPath):
         data = df[['workers', 'bps']].groupby(df.workers).mean()
         plt.plot(data['workers'], data['bps'], "-" + mark, markerfacecolor=face_c,
                  markersize=marker_s, linewidth=line_w) #, markevery=markers_on)
-    plt.title("Blocks Generation Rate", fontsize=fs)
+    plt.title("$\\beta=0$", fontsize=fs)
     plt.xticks(np.arange(0, 11, step=2), fontsize=fs)
     plt.yticks(np.arange(0, 1801, step=300), fontsize=fs)
     plt.grid(True)

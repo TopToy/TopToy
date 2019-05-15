@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from utiles import csvs2df
-fs=12
+fs=16
 
 line_w=1
 marker_s=5
@@ -15,7 +15,7 @@ markers=['s', 'x', '+', '^']
 
 def getYrange(index):
     if index == 1:
-        return np.arange(0, 66, 15)
+        return np.arange(0, 70, 13)
     if index == 2:
         return np.arange(0, 41, 10)
     if index == 3:

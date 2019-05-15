@@ -6,6 +6,8 @@ import proto.Types;
 import java.math.BigInteger;
 import java.util.Arrays;
 
+import static java.lang.String.format;
+
 public class blockDigSig {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(blockDigSig.class);
 
@@ -24,8 +26,12 @@ public class blockDigSig {
     }
 
     static public boolean verifyBlock(Types.Block b) {
-        return verfiyBlockWRTheader(b, b.getHeader())
-                && verifyHeader(b.getHeader().getBid().getPid(), b.getHeader());
+        boolean res1 = verfiyBlockWRTheader(b, b.getHeader());
+        boolean res2 = verifyHeader(b.getHeader().getBid().getPid(), b.getHeader());
+        logger.debug(format("C[%d] valid results are [%b : %b] for [height=%d ; cidSeries=%d ; cid=%d]",
+                b.getHeader().getM().getChannel(), res1, res2, b.getHeader().getHeight(), b.getHeader().getM().getCidSeries(),
+                b.getHeader().getM().getCid()));
+        return res1 && res2;
     }
 
     static public String sign(Types.BlockHeader header) {
@@ -42,7 +48,7 @@ public class blockDigSig {
         for (Types.Transaction t : b.getDataList()) {
             tHash = DigestMethod.hash(ArrayUtils.addAll(tHash, t.toByteArray()));
         }
-        tHash = DigestMethod.hash((ArrayUtils.addAll(tHash, b.getId().toByteArray())));
+//        tHash = DigestMethod.hash((ArrayUtils.addAll(tHash, b.getId().toByteArray())));
         return tHash;
     }
 
