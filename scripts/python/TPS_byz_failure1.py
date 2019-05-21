@@ -59,19 +59,22 @@ def tps(dirs, oPath):
     N = 6
     width = 0.35
     ind = [0.8, 2.9, 5]
+    faulty_nodes = [1, 2, 3]
     for bs in blockSize:
         sb = str(rows) + str(cols) + str(index)
         sb = int(sb)
         ax1 = plt.subplot(sb)
         allData = []
         m = 0
+        fni = 0
         for d in dirs:
             files = glob.glob(d + "/summeries/*.csv")
             df = csvs2df(files)
             mark = markers[m]
-
+            fn = faulty_nodes[fni]
+            fni+=1
             for ts in txSize:
-                data = df[(df.txSize == ts) & (df.txInBlock == bs) & (df.workers <= 5)]
+                data = df[(df.txSize == ts) & (df.txInBlock == bs) & (df.workers <= 5) & (df.id >= fn)]
                 data = data[['workers', 'duration', 'tps', 'syncs']]
 
                 data = data[['workers', 'duration', 'tps', 'syncs']].groupby(df.workers).mean()

@@ -15,11 +15,11 @@ markers=['s', 'x', '+', '^']
 
 def getYrange(index):
     if index == 1:
-        return np.arange(0, 7, 2)
+        return np.arange(0, 9, 2)
     if index == 2:
-        return np.arange(0, 41, 10)
+        return np.arange(0, 51, 15)
     if index == 3:
-        return np.arange(0, 61, 20)
+        return np.arange(0, 91, 30)
 
 
 def tps(dirs, oPath):
@@ -38,6 +38,8 @@ def tps(dirs, oPath):
     n = 0
     txSize = [512]
     blockSize = [10, 100, 1000]
+    faulty_nodes = [1, 2, 3]
+
     fig, ax = plt.subplots(nrows=rows, ncols=cols, figsize=(8, 2.5))
     plt.subplots_adjust(wspace=0.2, hspace=0.5)
     r, c = 0, 0
@@ -48,12 +50,14 @@ def tps(dirs, oPath):
         sb = int(sb)
         plt.subplot(sb)
         m = 0
+        fni = 0
         for d in dirs:
             files = glob.glob(d + "/summeries/*.csv")
             df = csvs2df(files)
-
+            fn = faulty_nodes[fni]
+            fni += 1
             for ts in txSize:
-                data = df[(df.txSize == ts) & (df.txInBlock == bs)]
+                data = df[(df.txSize == ts) & (df.txInBlock == bs) & (df.id >= fn)]
                 data = data[['workers', 'tps']]
                 mark = markers[m]
                 m += 1

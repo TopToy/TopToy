@@ -87,7 +87,8 @@ configure_servers_workers() {
 
 }
 start_aws_instances
-sleep 60
+test_correct_tps_servers_over_workers 512 1000 20 20 2 1000 120
+
 ##########################0#############################
 #test_correct_tps_servers_over_workers 0 0 1 9 2 1000 60
 #test_correct_tps_servers_over_workers 0 0 10 10 1 1000 120
@@ -102,7 +103,7 @@ sleep 60
 #test_correct_tps_servers_over_workers 512 100 9 10 1 1000 120
 
 #######################512x1000###########################
-test_correct_tps_servers_over_workers 512 1000 1 5 2 1000 120
+#test_correct_tps_servers_over_workers 512 1000 1 5 2 1000 120
 #test_correct_tps_servers_over_workers 512 1000 10 10 1 1000 120
 
 
