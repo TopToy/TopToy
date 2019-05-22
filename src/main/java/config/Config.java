@@ -1,6 +1,7 @@
 package config;
 
 import com.moandjiezana.toml.Toml;
+import utils.Node;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -20,7 +21,6 @@ public class Config {
         String SYSTEM_C_KEY = "system.c";
         String SYSTEM_TESTING_KEY = "system.testing";
         String SYSTEM_TX_SIZE = "system.txSize";
-        String SYSTEM_CUTTER_BATCH = "system.cutterBatch";;
         String SERVER_CRT_PATH = "server.TlsCertPath";
         String CLUSTER_KEY = "cluster";
         String SETTING_TMO_KEY = "setting.tmo";
@@ -38,11 +38,8 @@ public class Config {
     private static int s_id;
     private static Path tomlPath;
 
-    private static org.apache.log4j.Logger logger; //= org.apache.log4j.Logger.getLogger(Config.class);
+    private static org.apache.log4j.Logger logger;
     public Config() {
-//        Logger.getLogger("io.netty").setLevel(Level.OFF);
-//        Logger.getLogger("io.grpc").setLevel(Level.OFF);
-//        System.err.close();
         logger.debug("logger is configured");
     }
 
@@ -59,7 +56,7 @@ public class Config {
         tKeys = new tomlKeys();
         conf = readConf(tomlPath);
     }
-    static Toml readConf(Path tomlPath) {
+    private static Toml readConf(Path tomlPath) {
         byte[] encoded = new byte[0];
         try {
             encoded = Files.readAllBytes(tomlPath);
@@ -171,10 +168,5 @@ public class Config {
     public static int getTxSize() {
         return Math.toIntExact(conf.getLong(tKeys.SYSTEM_TX_SIZE));
     }
-
-    public static int getCutterBatch() {
-        return Math.toIntExact(conf.getLong(tKeys.SYSTEM_CUTTER_BATCH));
-    }
-
 
 }

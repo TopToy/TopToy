@@ -9,14 +9,16 @@ import bftsmart.tom.core.messages.TOMMessage;
 import bftsmart.tom.core.messages.TOMMessageType;
 import bftsmart.tom.server.defaultservices.DefaultSingleRecoverable;
 import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
 import das.data.Data;
+import das.ms.BFD;
 import proto.Types;
+
+import java.util.ArrayList;
 
 import static das.bbc.BBC.addToBBCData;
 import static das.ms.Membership.handleStartMsg;
 import static java.lang.String.format;
-import static servers.ToyBaseServer.addForkProof;
-import static servers.ToyBaseServer.addToSyncData;
 
 public class ABBftSMaRt extends DefaultSingleRecoverable {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ABBftSMaRt.class);
@@ -26,9 +28,8 @@ public class ABBftSMaRt extends DefaultSingleRecoverable {
     private String configHome;
     private int n;
     private int f;
-    private boolean stopped = false;
 
-    public ABBftSMaRt(int id, int n, int f, String configHome) {
+    ABBftSMaRt(int id, int n, int f, String configHome) {
         this.id = id;
         this.n = n;
         this.f = f;
@@ -113,5 +114,40 @@ public class ABBftSMaRt extends DefaultSingleRecoverable {
 //                ABProxy.cleanAsynchRequest(context.getReqId());
             }
         }, TOMMessageType.ORDERED_REQUEST);
+    }
+
+
+    private static void addForkProof(Types.RBMsg msg, int channel) throws InvalidProtocolBufferException {
+        logger.debug(format("received FORK message on channel [%d]", channel));
+        Types.ForkProof p = Types.ForkProof.parseFrom(msg.getData());
+        if (!Data.validateForkProof(p)) return;
+        BFD.reportByzActivity(channel);
+        logger.info(format("C[%d] received valid fork message and thus deactivate BFD", channel));
+        synchronized (Data.forksRBData[channel]) {
+            Data.forksRBData[channel].add(p);
+            Data.forksRBData[channel].notifyAll();
+        }
+    }
+
+    private static void addToSyncData(Types.RBMsg msg, int channel, int n, int f) throws InvalidProtocolBufferException {
+        logger.debug(format("received SYNC message on channel [%d]", channel));
+        Types.subChainVersion sbv = Types.subChainVersion.parseFrom(msg.getData());
+        int fp = sbv.getForkPoint();
+        synchronized (Data.syncRBData[channel]) {
+            if (Data.syncRBData[channel].containsKey(fp)
+                    && Data.syncRBData[channel].get(fp).size() == n - f) return;
+        }
+
+        synchronized (Data.syncRBData[channel]) {
+            if (!Data.validateSubChainVersion(sbv, f)) return;
+            Data.syncRBData[channel].computeIfAbsent(fp, k -> new ArrayList<>());
+            Data.syncRBData[channel].computeIfPresent(fp, (k, v) -> {
+                v.add(sbv);
+                return v;
+            });
+            if (Data.syncRBData[channel].get(fp).size() == n - f) {
+                Data.syncRBData[channel].notifyAll();
+            }
+        }
     }
 }

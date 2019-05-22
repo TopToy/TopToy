@@ -1,9 +1,9 @@
 package das.bbc;
 
 import blockchain.data.BCS;
-import config.Node;
-import crypto.blockDigSig;
-import crypto.sslUtils;
+import utils.Node;
+import crypto.BlockDigSig;
+import crypto.SslUtils;
 import das.data.BbcDecData;
 import das.data.Data;
 import das.data.VoteData;
@@ -79,8 +79,8 @@ public class OBBCRpcs extends ObbcGrpc.ObbcImplBase {
 
         Peer(String addr, int port, int workers, String caRoot, String serverCrt, String serverPrivKey) {
             try {
-                channel = sslUtils.buildSslChannel(addr, port,
-                        sslUtils.buildSslContextForClient(caRoot,
+                channel = SslUtils.buildSslChannel(addr, port,
+                        SslUtils.buildSslContextForClient(caRoot,
                                 serverCrt, serverPrivKey)).
                         intercept(new clientTlsIntercepter()).build();
             } catch (SSLException e) {
@@ -123,15 +123,16 @@ public class OBBCRpcs extends ObbcGrpc.ObbcImplBase {
     private Map<Integer, Peer> peers = new HashMap<>();
     private List<Node> nodes;
     private int id;
-    int n;
-    int f;
-    int qSize;
-    String caRoot;
-    String serverCrt;
-    String serverPrivKey;
-    int workers;
-    public OBBCRpcs(int id, int n, int f, int workers, int qSize, ArrayList<Node> obbcCluster, String caRoot, String serverCrt,
-                    String serverPrivKey) {
+    private int n;
+    private int f;
+    private int qSize;
+    private String caRoot;
+    private String serverCrt;
+    private String serverPrivKey;
+    private int workers;
+
+    OBBCRpcs(int id, int n, int f, int workers, int qSize, ArrayList<Node> obbcCluster, String caRoot, String serverCrt,
+             String serverPrivKey) {
         this.id = id;
         this.nodes = obbcCluster;
         this.n = n;
@@ -148,7 +149,7 @@ public class OBBCRpcs extends ObbcGrpc.ObbcImplBase {
         try {
             ObbcInnerServer = NettyServerBuilder.
                     forPort(nodes.get(id).getPort())
-                    .sslContext(sslUtils.buildSslContextForServer(serverCrt,
+                    .sslContext(SslUtils.buildSslContextForServer(serverCrt,
                             caRoot, serverPrivKey)).
                             addService(this).
                             intercept(new authInterceptor()).
@@ -171,7 +172,7 @@ public class OBBCRpcs extends ObbcGrpc.ObbcImplBase {
         }
     }
 
-    void handlePgbMsg(Types.BbcMsg msg) {
+    private void handlePgbMsg(Types.BbcMsg msg) {
         Types.BlockHeader nxt = msg.getNext();
 //        int sender = nxt.getBid().getPid();
         int cid = nxt.getM().getCid();
@@ -222,7 +223,7 @@ public class OBBCRpcs extends ObbcGrpc.ObbcImplBase {
         responseObserver.onCompleted();
     }
 
-    void addNewFastDec(int worker, Types.Meta key, boolean dec, int height) {
+    private void addNewFastDec(int worker, Types.Meta key, boolean dec, int height) {
 
         synchronized (bbcFastDec[worker]) {
             bbcFastDec[worker].computeIfAbsent(key, k1 -> {
@@ -319,7 +320,7 @@ public class OBBCRpcs extends ObbcGrpc.ObbcImplBase {
                             && res.getData().getM().getCidSeries() == cidSeries
                             && res.getData().getM().getChannel() == worker
                             && res.getSender() == expSender) {
-                        if (!blockDigSig.verifyHeader(expSender, res.getData())) {
+                        if (!BlockDigSig.verifyHeader(expSender, res.getData())) {
                             logger.debug(format("[#%d-C[%d]] has evidence received invalid response message from [#%d] for [cidSeries=%d ; cid=%d]",
                                     id, worker, res.getSender(), cidSeries, cid));
                             return val;

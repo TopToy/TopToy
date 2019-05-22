@@ -1,6 +1,6 @@
 package das.wrb;
 
-import config.Node;
+import utils.Node;
 import das.bbc.OBBC;
 import das.data.BbcDecData;
 import das.data.Data;
@@ -16,7 +16,6 @@ import static das.bbc.OBBC.setFastBbcVote;
 import static das.utils.TmoUtils.*;
 import static java.lang.Math.max;
 import static java.lang.String.format;
-import static utils.statistics.Statistics.*;
 
 public class WRB {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(WRB.class);
@@ -24,32 +23,15 @@ public class WRB {
     private static int id;
     private static int n;
     private static int f;
-    private static int tmo;
-    private static int tmoInterval;
-//    private static int[][] currentTmo;
-//    private static AtomicInteger totalDeliveredTries = new AtomicInteger(0);
-//    private static AtomicInteger optimialDec = new AtomicInteger(0);
-//    private static AtomicInteger pos = new AtomicInteger(0);
-//    private static AtomicInteger neg = new AtomicInteger(0);
-
     private static WrbRpcs rpcs;
-//    private static CommLayer comm;
 
     public WRB(int id, int workers, int n, int f, int tmo, int tmoInterval, ArrayList<Node> wrbCluster,
                String serverCrt, String serverPrivKey, String caRoot) {
-        WRB.tmo = tmo;
-        WRB.tmoInterval = tmoInterval;
-//        WRB.currentTmo = new int[n][workers];
+
         WRB.f = f;
         WRB.n = n;
         WRB.id = id;
-//        for (int j = 0 ; j < n ; j++) {
-//            for (int i = 0 ; i < workers ; i++) {
-//                WRB.currentTmo[j][i] = tmo;
-//            }
-//        }
 
-//        WRB.comm = comm;
         new TmoUtils(n, workers, tmo);
         new Data(workers);
         new BFD(n, f, workers,20 * tmo);
@@ -63,22 +45,6 @@ public class WRB {
     static public void start() {
         rpcs.start();
     }
-
-//    static public long getTotalDeliveredTries() {
-//        return totalDeliveredTries.get();
-//    }
-//
-//    static public int getTotalPos() {
-//        return pos.get();
-//    }
-//
-//    static public int getTotalNeg() {
-//        return neg.get();
-//    }
-//
-//    static public long getOptimialDec() {
-//        return optimialDec.get();
-//    }
 
     static public void shutdown() {
         rpcs.shutdown();
@@ -95,7 +61,6 @@ public class WRB {
 
     static public BlockHeader WRBDeliver(int worker, int cidSeries, int cid, int sender, int height, BlockHeader next)
             throws InterruptedException {
-//        totalDeliveredTries.incrementAndGet();
         Statistics.updateAll();
         Meta key = Meta.newBuilder()
                 .setChannel(worker)
@@ -108,15 +73,10 @@ public class WRB {
         BbcDecData dec = OBBC.propose(setFastBbcVote(key, worker, sender, cidSeries, cid, next), worker, height, sender);
 
         if (!dec.getDec()) {
-//            currentTmo[sender][worker] += tmoInterval;
-//            currentTmo[sender][worker] += tmo;
-
             logger.debug(format("[#%d-C[%d]] bbc returned [%d] for [cidSeries=%d ; cid=%d]", id, worker, 0, cidSeries, cid));
-//            neg.getAndIncrement();
             Statistics.updateNeg();
             return null;
         }
-//        currentTmo[sender][worker] = tmo;
         Statistics.updatePos();
         if (dec.fv) {
             Statistics.updateOpt();
@@ -171,7 +131,7 @@ public class WRB {
     static private BlockHeader postDeliverLogic(Meta key, int channel, int cidSeries, int cid, int sender, int height) throws InterruptedException {
         requestData(channel, cidSeries, cid, sender, height);
         if (!Data.pending[channel].containsKey(key)) {
-            logger.error(format("header was not found [cidSeries=d ; cid=%d]"));
+            logger.error("header was not found [cidSeries=d ; cid=%d]");
         }
         return Data.pending[channel].get(key);
     }

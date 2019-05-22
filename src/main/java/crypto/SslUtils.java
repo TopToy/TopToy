@@ -11,7 +11,7 @@ import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import javax.net.ssl.SSLException;
 import java.io.File;
 
-public class sslUtils {
+public class SslUtils {
 
     public static SslContext buildSslContextForClient(String caCertFilePath,
                                              String clientCertFilePath,

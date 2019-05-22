@@ -8,19 +8,17 @@ import utils.statistics.BCStat;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-
 import static blockchain.Utils.createBlockchain;
 import static com.google.common.primitives.Ints.min;
-import static com.google.common.primitives.Ints.reverse;
 import static java.lang.Integer.max;
 
 public class BCS {
     static private Blockchain[] bcs;
-    final static Object newBlockNotifier = new Object();
-    static int n;
-    static int f;
-    static int workers;
+    private final static Object newBlockNotifier = new Object();
+    private static int n;
+    private static int f;
+    private static int workers;
+
     public BCS(int id, int n, int f, int workers) {
         BCS.n = n;
         BCS.f = f;
@@ -31,10 +29,6 @@ public class BCS {
                     Paths.get("blocks", String.valueOf(i)));
         }
     }
-
-//    public static Blockchain getBC(int w) {
-//        return bcs[w];
-//    }
 
     public static boolean validateBlockHash(int w, Types.Block b) {
         return bcs[w].validateBlockHash(b);
@@ -55,8 +49,8 @@ public class BCS {
     public static void setBlocks(int w, List<Types.Block> blocks, int start) {
         bcs[w].setBlocks(blocks, start);
     }
-    
-    public static void notifyOnNewDifiniteBlock(int w) {
+
+    public static void notifyOnNewDefiniteBlock() {
         synchronized (newBlockNotifier) {
             newBlockNotifier.notifyAll();
         }

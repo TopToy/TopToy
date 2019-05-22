@@ -1,4 +1,4 @@
-package config;
+package utils;
 
 public class Node {
     private String addr;

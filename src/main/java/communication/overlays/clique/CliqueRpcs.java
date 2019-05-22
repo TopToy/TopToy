@@ -2,7 +2,7 @@ package communication.overlays.clique;
 
 import blockchain.data.BCS;
 import communication.data.Data;
-import config.Node;
+import utils.Node;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.Server;
@@ -10,13 +10,11 @@ import io.grpc.netty.NettyServerBuilder;
 import io.grpc.stub.StreamObserver;
 import proto.CommunicationGrpc;
 import proto.Types;
-import utils.statistics.Statistics;
-
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-import static crypto.blockDigSig.verfiyBlockWRTheader;
+import static crypto.BlockDigSig.verfiyBlockWRTheader;
 import static java.lang.String.format;
 
 public class CliqueRpcs  extends CommunicationGrpc.CommunicationImplBase {

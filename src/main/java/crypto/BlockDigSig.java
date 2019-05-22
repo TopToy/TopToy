@@ -8,11 +8,11 @@ import java.util.Arrays;
 
 import static java.lang.String.format;
 
-public class blockDigSig {
-    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(blockDigSig.class);
+public class BlockDigSig {
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(BlockDigSig.class);
 
     static public boolean verifyHeader(int id, Types.BlockHeader header) {
-        return pkiUtils.verify(id,
+        return PkiUtils.verify(id,
                 new String(header.getM().toByteArray())
                         + String.valueOf(header.getHeight())
                         + new String(header.getTransactionHash().toByteArray())
@@ -35,7 +35,7 @@ public class blockDigSig {
     }
 
     static public String sign(Types.BlockHeader header) {
-        return pkiUtils.sign(
+        return PkiUtils.sign(
                 new String(header.getM().toByteArray())
                 + String.valueOf(header.getHeight())
                 + new String(header.getTransactionHash().toByteArray())
@@ -48,7 +48,6 @@ public class blockDigSig {
         for (Types.Transaction t : b.getDataList()) {
             tHash = DigestMethod.hash(ArrayUtils.addAll(tHash, t.toByteArray()));
         }
-//        tHash = DigestMethod.hash((ArrayUtils.addAll(tHash, b.getId().toByteArray())));
         return tHash;
     }
 

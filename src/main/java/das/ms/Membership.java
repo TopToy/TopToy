@@ -15,7 +15,6 @@ public class Membership {
     private static CountDownLatch startLetch;
 
     public Membership(int n) {
-//        System.out.println("initiate with " + n);
         startLetch = new CountDownLatch(n);
     }
 

@@ -2,9 +2,7 @@ package app;
 
 import com.google.protobuf.ByteString;
 import config.Config;
-import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
-import io.grpc.stub.StreamObserver;
 import proto.Types;
 import proto.clientServiceGrpc;
 import utils.CSVUtils;
@@ -18,7 +16,6 @@ import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -28,23 +25,23 @@ import static java.lang.String.format;
 
 public class ClientTester {
     private static org.apache.log4j.Logger logger;
-    static clientServiceGrpc.clientServiceBlockingStub[] stubs;
+    private static clientServiceGrpc.clientServiceBlockingStub[] stubs;
 
-    static int clientID;
-    static int serverPort = 9876;
-    static int testTXS = 0;
-    static AtomicInteger latency = new AtomicInteger(0);
-    static AtomicInteger txNum = new AtomicInteger(0);
-    static AtomicInteger maxLatency = new AtomicInteger(0);
-    static int txSize = 0;
-    static long  testTime = 0;
-    static int n;
-    static ConcurrentLinkedQueue<Integer> txTimes = new ConcurrentLinkedQueue<>();
-    static ConcurrentLinkedQueue<Types.txID> txIds = new ConcurrentLinkedQueue<>();
-    static ExecutorService clients;
+    private static int clientID;
+    private static int serverPort = 9876;
+    private static int testTXS = 0;
+    private static AtomicInteger latency = new AtomicInteger(0);
+    private static AtomicInteger txNum = new AtomicInteger(0);
+    private static AtomicInteger maxLatency = new AtomicInteger(0);
+    private static int txSize = 0;
+    private static long  testTime = 0;
+    private static int n;
+    private static ConcurrentLinkedQueue<Integer> txTimes = new ConcurrentLinkedQueue<>();
+    private static ConcurrentLinkedQueue<Types.txID> txIds = new ConcurrentLinkedQueue<>();
+    private static ExecutorService clients;
 
-    static AtomicBoolean recorded = new AtomicBoolean(false);
-    static Object notifier;
+    private static AtomicBoolean recorded = new AtomicBoolean(false);
+    private static final Object notifier = new Object();
 
 
     public static void main(String[] argv) {
@@ -58,23 +55,15 @@ public class ClientTester {
                 }
 
             }
-//
         }));
-//        try {
-//            Thread.sleep(30 * 1000);
-//        } catch (InterruptedException e) {
-//            logger.error(e);
-//        }
+
         clientID = Integer.parseInt(argv[0]);
-//        serverID = Integer.parseInt(argv[1]);
         testTXS = Integer.parseInt(argv[2]);
         Config.setConfig(null, clientID);
         logger = org.apache.log4j.Logger.getLogger(ClientTester.class);
-//        serverIP = Config.getIP(serverID);
         txSize = Config.getTxSize();
         n = Config.getN();
         clients = Executors.newFixedThreadPool(n);
-        notifier = new Object();
 
         start();
         testTime = System.currentTimeMillis();
@@ -107,7 +96,7 @@ public class ClientTester {
     }
 
 
-    static void start() {
+    private static void start() {
         logger.info("init clients");
         stubs = new clientServiceGrpc.clientServiceBlockingStub[n];
         for (int i = 0 ; i < n ; i++) {
@@ -119,7 +108,7 @@ public class ClientTester {
         }
     }
 
-    static void test(clientServiceGrpc.clientServiceBlockingStub stub, int server) {
+    private static void test(clientServiceGrpc.clientServiceBlockingStub stub, int server) {
         logger.info("Start client for " + server);
         stub.write(Types.Transaction.newBuilder() // This meant to remove the effect of connecting to the server
                 .setData(ByteString.copyFrom(new byte[0]))
@@ -155,7 +144,7 @@ public class ClientTester {
         logger.info("Client " + server +" is done");
     }
 
-    static void collectResults() throws IOException {
+    private static void collectResults() throws IOException {
         testTime = System.currentTimeMillis() - testTime;
         String pathString = "/tmp/JToy/res/";
         Path path = Paths.get(pathString,   String.valueOf(clientID), "csummery.csv");
@@ -186,7 +175,7 @@ public class ClientTester {
         writer.close();
     }
 
-    static void collectSummery() throws IOException {
+    private static void collectSummery() throws IOException {
         String pathString = "/tmp/JToy/res/";
         Path path = Paths.get(pathString,   String.valueOf(clientID), "ctsummery.csv");
         File f = new File(path.toString());

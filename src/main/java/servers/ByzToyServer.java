@@ -1,36 +1,29 @@
 package servers;
 
-import blockchain.Blockchain;
-
-import blockchain.Utils;
 import blockchain.data.BCS;
 import com.google.protobuf.ByteString;
 import communication.CommLayer;
-import das.ab.ABService;
-
 import das.wrb.WRB;
 import proto.Types;
 
 import java.security.SecureRandom;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+
 
 import static blockchain.Utils.createBlockHeader;
-import static blockchain.Utils.createBlockchain;
 import static java.lang.String.format;
 
-public class ByzToyServer extends ToyBaseServer {
+class ByzToyServer extends ToyBaseServer {
 
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ByzToyServer.class);
     private boolean fullByz = false;
-    List<List<Integer>> groups = new ArrayList<>();
+    private List<List<Integer>> groups = new ArrayList<>();
     private int delayTime;
-    final Queue<Types.Block> byzProposed = new LinkedList<>();
+    private final Queue<Types.Block> byzProposed = new LinkedList<>();
 
 
-    public ByzToyServer(int id, int worker, int n, int f, int maxTx, boolean fastMode,
-                          CommLayer comm) {
+    ByzToyServer(int id, int worker, int n, int f, int maxTx, boolean fastMode,
+                 CommLayer comm) {
         super(id, worker, n, f, maxTx, fastMode, comm);
         groups.add(new ArrayList<>());
         for (int i = 0 ; i < n ; i++) {
@@ -67,39 +60,6 @@ public class ByzToyServer extends ToyBaseServer {
 
         }
     }
-
-//    @Override
-//    void commSendLogic() throws InterruptedException {
-//        while (!stopped.get()) {
-//            Thread.sleep(200);
-//            synchronized (byzProposed) {
-//                sendByzLogic();
-//            }
-//
-//
-//        }
-//    }
-
-//    void sendByzLogic() {
-//        ArrayList<Types.Block> byzs = new ArrayList<>();
-//        for (List<Integer> g : groups) {
-//            Types.Block byz = getByzBlock();
-//            comm.send(worker, byz, g.stream().mapToInt(i->i).toArray());
-//            byzs.add(byz);
-//        }
-//        byzProposed.add(byzs);
-//    }
-
-//    Types.BlockHeader leaderImpl() {
-//        addTransactionsToCurrBlock();
-//        if (!configuredFastMode) {
-//            return normalLeaderPhase();
-//        }
-//        if (currHeight == 1 || !fastMode) {
-//            normalLeaderPhase();
-//        }
-//        return fastModePhase();
-//    }
 
     Types.BlockHeader leaderImpl() throws InterruptedException {
         addTransactionsToCurrBlock();
@@ -150,7 +110,7 @@ public class ByzToyServer extends ToyBaseServer {
     }
 
 
-    public void setByzSetting() {
+    void setByzSetting() {
         LinkedList<Integer> ids = new LinkedList<>();
         for (int i =  0 ; i < n ; i++) {
             ids.add(i);
@@ -175,12 +135,12 @@ public class ByzToyServer extends ToyBaseServer {
         }
     }
 
-    public void setAsyncParam(int maxTime) {
+    void setAsyncParam(int maxTime) {
         this.delayTime = maxTime;
 
     }
 
-    Types.Block getByzBlock(Types.Block b) {
+    private Types.Block getByzBlock(Types.Block b) {
         SecureRandom random = new SecureRandom();
         byte[] byzTx = new byte[40];
         int bid = random.nextInt();
@@ -191,42 +151,8 @@ public class ByzToyServer extends ToyBaseServer {
                         .setTxNum(1)
                         .setChannel(worker))
                         .setData(ByteString.copyFrom(byzTx))
-//                        .setServerTs(System.currentTimeMillis())
                 .build()).build();
-//        Types.Block.Builder b = Types.Block.newBuilder()
-//                .setId(Types.BlockID.newBuilder()
-//                        .setBid(bid)
-//                        .setPid(getID())
-//                        .build());
-//        for (int i = 0 ; i < maxTransactionInBlock ; i++) {
-//            random.nextBytes(byzTx);
-//             b.addData(Types.Transaction.newBuilder()
-//                    .setId(Types.txID.newBuilder()
-//                            .setProposerID(getID())
-//                            .setBid(bid)
-//                            .setTxNum(1)
-//                            .setChannel(worker))
-////                        .setServerTs(System.currentTimeMillis())
-//                    .build());
-//        }
-//
-//                return b.build();
     }
-
-//    @Override
-//    public Blockchain initBC(int id, int channel) {
-//        return createBlockchain(Utils.BCT.SGC, id, n, sPath);
-//    }
-
-//    @Override
-//    public Blockchain getBC(int start, int end) {
-//        return new Blockchain(this.bc, start, end);
-//    }
-//
-//    @Override
-//    public Blockchain getEmptyBC() {
-//        return new Blockchain(this.getID());
-//    }
 
     @Override
     void potentialBehaviourForSync() throws InterruptedException {

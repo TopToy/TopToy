@@ -1,19 +1,13 @@
 package app;
-import blockchain.Blockchain;
 import blockchain.data.BCS;
 import com.google.protobuf.ByteString;
 import config.Config;
-//import crypto.rmfDigSig;
-import crypto.DigestMethod;
-import crypto.blockDigSig;
+import crypto.BlockDigSig;
 import das.ms.BFD;
 import org.apache.commons.cli.*;
-import org.apache.commons.lang.ArrayUtils;
 import proto.Types;
 import utils.statistics.Statistics;
 import utils.CSVUtils;
-
-import javax.print.DocFlavor;
 import java.io.FileWriter;
 import java.io.File;
 import java.io.IOException;
@@ -28,48 +22,26 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import static crypto.blockDigSig.hashBlockData;
-import static java.lang.Math.min;
-import static java.lang.StrictMath.max;
+import static crypto.BlockDigSig.hashBlockData;
 import static java.lang.String.format;
-import static java.lang.String.valueOf;
-import static utils.statistics.Statistics.*;
 
-public class Cli {
+class Cli {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Cli.class);
         private Options options = new Options();
-        private long totalRT = 0;
-        static String outPath = "/tmp/JToy/res/";
-        AtomicBoolean recorded = new AtomicBoolean(false);
-        public Cli() {
+        private static String outPath = "/tmp/JToy/res/";
+        private AtomicBoolean recorded = new AtomicBoolean(false);
+
+        Cli() {
             options.addOption("help", "print this message");
-            options.addOption("init", "init the server");
-            options.addOption("serve", "start the server\n" +
-                    "Note that before lunching the command, all other servers has to be initialized first");
+            options.addOption("init", "init a toy server");
+            options.addOption("serve", "start the server");
             options.addOption("stop", "terminate the server");
             options.addOption("quit", "exit Toy terminal");
-            options.addOption(Option.builder("tx")
-                            .hasArg()
-                            .desc("-a: add new transaction\n" +
-                                    "Usage: tx -a [data]\n" +
-                                    "-s: check the status of a transaction\n" +
-                                    "Usage: tx -s [txID]")
-                            .build()); // TODO: How?
+
             options.addOption(Option.builder("wait")
                     .hasArg()
                     .desc("Usage: wait [sec]\n" +
                             "waits for [sec] second")
-                    .build());
-            options.addOption(Option.builder("res")
-                    .hasArg()
-                    .desc("Write the results into csv file\n" +
-                            "Usage: res -p [path_to_csv]")
-                    .build());
-            options.addOption(Option.builder("bm")
-                    .hasArg()
-                    .desc("run a benchmark on the system\n" +
-                            "Note that this method should run write after init!\n" +
-                            "Usage: bm -t [transaction size] -s [amount of loaded transactions] -p [path to csv]")
                     .build());
 
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
@@ -81,11 +53,6 @@ public class Cli {
                         writeByzSummery(outPath);
                     }
                     writeBlocks();
-////                writeToScv(outPath);
-////                writeBlocksStatistics(outPath);
-//                    writeBlocksStatisticsSummery(outPath);
-//                    DBUtils.shutdown();
-//                    DiskUtils.shutdown();
                 }
 //
             }));
@@ -93,109 +60,79 @@ public class Cli {
 
 
         void parse(String[] args) throws InterruptedException, IOException {
-//            CommandLineParser parser = new DefaultParser();
-//            try {
-//                CommandLine line = parser.parse(options, args);
-                if (args[0].equals("help")) {
-                    help();
-                    return;
-                }
-                if (args[0].equals("init")) {
-                    init();
-                    System.out.println("Init server... [OK]");
-                    return;
-                }
 
-//                if (args[0].equals("latency")) {
-//                    latency();
-//                    System.out.println("latency... [OK]");
-//                    return;
-//                }
-
-                if (args[0].equals("serve")) {
-                    serve();
-//                    totalRT = System.currentTimeMillis();
-                    System.out.println("Serving... [OK]");
-                    return;
-                }
-            if (args[0].equals("writeBlocks")) {
-//                writeBlocks();
+            if (args[0].equals("help")) {
+                help();
                 return;
             }
-                if (args[0].equals("stop")) {
-                    stop();
-//                    totalRT = System.currentTimeMillis() - totalRT;
-                    System.out.println("stop server... [OK]");
-                    return;
+            if (args[0].equals("init")) {
+                init();
+                System.out.println("Init server... [OK]");
+                return;
+            }
+
+
+            if (args[0].equals("serve")) {
+                serve();
+                System.out.println("Serving... [OK]");
+                return;
+            }
+
+            if (args[0].equals("stop")) {
+                stop();
+                System.out.println("stop server... [OK]");
+                return;
+            }
+
+            if (args[0].equals("quit")) {
+                if (Statistics.getSyncs() == 0) {
+                    writeSummery(outPath);
+                } else {
+                    writeByzSummery(outPath);
                 }
-                if (args[0].equals("quit")) {
-                    if (Statistics.getSyncs() == 0) {
-                        writeSummery(outPath);
-                    } else {
-                        writeByzSummery(outPath);
+
+                writeBlocks();
+                recorded.set(true);
+                System.exit(0);
+            }
+
+            if (args[0].equals("wait")) {
+                if (args.length == 2) {
+                    int sec = Integer.parseInt(args[1]);
+                    if (sec > 0) {
+
+                        System.out.println(format("waits for %d seconds ", sec));
+                        Thread.sleep(sec * 1000);
                     }
+                }
+                return;
+            }
 
-                    writeBlocks();
-//                    writeBlocksStatisticsSummery(outPath);
-
-                    recorded.set(true);
-//                    System.out.println("Goodbye :)");
-                    System.exit(0);
+            if (args[0].equals("async")) {
+                if (!JToy.type.equals("a") && !JToy.type.equals("b")) {
+                    logger.debug("Unable to set async behaviour to a correct server");
                     return;
                 }
-
-                if (args[0].equals("wait")) {
-                    if (args.length == 2) {
-                        int sec = Integer.parseInt(args[1]);
-                        if (sec > 0) {
-
-                            System.out.println(format("waits for %d seconds ", sec));
-                            Thread.sleep(sec * 1000);
-                            totalRT = System.currentTimeMillis();
-                        }
-                    }
-                    return;
+                if (args.length == 3) {
+                    int sec = Integer.parseInt(args[1]);
+                    int duration = Integer.parseInt(args[2]);
+                    asyncPeriod(sec * 1000, duration * 1000);
                 }
+                return;
+            }
 
-                if (args[0].equals("async")) {
-                    if (!JToy.type.equals("a") && !JToy.type.equals("b")) {
-                        logger.debug("Unable to set async behaviour to a correct server");
-                        return;
-                    }
-                    if (args.length == 3) {
-                        int sec = Integer.parseInt(args[1]);
-                        int duration = Integer.parseInt(args[2]);
-                        asyncPeriod(sec * 1000, duration * 1000);
-                    }
-                    return;
-                }
+            if (args[0].equals("byz")) {
+                JToy.s.setByzSetting();
+                return;
+            }
 
-                if (args[0].equals("byz")) {
-//                    if (!JToy.type.equals("bs") && !JToy.type.equals("bf")) {
-//                        logger.debug("Unable to set byzantine behaviour to non async server");
-//                        return;
-//                    }
-                    setByzSetting();
-                    return;
-                }
+            if (args[0].equals("sigTest")) {
+                logger.info("Accepted sigTest");
+                int time = Integer.parseInt(args[1]);
+                sigTest(outPath, time);
+                return;
 
-//                if (args[0].equals("res")) {
-//                    if (args.length == 3) {
-//                        if (!args[1].equals("-p")) return;
-//                        String path = args[2];
-//                        writeToScv(path);
-//
-//                    }
-//                    return;
-//                }
-
-                if (args[0].equals("sigTest")) {
-                    logger.info("Accepted sigTest");
-                    int time = Integer.parseInt(args[1]);
-                    sigTest(outPath, time);
-                    return;
-
-                }
+            }
 
             if (args[0].equals("stStart")) {
                Statistics.activate(JToy.s.getID());
@@ -208,32 +145,21 @@ public class Cli {
                 return;
 
             }
-//                if (args[0].equals("bm")) {
-//                    if (args.length != 7) return;
-//                    if (!args[1].equals("-t")) return;
-//                    if (!args[3].equals("-s")) return;
-//                    if (!args[5].equals("-p")) return;
-//                    runBenchMark(Integer.parseInt(args[2]), Integer.parseInt(args[4]), args[6]);
-//                    return;
-//                }
 
-                if (args[0].equals("status")) {
-                    if (args.length == 5) {
-                        int channel = Integer.parseInt(args[1]);
-                        int pid = Integer.parseInt(args[2]);
-                        int bid = Integer.parseInt(args[3]);
-                        int tid  = Integer.parseInt(args[4]);
+            if (args[0].equals("status")) {
+                if (args.length == 5) {
+                    int channel = Integer.parseInt(args[1]);
+                    int pid = Integer.parseInt(args[2]);
+                    int bid = Integer.parseInt(args[3]);
+                    int tid  = Integer.parseInt(args[4]);
 
-                        String stat = txStatus(channel, pid, bid, tid);
-                        System.out.println(format("[channel=%d ; pid:%d ; bid=%d ; tid=%d] status=%s", channel, pid,
-                                bid, tid, stat));
-                        return;
-                    }
+                    String stat = txStatus(channel, pid, bid, tid);
+                    System.out.println(format("[channel=%d ; pid:%d ; bid=%d ; tid=%d] status=%s", channel, pid,
+                            bid, tid, stat));
+                    return;
                 }
-                logger.error(format("Invalid command %s", Arrays.toString(args)));
-//            } catch (Exception e) {
-//                logger.error("", e);
-//            }
+            }
+            logger.error(format("Invalid command %s", Arrays.toString(args)));
 
         }
         private void help() {
@@ -252,20 +178,9 @@ public class Cli {
             JToy.s.serve();
         }
         private void stop() {
-//            JToy.s.stop();
             JToy.s.shutdown();
         }
 
-//        private void latency() throws InterruptedException {
-//            init();
-//            serve();
-//            while (true) {
-//                Thread.sleep(10 * 60 * 1000);
-//            }
-//        }
-        private Types.txID addtx(String data, int clientID) {
-            return JToy.s.addTransaction(data.getBytes(), clientID);
-        }
 
         private String txStatus(int channel, int pid, int bid, int tid) throws InterruptedException {
             Types.txID txid = Types.txID.newBuilder()
@@ -279,9 +194,6 @@ public class Cli {
             switch (stat) {
                 case -1: return "Not exist";
                 case 0: return "Approved";
-//                case 1: return "Proposed";
-//                case 2: return "Approved";
-//                case 3: return "Pending";
             }
             return null;
         }
@@ -290,7 +202,7 @@ public class Cli {
                     .toBuilder()
                     .setTransactionHash(ByteString.copyFrom(hashBlockData(b.build()))));
             b1.setHeader(b.getHeader().toBuilder()
-                    .setProof(blockDigSig.sign(b1.getHeader()))).build();
+                    .setProof(BlockDigSig.sign(b1.getHeader()))).build();
         }
         private Types.Block.Builder createBlock(int txSize) {
             Types.Block.Builder bb = Types.Block.newBuilder();
@@ -344,7 +256,7 @@ public class Cli {
                     latch1.countDown();
                 });
             }
-            logger.info(format("Await termination 1"));
+            logger.info("Await termination 1");
             Thread.sleep(time * 1000);
             stop.set(true);
 //            executor.awaitTermination(120, TimeUnit.SECONDS);
@@ -357,7 +269,7 @@ public class Cli {
                 f.getParentFile().mkdirs();
                 f.createNewFile();
             }
-            logger.info(format("Collecting results"));
+            logger.info("Collecting results");
             FileWriter writer = new FileWriter(path.toString(), true);
             DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy-HH:mm:ss");
             List<String> row = Arrays.asList(
@@ -371,67 +283,8 @@ public class Cli {
             writer.flush();
             writer.close();
         }
-//        private void writeToScv(String pathString) {
-//            if (JToy.type.equals("m")) return;
-//            DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy-HH:mm:ss");
-//            Path path = Paths.get(pathString, String.valueOf(JToy.s.getID()), dateFormat.format(new Date()) + ".csv");
-//            try {
-//                File f = new File(path.toString());
-//
-//                f.getParentFile().mkdirs();
-//                f.createNewFile();
-//                FileWriter writer = new FileWriter(path.toString());
-//                int nob = JToy.s.getBCSize();
-//                long fts = 0;
-//                long lts = 0;
-//                int tCount = 0;
-//                int txSize = -1;
-//                fts = JToy.s.nonBlockingDeliver(1).getSt().getDecided();
-//                lts = JToy.s.nonBlockingDeliver(nob - 1).getSt().getDecided();
-//                tCount = (nob - 1) * Config.getMaxTransactionsInBlock();
-//                txSize = JToy.s.nonBlockingDeliver(1).getData(0).getSerializedSize();
-//                for (int i = 0 ; i < nob ; i++) {
-//                    Types.Block b = JToy.s.nonBlockingDeliver(i);
-//                    for (Types.Transaction t : b.getDataList()) {
-//                        if (fts == 0) {
-//                            fts = b.getSt().getDecided();
-//                            lts = fts;
-//                        }
-//                        fts = min(fts, b.getSt().getDecided());
-//                        lts = max(lts, b.getSt().getDecided());
-//                        tCount++;
-//                        if (txSize == -1) {
-//                            txSize = t.getSerializedSize();
-//                        }
-//                        List<String> row = Arrays.asList(format("[%d:%d]", t.getId().getProposerID(), t.getId().getTxNum())
-//                                , String.valueOf(t.getSerializedSize()),
-//                                String.valueOf(t.getClientID()), String.valueOf(b.getSt().getDecided()),
-//                                String.valueOf(t.getData().size()), String.valueOf(i),
-//                                String.valueOf(b.getHeader().getBid().getPid()));
-//                        CSVUtils.writeLine(writer, row);
-//                    }
-//                }
-//                writer.flush();
-//                writer.close();
-////                writeSummery(pathString, tCount, txSize, fts, lts);
-//            } catch (IOException e) {
-//                logger.error("", e);
-//            }
-//        }
 
-//        boolean validateBC() {
-//            return JToy.s.isValid();
-////            for (int i = 1 ; i < JToy.s.getBCSize() ; i++) {
-////                if (!validateBlockHash(JToy.s.nonBlockingDeliver(i - 1),
-////                        JToy.s.nonBlockingDeliver(i))) {
-////                    System.out.println(String.format("Invalid Blockchain!! [%d -> %d]", i-1, i));
-////                    return false;
-////                }
-////            }
-////            return true;
-//        }
-
-        void writeBlocks() {
+        private void writeBlocks() {
             if (Config.getTxSize() != 512) return;
             logger.info("Starting writeBlocks");
             String pathString = "/tmp/JToy/res/";
@@ -443,11 +296,10 @@ public class Cli {
                     f.getParentFile().mkdirs();
                     f.createNewFile();
                 }
-                FileWriter writer = null;
+                FileWriter writer;
                 writer = new FileWriter(path.toString(), true);
                 List<List<String>> rows = new ArrayList<>();
                 int workers = Config.getC();
-                if (Statistics.getH1() < 0 || Statistics.getH2() > 0) return;
                 for (int i = Statistics.getH1() ; i < Statistics.getH2() ; i++) {
                     List<Types.Block> rBlocks = new ArrayList<>();
                     for (int  j = 0 ; j < workers ; j++) {
@@ -462,10 +314,6 @@ public class Cli {
                         long pt = b.getBst().getProposeTime();
                         long tt = b.getHeader().getHst().getTentativeTime();
                         long dt = b.getHeader().getHst().getDefiniteTime();
-//                        if (dlt == -1) {
-//                            logger.info(format("Un registered block [h=%d ; w=%d]", i, j));
-//                            continue;
-//                        }
                         rows.add(Arrays.asList(
                                     String.valueOf(Config.getMaxTransactionsInBlock())
                                     , String.valueOf(Config.getTxSize())
@@ -493,7 +341,8 @@ public class Cli {
                 logger.error(e);
             }
         }
-        void writeSummery(String pathString) {
+
+        private void writeSummery(String pathString) {
             logger.info("Starting writeSummery");
             Path path = Paths.get(pathString, String.valueOf(JToy.s.getID()), "summery.csv");
             File f = new File(path.toString());
@@ -503,7 +352,7 @@ public class Cli {
                     f.getParentFile().mkdirs();
                     f.createNewFile();
                 }
-                FileWriter writer = null;
+                FileWriter writer;
                 writer = new FileWriter(path.toString(), true);
 
                 int nob = Statistics.getNob();
@@ -512,8 +361,6 @@ public class Cli {
                 int stBlockNum = Statistics.getStBlockNum();
                 long txSize = Config.getTxSize();
                 int txInBlock = Config.getMaxTransactionsInBlock();
-//                int h1 = Statistics.getH1();
-//                int h2 = Statistics.getH2();
                 int avgTxInBlock = 0;
                 double acBP2T = Statistics.getAcBP2T();
                 double acBP2D = Statistics.getAcBP2D();
@@ -531,9 +378,6 @@ public class Cli {
 
                 }
 
-//                if (nob > 0) {
-//                    txInBlock = txCount / nob;
-//                }
                 double BP2T = 0;
                 double BP2D = 0;
                 double BP2DL = 0;
@@ -646,17 +490,15 @@ public class Cli {
                 f.getParentFile().mkdirs();
                 f.createNewFile();
             }
-            FileWriter writer = null;
+            FileWriter writer;
             writer = new FileWriter(path.toString(), true);
             int workers = Config.getC();
 
             int nob = 0;
             int noeb = 0;
             int txCount = 0;
-//            System.out.println(Statistics.getH1() + ":" + Statistics.getH2());
             for (int i = Statistics.getH1() ; i < Statistics.getH2() ; i++) {
                 for (int j = 0 ; j < workers ; j++) {
-//                    System.out.println(j + ":" + i);
                     Types.Block b = BCS.nbGetBlock(j, i);
                         nob++;
                         if (b.getDataCount() == 0) {
@@ -669,8 +511,6 @@ public class Cli {
 
             long txSize = Config.getTxSize();
             int txInBlock = Config.getMaxTransactionsInBlock();
-//                int h1 = Statistics.getH1();
-//                int h2 = Statistics.getH2();
             int avgTxInBlock = 0;
 
             long time = (Statistics.getStop() - Statistics.getStart()) / 1000;
@@ -678,10 +518,6 @@ public class Cli {
                 avgTxInBlock = txCount / nob;
 
             }
-
-//            if (nob > 0) {
-//                txInBlock = txCount / nob;
-//            }
 
             int tps = 0;
             int bps = 0;
@@ -763,150 +599,15 @@ public class Cli {
 
     }
 
-//    void writeBlocksStatisticsSummery(String pathString)  {
-//        Path path = Paths.get(pathString,   String.valueOf(JToy.s.getID()), "blocksStatSummery.csv");
-//        try {
-//            File f = new File(path.toString());
-//            if (!f.exists()) {
-//                f.getParentFile().mkdirs();
-//                f.createNewFile();
-//            }
-//            FileWriter writer = null;
-//            writer = new FileWriter(path.toString(), true);
-//            int nob = JToy.s.getBCSize();
-////            DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy-HH:mm:ss");
-//            Statistics st = JToy.s.getStatistics();
-////            long total = 0;
-//            long signaturePeriod = 0;
-////            long create2propose = 0;
-//            long verificationPeriod = 0;
-//            long propose2tentative = 0;
-//            long tentative2permanent = 0;
-//            long channelPermanent2decide = 0;
-//            long propose2permanentchannel= 0;
-//            long propose2decide = 0;
-//            for (int i = 1 ; i < nob ; i++) {
-//                Types.Block b = JToy.s.nonBlockingDeliver(i);
-//                if (b == null) {
-//                    System.out.println(format("[i=%d] and NULL!!!!!", i));
-//                    continue;
-//                }
-//                Types.blockStatistics bst = b.getSt();
-//                signaturePeriod += bst.getSign();
-////                create2propose += bst.getProposed() - bst.getCreated();
-//                verificationPeriod += bst.getVerified();
-//                propose2tentative += bst.getChannelDecided() - bst.getProposed();
-//                tentative2permanent += bst.getPd() - bst.getChannelDecided();
-//                channelPermanent2decide += bst.getDecided() - bst.getPd();
-//                propose2permanentchannel += bst.getPd() - bst.getProposed();
-//                propose2decide += bst.getDecided() - bst.getProposed();
-////                total += b.getSt().getDecided() - b.getSt().getProposed();
-//            }
-////            long avgTotal = total / nob;
-//            signaturePeriod = signaturePeriod / nob;
-////            create2propose = create2propose / nob;
-//            verificationPeriod = verificationPeriod / nob;
-//            propose2tentative = propose2tentative / nob;
-//            tentative2permanent = tentative2permanent / nob;
-//            channelPermanent2decide = channelPermanent2decide / nob;
-//            propose2permanentchannel = propose2permanentchannel / nob;
-//            propose2decide = propose2decide / nob;
-//            List<String> row = Arrays.asList(String.valueOf(JToy.s.getID()),
-//                    JToy.type, String.valueOf(Config.getC()), String.valueOf(st.txSize),
-//                    String.valueOf(Config.getMaxTransactionsInBlock()),
-//                    String.valueOf(signaturePeriod),
-//                    String.valueOf(verificationPeriod),
-////                    String.valueOf(create2propose),
-//                    String.valueOf(propose2tentative),
-//                    String.valueOf(tentative2permanent),
-//                    String.valueOf(channelPermanent2decide),
-//                    String.valueOf(propose2permanentchannel),
-//                    String.valueOf(propose2decide));
-////                    String.valueOf(avgTotal));
-//            CSVUtils.writeLine(writer, row);
-//            writer.flush();
-//            writer.close();
-//        } catch (IOException e) {
-//            logger.error(e);
-//        }
-//    }
 
-//        void writeBlocksStatistics(String pathString)  {
-//            Path path = Paths.get(pathString,   String.valueOf(JToy.s.getID()), "blocksStat.csv");
-//            try {
-//                File f = new File(path.toString());
-//                if (!f.exists()) {
-//                    f.getParentFile().mkdirs();
-//                    f.createNewFile();
-//                }
-//                FileWriter writer = null;
-//                writer = new FileWriter(path.toString(), true);
-//                int nob = JToy.s.getBCSize();
-////                DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy-HH:mm:ss");
-//                Statistics st = JToy.s.getStatistics();
-//                for (int i = 1 ; i < nob ; i++) {
-//                    Types.Block b = JToy.s.nonBlockingDeliver(i);
-////                    logger.info(format("[height=%d] [tentative=%d] [permanent=%d] [diff=%d]",
-////                            b.getHeader().getHeight(), b.getSt().getChannelDecided(),
-////                            b.getSt().getPd(), b.getSt().getPd() - b.getSt().getChannelDecided()));
-//                    Types.blockStatistics bst = b.getSt();
-////                    long total = bst.getDecided() - bst.getChannelDecided();
-//                    long signaturePeriod = bst.getSign();
-//                    long verificationPeriod = bst.getVerified();
-////                    long create2propose = bst.getProposed() - bst.getCreated();
-//                    long propose2tentative = bst.getChannelDecided() - bst.getProposed();
-//                    long tentative2permanent = bst.getPd() - bst.getChannelDecided();
-//                    long channelPermanent2decide = bst.getDecided() - bst.getPd();
-//                    long propose2permanentchannel= bst.getPd() - bst.getProposed();
-//                    long propose2decide = bst.getDecided() - bst.getProposed();
-//                    List<String> row = Arrays.asList(String.valueOf(JToy.s.getID()),
-//                            JToy.type, String.valueOf(Config.getC()), String.valueOf(st.txSize),
-//                            String.valueOf(Config.getMaxTransactionsInBlock()),
-//                            String.valueOf(b.getDataCount()),
-//                            String.valueOf(b.getHeader().getHeight()),
-//                            String.valueOf(signaturePeriod),
-//                            String.valueOf(verificationPeriod),
-////                            String.valueOf(create2propose),
-//                            String.valueOf(propose2tentative),
-//                            String.valueOf(tentative2permanent),
-//                            String.valueOf(channelPermanent2decide),
-//                            String.valueOf(propose2permanentchannel),
-//                            String.valueOf(propose2decide));
-////                            String.valueOf(total));
-//                    CSVUtils.writeLine(writer, row);
-//                }
-//                writer.flush();
-//                writer.close();
-//            } catch (IOException e) {
-//                logger.error(e);
-//            }
-//        }
-
-        private void setByzSetting() {
-            System.out.println("Setting byz");
-//            boolean fullByz = Integer.parseInt(args[1]) == 1;
-//            List<List<Integer>> groups = new ArrayList<>();
-//            int i = 2;
-//            while (i < args.length) {
-//                i++;
-//                List<Integer> group = new ArrayList<>();
-//                while (i < args.length && !args[i].equals("-g")) {
-//                    group.add(Integer.parseInt(args[i]));
-//                    i++;
-//                }
-//                groups.add(group);
-//            }
-            JToy.s.setByzSetting();
+    private void asyncPeriod(int sec, int duration) throws InterruptedException {
+        System.out.println(format("setting async params [%d] sec delay for [%d] sec", sec/1000, duration/1000));
+        JToy.s.setAsyncParam(sec);
+        if (duration > 0) {
+            Thread.sleep(duration);
         }
-
-        private void asyncPeriod(int sec, int duration) throws InterruptedException {
-            System.out.println(format("setting async params [%d] sec delay for [%d] sec", sec/1000, duration/1000));
-            JToy.s.setAsyncParam(sec);
-            if (duration > 0) {
-                Thread.sleep(duration);
-            }
-            System.out.println(format("return to normal"));
-            JToy.s.setAsyncParam(0);
-        }
+        System.out.println("return to normal");
+        JToy.s.setAsyncParam(0);
+    }
 
 }

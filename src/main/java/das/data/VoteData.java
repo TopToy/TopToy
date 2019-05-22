@@ -3,7 +3,7 @@ package das.data;
 import java.util.ArrayList;
 
 public class VoteData {
-    ArrayList<ArrayList<Integer>> votes = new ArrayList<>();
+    private ArrayList<ArrayList<Integer>> votes = new ArrayList<>();
     public VoteData() {
         votes.add(new ArrayList<>());
         votes.add(new ArrayList<>());

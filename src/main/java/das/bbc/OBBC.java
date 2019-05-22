@@ -3,10 +3,9 @@ package das.bbc;
 import blockchain.data.BCS;
 import com.google.protobuf.ByteString;
 import communication.CommLayer;
-import config.Node;
+import utils.Node;
 
-import crypto.DigestMethod;
-import crypto.blockDigSig;
+import crypto.BlockDigSig;
 import das.data.BbcDecData;
 
 import das.data.Data;
@@ -174,8 +173,8 @@ public class OBBC extends ObbcGrpc.ObbcImplBase  {
         Types.BlockHeader.Builder nextBuilder = next
                 .toBuilder()
                 .setPrev(ByteString
-                        .copyFrom(blockDigSig.hashHeader(curr)));
-        String signature = blockDigSig.sign(nextBuilder.build());
+                        .copyFrom(BlockDigSig.hashHeader(curr)));
+        String signature = BlockDigSig.sign(nextBuilder.build());
         return nextBuilder
                 .setProof(signature)
                 .build();

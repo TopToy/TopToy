@@ -9,9 +9,9 @@ import static java.lang.String.format;
 public class ClientRpcsService extends clientServiceGrpc.clientServiceImplBase {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ClientRpcsService.class);
 
-    Top topServer;
+    private Top topServer;
 
-    public ClientRpcsService(Top topServer)  {
+    ClientRpcsService(Top topServer)  {
         this.topServer = topServer;
     }
 

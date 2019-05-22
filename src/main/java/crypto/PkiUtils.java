@@ -12,8 +12,8 @@ import java.util.HashMap;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-public class pkiUtils {
-    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(pkiUtils.class);
+public class PkiUtils {
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(PkiUtils.class);
     private static PrivateKey privKey;
     private static HashMap<Integer, Signature> clusterPubKeys = new HashMap<>();
     private static final Object globalLock = new Object();
@@ -65,8 +65,6 @@ public class pkiUtils {
         synchronized (globalLock) {
             Signature publicSignature = clusterPubKeys.get(id);
             try {
-//            publicSignature = Signature.getInstance("SHA256withECDSA");
-//            publicSignature.initVerify(clusterPubKeys.get(id));
                 publicSignature.update(plainText.getBytes(UTF_8));
                 byte[] signatureBytes = Base64.getDecoder().decode(signature);
                 return publicSignature.verify(signatureBytes);

@@ -1,6 +1,5 @@
 package communication;
 
-import blockchain.Blockchain;
 import proto.Types;
 
 public interface CommLayer {

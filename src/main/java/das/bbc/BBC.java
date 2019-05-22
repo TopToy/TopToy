@@ -13,10 +13,11 @@ import static java.lang.String.format;
 public class BBC {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(BBC.class);
 
-    static int n;
-    static int id;
-    static int f;
-    static int qSize;
+    private static int n;
+    private static int id;
+    private static int f;
+    private static int qSize;
+
     public BBC(int id, int n, int f, int qSize) {
         BBC.id = id;
         BBC.n = n;
@@ -39,7 +40,7 @@ public class BBC {
         return Data.bbcRegDec[worker].get(key);
     }
 
-    static public void nonBlockingPropose(Types.BbcMsg bm) {
+    static void nonBlockingPropose(Types.BbcMsg bm) {
         ABService.broadcast(bm.toByteArray(), bm.getM(), Data.RBTypes.BBC);
     }
 

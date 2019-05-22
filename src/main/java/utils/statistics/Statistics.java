@@ -2,15 +2,6 @@ package utils.statistics;
 
 import blockchain.data.BCS;
 import config.Config;
-import das.ms.BFD;
-import org.h2.mvstore.ConcurrentArrayList;
-import proto.Types;
-
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -18,8 +9,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static java.lang.Math.max;
-import static java.lang.Math.min;
-import static java.lang.String.format;
 
 public class Statistics {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Statistics.class);
@@ -39,27 +28,23 @@ public class Statistics {
     static private AtomicInteger maxTmo = new AtomicInteger(0);
     static private AtomicInteger syncs = new AtomicInteger(0);
     static private AtomicLong negTime = new AtomicLong(0);
-//    static private HashMap<Integer[], Long> dlt = new HashMap<>();
-
-
     static private AtomicBoolean active = new AtomicBoolean(false);
 
-    static int txCount = 0;
-    static int nob = 0;
-    static int neb = 0;
-    static int txSize = 0;
-    static int txInBlock = 0;
-    static int stBlockNum = 0;
+    private static int txCount = 0;
+    private static int nob = 0;
+    private static int neb = 0;
+    private static int txInBlock = 0;
+    private static int stBlockNum = 0;
 
-    static double acBP2T = 0;
-    static double acBP2D = 0;
-    static double acBP2DL = 0;
+    private static double acBP2T = 0;
+    private static double acBP2D = 0;
+    private static double acBP2DL = 0;
 
-    static double acHP2T = 0;
-    static double acHP2D = 0;
-    static double acHT2D = 0;
-    static double acHP2DL = 0;
-    static double acHD2DL = 0;
+    private static double acHP2T = 0;
+    private static double acHP2D = 0;
+    private static double acHT2D = 0;
+    private static double acHP2DL = 0;
+    private static double acHD2DL = 0;
 
     static public void updateAll() {
         if (!active.get()) return;
@@ -223,10 +208,6 @@ public class Statistics {
         return stBlockNum;
     }
 
-    //    public static int getTxSize() {
-//        return txSize;
-//    }
-
     public static double getAcBP2DL() {
         return acBP2DL;
     }
@@ -243,16 +224,14 @@ public class Statistics {
         return active.get();
     }
 
-    static void collectForBlock(BCStat b) {
+    private static void collectForBlock(BCStat b) {
         long curr = System.currentTimeMillis();
         nob++;
         if (b.txCount == 0) {
             neb++;
         }
         txCount += b.txCount;
-//        for (Types.Transaction t : b.getDataList()) {
-//            txSize += t.getData().size();
-//        }
+
         if (b.pid == id) {
             stBlockNum++;
             acBP2T += b.hst.getTentativeTime() - b.bst
@@ -271,11 +250,9 @@ public class Statistics {
             acHP2DL += curr - b.hst.getProposeTime();
             acHD2DL += curr - b.hst.getDefiniteTime();
         }
-
-//        dlt.put(new Integer[]{h, worker}, curr);
     }
 
-    static void collectReasults() throws InterruptedException {
+    private static void collectReasults() throws InterruptedException {
         int workers = Config.getC();
         int h = getH1();
         while (active.get()) {
@@ -287,12 +264,5 @@ public class Statistics {
             h++;
         }
     }
-
-//    static public long getDltByHeight(int height, int w) {
-//        Integer[] key = new Integer[]{height, w};
-//        if (!dlt.containsKey(key)) return -1;
-//        return dlt.get(new Integer[]{height, w});
-//
-//    }
 
 }

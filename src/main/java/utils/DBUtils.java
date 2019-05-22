@@ -12,12 +12,13 @@ import static java.lang.String.format;
 
 public class DBUtils {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(DBUtils.class);
-    static JdbcDataSource eds = null;
-    static String txTableName = "BLOCKSMAP";
+    private static JdbcDataSource eds = null;
+    private static String txTableName = "BLOCKSMAP";
     static private ExecutorService worker = Executors.newSingleThreadExecutor();
     private static HashMap<Integer, Connection> rc = new HashMap<>();
     private static HashMap<Integer, Connection> wc = new HashMap<>();
     private static final Object newWriteNotifier = new Object();
+
     public DBUtils(int workers) {
         try {
             Class.forName("org.h2.Driver");
@@ -36,16 +37,6 @@ public class DBUtils {
         }
     }
 
-//    static public void shutdown(int channel) {
-//        try {
-//            rc.get(channel).close();
-//            wc.get(channel).close();
-//        } catch (SQLException e) {
-//            logger.error(format("unable shutdown connection [channel=%d]", channel));
-//        }
-//        worker.shutdownNow();
-//    }
-
     static public void shutdown() {
 
         try {
@@ -56,7 +47,7 @@ public class DBUtils {
                 c.close();
             }
         } catch (SQLException e) {
-            logger.error(format("Unable to shutdown connection"));
+            logger.error("Unable to shutdown connection");
             return;
         }
         worker.shutdownNow();
@@ -68,6 +59,7 @@ public class DBUtils {
     static private String getTableName(int channel) {
         return txTableName + "_" + channel;
     }
+
     static public void initTables(int channel) throws SQLException {
         Connection conn = wc.get(channel);
         Statement stmt = conn.createStatement();
@@ -112,14 +104,12 @@ public class DBUtils {
     }
 
     static private void writeBlockToTable(int channel, int pid, int bid, int height) {
-//        createWriteConn(channel);
         synchronized (newWriteNotifier) {
             try {
                 Statement stmt = wc.get(channel).createStatement();
                 stmt.executeUpdate(format("INSERT INTO %s VALUES(%d, %d, %d)", getTableName(channel),
                         pid, bid, height));
                 stmt.close();
-//            System.out.println(format("insert [%d, %d, %d]", pid, bid, height));
             } catch (SQLException e) {
                 logger.error(format("unable to create statement for tx [channel=%d]", channel), e);
             }
@@ -133,27 +123,11 @@ public class DBUtils {
         int bid = b.getId().getBid();
         int height = b.getHeader().getHeight();
         int channel = b.getHeader().getM().getChannel();
-//        CacheUtils.add(Types.BlockID.newBuilder().setPid(pid).setBid(bid).build(), channel, height);
         worker.execute(() -> {
             writeBlockToTable(channel, pid, bid, height);
             logger.debug(format("have write to DB [c=%d, h=%d, pid=%d, bid=%d", channel, height, pid, bid));
         });
     }
-
-//    static public void writeBlockToTable(int channel, int height, Types.Block b) {
-//        createWriteConn(channel);
-//        try {
-//            Statement stmt = wc.get(channel).createStatement();
-//            for (Types.Transaction tx : b.getDataList()) {
-//                stmt.addBatch(format("INSERT INTO %s VALUES(%d, %d, %d)", getTableName(channel),
-//                        tx.getId().getProposerID(), tx.getId().getTxNum(), bid));
-//            }
-//            stmt.executeBatch();
-//            stmt.close();
-//        } catch (SQLException e) {
-//            logger.error(format("unable to create statement for block [channel=%d]", channel), e);
-//        }
-//    }
 
     static public int getBlockRecord(int worker, int pid, int bid, boolean blocking) throws InterruptedException {
         if (!blocking) return getBlockRecord(worker, pid, bid);
@@ -170,12 +144,6 @@ public class DBUtils {
     }
 
     static private int getBlockRecord(int worker, int pid, int bid) {
-//        Types.BlockID bd = Types.BlockID.newBuilder().setBid(bid).setPid(pid).build();
-//        if (CacheUtils.contains(bd, worker)) {
-//            Integer res = CacheUtils.get(bd, worker);
-//            if (res == null) return -1;
-//            return (int) res;
-//        }
         try {
             Statement stmt = rc.get(worker).createStatement();
             ResultSet rs = stmt.executeQuery(format("SELECT height FROM %s WHERE pid=%d AND bid=%d",

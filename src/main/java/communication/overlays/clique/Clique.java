@@ -2,13 +2,13 @@ package communication.overlays.clique;
 
 import communication.CommLayer;
 import communication.data.Data;
-import config.Node;
+import utils.Node;
 import proto.Types;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static crypto.blockDigSig.verfiyBlockWRTheader;
+import static crypto.BlockDigSig.verfiyBlockWRTheader;
 import static java.lang.String.format;
 
 public class Clique implements CommLayer {
@@ -17,8 +17,8 @@ public class Clique implements CommLayer {
 
 
     private int id;
-    int n;
-    CliqueRpcs rpcs;
+    private int n;
+    private CliqueRpcs rpcs;
 
     public Clique(int id, int workers, int n,  ArrayList<Node> nodes) {
         this.id = id;
@@ -50,7 +50,7 @@ public class Clique implements CommLayer {
         rpcs.send(worker, data, recipients);
     }
 
-    Types.Block getBlockFromData(int channel, Types.BlockID bid, Types.BlockHeader proof) {
+    private Types.Block getBlockFromData(int channel, Types.BlockID bid, Types.BlockHeader proof) {
         final Types.Block[] res = {null};
         int pid = bid.getPid();
         Data.blocks[pid][channel].computeIfPresent(bid, (k, v) -> {
@@ -64,7 +64,6 @@ public class Clique implements CommLayer {
 
     @Override
     public Types.Block recBlock(int channel, Types.BlockHeader proof) throws InterruptedException {
-//        if (proof.getEmpty()) return Types.Block.getDefaultInstance();
         Types.BlockID bid = proof.getBid();
         Types.Block res = getBlockFromData(channel, bid, proof);
         if (res != null) return res;

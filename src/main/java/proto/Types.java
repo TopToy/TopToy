@@ -24,16 +24,12 @@ public final class Types {
     int getChannel();
 
     /**
-     * <pre>
-     *    int32 sender = 2;
-     * </pre>
-     *
-     * <code>int32 cid = 3;</code>
+     * <code>int32 cid = 2;</code>
      */
     int getCid();
 
     /**
-     * <code>int32 cidSeries = 4;</code>
+     * <code>int32 cidSeries = 3;</code>
      */
     int getCidSeries();
   }
@@ -81,12 +77,12 @@ public final class Types {
               channel_ = input.readInt32();
               break;
             }
-            case 24: {
+            case 16: {
 
               cid_ = input.readInt32();
               break;
             }
-            case 32: {
+            case 24: {
 
               cidSeries_ = input.readInt32();
               break;
@@ -132,23 +128,19 @@ public final class Types {
       return channel_;
     }
 
-    public static final int CID_FIELD_NUMBER = 3;
+    public static final int CID_FIELD_NUMBER = 2;
     private int cid_;
     /**
-     * <pre>
-     *    int32 sender = 2;
-     * </pre>
-     *
-     * <code>int32 cid = 3;</code>
+     * <code>int32 cid = 2;</code>
      */
     public int getCid() {
       return cid_;
     }
 
-    public static final int CIDSERIES_FIELD_NUMBER = 4;
+    public static final int CIDSERIES_FIELD_NUMBER = 3;
     private int cidSeries_;
     /**
-     * <code>int32 cidSeries = 4;</code>
+     * <code>int32 cidSeries = 3;</code>
      */
     public int getCidSeries() {
       return cidSeries_;
@@ -172,10 +164,10 @@ public final class Types {
         output.writeInt32(1, channel_);
       }
       if (cid_ != 0) {
-        output.writeInt32(3, cid_);
+        output.writeInt32(2, cid_);
       }
       if (cidSeries_ != 0) {
-        output.writeInt32(4, cidSeries_);
+        output.writeInt32(3, cidSeries_);
       }
       unknownFields.writeTo(output);
     }
@@ -192,11 +184,11 @@ public final class Types {
       }
       if (cid_ != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(3, cid_);
+          .computeInt32Size(2, cid_);
       }
       if (cidSeries_ != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(4, cidSeries_);
+          .computeInt32Size(3, cidSeries_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -518,21 +510,13 @@ public final class Types {
 
       private int cid_ ;
       /**
-       * <pre>
-       *    int32 sender = 2;
-       * </pre>
-       *
-       * <code>int32 cid = 3;</code>
+       * <code>int32 cid = 2;</code>
        */
       public int getCid() {
         return cid_;
       }
       /**
-       * <pre>
-       *    int32 sender = 2;
-       * </pre>
-       *
-       * <code>int32 cid = 3;</code>
+       * <code>int32 cid = 2;</code>
        */
       public Builder setCid(int value) {
         
@@ -541,11 +525,7 @@ public final class Types {
         return this;
       }
       /**
-       * <pre>
-       *    int32 sender = 2;
-       * </pre>
-       *
-       * <code>int32 cid = 3;</code>
+       * <code>int32 cid = 2;</code>
        */
       public Builder clearCid() {
         
@@ -556,13 +536,13 @@ public final class Types {
 
       private int cidSeries_ ;
       /**
-       * <code>int32 cidSeries = 4;</code>
+       * <code>int32 cidSeries = 3;</code>
        */
       public int getCidSeries() {
         return cidSeries_;
       }
       /**
-       * <code>int32 cidSeries = 4;</code>
+       * <code>int32 cidSeries = 3;</code>
        */
       public Builder setCidSeries(int value) {
         
@@ -571,7 +551,7 @@ public final class Types {
         return this;
       }
       /**
-       * <code>int32 cidSeries = 4;</code>
+       * <code>int32 cidSeries = 3;</code>
        */
       public Builder clearCidSeries() {
         
@@ -9570,12 +9550,6 @@ public final class Types {
     int getCid();
   }
   /**
-   * <pre>
-   *message read {
-   *    txID txID = 1;
-   *}
-   * </pre>
-   *
    * Protobuf type {@code proto.readReq}
    */
   public  static final class readReq extends
@@ -9942,12 +9916,6 @@ public final class Types {
       return builder;
     }
     /**
-     * <pre>
-     *message read {
-     *    txID txID = 1;
-     *}
-     * </pre>
-     *
      * Protobuf type {@code proto.readReq}
      */
     public static final class Builder extends
@@ -19585,7 +19553,7 @@ public final class Types {
   static {
     java.lang.String[] descriptorData = {
       "\n\013types.proto\022\005proto\"7\n\004Meta\022\017\n\007channel\030" +
-      "\001 \001(\005\022\013\n\003cid\030\003 \001(\005\022\021\n\tcidSeries\030\004 \001(\005\"G\n" +
+      "\001 \001(\005\022\013\n\003cid\030\002 \001(\005\022\021\n\tcidSeries\030\003 \001(\005\"G\n" +
       "\013BbcDecision\022\026\n\001m\030\001 \001(\0132\013.proto.Meta\022\020\n\010" +
       "decosion\030\002 \001(\005\022\016\n\006sender\030\003 \001(\005\"#\n\007BlockI" +
       "D\022\013\n\003pid\030\001 \001(\005\022\013\n\003bid\030\002 \001(\005\"\275\001\n\013BlockHea" +

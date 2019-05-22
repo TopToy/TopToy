@@ -1,9 +1,9 @@
 package das.wrb;
 
 import blockchain.data.BCS;
-import config.Node;
-import crypto.blockDigSig;
-import crypto.sslUtils;
+import utils.Node;
+import crypto.BlockDigSig;
+import crypto.SslUtils;
 import das.data.Data;
 import io.grpc.*;
 import io.grpc.netty.NettyServerBuilder;
@@ -82,8 +82,8 @@ public class WrbRpcs extends WrbGrpc.WrbImplBase {
 
         peer(String addr, int port, int workers, String caRoot, String serverCrt, String serverPrivKey) {
             try {
-                channel = sslUtils.buildSslChannel(addr, port,
-                        sslUtils.buildSslContextForClient(caRoot,
+                channel = SslUtils.buildSslChannel(addr, port,
+                        SslUtils.buildSslContextForClient(caRoot,
                                 serverCrt, serverPrivKey)).
                         intercept(new clientTlsIntercepter()).build();
             } catch (SSLException e) {
@@ -121,7 +121,7 @@ public class WrbRpcs extends WrbGrpc.WrbImplBase {
     }
 
     private int id;
-    Map<Integer, peer> peers = new HashMap<>();
+    private Map<Integer, peer> peers = new HashMap<>();
     private List<Node> nodes;
     private Server wrbServer;
     private int workers;
@@ -131,8 +131,8 @@ public class WrbRpcs extends WrbGrpc.WrbImplBase {
     private String serverPrivKey;
     private String caRoot;
 
-    public WrbRpcs(int id, int workers, int n,  int f,  ArrayList<Node> wrbCluster,
-                   String serverCrt, String serverPrivKey, String caRoot) {
+    WrbRpcs(int id, int workers, int n, int f, ArrayList<Node> wrbCluster,
+            String serverCrt, String serverPrivKey, String caRoot) {
         this.workers = workers;
         this.id = id;
         this.n = n;
@@ -156,7 +156,7 @@ public class WrbRpcs extends WrbGrpc.WrbImplBase {
                     .workerEventLoopGroup(weg)
                     .bossEventLoopGroup(weg)
 //                    .maxConcurrentCallsPerConnection(100)
-                    .sslContext(sslUtils.buildSslContextForServer(serverCrt,
+                    .sslContext(SslUtils.buildSslContextForServer(serverCrt,
                             caRoot, serverPrivKey)).
                             addService(this).
                             intercept(new authInterceptor()).
@@ -181,7 +181,7 @@ public class WrbRpcs extends WrbGrpc.WrbImplBase {
         wrbServer.shutdown();
     }
 
-    void sendDataMessage(peer p, Types.BlockHeader msg) {
+    private void sendDataMessage(peer p, Types.BlockHeader msg) {
         p.send(msg, msg.getM().getChannel());
     }
 
@@ -201,7 +201,7 @@ public class WrbRpcs extends WrbGrpc.WrbImplBase {
                         && res.getM().getChannel() == worker &&
                         res.getData().getM().getChannel() == worker) {
                     if (Data.pending[worker].containsKey(key) || BCS.contains(worker, req.getHeight())) return;
-                    if (!blockDigSig.verifyHeader(sender, res.getData())) {
+                    if (!BlockDigSig.verifyHeader(sender, res.getData())) {
                         logger.debug(format("[#%d-C[%d]] has received invalid response message from [#%d] for [cidSeries=%d ; cid=%d]",
                                 id, worker, res.getSender(), cidSeries, cid));
                         return;

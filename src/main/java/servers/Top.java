@@ -3,7 +3,7 @@ package servers;
 import blockchain.data.BCS;
 import communication.CommLayer;
 import communication.overlays.clique.Clique;
-import config.Node;
+import utils.Node;
 import das.ab.ABService;
 import das.bbc.BBC;
 import das.bbc.OBBC;
@@ -11,27 +11,18 @@ import das.ms.Membership;
 import das.wrb.WRB;
 import io.grpc.Server;
 import io.grpc.netty.NettyServerBuilder;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
 import proto.Types;
 import utils.CacheUtils;
 import utils.DBUtils;
 import utils.DiskUtils;
-import utils.statistics.Statistics;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.atomic.AtomicBoolean;
-import static java.lang.Math.min;
 import static java.lang.String.format;
 
 public class Top {
 
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Top.class);
-    boolean up = false;
-
     private CommLayer comm;
     private int n;
     private int f;
@@ -39,8 +30,6 @@ public class Top {
     private int id;
     private int workers;
     private String type;
-    private AtomicBoolean stopped = new AtomicBoolean(false);
-    private int maxTx;
     private Server txsServer;
 //    private ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(1);
 //    private EventLoopGroup gnio = new NioEventLoopGroup(2);
@@ -52,17 +41,6 @@ public class Top {
                String abConfig, String type, String serverCrt, String serverPrivKey, String caRoot) {
         this.n = n;
         this.f = f;
-        this.maxTx = maxTx;
-//        lastDelivered = new int[c][];
-//        lastGCpoint = new int[c];
-//        for (int i = 0 ; i < c ; i++) {
-//            lastDelivered[i] = new int[n];
-//            lastGCpoint[i] = 1;
-//            for (int j = 0 ; j < n ; j++) {
-//                lastDelivered[i][j] = 0;
-//
-//            }
-//        }
         this.workers = workers;
         this.toys = new ToyBaseServer[workers];
         this.id = id;
@@ -91,9 +69,9 @@ public class Top {
 
     }
 
-    void initProtocols(ArrayList<Node> obbcCluster, ArrayList<Node> wrbCluster, int tmo, int tmoInterval,
-                       String serverCrt, String serverPrivKey, String caRoot,
-                       ArrayList<Node> commCluster, String abConfigHome) {
+    private void initProtocols(ArrayList<Node> obbcCluster, ArrayList<Node> wrbCluster, int tmo, int tmoInterval,
+                               String serverCrt, String serverPrivKey, String caRoot,
+                               ArrayList<Node> commCluster, String abConfigHome) {
         comm = new Clique(id, workers, this.n, commCluster);
         logger.info(format("[%d] has initiated communication layer", id));
         new ABService(id, n, f, abConfigHome);
@@ -115,13 +93,6 @@ public class Top {
 
 
     public void start() {
-//        if (id == 0) {
-//            try {
-//                Thread.sleep(3 * 1000);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//        }
         logger.info("Starting OBBC");
         OBBC.start();
         logger.info("Starting wrb");
@@ -141,7 +112,6 @@ public class Top {
     }
 
     public void shutdown() {
-//        updateStop();
         ABService.shutdown();
         logger.info("shutdown AB");
         comm.leave();
@@ -188,8 +158,6 @@ public class Top {
         } catch (IOException e) {
             logger.error("", e);
         }
-        up = true;
-//        updateStart();
         logger.info("Start serving, everything looks good");
     }
 
@@ -271,16 +239,5 @@ public class Top {
         }
 
     }
-
-//    public int getBCSize() {
-//        return BCS.size() *  workers;
-//    }
-    
-//    public boolean isValid() {
-//        for (int i = 0 ; i < workers ; i++) {
-//            if (!toys[i].isBcValid()) return false;
-//        }
-//        return true;
-//    }
 
 }

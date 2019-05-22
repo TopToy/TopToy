@@ -5,12 +5,9 @@ package proto;
 
 message Meta {
     int32 channel = 1;
-//    int32 sender = 2;
-    int32 cid = 3;
-    int32 cidSeries = 4;
+    int32 cid = 2;
+    int32 cidSeries = 3;
 }
-
-
 
 message BbcDecision {
     Meta m = 1;
@@ -65,11 +62,6 @@ message Comm {
     Block data = 2;
 }
 
-//TODO: Adding: client signature, client public key etc.
-//message txID {
-//    string txID = 1;
-//}
-
 message txID {
     int32 proposerID = 1;
     int32 bid = 2;
@@ -80,8 +72,6 @@ message Transaction {
     int32 clientID = 1;
     txID id = 2;
     bytes data = 3; // generic data type
-//    int64 clientTs = 4;
-//    int64 serverTs = 5;
 }
 
 message accepted {
@@ -89,14 +79,6 @@ message accepted {
     txID txID = 2;
 }
 
-//message approved {
-//    Transaction tx = 1;
-////    blockStatistics st = 3;
-//}
-
-//message read {
-//    txID txID = 1;
-//}
 message readReq {
     txID tid = 1;
     Transaction tx = 2;
@@ -124,7 +106,6 @@ message RBMsg {
 message Empty {
 
 }
-
 
 message WrbReq {
     Meta _meta = 1;

@@ -1,7 +1,7 @@
 package das.data;
 
 import blockchain.data.BCS;
-import crypto.blockDigSig;
+import crypto.BlockDigSig;
 import proto.Types;
 
 import java.util.*;
@@ -71,7 +71,7 @@ public class Data {
     static public void addToPendings(Types.BlockHeader request, Types.Meta key) {
         int worker = key.getChannel();
         int height = request.getHeight();
-        if (!blockDigSig.verifyHeader(request.getBid().getPid(), request)) {
+        if (!BlockDigSig.verifyHeader(request.getBid().getPid(), request)) {
             logger.debug(format("invalid pgb message [w=%d ; cidSeries=%d ; cid=%d ; sender=%d, height=%d]",
                     request.getM().getChannel(), request.getM().getCidSeries(), request.getM().getCid()
                     , request.getBid().getPid(), request.getHeight()));
@@ -167,11 +167,11 @@ public class Data {
         logger.debug(format("starts validating fp"));
         Types.Block curr = p.getCurr();
         Types.Block prev = p.getPrev();
-        if (!blockDigSig.verifyBlock(curr)) {
+        if (!BlockDigSig.verifyBlock(curr)) {
             logger.debug(format("invalid fork proof #3"));
             return false;
         }
-        if (!blockDigSig.verifyBlock(prev)) {
+        if (!BlockDigSig.verifyBlock(prev)) {
             logger.debug(format("invalid fork proof #4"));
             return false;
         }
@@ -186,7 +186,7 @@ public class Data {
         leaders.add(v.getV(0).getHeader().getBid().getPid());
         for (int i = 1 ; i < v.getVList().size() ; i++ ) {
             Types.Block pb = v.getV(i);
-            if (!blockDigSig.verifyBlock(pb)) {
+            if (!BlockDigSig.verifyBlock(pb)) {
                 logger.debug(format("invalid sub chain version, block [height=%d] digital signature is invalid " +
                         "[sender=%d]", pb.getHeader().getHeight(),  v.getSender()));
                 return false;

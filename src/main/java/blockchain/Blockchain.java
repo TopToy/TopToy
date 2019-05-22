@@ -6,11 +6,9 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Future;
 
 import static java.lang.String.format;
-import static java.util.Collections.max;
 
 import proto.Types.*;
 import utils.statistics.BCStat;
@@ -24,7 +22,6 @@ public class Blockchain {
     private Path swapPath;
     private int maxCacheSize = 100;
     private boolean swapAble = false;
-//    private final ConcurrentLinkedQueue<Block> blocks = new ConcurrentLinkedQueue();
     private final ConcurrentHashMap<Integer, Block> blocks = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<Integer, BCStat> bsts = new ConcurrentHashMap<>();
 
@@ -33,7 +30,7 @@ public class Blockchain {
 
 //    int size = 0;
 
-    public Blockchain(int creatorID,  int maxCacheSize, GenCreator gcreator, Path swapPath) {
+    Blockchain(int creatorID, int maxCacheSize, GenCreator gcreator, Path swapPath) {
         this.creatorID = creatorID;
         if (maxCacheSize > 0) {
             this.maxCacheSize = maxCacheSize;
@@ -54,10 +51,6 @@ public class Blockchain {
             addBlock(orig.getBlock(i));
         }
     }
-
-//    public abstract BaseBlock createNewBLock();
-//
-//    abstract void createGenesis(int channel);
 
     // We assume now that all the validated blocks are in memory
     public boolean validateCurrentLeader(int leader, int f) {

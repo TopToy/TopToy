@@ -4,15 +4,14 @@ import blockchain.genesis.SGC;
 import blockchain.validation.Validator;
 import com.google.protobuf.ByteString;
 import crypto.DigestMethod;
-import crypto.blockDigSig;
-import org.apache.commons.lang.ArrayUtils;
+import crypto.BlockDigSig;
 import proto.Types;
 
 import java.nio.file.Path;
 import java.util.Objects;
 
-import static crypto.blockDigSig.hashBlockData;
-import static crypto.blockDigSig.hashHeader;
+import static crypto.BlockDigSig.hashBlockData;
+import static crypto.BlockDigSig.hashHeader;
 
 public class Utils {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Utils.class);
@@ -32,10 +31,6 @@ public class Utils {
                                                          int channel, Types.BlockID bid) {
 
         byte[] tHash = hashBlockData(b);
-//        for (Types.Transaction t : b.getDataList()) {
-//            tHash = DigestMethod.hash(ArrayUtils.addAll(tHash, t.toByteArray()));
-//        }
-
 
         byte[] headerHash = new byte[0];
         if (header != null) {
@@ -54,11 +49,7 @@ public class Utils {
                 .setHst(Types.headerStatistics.newBuilder().setProposeTime(System.currentTimeMillis()).build())
                 .build();
 
-//        if (creatorID == -1) {
-//            return h;
-//        }
-
-        String signature = blockDigSig.sign(h);
+        String signature = BlockDigSig.sign(h);
         return h.toBuilder()
                 .setProof(signature)
         .build();
