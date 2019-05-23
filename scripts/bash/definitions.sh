@@ -27,9 +27,5 @@ config_rb=${conf}/ABConfig/hosts.config
 config_toml=${conf}/config.toml
 inst=${conf}/inst/input.inst
 
-
-
 n=4
 f=1
-
-#source ${utils_dir}/*.sh

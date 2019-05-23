@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 
-. utils/defs.sh
+#config_dir=./gconfigurations
+data_dir=../data/agc
+n=4
+f=1
+
 
 # ${1} - out directory
 # ${2} - n
@@ -235,7 +239,7 @@ generate_bftSMaRt_keys() {
 }
 
 main() {
-    out_dir=${config_dir}/${n}
+    out_dir=${1}/${n}
     rm -r -f ${out_dir}
     mkdir -p ${out_dir}/sslConfig
     mkdir -p ${out_dir}/inst
@@ -248,6 +252,8 @@ main() {
     cp -r ${data_dir}/inst/* ${out_dir}/inst
     cp -r ${data_dir}/sslConfig/* ${out_dir}/sslConfig
     cp ${data_dir}/log4j.properties ${out_dir}
+
+    echo "generated configuration in ${out_dir}"
 }
 
-main
+main ${1}
