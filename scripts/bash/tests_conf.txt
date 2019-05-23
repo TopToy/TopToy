@@ -1,7 +1,0 @@
-correct_tps test_no_failures
-#clients_latency test_clients_latency
-#correct_tps_gd test_no_failures_gd
-#benign_failure1 test_benign_failure1
-#sig_rate test_sig_rate
-#byz_failure1 test_byz_failure1
-#network_performance test_network_performance

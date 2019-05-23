@@ -1,10 +1,5 @@
 build:
 	./make_scripts/build.sh
-bin-build:
-	./make_scripts/bin-build.sh
-
-cbin-build:
-	./make_scripts/cbin-build.sh
 
 docker_build:
 	docker build -t toy:0.1 .
@@ -20,8 +15,6 @@ docker-generate-configuration:
 
 docker-full-build:
 	make build
-	make bin-build
-	make cbin-build
 	make docker_build
 	make cdocker_build
 	make docker-generate-configuration
@@ -36,5 +29,9 @@ docker-run:
 
 docker-run-tests:
 	./make_scripts/runner.sh
+
+clean:
+	./make_scripts/clean.sh
+
 
 

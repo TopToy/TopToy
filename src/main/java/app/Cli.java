@@ -52,7 +52,7 @@ class Cli {
                     } else {
                         writeByzSummery(outPath);
                     }
-                    writeBlocks();
+//                    writeBlocks();
                 }
 //
             }));
@@ -91,7 +91,7 @@ class Cli {
                     writeByzSummery(outPath);
                 }
 
-                writeBlocks();
+//                writeBlocks();
                 recorded.set(true);
                 System.exit(0);
             }
@@ -126,13 +126,13 @@ class Cli {
                 return;
             }
 
-            if (args[0].equals("sigTest")) {
-                logger.info("Accepted sigTest");
-                int time = Integer.parseInt(args[1]);
-                sigTest(outPath, time);
-                return;
-
-            }
+//            if (args[0].equals("sigTest")) {
+//                logger.info("Accepted sigTest");
+//                int time = Integer.parseInt(args[1]);
+//                sigTest(outPath, time);
+//                return;
+//
+//            }
 
             if (args[0].equals("stStart")) {
                Statistics.activate(JToy.s.getID());
@@ -285,6 +285,7 @@ class Cli {
         }
 
         private void writeBlocks() {
+
             if (Config.getTxSize() != 512) return;
             logger.info("Starting writeBlocks");
             String pathString = "/tmp/JToy/res/";
