@@ -28,6 +28,3 @@ cbin*
 scripts/python/.idea*
 scripts/python/venv*
 scripts/python/*.html
-
-scripts/*
-configurations/*
