@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source /home/yoni/github.com/JToy/definitions.sh
+source $PWD/definitions.sh
 
 compose_header() {
     echo \
@@ -214,6 +214,7 @@ main_byz(){
     compose_footer ${compose_file_byz}
 }
 
+mkdir -p ${composed}
 main_correct
 main_benign_failures
 main_async

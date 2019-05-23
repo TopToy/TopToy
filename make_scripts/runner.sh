@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source /home/yoni/github.com/JToy/definitions.sh
+source $PWD/definitions.sh
 
 run2() {
     while read -r line; do

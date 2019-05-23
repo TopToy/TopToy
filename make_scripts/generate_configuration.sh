@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source /home/yoni/github.com/JToy/definitions.sh
+source $PWD/definitions.sh
 
 generate_config_toml() {
     echo \
@@ -224,29 +224,15 @@ generate_log4j() {
 }
 
 main(){
+
     mkdir -p ${1}/ABConfig
-#    mkdir -p ${1}/panicRBConfig
-#    mkdir -p ${1}/syncRBConfig
-#    mkdir -p ${1}/RBConfig
     mkdir -p ${1}/inst
 
     generate_config_toml ${1}
 
     generate_hosts ${1}/ABConfig 12000
-#    generate_hosts ${1}/panicRBConfig 11000
-#    generate_hosts ${1}/syncRBConfig 13000
-#    generate_hosts ${1}/RBConfig 13000
-
     generate_system ${1}/ABConfig
-#    generate_system ${1}/panicRBConfig
-#    generate_system ${1}/syncRBConfig
-#    generate_system ${1}/RBConfig
-
     generate_keys ${1}/ABConfig
-#    generate_keys ${1}/panicRBConfig
-#    generate_keys ${1}/syncRBConfig
-#    generate_keys ${1}/RBConfig
-
     generate_log4j ${1}
 
     cp -r ${make_script_dir}/sslConfig ${1}
@@ -257,4 +243,6 @@ main ${cdest}
 main ${fbdest}
 main ${asdest}
 main ${byzdest}
+
+mkdir -p ${cldest}
 generate_config_toml ${cldest}
