@@ -288,7 +288,7 @@ class Cli {
             if (Config.getTxSize() != 512) return;
             logger.info("Starting writeBlocks");
             String pathString = "/tmp/JToy/res/";
-            Path path = Paths.get(pathString, String.valueOf(JToy.s.getID()), "bsummary.csv");
+            Path path = Paths.get(pathString, String.valueOf(JToy.s.getID()), "bsummery.csv");
             File f = new File(path.toString());
 
             try {
@@ -344,7 +344,7 @@ class Cli {
 
         private void writeSummery(String pathString) {
             logger.info("Starting writeSummery");
-            Path path = Paths.get(pathString, String.valueOf(JToy.s.getID()), "summary.csv");
+            Path path = Paths.get(pathString, String.valueOf(JToy.s.getID()), "summery.csv");
             File f = new File(path.toString());
 
             try {
@@ -482,7 +482,7 @@ class Cli {
 
     void writeByzSummery(String pathString) {
         logger.info("Starting writeSummery");
-        Path path = Paths.get(pathString, String.valueOf(JToy.s.getID()), "summary.csv");
+        Path path = Paths.get(pathString, String.valueOf(JToy.s.getID()), "summery.csv");
         File f = new File(path.toString());
 
         try {
