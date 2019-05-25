@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-source /home/yoni/github.com/JToy/make_scripts/tests/utiles.sh
-source /home/yoni/github.com/JToy/definitions.sh
+source $PWD/make_scripts/tests/utiles.sh
+source $PWD/definitions.sh
 # ${1} - start worker
 # ${2} - end worker
 # ${3} - interval
@@ -43,17 +43,4 @@ run_channels2() {
     done
 }
 
-# ${1} - start worker
-# ${2} - end worker
-# ${3} - interval
-# ${4} - tx_size
-# ${5} - tmo
-# ${6} - block_size
-# ${7} - test_time
-# ${8} - async param
-
-
-# run_channels 1 1 1 0 1000 1000 60 30
-# run_channels 1 1 1 0 1000 1000 60
 run_channels2 1 1 1 512 100 1000 60 0
-#run_channels2 1 2 1 512 1000 1000 180 5

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-source /home/yoni/github.com/JToy/make_scripts/tests/utiles.sh
-source /home/yoni/github.com/JToy/definitions.sh
+source $PWD/make_scripts/tests/utiles.sh
+source $PWD/definitions.sh
 # ${1} - start worker
 # ${2} - end worker
 # ${3} - interval
