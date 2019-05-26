@@ -46,9 +46,13 @@ echo \
         volumes:
         - ${out}:/tmp/JToy
         - ${conf}:/JToy/bin/src/main/resources
-        depends_on:
-        - TS${id}
-        networks:
+        depends_on:" >> ${5}
+for s in `seq 0 $((${C} - 1))`; do
+echo \
+"        - TS${s}" >> ${5}
+done
+echo \
+"        networks:
             composed_toy_net:
                 ipv4_address: 172.18.0.$((${id} + ${C} + 3))" \
             >> ${5}

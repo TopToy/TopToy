@@ -263,7 +263,7 @@ class Cli {
             latch1.await();
             executor.shutdownNow();
             int sigPerSec = avgSig.get() / time;
-            Path path = Paths.get(pathString,   String.valueOf(0), "sig_summery.csv");
+            Path path = Paths.get(pathString,   String.valueOf(0), "sig_summary.csv");
             File f = new File(path.toString());
             if (!f.exists()) {
                 f.getParentFile().mkdirs();
@@ -288,7 +288,7 @@ class Cli {
             if (Config.getTxSize() != 512) return;
             logger.info("Starting writeBlocks");
             String pathString = "/tmp/JToy/res/";
-            Path path = Paths.get(pathString, String.valueOf(JToy.s.getID()), "bsummery.csv");
+            Path path = Paths.get(pathString, String.valueOf(JToy.s.getID()), "bsummary.csv");
             File f = new File(path.toString());
 
             try {
@@ -343,8 +343,8 @@ class Cli {
         }
 
         private void writeSummery(String pathString) {
-            logger.info("Starting writeSummery");
-            Path path = Paths.get(pathString, String.valueOf(JToy.s.getID()), "summery.csv");
+            logger.info("Starting writeSummary");
+            Path path = Paths.get(pathString, String.valueOf(JToy.s.getID()), "summary.csv");
             File f = new File(path.toString());
 
             try {
@@ -473,7 +473,7 @@ class Cli {
                 CSVUtils.writeLine(writer, row);
                 writer.flush();
                 writer.close();
-                logger.info("ended writeSummery");
+                logger.info("ended writeSummary");
             } catch (IOException e) {
                 logger.error(e);
             }
@@ -481,8 +481,8 @@ class Cli {
         }
 
     void writeByzSummery(String pathString) {
-        logger.info("Starting writeSummery");
-        Path path = Paths.get(pathString, String.valueOf(JToy.s.getID()), "summery.csv");
+        logger.info("Starting writeSummary");
+        Path path = Paths.get(pathString, String.valueOf(JToy.s.getID()), "summary.csv");
         File f = new File(path.toString());
 
         try {
@@ -592,7 +592,7 @@ class Cli {
             CSVUtils.writeLine(writer, row);
             writer.flush();
             writer.close();
-            logger.info("ended writeSummery");
+            logger.info("ended writeSummary");
         } catch (IOException e) {
             logger.error(e);
         }

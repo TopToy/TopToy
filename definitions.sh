@@ -30,8 +30,8 @@ compose_file_async=${composed}/docker-compose-async.yml
 compose_file_byz=${composed}/docker-compose-byz.yml
 compose_file_correct_with_clients=${composed}/docker-compose-correct-with-clients.yml
 
-docker_out=${curr_out}/curr/
-cdocker_out=${curr_out}/ccurr/
+docker_out=${curr_out}/curr
+cdocker_out=${curr_out}/ccurr
 
 test_dir=${make_script_dir}/tests
 tests_conf=${test_dir}/tests_conf.txt
