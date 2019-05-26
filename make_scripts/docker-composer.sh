@@ -42,7 +42,7 @@ echo \
         environment:
         - CID=${id}
         - SID=${id}
-        - TXS=10
+        - TXS=100
         volumes:
         - ${out}:/tmp/JToy
         - ${conf}:/JToy/bin/src/main/resources
