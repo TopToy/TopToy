@@ -2,6 +2,7 @@
 
 source $PWD/make_scripts/tests/utiles.sh
 source $PWD/definitions.sh
+
 # ${1} - start worker
 # ${2} - end worker
 # ${3} - interval
@@ -9,9 +10,9 @@ source $PWD/definitions.sh
 # ${5} - tmo
 # ${6} - block_size
 # ${7} - test_time
-
-run_channels() {
-    local outputDir=${output}/$(date '+%F-%H:%M:%S').byz
+# ${8} - async param
+run_async() {
+    local outputDir=${output}/$(date '+%F-%H:%M:%S').async
     mkdir -p ${outputDir}/servers
     print_servers_headers ${outputDir}
 
@@ -19,17 +20,12 @@ run_channels() {
     configure_tx_size ${4} ${asdest}
     configure_tmo ${5} ${asdest}
     configure_max_tx_in_block ${6} ${asdest}
-    configure_async_byz_inst ${7} ${8} ${byzdest}
-    configure_tx_size ${4} ${byzdest}
-    configure_tmo ${5} ${byzdest}
-    configure_max_tx_in_block ${6} ${byzdest}
     for i in `seq ${1} ${3} ${2}`; do
         configure_channels ${i} ${asdest}
-        configure_channels ${i} ${byzdest}
-        run_dockers ${compose_file_byz}
+        run_dockers ${compose_file_async}
         wait
         collect_res_from_servers ${outputDir}
     done
 }
 
-run_channels 1 1 1 512 100 1000 60 0
+run_async 1 1 1 0 1000 1000 60 5

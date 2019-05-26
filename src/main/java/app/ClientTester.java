@@ -67,6 +67,12 @@ public class ClientTester {
 
         start();
         testTime = System.currentTimeMillis();
+        try {
+            Thread.sleep(30*1000);
+        } catch (InterruptedException e) {
+            logger.error(e);
+            return;
+        }
         for (int i = 0 ; i < n ; i++) {
             int finalI = i;
             clients.submit(() -> test(stubs[finalI], finalI));
@@ -120,7 +126,8 @@ public class ClientTester {
             SecureRandom random = new SecureRandom();
             byte[] tx = new byte[txSize];
             random.nextBytes(tx);
-            Types.txID tid = stub.write(Types.Transaction.newBuilder()
+            Types.txID tid = stub //.withDeadlineAfter(3, TimeUnit.SECONDS)
+                    .write(Types.Transaction.newBuilder()
                     .setData(ByteString.copyFrom(tx))
                     .setClientID(clientID)
                     .build());
@@ -147,7 +154,7 @@ public class ClientTester {
     private static void collectResults() throws IOException {
         testTime = System.currentTimeMillis() - testTime;
         String pathString = "/tmp/JToy/res/";
-        Path path = Paths.get(pathString,   String.valueOf(clientID), "csummery.csv");
+        Path path = Paths.get(pathString,   String.valueOf(clientID), "csummary.csv");
         File f = new File(path.toString());
         if (!f.exists()) {
             f.getParentFile().mkdirs();
@@ -177,7 +184,7 @@ public class ClientTester {
 
     private static void collectSummery() throws IOException {
         String pathString = "/tmp/JToy/res/";
-        Path path = Paths.get(pathString,   String.valueOf(clientID), "ctsummery.csv");
+        Path path = Paths.get(pathString,   String.valueOf(clientID), "ctsummary.csv");
         File f = new File(path.toString());
         if (!f.exists()) {
             f.getParentFile().mkdirs();

@@ -10,6 +10,10 @@ source $PWD/definitions.sh
 # ${6} - block_size
 # ${7} - test_time
 run_channels() {
+    local outputDir=${output}/$(date '+%F-%H:%M:%S').correct
+    mkdir -p ${outputDir}/servers
+    print_servers_headers ${outputDir}
+
     configure_inst ${7} ${cdest}
     configure_tx_size ${4} ${cdest}
     configure_tmo ${5} ${cdest}
@@ -18,6 +22,7 @@ run_channels() {
         configure_channels ${i} ${cdest}
         run_dockers ${compose_file_correct}
         wait
+        collect_res_from_servers ${outputDir}
     done
 }
 
