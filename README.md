@@ -39,7 +39,7 @@ TopToy is supported only on an Ubuntu linux machine requires the following
     ```
 1. Build the project
     ```
-    make docker-full-build
+    make build
     ```
 
 ## Benchmarks
@@ -51,8 +51,9 @@ The benchmarks parameters are described in the [wiki]().
 Benchmark | Description
 ----------|-------------
 test_correct | Test the system when no failures occur
-test_benign_failure | Test the system with (i) _f_ benign failures or (ii) in an asynchronous period
-test_byz_failure | Test the system with (i) _f_ Byzantine failures and (ii) ina asynchronous period
+test_benign_failure | Test the system with (i) _f_ benign failures 
+test_async | Test the system in a asynchronous period
+test_byz_failure | Test the system with (i) _f_ Byzantine failures and (ii) in an asynchronous period
 test_correct_with_clients | Test the system when no failures occur with clients running on top of docker containers
 
 ### Running A Benchmark
