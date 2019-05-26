@@ -62,6 +62,6 @@ test_correct_with_clients | Test the system when no failures occur with clients 
     * To exclude a benchmark, mark it with '_#_'
 1. Build the project using `make docker-full-build`
 1. Run the benchmarks using `make docker-run-tests`
-1. See the results and the logs at `/tmp/dtoy/out`
+1. See the results and logs at `/tmp/dtoy/out`
 
 
