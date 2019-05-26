@@ -9,7 +9,7 @@ source $PWD/definitions.sh
 # ${5} - tmo
 # ${6} - block_size
 # ${7} - test_time
-
+# ${8} - async param
 run_channels() {
     local outputDir=${output}/$(date '+%F-%H:%M:%S').byz
     mkdir -p ${outputDir}/servers
