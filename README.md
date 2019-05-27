@@ -38,6 +38,11 @@ TopToy is supported only on an Ubuntu linux machine requires the following
         sudo usermod -aG docker $USER
         ```
     1. Restart (or logout and login) your system
+    1. Install docker-compose
+        ```
+        sudo curl -L "https://github.com/docker/compose/releases/download/1.24.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+        sudo chmod +x /usr/local/bin/docker-compose
+        ```
 1. Install [maven](https://maven.apache.org/install.html)
     ```
     sudo apt update
