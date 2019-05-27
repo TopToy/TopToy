@@ -2,6 +2,6 @@
 
 source $PWD/definitions.sh
 
-rm -r -f ${BIN_DIR}
-rm -r -f ${CBIN_DIR}
-rm -r -f ${curr_out}
+sudo rm -r -f ${BIN_DIR}
+sudo rm -r -f ${CBIN_DIR}
+sudo rm -r -f ${curr_out}
