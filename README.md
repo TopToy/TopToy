@@ -32,6 +32,12 @@ TopToy is supported only on an Ubuntu linux machine requires the following
         sudo apt-get update
         sudo apt-get install docker-ce docker-ce-cli containerd.io
         ```
+    1. Add permissions for your current user to run docker
+        ```
+        sudo groupadd docker
+        sudo usermod -aG docker $USER
+        ```
+    1. Restart (or logout and login) your system
 1. Install [maven](https://maven.apache.org/install.html)
     ```
     sudo apt update
