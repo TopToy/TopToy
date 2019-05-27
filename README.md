@@ -9,6 +9,11 @@ TOP runs TOYS as workers and is capable to deal with tens to hundreds of thousan
 TopToy is supported only on an Ubuntu linux machine requires the following
 
 ### Prerequisites
+1. Install Java
+    ```
+    sudo apt update
+    sudo apt install default-jdk
+    ```
 1. Install [docker](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
     1. Remove an old version (if exists)
         ```
