@@ -9,6 +9,11 @@ TOP runs TOYS as workers and is capable to deal with tens to hundreds of thousan
 TopToy is supported only on an Ubuntu linux machine requires the following
 
 ### Prerequisites
+1. Install Java
+    ```
+    sudo apt update
+    sudo apt install default-jdk
+    ```
 1. Install [docker](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
     1. Remove an old version (if exists)
         ```
@@ -27,10 +32,25 @@ TopToy is supported only on an Ubuntu linux machine requires the following
         sudo apt-get update
         sudo apt-get install docker-ce docker-ce-cli containerd.io
         ```
+    1. Add permissions for your current user to run docker
+        ```
+        sudo groupadd docker
+        sudo usermod -aG docker $USER
+        ```
+    1. Restart (or logout and login) your system
+    1. Install docker-compose
+        ```
+        sudo curl -L "https://github.com/docker/compose/releases/download/1.24.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+        sudo chmod +x /usr/local/bin/docker-compose
+        ```
 1. Install [maven](https://maven.apache.org/install.html)
     ```
     sudo apt update
     sudo apt install maven
+    ```
+1. Install `make`
+    ```
+    sudo apt install make
     ```
 ### Installation
 1. Clone this repository
