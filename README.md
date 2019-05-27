@@ -43,6 +43,10 @@ TopToy is supported only on an Ubuntu linux machine requires the following
     sudo apt update
     sudo apt install maven
     ```
+1. Install `make`
+    ```
+    sudo apt install make
+    ```
 ### Installation
 1. Clone this repository
     ```
