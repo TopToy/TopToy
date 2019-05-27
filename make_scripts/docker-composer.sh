@@ -124,9 +124,8 @@ echo \
 compose_footer(){
     echo \
 "networks:
-    composed_toy_net:
+    toy_net:
         driver: bridge
-        external: true
         ipam:
             driver: default
             config:
