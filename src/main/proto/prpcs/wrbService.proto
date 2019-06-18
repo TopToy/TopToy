@@ -1,0 +1,14 @@
+//syntax = "proto3";
+////option java_package = "proto";
+////option java_multiple_files = true;
+//
+//package proto.prpcs.wrbService;
+//
+//import "../types/block.proto";
+//import "../types/empty.proto";
+//import "../types/wrb.proto";
+//
+//service Wrb {
+//    rpc DisseminateMessage(BlockHeader) returns (Empty) {};
+//    rpc reqMessage(WrbReq) returns (WrbRes) {};
+//}

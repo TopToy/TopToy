@@ -1,0 +1,18 @@
+//syntax = "proto3";
+//option java_package = "proto.types.wrb";
+//package proto.types.wrb;
+//
+//import "types/meta.proto";
+//import "types/block.proto";
+//
+//message WrbReq {
+//    Meta _meta = 1;
+//    int32 height = 2;
+//    int32 sender = 3;
+//}
+//
+//message WrbRes {
+//    Meta m = 1;
+//    BlockHeader data = 2;
+//    int32 sender = 3;
+//}

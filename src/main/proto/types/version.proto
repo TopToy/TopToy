@@ -1,0 +1,12 @@
+//syntax = "proto3";
+//option java_package = "proto.types.version";
+//package proto.types.version;
+//
+//import "types/block.proto";
+//
+//message SubChainVersion {
+//    int32 forkPoint = 1;
+//    int32 suggested = 2;
+//    repeated Block v = 3;
+//    int32 sender = 4;
+//}

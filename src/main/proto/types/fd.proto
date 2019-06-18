@@ -1,0 +1,12 @@
+//syntax = "proto3";
+//option java_package = "proto.types.fd";
+//package proto.types.fd;
+//
+//message StartMsg {
+//    int32 id = 1;
+//}
+//
+//message Suspected {
+//    int32 id = 1;
+//    int32 tmo = 2;
+//}

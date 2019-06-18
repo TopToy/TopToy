@@ -1,0 +1,12 @@
+syntax = "proto3";
+option java_package = "proto.types.rb";
+package proto.types.rb;
+
+import "types/meta.proto";
+
+message RBMsg {
+    Meta m = 1;
+    int32 type = 2;
+    bytes data = 3;
+    int32 sender = 4;
+}
