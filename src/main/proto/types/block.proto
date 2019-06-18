@@ -1,0 +1,40 @@
+//syntax = "proto3";
+//option java_package = "proto.types.block";
+//package proto.types.bbc;
+//
+//import "types/meta.proto";
+//import "types/transaction.proto";
+//
+//message BlockID {
+//    int32 pid = 1;
+//    int32 bid = 2;
+//}
+//
+//message BlockHeader {
+//    Meta m = 1;
+//    bytes prev= 2;
+//    int32 height = 3;
+//    bytes transactionHash = 4;
+//    string proof = 5;
+//    BlockID bid = 6;
+//    bool empty = 7;
+//    HeaderStatistics hst = 8;
+//}
+//
+//message HeaderStatistics {
+//    int64 proposeTime = 1;
+//    int64 tentativeTime = 2;
+//    int64 definiteTime = 3;
+//    bool tentative = 5;
+//}
+//
+//message BlockStatistics {
+//    int64 proposeTime = 1;
+//}
+//
+//message Block {
+//    BlockHeader header = 1;
+//    BlockID id = 2;
+//    repeated Transaction data = 3;
+//    BlockStatistics bst = 4;
+//}

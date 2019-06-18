@@ -1,0 +1,7 @@
+//syntax = "proto3";
+//option java_package = "proto.types.empty";
+//package proto.types.empty;
+//
+//message Empty {
+//
+//}

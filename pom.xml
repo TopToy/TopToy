@@ -187,14 +187,15 @@
                 <configuration>
                     <clearOutputDirectory>false</clearOutputDirectory>
                     <attachProtoSources>false</attachProtoSources>
+                    <protoSourceRoot>${basedir}/src/main/proto</protoSourceRoot>
+                    <outputDirectory>${basedir}/src/main/java/</outputDirectory>
                     <protocArtifact>com.google.protobuf:protoc:3.7.1:exe:${os.detected.classifier}</protocArtifact>
                     <pluginId>grpc-java</pluginId>
                     <!--<includes>-->
                         <!--<include>${basedir}/src/main/proto</include>-->
                     <!--</includes>-->
                     <pluginArtifact>io.grpc:protoc-gen-grpc-java:1.20.0:exe:${os.detected.classifier}</pluginArtifact>
-                    <protoSourceRoot>${basedir}/src/main/proto</protoSourceRoot>
-                    <outputDirectory>${basedir}/src/main/java/</outputDirectory>
+
                 </configuration>
                 <executions>
                     <execution>

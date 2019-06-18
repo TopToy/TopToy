@@ -1,0 +1,13 @@
+//syntax = "proto3";
+////option java_package = "proto";
+//
+//package proto.prpcs.obbc;
+//
+//import "../types/bbc.proto";
+//import "../types/empty.proto";
+//import "../types/evidence.proto";
+//
+//service Obbc {
+//    rpc FastVote(BbcMsg) returns (Empty) {};
+//    rpc EvidenceReqMessage(EvidenceReq) returns (EvidenceRes) {};
+//}
