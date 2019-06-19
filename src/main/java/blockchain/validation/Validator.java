@@ -1,7 +1,8 @@
 package blockchain.validation;
+import proto.types.transaction.*;
+import proto.types.block.*;
 
-import proto.Types;
 
 public interface Validator {
-    boolean validateTX(Types.Block.Builder b, Types.Transaction tx);
+    boolean validateTX(Block.Builder b, Transaction tx);
 }

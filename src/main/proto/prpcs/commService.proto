@@ -1,12 +1,13 @@
-//syntax = "proto3";
-////option java_package = "proto";
-//
-//package proto.prpcs.commService;
-//
-//import "../types/comm.proto";
-//import "../types/empty.proto";
-//
-//service Communication {
-//    rpc dsm(Comm) returns (Empty) {};
-//    rpc reqBlock(CommReq) returns (CommRes) {};
-//}
+syntax = "proto3";
+option java_package = "proto.prpcs.commService";
+package proto.prpcs.commService;
+option java_outer_classname = "commService";
+
+
+import "types/comm.proto";
+import "types/empty.proto";
+
+service Communication {
+    rpc dsm(proto.types.Comm) returns (proto.types.Empty) {};
+    rpc reqBlock(proto.types.CommReq) returns (proto.types.CommRes) {};
+}

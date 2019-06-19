@@ -6,9 +6,11 @@ import das.ab.ABService;
 import das.data.BbcDecData;
 import das.data.Data;
 import das.data.VoteData;
-import proto.Types;
 
 import static java.lang.String.format;
+import proto.types.meta.*;
+import proto.types.bbc.*;
+import proto.types.rb.*;
 
 public class BBC {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(BBC.class);
@@ -27,7 +29,7 @@ public class BBC {
 
     }
 
-    static public BbcDecData propose(Types.BbcMsg bm, Types.Meta key) throws InterruptedException {
+    static public BbcDecData propose(BbcMsg bm, Meta key) throws InterruptedException {
         logger.debug(format("[#%d-C[%d]] broadcast BBC message [cidSeries=%d ; cid=%d ; height=%d ; vote=%b]",
                 id, bm.getM().getChannel(), bm.getM().getCidSeries(), bm.getM().getCid(), bm.getHeight(), bm.getVote()));
         ABService.broadcast(bm.toByteArray(), bm.getM(), Data.RBTypes.BBC);
@@ -40,13 +42,13 @@ public class BBC {
         return Data.bbcRegDec[worker].get(key);
     }
 
-    static void nonBlockingPropose(Types.BbcMsg bm) {
+    static void nonBlockingPropose(BbcMsg bm) {
         ABService.broadcast(bm.toByteArray(), bm.getM(), Data.RBTypes.BBC);
     }
 
-    static public void addToBBCData(Types.RBMsg omsg, int worker) throws InvalidProtocolBufferException {
-        Types.BbcMsg bm = Types.BbcMsg.parseFrom(omsg.getData());
-        Types.Meta key = omsg.getM();
+    static public void addToBBCData(RBMsg omsg, int worker) throws InvalidProtocolBufferException {
+        BbcMsg bm = BbcMsg.parseFrom(omsg.getData());
+        Meta key = omsg.getM();
         logger.debug(format("[#%d-C[%d]] received BBC message [sender=%d ; cidSeries=%d ; cid=%d ; height=%d ; vote=%b]"
                 ,id, worker, bm.getSender(), bm.getM().getCidSeries(), bm.getM().getCid(), bm.getHeight(), bm.getVote()));
         OBBC.reCons(key, id, bm.getHeight());

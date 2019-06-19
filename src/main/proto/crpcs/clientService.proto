@@ -1,0 +1,14 @@
+syntax = "proto3";
+option java_package = "proto.crpcs.clientService";
+package proto.crpcs.clientService;
+option java_outer_classname = "clientService";
+
+
+import "types/transaction.proto";
+import "types/client.proto";
+
+service ClientService {
+    rpc write(proto.types.Transaction) returns (proto.types.TxID) {};
+    rpc read(proto.types.ReadReq) returns (proto.types.Transaction) {};
+    rpc status(proto.types.ReadReq) returns (proto.types.TxStatus) {};
+}

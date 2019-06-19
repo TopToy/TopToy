@@ -1,15 +1,16 @@
-//syntax = "proto3";
-//option java_package = "proto.types.transaction";
-//package proto.types.transaction;
-//
-//message TxID {
-//    int32 proposerID = 1;
-//    int32 bid = 2;
-//    int32 txNum = 3;
-//    int32 channel = 4;
-//}
-//message Transaction {
-//    int32 clientID = 1;
-//    TxID id = 2;
-//    bytes data = 3; // generic data type
-//}
+syntax = "proto3";
+option java_package = "proto.types";
+package proto.types;
+option java_outer_classname = "transaction";
+
+message TxID {
+    int32 proposerID = 1;
+    int32 bid = 2;
+    int32 txNum = 3;
+    int32 channel = 4;
+}
+message Transaction {
+    int32 clientID = 1;
+    TxID id = 2;
+    bytes data = 3; // generic data type
+}

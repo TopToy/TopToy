@@ -1,9 +1,9 @@
 package das.ab;
 
 import das.data.Data;
-import proto.Types;
 
 import static java.lang.String.format;
+import proto.types.meta.*;
 
 public class ABService {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ABService.class);
@@ -26,7 +26,7 @@ public class ABService {
         logger.info(format("[#%d] shutting down ABService", id));
     }
 
-    static public void broadcast(byte[] m, Types.Meta key, Data.RBTypes t) {
+    static public void broadcast(byte[] m, Meta key, Data.RBTypes t) {
         bs.broadcast(m, key, t);
     }
 

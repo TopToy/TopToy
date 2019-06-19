@@ -1,18 +1,18 @@
 package das.ms;
-import proto.Types;
 
 import java.util.Comparator;
 import java.util.PriorityQueue;
 
 import static java.lang.Math.max;
 import static java.lang.Math.min;
+import proto.types.fd.*;
 
 public class BFD {
 
     static private int n;
     static private int f;
     static private int workers;
-    static private PriorityQueue<Types.suspected>[] sus;
+    static private PriorityQueue<Suspected>[] sus;
     static private int threshold;
     static private boolean[] active;
     static private boolean[] byzActivity;
@@ -28,7 +28,7 @@ public class BFD {
         for (int i = 0 ; i < workers ; i++) {
             BFD.active[i] = false;
             BFD.byzActivity[i] = false;
-            BFD.sus[i] = new PriorityQueue(max(f, 1), Comparator.comparing(Types.suspected::getTmo).reversed());
+            BFD.sus[i] = new PriorityQueue(max(f, 1), Comparator.comparing(Suspected::getTmo).reversed());
         }
 
     }
@@ -78,7 +78,7 @@ public class BFD {
             if (tmo <= sus[w].peek().getTmo()) return;
             sus[w].remove();
         }
-        sus[w].add(Types.suspected.newBuilder().setId(id).setTmo(tmo).build());
+        sus[w].add(Suspected.newBuilder().setId(id).setTmo(tmo).build());
     }
 
     static public void unsuspect(int id, int w) {

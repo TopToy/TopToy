@@ -1,4 +1,4 @@
-package proto;
+package proto.prpcs.wrbService;
 
 import static io.grpc.MethodDescriptor.generateFullMethodName;
 import static io.grpc.stub.ClientCalls.asyncBidiStreamingCall;
@@ -19,38 +19,38 @@ import static io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall;
  */
 @javax.annotation.Generated(
     value = "by gRPC proto compiler (version 1.20.0)",
-    comments = "Source: wrbService.proto")
+    comments = "Source: prpcs/wrbService.proto")
 public final class WrbGrpc {
 
   private WrbGrpc() {}
 
-  public static final String SERVICE_NAME = "proto.Wrb";
+  public static final String SERVICE_NAME = "proto.prpcs.wrbService.Wrb";
 
   // Static method descriptors that strictly reflect the proto.
-  private static volatile io.grpc.MethodDescriptor<proto.Types.BlockHeader,
-      proto.Types.Empty> getDisseminateMessageMethod;
+  private static volatile io.grpc.MethodDescriptor<proto.types.block.BlockHeader,
+      proto.types.empty.Empty> getDisseminateMessageMethod;
 
   @io.grpc.stub.annotations.RpcMethod(
       fullMethodName = SERVICE_NAME + '/' + "DisseminateMessage",
-      requestType = proto.Types.BlockHeader.class,
-      responseType = proto.Types.Empty.class,
+      requestType = proto.types.block.BlockHeader.class,
+      responseType = proto.types.empty.Empty.class,
       methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
-  public static io.grpc.MethodDescriptor<proto.Types.BlockHeader,
-      proto.Types.Empty> getDisseminateMessageMethod() {
-    io.grpc.MethodDescriptor<proto.Types.BlockHeader, proto.Types.Empty> getDisseminateMessageMethod;
+  public static io.grpc.MethodDescriptor<proto.types.block.BlockHeader,
+      proto.types.empty.Empty> getDisseminateMessageMethod() {
+    io.grpc.MethodDescriptor<proto.types.block.BlockHeader, proto.types.empty.Empty> getDisseminateMessageMethod;
     if ((getDisseminateMessageMethod = WrbGrpc.getDisseminateMessageMethod) == null) {
       synchronized (WrbGrpc.class) {
         if ((getDisseminateMessageMethod = WrbGrpc.getDisseminateMessageMethod) == null) {
           WrbGrpc.getDisseminateMessageMethod = getDisseminateMessageMethod = 
-              io.grpc.MethodDescriptor.<proto.Types.BlockHeader, proto.Types.Empty>newBuilder()
+              io.grpc.MethodDescriptor.<proto.types.block.BlockHeader, proto.types.empty.Empty>newBuilder()
               .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
               .setFullMethodName(generateFullMethodName(
-                  "proto.Wrb", "DisseminateMessage"))
+                  "proto.prpcs.wrbService.Wrb", "DisseminateMessage"))
               .setSampledToLocalTracing(true)
               .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
-                  proto.Types.BlockHeader.getDefaultInstance()))
+                  proto.types.block.BlockHeader.getDefaultInstance()))
               .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
-                  proto.Types.Empty.getDefaultInstance()))
+                  proto.types.empty.Empty.getDefaultInstance()))
                   .setSchemaDescriptor(new WrbMethodDescriptorSupplier("DisseminateMessage"))
                   .build();
           }
@@ -59,30 +59,30 @@ public final class WrbGrpc {
      return getDisseminateMessageMethod;
   }
 
-  private static volatile io.grpc.MethodDescriptor<proto.Types.WrbReq,
-      proto.Types.WrbRes> getReqMessageMethod;
+  private static volatile io.grpc.MethodDescriptor<proto.types.wrb.WrbReq,
+      proto.types.wrb.WrbRes> getReqMessageMethod;
 
   @io.grpc.stub.annotations.RpcMethod(
       fullMethodName = SERVICE_NAME + '/' + "reqMessage",
-      requestType = proto.Types.WrbReq.class,
-      responseType = proto.Types.WrbRes.class,
+      requestType = proto.types.wrb.WrbReq.class,
+      responseType = proto.types.wrb.WrbRes.class,
       methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
-  public static io.grpc.MethodDescriptor<proto.Types.WrbReq,
-      proto.Types.WrbRes> getReqMessageMethod() {
-    io.grpc.MethodDescriptor<proto.Types.WrbReq, proto.Types.WrbRes> getReqMessageMethod;
+  public static io.grpc.MethodDescriptor<proto.types.wrb.WrbReq,
+      proto.types.wrb.WrbRes> getReqMessageMethod() {
+    io.grpc.MethodDescriptor<proto.types.wrb.WrbReq, proto.types.wrb.WrbRes> getReqMessageMethod;
     if ((getReqMessageMethod = WrbGrpc.getReqMessageMethod) == null) {
       synchronized (WrbGrpc.class) {
         if ((getReqMessageMethod = WrbGrpc.getReqMessageMethod) == null) {
           WrbGrpc.getReqMessageMethod = getReqMessageMethod = 
-              io.grpc.MethodDescriptor.<proto.Types.WrbReq, proto.Types.WrbRes>newBuilder()
+              io.grpc.MethodDescriptor.<proto.types.wrb.WrbReq, proto.types.wrb.WrbRes>newBuilder()
               .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
               .setFullMethodName(generateFullMethodName(
-                  "proto.Wrb", "reqMessage"))
+                  "proto.prpcs.wrbService.Wrb", "reqMessage"))
               .setSampledToLocalTracing(true)
               .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
-                  proto.Types.WrbReq.getDefaultInstance()))
+                  proto.types.wrb.WrbReq.getDefaultInstance()))
               .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
-                  proto.Types.WrbRes.getDefaultInstance()))
+                  proto.types.wrb.WrbRes.getDefaultInstance()))
                   .setSchemaDescriptor(new WrbMethodDescriptorSupplier("reqMessage"))
                   .build();
           }
@@ -120,15 +120,15 @@ public final class WrbGrpc {
 
     /**
      */
-    public void disseminateMessage(proto.Types.BlockHeader request,
-        io.grpc.stub.StreamObserver<proto.Types.Empty> responseObserver) {
+    public void disseminateMessage(proto.types.block.BlockHeader request,
+        io.grpc.stub.StreamObserver<proto.types.empty.Empty> responseObserver) {
       asyncUnimplementedUnaryCall(getDisseminateMessageMethod(), responseObserver);
     }
 
     /**
      */
-    public void reqMessage(proto.Types.WrbReq request,
-        io.grpc.stub.StreamObserver<proto.Types.WrbRes> responseObserver) {
+    public void reqMessage(proto.types.wrb.WrbReq request,
+        io.grpc.stub.StreamObserver<proto.types.wrb.WrbRes> responseObserver) {
       asyncUnimplementedUnaryCall(getReqMessageMethod(), responseObserver);
     }
 
@@ -138,15 +138,15 @@ public final class WrbGrpc {
             getDisseminateMessageMethod(),
             asyncUnaryCall(
               new MethodHandlers<
-                proto.Types.BlockHeader,
-                proto.Types.Empty>(
+                proto.types.block.BlockHeader,
+                proto.types.empty.Empty>(
                   this, METHODID_DISSEMINATE_MESSAGE)))
           .addMethod(
             getReqMessageMethod(),
             asyncUnaryCall(
               new MethodHandlers<
-                proto.Types.WrbReq,
-                proto.Types.WrbRes>(
+                proto.types.wrb.WrbReq,
+                proto.types.wrb.WrbRes>(
                   this, METHODID_REQ_MESSAGE)))
           .build();
     }
@@ -172,16 +172,16 @@ public final class WrbGrpc {
 
     /**
      */
-    public void disseminateMessage(proto.Types.BlockHeader request,
-        io.grpc.stub.StreamObserver<proto.Types.Empty> responseObserver) {
+    public void disseminateMessage(proto.types.block.BlockHeader request,
+        io.grpc.stub.StreamObserver<proto.types.empty.Empty> responseObserver) {
       asyncUnaryCall(
           getChannel().newCall(getDisseminateMessageMethod(), getCallOptions()), request, responseObserver);
     }
 
     /**
      */
-    public void reqMessage(proto.Types.WrbReq request,
-        io.grpc.stub.StreamObserver<proto.Types.WrbRes> responseObserver) {
+    public void reqMessage(proto.types.wrb.WrbReq request,
+        io.grpc.stub.StreamObserver<proto.types.wrb.WrbRes> responseObserver) {
       asyncUnaryCall(
           getChannel().newCall(getReqMessageMethod(), getCallOptions()), request, responseObserver);
     }
@@ -207,14 +207,14 @@ public final class WrbGrpc {
 
     /**
      */
-    public proto.Types.Empty disseminateMessage(proto.Types.BlockHeader request) {
+    public proto.types.empty.Empty disseminateMessage(proto.types.block.BlockHeader request) {
       return blockingUnaryCall(
           getChannel(), getDisseminateMessageMethod(), getCallOptions(), request);
     }
 
     /**
      */
-    public proto.Types.WrbRes reqMessage(proto.Types.WrbReq request) {
+    public proto.types.wrb.WrbRes reqMessage(proto.types.wrb.WrbReq request) {
       return blockingUnaryCall(
           getChannel(), getReqMessageMethod(), getCallOptions(), request);
     }
@@ -240,16 +240,16 @@ public final class WrbGrpc {
 
     /**
      */
-    public com.google.common.util.concurrent.ListenableFuture<proto.Types.Empty> disseminateMessage(
-        proto.Types.BlockHeader request) {
+    public com.google.common.util.concurrent.ListenableFuture<proto.types.empty.Empty> disseminateMessage(
+        proto.types.block.BlockHeader request) {
       return futureUnaryCall(
           getChannel().newCall(getDisseminateMessageMethod(), getCallOptions()), request);
     }
 
     /**
      */
-    public com.google.common.util.concurrent.ListenableFuture<proto.Types.WrbRes> reqMessage(
-        proto.Types.WrbReq request) {
+    public com.google.common.util.concurrent.ListenableFuture<proto.types.wrb.WrbRes> reqMessage(
+        proto.types.wrb.WrbReq request) {
       return futureUnaryCall(
           getChannel().newCall(getReqMessageMethod(), getCallOptions()), request);
     }
@@ -276,12 +276,12 @@ public final class WrbGrpc {
     public void invoke(Req request, io.grpc.stub.StreamObserver<Resp> responseObserver) {
       switch (methodId) {
         case METHODID_DISSEMINATE_MESSAGE:
-          serviceImpl.disseminateMessage((proto.Types.BlockHeader) request,
-              (io.grpc.stub.StreamObserver<proto.Types.Empty>) responseObserver);
+          serviceImpl.disseminateMessage((proto.types.block.BlockHeader) request,
+              (io.grpc.stub.StreamObserver<proto.types.empty.Empty>) responseObserver);
           break;
         case METHODID_REQ_MESSAGE:
-          serviceImpl.reqMessage((proto.Types.WrbReq) request,
-              (io.grpc.stub.StreamObserver<proto.Types.WrbRes>) responseObserver);
+          serviceImpl.reqMessage((proto.types.wrb.WrbReq) request,
+              (io.grpc.stub.StreamObserver<proto.types.wrb.WrbRes>) responseObserver);
           break;
         default:
           throw new AssertionError();
@@ -305,7 +305,7 @@ public final class WrbGrpc {
 
     @java.lang.Override
     public com.google.protobuf.Descriptors.FileDescriptor getFileDescriptor() {
-      return proto.WrbService.getDescriptor();
+      return proto.prpcs.wrbService.wrbService.getDescriptor();
     }
 
     @java.lang.Override

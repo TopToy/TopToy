@@ -1,7 +1,8 @@
 package blockchain.genesis;
 
-import proto.Types;
+import proto.types.block.*;
+
 
 public interface GenCreator {
-    Types.Block createGenesisBlock();
+    Block createGenesisBlock();
 }

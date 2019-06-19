@@ -1,12 +1,10 @@
 package communication.data;
-
-import proto.Types;
-
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
+import proto.types.block.*;
 
 public class Data {
-    static public ConcurrentHashMap<Types.BlockID, Queue<Types.Block>>[][] blocks;
+    static public ConcurrentHashMap<BlockID, Queue<Block>>[][] blocks;
 
     public Data(int n, int channels) {
         blocks = new ConcurrentHashMap[n][channels];
@@ -18,7 +16,7 @@ public class Data {
         }
     }
 
-    static public void evacuateOldData(int channel, Types.BlockID bid) {
+    static public void evacuateOldData(int channel, BlockID bid) {
         int pid = bid.getPid();
         synchronized (blocks[pid][channel]) {
             blocks[pid][channel].remove(bid);
@@ -26,10 +24,10 @@ public class Data {
 
     }
 
-    static public void evacuateAllOldData(int channel, Types.BlockID bid) {
+    static public void evacuateAllOldData(int channel, BlockID bid) {
         int pid = bid.getPid();
         synchronized (blocks[pid][channel]) {
-            for (Types.BlockID id : blocks[pid][channel].keySet()) {
+            for (BlockID id : blocks[pid][channel].keySet()) {
                 if (id.getBid() < bid.getBid()) {
                     blocks[pid][channel].remove(bid);
                 }

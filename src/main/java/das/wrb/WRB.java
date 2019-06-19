@@ -7,7 +7,6 @@ import das.data.Data;
 
 import das.ms.BFD;
 import das.utils.TmoUtils;
-import proto.Types.*;
 import utils.statistics.Statistics;
 
 import java.util.*;
@@ -16,6 +15,9 @@ import static das.bbc.OBBC.setFastBbcVote;
 import static das.utils.TmoUtils.*;
 import static java.lang.Math.max;
 import static java.lang.String.format;
+import proto.types.block.*;
+import proto.types.meta.*;
+import proto.types.wrb.*;
 
 public class WRB {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(WRB.class);

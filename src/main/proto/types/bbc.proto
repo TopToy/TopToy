@@ -1,20 +1,22 @@
-//syntax = "proto3";
-//option java_package = "proto.types.bbc";
-//package proto.types.bbc;
-//
-//import "types/meta.proto";
-//import "types/block.proto";
-//
-//message BbcDecision {
-//    Meta m = 1;
-//    int32 decosion = 2;
-//    int32 sender = 3;
-//}
-//
-//message BbcMsg {
-//    Meta m = 1;
-//    bool vote = 2;
-//    BlockHeader next = 3;
-//    int32 height = 4;
-//    int32 sender = 5;
-//}
+syntax = "proto3";
+option java_package = "proto.types";
+option java_outer_classname = "bbc";
+
+package proto.types;
+
+import "types/meta.proto";
+import "types/block.proto";
+
+message BbcDecision {
+    proto.types.Meta m = 1;
+    int32 decosion = 2;
+    int32 sender = 3;
+}
+
+message BbcMsg {
+    proto.types.Meta m = 1;
+    bool vote = 2;
+    proto.types.BlockHeader next = 3;
+    int32 height = 4;
+    int32 sender = 5;
+}

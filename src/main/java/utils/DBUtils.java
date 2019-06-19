@@ -1,13 +1,12 @@
 package utils;
 
 import org.h2.jdbcx.JdbcDataSource;
-import proto.Types;
 
 import java.sql.*;
 import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
+import proto.types.block.Block;
 import static java.lang.String.format;
 
 public class DBUtils {
@@ -118,7 +117,7 @@ public class DBUtils {
 
     }
 
-    static public void writeBlockToTable(Types.Block b) {
+    static public void writeBlockToTable(Block b) {
         int pid = b.getHeader().getBid().getPid();
         int bid = b.getId().getBid();
         int height = b.getHeader().getHeight();
