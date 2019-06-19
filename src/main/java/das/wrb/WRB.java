@@ -27,7 +27,7 @@ public class WRB {
     private static int f;
     private static WrbRpcs rpcs;
 
-    public WRB(int id, int workers, int n, int f, int tmo, int tmoInterval, ArrayList<Node> wrbCluster,
+    public WRB(int id, int workers, int n, int f, int tmo, ArrayList<Node> wrbCluster,
                String serverCrt, String serverPrivKey, String caRoot) {
 
         WRB.f = f;
@@ -39,8 +39,7 @@ public class WRB {
         new BFD(n, f, workers,20 * tmo);
         BFD.activateAll();
         WRB.rpcs = new WrbRpcs(id, workers, n, f, wrbCluster, serverCrt, serverPrivKey, caRoot);
-        logger.info(format("Initiated WRB: [id=%d; n=%d; f=%d; tmo=%d; tmoInterval=%d]", id, n, f, tmo,
-                tmoInterval));
+        logger.info(format("Initiated WRB: [id=%d; n=%d; f=%d; tmo=%d]", id, n, f, tmo));
     }
 
 

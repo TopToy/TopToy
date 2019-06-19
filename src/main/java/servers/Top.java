@@ -37,8 +37,8 @@ public class Top {
 //    private EventLoopGroup gnio = new NioEventLoopGroup(2);
 
 
-    public Top(int id, int n, int f, int workers, int tmo, int tmoInterval,
-               int maxTx, boolean fastMode, ArrayList<Node> obbcCluster,
+    public Top(int id, int n, int f, int workers, int tmo,
+               int maxTx, ArrayList<Node> obbcCluster,
                ArrayList<Node> wrbCluster, ArrayList<Node> commCluster,
                String abConfig, String type, String serverCrt, String serverPrivKey, String caRoot) {
         this.n = n;
@@ -47,31 +47,31 @@ public class Top {
         this.toys = new ToyBaseServer[workers];
         this.id = id;
         new BCS(id, n, f, workers);
-        initProtocols(obbcCluster, wrbCluster, tmo, tmoInterval, serverCrt,
+        initProtocols(obbcCluster, wrbCluster, tmo, serverCrt,
                 serverPrivKey, caRoot, commCluster, abConfig);
 
         this.type = type;
         // TODO: Apply to more types
         if (type.equals("r")) {
             for (int i = 0 ; i < workers ; i++) {
-                toys[i] = new ToyServer(id, i, n, f, maxTx, fastMode, comm);
+                toys[i] = new ToyServer(id, i, n, f, maxTx, comm);
             }
         }
         if (type.equals("b")) {
             for (int i = 0 ; i < workers ; i++) {
-                toys[i] = new ByzToyServer(id, i, n, f, maxTx, fastMode, comm);
+                toys[i] = new ByzToyServer(id, i, n, f, maxTx, comm);
             }
         }
         if (type.equals("a")) {
             for (int i = 0 ; i < workers ; i++) {
-                toys[i] = new AsyncToyServer(id, i, n, f, maxTx, fastMode, comm);
+                toys[i] = new AsyncToyServer(id, i, n, f, maxTx, comm);
             }
         }
         logger.info(format("Initiated TOP: [id=%d; n=%d; f=%d; workers=%d]", id, n, f, workers));
 
     }
 
-    private void initProtocols(ArrayList<Node> obbcCluster, ArrayList<Node> wrbCluster, int tmo, int tmoInterval,
+    private void initProtocols(ArrayList<Node> obbcCluster, ArrayList<Node> wrbCluster, int tmo,
                                String serverCrt, String serverPrivKey, String caRoot,
                                ArrayList<Node> commCluster, String abConfigHome) {
         comm = new Clique(id, workers, this.n, commCluster);
@@ -82,7 +82,7 @@ public class Top {
         logger.info(format("[%d] has initiated BBC", id));
         new OBBC(id, n, f, workers, n - f, obbcCluster, comm, caRoot, serverCrt, serverPrivKey);
         logger.info(format("[%d] has initiated OBBC service", id));
-        new WRB(id, workers, n, f, tmo, tmoInterval, wrbCluster, serverCrt, serverPrivKey, caRoot);
+        new WRB(id, workers, n, f, tmo, wrbCluster, serverCrt, serverPrivKey, caRoot);
         logger.info(format("[%d] has initiated WRB", id));
         new Membership(n);
         logger.info(format("[%d] has initiated Membership", id));

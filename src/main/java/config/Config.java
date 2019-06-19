@@ -24,11 +24,9 @@ public class Config {
         String SERVER_CRT_PATH = "server.TlsCertPath";
         String CLUSTER_KEY = "cluster";
         String SETTING_TMO_KEY = "setting.tmo";
-        String SETTING_TMO_INTERVAL_KEY = "setting.tmoInterval";
         String SETTING_ABCONFIG_KEY = "setting.ABConfigPath";
         String SETTING_MAXTRANSACTIONSINBLOCK_KEY = "setting.maxTransactionInBlock";
         String SETTING_CA_ROOT_PATH = "setting.caRootPath";
-        String SETTING_FAST_MODE = "setting.fastMode";
         String SERVER_PRIVKEY = "server.privateKey";
         String SERVER_PRIVKET_PATH = "server.TlsPrivKeyPath";
     }
@@ -78,10 +76,6 @@ public class Config {
 
     public static int getTMO() {
         return Math.toIntExact(conf.getLong(tKeys.SETTING_TMO_KEY));
-    }
-
-    public static int getTMOInterval() {
-        return Math.toIntExact(conf.getLong(tKeys.SETTING_TMO_INTERVAL_KEY));
     }
 
     public static int getC() {
@@ -162,8 +156,6 @@ public class Config {
     public static String getCaRootPath() {return conf.getString(tKeys.SETTING_CA_ROOT_PATH); }
 
     public static String getServerCrtPath() { return conf.getString(tKeys.SERVER_CRT_PATH); }
-
-    public static boolean getFastMode() { return conf.getBoolean(tKeys.SETTING_FAST_MODE); }
 
     public static int getTxSize() {
         return Math.toIntExact(conf.getLong(tKeys.SYSTEM_TX_SIZE));

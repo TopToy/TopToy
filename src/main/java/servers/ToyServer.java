@@ -10,9 +10,9 @@ import static java.lang.String.format;
 class ToyServer extends ToyBaseServer {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ToyServer.class);
 
-    ToyServer(int id, int worker, int n, int f, int maxTx, boolean fastMode,
+    ToyServer(int id, int worker, int n, int f, int maxTx,
               CommLayer comm) {
-        super(id, worker, n, f, maxTx, fastMode, comm);
+        super(id, worker, n, f, maxTx, comm);
     }
 
     BlockHeader leaderImpl() {
