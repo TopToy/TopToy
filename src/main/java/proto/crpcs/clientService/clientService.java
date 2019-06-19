@@ -25,13 +25,13 @@ public final class clientService {
     java.lang.String[] descriptorData = {
       "\n\031crpcs/clientService.proto\022\031proto.crpcs" +
       ".clientService\032\027types/transaction.proto\032" +
-      "\022types/client.proto2\272\001\n\rClientService\0226\n" +
-      "\005write\022\030.proto.types.Transaction\032\021.proto" +
-      ".types.TxID\"\000\0228\n\004read\022\024.proto.types.Read" +
-      "Req\032\030.proto.types.Transaction\"\000\0227\n\006statu" +
-      "s\022\024.proto.types.ReadReq\032\025.proto.types.Tx" +
-      "Status\"\000B*\n\031proto.crpcs.clientServiceB\rc" +
-      "lientServiceb\006proto3"
+      "\022types/client.proto2\274\001\n\rClientService\0228\n" +
+      "\007txWrite\022\030.proto.types.Transaction\032\021.pro" +
+      "to.types.TxID\"\000\0228\n\006txRead\022\022.proto.types." +
+      "TxReq\032\030.proto.types.Transaction\"\000\0227\n\010txS" +
+      "tatus\022\022.proto.types.TxReq\032\025.proto.types." +
+      "TxStatus\"\000B*\n\031proto.crpcs.clientServiceB" +
+      "\rclientServiceb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

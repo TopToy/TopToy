@@ -6,6 +6,7 @@ import crypto.BlockDigSig;
 import das.ms.BFD;
 import org.apache.commons.cli.*;
 import proto.types.block.*;
+import proto.types.client;
 import proto.types.transaction.*;
 import proto.types.meta.*;
 import utils.statistics.Statistics;
@@ -191,13 +192,8 @@ class Cli {
                     .setTxNum(tid)
                     .setChannel(channel)
                     .build();
-            int stat = JToy.s.status(txid, false);
+            return JToy.s.status(txid, false).toString();
 
-            switch (stat) {
-                case -1: return "Not exist";
-                case 0: return "Approved";
-            }
-            return null;
         }
         private void signBlockFromBuilder(Block.Builder b) {
             Block.Builder b1 = b.setHeader(b.getHeader()

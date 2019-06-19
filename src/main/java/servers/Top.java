@@ -3,6 +3,7 @@ package servers;
 import blockchain.data.BCS;
 import communication.CommLayer;
 import communication.overlays.clique.Clique;
+import proto.types.client;
 import utils.Node;
 import das.ab.ABService;
 import das.bbc.BBC;
@@ -12,7 +13,7 @@ import das.wrb.WRB;
 import io.grpc.Server;
 import io.grpc.netty.NettyServerBuilder;
 
-import utils.CacheUtils;
+import utils.cache.TxCache;
 import utils.DBUtils;
 import utils.DiskUtils;
 import proto.types.transaction.*;
@@ -86,7 +87,7 @@ public class Top {
         logger.info(format("[%d] has initiated WRB", id));
         new Membership(n);
         logger.info(format("[%d] has initiated Membership", id));
-        new CacheUtils(0, workers);
+        new TxCache(0, workers);
         logger.info(format("[%d] has initiated Cache utils", id));
         new DBUtils(workers);
         logger.info(format("[%d] has initiated DB Utils", id));
@@ -189,7 +190,7 @@ public class Top {
         return toys[worker].addTransaction(data, clientID);
     }
 
-    public int status(TxID tid, boolean blocking) throws InterruptedException {
+    public client.TxState status(TxID tid, boolean blocking) throws InterruptedException {
         return toys[tid.getChannel()].status(tid, blocking);
     }
 

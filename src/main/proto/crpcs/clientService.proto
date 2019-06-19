@@ -8,7 +8,7 @@ import "types/transaction.proto";
 import "types/client.proto";
 
 service ClientService {
-    rpc write(proto.types.Transaction) returns (proto.types.TxID) {};
-    rpc read(proto.types.ReadReq) returns (proto.types.Transaction) {};
-    rpc status(proto.types.ReadReq) returns (proto.types.TxStatus) {};
+    rpc txWrite(proto.types.Transaction) returns (proto.types.TxID) {};
+    rpc txRead(proto.types.TxReq) returns (proto.types.Transaction) {};
+    rpc txStatus(proto.types.TxReq) returns (proto.types.TxStatus) {};
 }

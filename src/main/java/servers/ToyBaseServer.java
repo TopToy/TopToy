@@ -4,14 +4,14 @@ import blockchain.data.BCS;
 import blockchain.validation.Tvalidator;
 import blockchain.validation.Validator;
 import com.google.protobuf.ByteString;
-import com.google.protobuf.InvalidProtocolBufferException;
 import communication.CommLayer;
 import config.Config;
 import das.ab.ABService;
 import das.data.Data;
 import das.ms.BFD;
 import das.wrb.WRB;
-import utils.CacheUtils;
+import proto.types.client;
+import utils.cache.TxCache;
 import utils.DBUtils;
 import java.io.IOException;
 import java.security.SecureRandom;
@@ -418,14 +418,27 @@ public abstract class ToyBaseServer {
 
     }
 
-    int status(TxID tid, boolean blocking) throws InterruptedException {
-        if (getTx(tid, blocking) != null) return 0;
-        return -1;
+    client.TxState status(TxID tid, boolean blocking) throws InterruptedException {
+        if (getTx(tid, blocking) != null) return client.TxState.COMMITTED;
+        synchronized (cbl) {
+            if (currBLock.getDataList().stream().anyMatch(tx -> tx.getId().equals(tid))) return client.TxState.PENDING;
+        }
+        synchronized (blocksForPropose) {
+            if (blocksForPropose.stream().anyMatch(
+                    b -> b.getDataList().stream().anyMatch(tx -> tx.getId().equals(tid)))
+            ) return client.TxState.PENDING;
+        }
+        synchronized (proposedBlocks) {
+            if (proposedBlocks.stream().anyMatch(
+                    b -> b.getDataList().stream().anyMatch(tx -> tx.getId().equals(tid)))
+            ) return client.TxState.PROPOSED;
+        }
+        return client.TxState.UNKNOWN;
     }
 
     public Transaction getTx(TxID tid, boolean blocking) throws InterruptedException {
-        if (CacheUtils.contains(tid)) {
-            return CacheUtils.get(tid);
+        if (TxCache.contains(tid)) {
+            return TxCache.get(tid);
         }
         int height = DBUtils.getBlockRecord(tid.getChannel(), tid.getProposerID(), tid.getBid(), blocking);
         if (height == -1) return null;
@@ -439,7 +452,7 @@ public abstract class ToyBaseServer {
         if (b == null) return null;
         Transaction tx = b.getData(tid.getTxNum());
         if (tx.getId().equals(tid)) {
-            CacheUtils.add(tx);
+            TxCache.add(tx);
             return tx;
         } else {
             logger.error(format("Invalid tx [w=%d ; pid=%d ; bid=%d ; tid=%d]",
@@ -561,13 +574,13 @@ public abstract class ToyBaseServer {
 
     Block deliver(int index) throws InterruptedException {
         Block b = BCS.bGetBlock(worker, index);
-        CacheUtils.addBlock(b);
+        TxCache.addBlock(b);
         return b;
     }
 
     Block nonBlockingdeliver(int index) {
         Block b = BCS.nbGetBlock(worker, index);
-        CacheUtils.addBlock(b);
+        TxCache.addBlock(b);
         return b;
     }
 

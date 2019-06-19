@@ -4,19 +4,52 @@ package proto.types;
 option java_outer_classname = "client";
 
 import "types/transaction.proto";
+import "types/block.proto";
 
-message Accepted {
-    bool accepted = 1;
-    proto.types.TxID txID = 2;
-}
-
-message ReadReq {
-    proto.types.TxID tid = 1;
-    proto.types.Transaction tx = 2;
-    bool blocking = 3;
-    int32 cid = 4;
+enum TxState {
+    COMMITTED = 0;
+    PENDING = 1;
+    PROPOSED = 2;
+    UNKNOWN = 3;
 }
 
 message TxStatus {
-    int32 res = 1;
+    TxState status = 1;
+}
+
+message TxReq {
+    proto.types.TxID tid = 1;
+    bool blocking = 2;
+    int32 cid = 3;
+}
+
+message BlockReq {
+    int32 height = 1;
+    bool blocking = 2;
+    int32 cid = 3;
+}
+
+message Health {
+
+}
+
+message TxPoolSize {
+
+}
+
+message PendingTxNum {
+
+}
+
+message Validators {
+    repeated string ips = 1;
+}
+
+message ConfigInfo {
+    int32 clusterSize = 1;
+    int32 maxFailures = 2;
+    int32 workers = 3;
+    int32 initTmo = 4;
+    int32 maxTxInBlock = 5;
+    int32 serverID = 6;
 }
