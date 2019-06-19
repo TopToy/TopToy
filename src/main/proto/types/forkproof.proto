@@ -1,11 +1,13 @@
-//syntax = "proto3";
-//option java_package = "proto.types.forkproof";
-//package proto.types.forkproof;
-//import "types/block.proto";
-//
-//message ForkProof {
-//    int32 sender = 1;
-//    Block curr = 2;
-//    Block prev = 3;
-//    //    bool done = 4;
-//}
+syntax = "proto3";
+option java_package = "proto.types";
+package proto.types;
+option java_outer_classname = "forkproof";
+
+import "types/block.proto";
+
+message ForkProof {
+    int32 sender = 1;
+    proto.types.Block curr = 2;
+    proto.types.Block prev = 3;
+    //    bool done = 4;
+}

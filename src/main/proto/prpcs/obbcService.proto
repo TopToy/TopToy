@@ -1,0 +1,13 @@
+syntax = "proto3";
+option java_package = "proto.prpcs.obbcService";
+package proto.prpcs.obbcService;
+option java_outer_classname = "obbcService";
+
+import "types/bbc.proto";
+import "types/empty.proto";
+import "types/evidence.proto";
+
+service Obbc {
+    rpc FastVote(proto.types.BbcMsg) returns (proto.types.Empty) {};
+    rpc EvidenceReqMessage(proto.types.EvidenceReq) returns (proto.types.EvidenceRes) {};
+}

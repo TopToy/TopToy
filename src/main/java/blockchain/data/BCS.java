@@ -2,7 +2,7 @@ package blockchain.data;
 
 import blockchain.Blockchain;
 import blockchain.Utils;
-import proto.Types;
+import proto.types.block.*;
 import utils.statistics.BCStat;
 
 import java.io.IOException;
@@ -30,7 +30,7 @@ public class BCS {
         }
     }
 
-    public static boolean validateBlockHash(int w, Types.Block b) {
+    public static boolean validateBlockHash(int w, Block b) {
         return bcs[w].validateBlockHash(b);
     }
 
@@ -38,7 +38,7 @@ public class BCS {
         return bcs[w].validateCurrentLeader(currLeader, currF);
     }
 
-    public static void addBlock(int w, Types.Block b) {
+    public static void addBlock(int w, Block b) {
         bcs[w].addBlock(b);
     }
 
@@ -46,7 +46,7 @@ public class BCS {
         bcs[w].removeBlock(h);
     }
 
-    public static void setBlocks(int w, List<Types.Block> blocks, int start) {
+    public static void setBlocks(int w, List<Block> blocks, int start) {
         bcs[w].setBlocks(blocks, start);
     }
 
@@ -56,11 +56,11 @@ public class BCS {
         }
     }
 
-    public static Types.Block nbGetBlock(int w, int h) {
+    public static Block nbGetBlock(int w, int h) {
         return bcs[w].getBlock(h);
     }
 
-    public static void setBlock(int w, int h, Types.Block b) {
+    public static void setBlock(int w, int h, Block b) {
         bcs[w].setBlock(h, b);
     }
 
@@ -68,7 +68,7 @@ public class BCS {
         return bcs[w].contains(h);
     }
 
-    public static List<Types.Block> getBlocks(int w, int low, int high) {
+    public static List<Block> getBlocks(int w, int low, int high) {
         return bcs[w].getBlocks(low, high);
     }
 
@@ -81,7 +81,7 @@ public class BCS {
         }
     }
 
-    public static Types.Block bGetBlock(int w, int h) throws InterruptedException {
+    public static Block bGetBlock(int w, int h) throws InterruptedException {
         synchronized (newBlockNotifier) {
             while (height() < h) {
                 newBlockNotifier.wait();

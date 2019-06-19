@@ -4,8 +4,7 @@ import blockchain.data.BCS;
 import communication.CommLayer;
 
 import das.wrb.WRB;
-import proto.Types.*;
-
+import proto.types.block.*;
 import static java.lang.String.format;
 
 class ToyServer extends ToyBaseServer {

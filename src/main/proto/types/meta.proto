@@ -1,6 +1,7 @@
 syntax = "proto3";
-option java_package = "proto.types.meta";
-package proto.types.meta;
+option java_package = "proto.types";
+package proto.types;
+option java_outer_classname = "meta";
 
 message Meta {
     int32 channel = 1;

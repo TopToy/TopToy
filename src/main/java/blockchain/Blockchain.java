@@ -10,9 +10,9 @@ import java.util.concurrent.Future;
 
 import static java.lang.String.format;
 
-import proto.Types.*;
 import utils.statistics.BCStat;
 import utils.statistics.Statistics;
+import proto.types.block.*;
 
 public class Blockchain {
 

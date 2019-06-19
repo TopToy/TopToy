@@ -11,7 +11,6 @@ import das.ab.ABService;
 import das.data.Data;
 import das.ms.BFD;
 import das.wrb.WRB;
-import proto.Types;
 import utils.CacheUtils;
 import utils.DBUtils;
 import java.io.IOException;
@@ -21,12 +20,16 @@ import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
+import proto.types.block.*;
+import proto.types.transaction.*;
+import proto.types.meta.*;
+import proto.types.forkproof.*;
+import proto.types.version.*;
 
 import static blockchain.Utils.*;
 import static java.lang.Math.max;
 import static java.lang.String.format;
 
-import proto.Types.*;
 import utils.statistics.Statistics;
 
 public abstract class ToyBaseServer {
@@ -206,7 +209,7 @@ public abstract class ToyBaseServer {
     }
 
 
-    private Types.Block getBlockWRTheader(Types.BlockHeader h, int channel) throws InterruptedException {
+    private Block getBlockWRTheader(BlockHeader h, int channel) throws InterruptedException {
         if (h.getEmpty()) {
             logger.debug(format("received an empty block, returning a match [w=%d ; " +
                             "cidSereis=%d ; cid=%d ; height=%d ; pid=%d ; bid=%d]",
@@ -214,7 +217,7 @@ public abstract class ToyBaseServer {
                     h.getBid().getPid(), h.getBid().getBid()));
 
             return Block.newBuilder().setBst(
-                    blockStatistics.newBuilder()
+                    BlockStatistics.newBuilder()
                             .setProposeTime(System.currentTimeMillis())
                             .build()
             ).build();
@@ -222,7 +225,7 @@ public abstract class ToyBaseServer {
         return comm.recBlock(channel, h);
     }
 
-    BlockHeader getHeaderForCurrentBlock(Types.BlockHeader prev,
+    BlockHeader getHeaderForCurrentBlock(BlockHeader prev,
                                          int height, int cidSeries, int cid) {
         synchronized (cbl) {
             synchronized (proposedBlocks) {
@@ -379,14 +382,14 @@ public abstract class ToyBaseServer {
 
     }
 
-    txID addTransaction(Transaction tx) {
+    TxID addTransaction(Transaction tx) {
         if (getTxPoolSize() > txPoolMax) return null;
         synchronized (cbl) {
             if (currBLock.getDataCount() + 1 > maxTransactionInBlock) return null;
             int cbid = currBLock.getId().getBid();
             int txnum = currBLock.getDataCount();
             Transaction ntx = tx.toBuilder()
-                    .setId(txID.newBuilder()
+                    .setId(TxID.newBuilder()
                             .setProposerID(getID())
                             .setBid(cbid)
                             .setTxNum(txnum)
@@ -408,7 +411,7 @@ public abstract class ToyBaseServer {
     }
 
 
-    txID addTransaction(byte[] data, int clientID) {
+    TxID addTransaction(byte[] data, int clientID) {
         Transaction tx = Transaction.newBuilder()
                 .setClientID(clientID)
                 .setData(ByteString.copyFrom(data)).build();
@@ -416,12 +419,12 @@ public abstract class ToyBaseServer {
 
     }
 
-    int status(txID tid, boolean blocking) throws InterruptedException {
+    int status(TxID tid, boolean blocking) throws InterruptedException {
         if (getTx(tid, blocking) != null) return 0;
         return -1;
     }
 
-    public Transaction getTx(txID tid, boolean blocking) throws InterruptedException {
+    public Transaction getTx(TxID tid, boolean blocking) throws InterruptedException {
         if (CacheUtils.contains(tid)) {
             return CacheUtils.get(tid);
         }
@@ -570,7 +573,7 @@ public abstract class ToyBaseServer {
     }
 
     private void disseminateChainVersion(int forkPoint) {
-        subChainVersion.Builder sv = subChainVersion.newBuilder();
+        SubChainVersion.Builder sv = SubChainVersion.newBuilder();
         if (currHeight < forkPoint - 1) {
             logger.debug(format("[#%d-C[%d]] too far behind... [r=%d ; curr=%d]"
                     , getID(), worker, forkPoint, currHeight));
@@ -632,13 +635,13 @@ public abstract class ToyBaseServer {
     }
 
     private void adoptSubVersion(int forkPoint) throws IOException {
-        final subChainVersion[] choosen = new subChainVersion[1];
+        final SubChainVersion[] choosen = new SubChainVersion[1];
         final int[] sPoint = {0};
         AtomicBoolean noMatch = new AtomicBoolean(false);
         synchronized (Data.syncRBData[worker]) {
             Data.syncRBData[worker].computeIfPresent(forkPoint, (k, v1)-> {
-                ArrayList<subChainVersion> ret = new ArrayList<>();
-                ret.add(subChainVersion.getDefaultInstance());
+                ArrayList<SubChainVersion> ret = new ArrayList<>();
+                ret.add(SubChainVersion.getDefaultInstance());
                 if (v1.stream().noneMatch(v -> v.getVCount() > 0)) {
                     // A Byzantine nodes may trigger fork while all correct nodes are unable to send
                     // a valid versions.
@@ -663,7 +666,7 @@ public abstract class ToyBaseServer {
                     noMatch.set(true);
                     return ret;
                 }
-                choosen[0] = (subChainVersion) valid.stream().
+                choosen[0] = (SubChainVersion) valid.stream().
                         findFirst().get();
                 sPoint[0] = choosen[0].getV(0).getHeader().getHeight();
                 logger.info(format("[#%d-C[%d]] adopts sub chain version [length=%d] from [#%d] " +
@@ -691,7 +694,7 @@ public abstract class ToyBaseServer {
 
         fp.replace(forkPoint, syncStates.DONE);
         synchronized (Data.syncRBData[worker]) {
-            for (Iterator<Map.Entry<Integer, List<subChainVersion>>> it =
+            for (Iterator<Map.Entry<Integer, List<SubChainVersion>>> it =
                  Data.syncRBData[worker].entrySet().iterator();
                  it.hasNext(); ) {
                 int p = it.next().getKey();

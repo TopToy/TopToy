@@ -3,10 +3,10 @@ package app;
 import com.google.protobuf.ByteString;
 import config.Config;
 import io.grpc.ManagedChannelBuilder;
-import proto.Types;
-import proto.clientServiceGrpc;
+import proto.crpcs.clientService.ClientServiceGrpc.*;
 import utils.CSVUtils;
-
+import proto.types.transaction.*;
+import proto.types.client.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -22,10 +22,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.lang.StrictMath.max;
 import static java.lang.String.format;
+import static proto.crpcs.clientService.ClientServiceGrpc.newBlockingStub;
 
 public class ClientTester {
     private static org.apache.log4j.Logger logger;
-    private static clientServiceGrpc.clientServiceBlockingStub[] stubs;
+    private static ClientServiceBlockingStub[] stubs;
 
     private static int clientID;
     private static int serverPort = 9876;
@@ -37,7 +38,7 @@ public class ClientTester {
     private static long  testTime = 0;
     private static int n;
     private static ConcurrentLinkedQueue<Integer> txTimes = new ConcurrentLinkedQueue<>();
-    private static ConcurrentLinkedQueue<Types.txID> txIds = new ConcurrentLinkedQueue<>();
+    private static ConcurrentLinkedQueue<TxID> txIds = new ConcurrentLinkedQueue<>();
     private static ExecutorService clients;
 
     private static AtomicBoolean recorded = new AtomicBoolean(false);
@@ -104,9 +105,9 @@ public class ClientTester {
 
     private static void start() {
         logger.info("init clients");
-        stubs = new clientServiceGrpc.clientServiceBlockingStub[n];
+        stubs = new ClientServiceBlockingStub[n];
         for (int i = 0 ; i < n ; i++) {
-            stubs[i] = clientServiceGrpc.newBlockingStub(
+            stubs[i] = newBlockingStub(
                     ManagedChannelBuilder
                             .forAddress(Config.getIP(i), serverPort)
                             .usePlaintext()
@@ -114,9 +115,9 @@ public class ClientTester {
         }
     }
 
-    private static void test(clientServiceGrpc.clientServiceBlockingStub stub, int server) {
+    private static void test(ClientServiceBlockingStub stub, int server) {
         logger.info("Start client for " + server);
-        stub.write(Types.Transaction.newBuilder() // This meant to remove the effect of connecting to the server
+        stub.write(Transaction.newBuilder() // This meant to remove the effect of connecting to the server
                 .setData(ByteString.copyFrom(new byte[0]))
                 .setClientID(clientID)
                 .build());
@@ -126,12 +127,12 @@ public class ClientTester {
             SecureRandom random = new SecureRandom();
             byte[] tx = new byte[txSize];
             random.nextBytes(tx);
-            Types.txID tid = stub //.withDeadlineAfter(3, TimeUnit.SECONDS)
-                    .write(Types.Transaction.newBuilder()
+            TxID tid = stub //.withDeadlineAfter(3, TimeUnit.SECONDS)
+                    .write(Transaction.newBuilder()
                     .setData(ByteString.copyFrom(tx))
                     .setClientID(clientID)
                     .build());
-            Types.txStatus sts = stub.status(Types.readReq.newBuilder().setCid(clientID).setTid(tid)
+            TxStatus sts = stub.status(ReadReq.newBuilder().setCid(clientID).setTid(tid)
                     .setBlocking(true).build());
             if (sts.getRes() != 0) {
                 logger.info("An uncommitted transaction");
@@ -195,7 +196,7 @@ public class ClientTester {
         List<List<String>> data = new LinkedList<>();
         int n = 0;
         while (txTimes.size() > 0) {
-            Types.txID tid = txIds.remove();
+            TxID tid = txIds.remove();
             int txTime = txTimes.remove();
             data.add(Arrays.asList(
                     String.valueOf(n)

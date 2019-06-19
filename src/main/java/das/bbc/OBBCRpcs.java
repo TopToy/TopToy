@@ -1,6 +1,7 @@
 package das.bbc;
 
 import blockchain.data.BCS;
+import proto.prpcs.obbcService.ObbcGrpc.*;
 import utils.Node;
 import crypto.BlockDigSig;
 import crypto.SslUtils;
@@ -10,8 +11,7 @@ import das.data.VoteData;
 import io.grpc.*;
 import io.grpc.netty.NettyServerBuilder;
 import io.grpc.stub.StreamObserver;
-import proto.ObbcGrpc;
-import proto.Types;
+
 
 import javax.net.ssl.SSLException;
 import java.io.IOException;
@@ -22,8 +22,14 @@ import static das.data.Data.*;
 import static das.data.Data.bbcFastDec;
 import static io.grpc.Metadata.ASCII_STRING_MARSHALLER;
 import static java.lang.String.format;
+import static proto.prpcs.obbcService.ObbcGrpc.newStub;
+import proto.types.bbc.*;
+import proto.types.empty.*;
+import proto.types.block.*;
+import proto.types.meta.*;
+import proto.types.evidence.*;
 
-public class OBBCRpcs extends ObbcGrpc.ObbcImplBase {
+public class OBBCRpcs extends ObbcImplBase {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(OBBCRpcs.class);
 
     class authInterceptor implements ServerInterceptor {
@@ -73,7 +79,7 @@ public class OBBCRpcs extends ObbcGrpc.ObbcImplBase {
     }
     class Peer {
         ManagedChannel channel;
-        ObbcGrpc.ObbcStub stub;
+        ObbcStub stub;
         AtomicInteger[] pending;
         int maxPending = 1000;
 
@@ -90,15 +96,15 @@ public class OBBCRpcs extends ObbcGrpc.ObbcImplBase {
             for (int i = 0 ; i < workers ; i++) {
                 pending[i] = new AtomicInteger(0);
             }
-            stub = ObbcGrpc.newStub(channel);
+            stub = newStub(channel);
         }
 
-        void send(Types.BbcMsg msg, int w) {
+        void send(BbcMsg msg, int w) {
 //            if (pending[w].get() > maxPending) return;
 //            pending[w].incrementAndGet();
-            stub.fastVote(msg, new StreamObserver<Types.Empty>() {
+            stub.fastVote(msg, new StreamObserver<Empty>() {
                 @Override
-                public void onNext(Types.Empty empty) {
+                public void onNext(Empty empty) {
 //                    pending[w].decrementAndGet();
                 }
 
@@ -172,13 +178,13 @@ public class OBBCRpcs extends ObbcGrpc.ObbcImplBase {
         }
     }
 
-    private void handlePgbMsg(Types.BbcMsg msg) {
-        Types.BlockHeader nxt = msg.getNext();
+    private void handlePgbMsg(BbcMsg msg) {
+        BlockHeader nxt = msg.getNext();
 //        int sender = nxt.getBid().getPid();
         int cid = nxt.getM().getCid();
         int worker = nxt.getM().getChannel();
         int cidSeries = nxt.getM().getCidSeries();
-        Types.Meta key = Types.Meta.newBuilder()
+        Meta key = Meta.newBuilder()
                 .setChannel(worker)
                 .setCidSeries(cidSeries)
                 .setCid(cid)
@@ -188,14 +194,14 @@ public class OBBCRpcs extends ObbcGrpc.ObbcImplBase {
     }
 
     @Override
-    public void fastVote(proto.Types.BbcMsg request,
-                         StreamObserver<Types.Empty> responseObserver) {
+    public void fastVote(BbcMsg request,
+                         StreamObserver<Empty> responseObserver) {
 
 
         int cid = request.getM().getCid();
         int cidSeries = request.getM().getCidSeries();
         int channel = request.getM().getChannel();
-        Types.Meta key = request.getM();
+        Meta key = request.getM();
 
         if (request.hasNext()) {
             handlePgbMsg(request);
@@ -219,11 +225,11 @@ public class OBBCRpcs extends ObbcGrpc.ObbcImplBase {
             }
             return v;
         });
-        responseObserver.onNext(Types.Empty.newBuilder().build());
+        responseObserver.onNext(Empty.newBuilder().build());
         responseObserver.onCompleted();
     }
 
-    private void addNewFastDec(int worker, Types.Meta key, boolean dec, int height) {
+    private void addNewFastDec(int worker, Meta key, boolean dec, int height) {
 
         synchronized (bbcFastDec[worker]) {
             bbcFastDec[worker].computeIfAbsent(key, k1 -> {
@@ -231,7 +237,7 @@ public class OBBCRpcs extends ObbcGrpc.ObbcImplBase {
                     bbcVotes[worker].computeIfPresent(key, (k2, v2) -> {
                         logger.debug(format("[#%d-C[%d]] (addNewFastDec) found that a full bbc initialized, thus propose [cidSeries=%d ; cid=%d]",
                                 id, worker, key.getCidSeries(),  key.getCid()));
-                        BBC.nonBlockingPropose(Types.BbcMsg.newBuilder()
+                        BBC.nonBlockingPropose(BbcMsg.newBuilder()
                                 .setM(key)
                                 .setHeight(height)
                                 .setSender(id)
@@ -246,13 +252,13 @@ public class OBBCRpcs extends ObbcGrpc.ObbcImplBase {
     }
 
     @Override
-    public void evidenceReqMessage(proto.Types.EvidenceReq request,
-                                   StreamObserver<proto.Types.EvidenceRes> responseObserver) {
-        Types.BlockHeader msg;
+    public void evidenceReqMessage(EvidenceReq request,
+                                   StreamObserver<EvidenceRes> responseObserver) {
+        BlockHeader msg;
         int cid = request.getMeta().getCid();
         int cidSeries = request.getMeta().getCidSeries();
         int worker = request.getMeta().getChannel();
-        Types.Meta key =  Types.Meta.newBuilder()
+        Meta key =  Meta.newBuilder()
                 .setChannel(worker)
                 .setCidSeries(cidSeries)
                 .setCid(cid)
@@ -263,7 +269,7 @@ public class OBBCRpcs extends ObbcGrpc.ObbcImplBase {
             msg = BCS.nbGetBlock(worker, request.getHeight()).getHeader();
         }
         if (msg == null) {
-            msg = Types.BlockHeader.getDefaultInstance();
+            msg = BlockHeader.getDefaultInstance();
             logger.debug(format("[#%d-C[%d]] has received evidence request message" +
                             " from [#%d] of [cidSeries=%d ; cid=%d] response with NULL",
                     id, worker, request.getSender(), cidSeries, cid));
@@ -273,12 +279,12 @@ public class OBBCRpcs extends ObbcGrpc.ObbcImplBase {
                     id, worker, request.getSender(), cidSeries, cid));
         }
 
-        Types.Meta meta = Types.Meta.newBuilder().
+        Meta meta = Meta.newBuilder().
                 setChannel(worker).
                 setCid(cid).
                 setCidSeries(cidSeries).
                 build();
-        responseObserver.onNext(Types.EvidenceRes.newBuilder().
+        responseObserver.onNext(EvidenceRes.newBuilder().
                 setData(msg).
                 setSender(id).
                 setM(meta).
@@ -286,20 +292,20 @@ public class OBBCRpcs extends ObbcGrpc.ObbcImplBase {
         responseObserver.onCompleted();
     }
 
-    private void sendFVMessage(Peer p, Types.BbcMsg v) {
+    private void sendFVMessage(Peer p, BbcMsg v) {
         p.send(v, v.getM().getChannel());
     }
 
-    void broadcastFVMessage(Types.BbcMsg v) {
+    void broadcastFVMessage(BbcMsg v) {
         for (int p : peers.keySet()) {
             sendFVMessage(peers.get(p), v);
         }
     }
 
-    private void sendEvidenceReqMessage(ObbcGrpc.ObbcStub stub, Types.EvidenceReq req, Types.Meta key, int expSender) {
-        stub.evidenceReqMessage(req, new StreamObserver<Types.EvidenceRes>() {
+    private void sendEvidenceReqMessage(ObbcStub stub, EvidenceReq req, Meta key, int expSender) {
+        stub.evidenceReqMessage(req, new StreamObserver<EvidenceRes>() {
             @Override
-            public void onNext(Types.EvidenceRes res) {
+            public void onNext(EvidenceRes res) {
 
                 int worker = key.getChannel();
                 int cidSeries = key.getCidSeries();
@@ -315,7 +321,7 @@ public class OBBCRpcs extends ObbcGrpc.ObbcImplBase {
                     logger.debug(format("[#%d-C[%d]] received evidence response from [%d] [cidSeries=%d ; cid=%d]",
                             id, worker, res.getSender(), cidSeries, cid));
 
-                    if ((!res.getData().equals(Types.BlockHeader.getDefaultInstance()))
+                    if ((!res.getData().equals(BlockHeader.getDefaultInstance()))
                             && res.getData().getM().getCid() == cid
                             && res.getData().getM().getCidSeries() == cidSeries
                             && res.getData().getM().getChannel() == worker
@@ -330,7 +336,7 @@ public class OBBCRpcs extends ObbcGrpc.ObbcImplBase {
                                     id, worker, res.getSender(), cidSeries, cid));
                             Data.pending[worker].putIfAbsent(key, res.getData());
                         }
-                    } else if (res.getData().equals(Types.BlockHeader.getDefaultInstance())) {
+                    } else if (res.getData().equals(BlockHeader.getDefaultInstance())) {
                         logger.debug(format("[#%d-C[%d]] has evidence received NULL message from [#%d] for [cidSeries=%d ; cid=%d]",
                                 id, worker, res.getSender(), cidSeries,  cid));
                     }
@@ -360,7 +366,7 @@ public class OBBCRpcs extends ObbcGrpc.ObbcImplBase {
         });
     }
 
-    void broadcastEvidenceReq(Types.EvidenceReq req, Types.Meta key, int expSender) {
+    void broadcastEvidenceReq(EvidenceReq req, Meta key, int expSender) {
         for (int p : peers.keySet()) {
             sendEvidenceReqMessage(peers.get(p).stub, req, key, expSender);
         }

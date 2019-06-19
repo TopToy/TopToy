@@ -1,21 +1,22 @@
-//syntax = "proto3";
-//option java_package = "proto.types.client";
-//package proto.types.client;
-//
-//import "types/transaction.proto";
-//
-//message Accepted {
-//    bool accepted = 1;
-//    TxID txID = 2;
-//}
-//
-//message ReadReq {
-//    TxID tid = 1;
-//    Transaction tx = 2;
-//    bool blocking = 3;
-//    int32 cid = 4;
-//}
-//
-//message TxStatus {
-//    int32 res = 1;
-//}
+syntax = "proto3";
+option java_package = "proto.types";
+package proto.types;
+option java_outer_classname = "client";
+
+import "types/transaction.proto";
+
+message Accepted {
+    bool accepted = 1;
+    proto.types.TxID txID = 2;
+}
+
+message ReadReq {
+    proto.types.TxID tid = 1;
+    proto.types.Transaction tx = 2;
+    bool blocking = 3;
+    int32 cid = 4;
+}
+
+message TxStatus {
+    int32 res = 1;
+}

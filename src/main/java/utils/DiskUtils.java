@@ -1,7 +1,5 @@
 package utils;
 import org.apache.commons.io.FileUtils;
-import proto.Types;
-
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -10,7 +8,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-
+import proto.types.block.*;
 import static java.lang.String.format;
 
 public class DiskUtils {
@@ -33,21 +31,21 @@ public class DiskUtils {
         }
     }
 
-    public static void cutBlock(Types.Block b, Path path) throws IOException {
+    public static void cutBlock(Block b, Path path) throws IOException {
         Path blockFile = Paths.get(path.toString(), String.valueOf(b.getHeader().getHeight()));
         Files.write(blockFile, b.toByteArray(), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
     }
 
-    public static Types.Block getBlockFromFile(int height, Path path) throws IOException {
+    public static Block getBlockFromFile(int height, Path path) throws IOException {
         Path blockFile = Paths.get(path.toString(), String.valueOf(height));
-        return Types.Block.parseFrom(Files.readAllBytes(blockFile));
+        return Block.parseFrom(Files.readAllBytes(blockFile));
     }
 
     public static void deleteBlockFile(int height, Path path) throws IOException {
         Path blockFile = Paths.get(path.toString(), String.valueOf(height));
         Files.deleteIfExists(blockFile);
     }
-    public static Future cutBlockAsync(Types.Block b, Path path) {
+    public static Future cutBlockAsync(Block b, Path path) {
         return worker.submit(() -> {
             try {
                 cutBlock(b, path);

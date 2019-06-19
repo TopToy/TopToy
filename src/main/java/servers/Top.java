@@ -11,10 +11,12 @@ import das.ms.Membership;
 import das.wrb.WRB;
 import io.grpc.Server;
 import io.grpc.netty.NettyServerBuilder;
-import proto.Types;
+
 import utils.CacheUtils;
 import utils.DBUtils;
 import utils.DiskUtils;
+import proto.types.transaction.*;
+import proto.types.block.*;
 
 import java.io.IOException;
 import java.util.*;
@@ -161,7 +163,7 @@ public class Top {
         logger.info("Start serving, everything looks good");
     }
 
-    public Types.txID addTransaction(Types.Transaction tx) {
+    public TxID addTransaction(Transaction tx) {
         int ps = toys[0].getTxPoolSize();
         int worker = 0;
         for (int i = 1 ; i < workers ; i++) {
@@ -174,7 +176,7 @@ public class Top {
         return toys[worker].addTransaction(tx);
     }
 
-    public Types.txID addTransaction(byte[] data, int clientID) {
+    public TxID addTransaction(byte[] data, int clientID) {
        int ps = toys[0].getTxPoolSize();
        int worker = 0;
        for (int i = 1 ; i < workers ; i++) {
@@ -187,21 +189,21 @@ public class Top {
         return toys[worker].addTransaction(data, clientID);
     }
 
-    public int status(Types.txID tid, boolean blocking) throws InterruptedException {
+    public int status(TxID tid, boolean blocking) throws InterruptedException {
         return toys[tid.getChannel()].status(tid, blocking);
     }
 
-    public Types.Transaction getTransaction(Types.txID txID, boolean blocking) throws InterruptedException {
+    public Transaction getTransaction(TxID txID, boolean blocking) throws InterruptedException {
         return toys[txID.getChannel()].getTx(txID, blocking);
     }
 
-    public Types.Block deliver(int index) throws InterruptedException {
+    public Block deliver(int index) throws InterruptedException {
         int channel_num = index % workers;
         int block_num = index / workers;
         return toys[channel_num].deliver(block_num);
     }
 
-    public Types.Block nonBlockingDeliver(int index) {
+    public Block nonBlockingDeliver(int index) {
         int channel_num = index % workers;
         int block_num = index / workers;
         return toys[channel_num].nonBlockingdeliver(block_num);

@@ -5,7 +5,9 @@ import config.Config;
 import crypto.BlockDigSig;
 import das.ms.BFD;
 import org.apache.commons.cli.*;
-import proto.Types;
+import proto.types.block.*;
+import proto.types.transaction.*;
+import proto.types.meta.*;
 import utils.statistics.Statistics;
 import utils.CSVUtils;
 import java.io.FileWriter;
@@ -183,7 +185,7 @@ class Cli {
 
 
         private String txStatus(int channel, int pid, int bid, int tid) throws InterruptedException {
-            Types.txID txid = Types.txID.newBuilder()
+            TxID txid = TxID.newBuilder()
                     .setProposerID(pid)
                     .setBid(bid)
                     .setTxNum(tid)
@@ -197,21 +199,21 @@ class Cli {
             }
             return null;
         }
-        private void signBlockFromBuilder(Types.Block.Builder b) {
-            Types.Block.Builder b1 = b.setHeader(b.getHeader()
+        private void signBlockFromBuilder(Block.Builder b) {
+            Block.Builder b1 = b.setHeader(b.getHeader()
                     .toBuilder()
                     .setTransactionHash(ByteString.copyFrom(hashBlockData(b.build()))));
             b1.setHeader(b.getHeader().toBuilder()
                     .setProof(BlockDigSig.sign(b1.getHeader()))).build();
         }
-        private Types.Block.Builder createBlock(int txSize) {
-            Types.Block.Builder bb = Types.Block.newBuilder();
+        private Block.Builder createBlock(int txSize) {
+            Block.Builder bb = Block.newBuilder();
             for (int i = 0 ; i < Config.getMaxTransactionsInBlock() ; i++) {
                 SecureRandom random = new SecureRandom();
                 byte[] tx = new byte[txSize];
                 random.nextBytes(tx);
-                bb.addData(Types.Transaction.newBuilder()
-                        .setId(Types.txID.newBuilder()
+                bb.addData(Transaction.newBuilder()
+                        .setId(TxID.newBuilder()
                                 .setTxNum(0)
                                 .setProposerID(0)
                                 .setChannel(0)
@@ -225,13 +227,13 @@ class Cli {
             byte[] tx = new byte[32];
             random.nextBytes(tx);
 
-            return bb.setHeader(Types.BlockHeader.newBuilder()
-                    .setM(Types.Meta.newBuilder()
+            return bb.setHeader(BlockHeader.newBuilder()
+                    .setM(Meta.newBuilder()
                             .setChannel(0)
                             .setCidSeries(0)
                             .setCid(0))
                     .setHeight(0)
-                    .setBid(Types.BlockID.newBuilder().setBid(0).setPid(0).build())
+                    .setBid(BlockID.newBuilder().setBid(0).setPid(0).build())
                     .setPrev(ByteString.copyFrom(tx)));
 
 
@@ -246,7 +248,7 @@ class Cli {
                 int finalC = c;
                 (executor).submit(() -> {
                     int sigCount = 0;
-                    Types.Block.Builder b = createBlock(Config.getTxSize());
+                    Block.Builder b = createBlock(Config.getTxSize());
                     while (!stop.get()) {
                         signBlockFromBuilder(b);
                         sigCount++;
@@ -301,7 +303,7 @@ class Cli {
                 List<List<String>> rows = new ArrayList<>();
                 int workers = Config.getC();
                 for (int i = Statistics.getH1() ; i < Statistics.getH2() ; i++) {
-                    List<Types.Block> rBlocks = new ArrayList<>();
+                    List<Block> rBlocks = new ArrayList<>();
                     for (int  j = 0 ; j < workers ; j++) {
                         rBlocks.add(BCS.nbGetBlock(j, i));
 
@@ -309,7 +311,7 @@ class Cli {
                     long dlt = Collections.max(rBlocks.stream().map(b ->
                             b.getHeader().getHst().getDefiniteTime()).collect(Collectors.toList()));
                     for (int j = 0 ; j < workers ; j++) {
-                        Types.Block b = rBlocks.get(j);
+                        Block b = rBlocks.get(j);
                         if (b.getId().getPid() != JToy.s.getID()) continue;
                         long pt = b.getBst().getProposeTime();
                         long tt = b.getHeader().getHst().getTentativeTime();
@@ -499,7 +501,7 @@ class Cli {
             int txCount = 0;
             for (int i = Statistics.getH1() ; i < Statistics.getH2() ; i++) {
                 for (int j = 0 ; j < workers ; j++) {
-                    Types.Block b = BCS.nbGetBlock(j, i);
+                    Block b = BCS.nbGetBlock(j, i);
                         nob++;
                         if (b.getDataCount() == 0) {
                             noeb++;

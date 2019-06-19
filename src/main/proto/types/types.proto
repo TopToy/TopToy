@@ -1,3 +1,0 @@
-syntax = "proto3";
-option java_package = "proto";
-package proto;

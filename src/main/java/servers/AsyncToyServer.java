@@ -3,8 +3,7 @@ package servers;
 import blockchain.data.BCS;
 import communication.CommLayer;
 import das.wrb.WRB;
-import proto.Types;
-
+import proto.types.block.*;
 import java.util.Random;
 
 import static java.lang.String.format;
@@ -19,7 +18,7 @@ public class AsyncToyServer extends ToyBaseServer {
     }
 
 
-    Types.BlockHeader leaderImpl() throws InterruptedException {
+    BlockHeader leaderImpl() throws InterruptedException {
         if (maxTime > 0) {
             Random rand = new Random();
             int x = rand.nextInt(maxTime);
@@ -32,7 +31,7 @@ public class AsyncToyServer extends ToyBaseServer {
     }
 
 
-    private Types.BlockHeader normalLeaderPhase() {
+    private BlockHeader normalLeaderPhase() {
         if (currLeader != getID()) {
             return null;
         }
@@ -45,7 +44,7 @@ public class AsyncToyServer extends ToyBaseServer {
         return null;
     }
 
-    private Types.BlockHeader fastModePhase() {
+    private BlockHeader fastModePhase() {
         if ((currLeader + 1) % n != getID()) {
             return null;
         }

@@ -1,19 +1,20 @@
-//syntax = "proto3";
-//option java_package = "proto.types.comm";
-//package proto.types.comm;
-//
-//import "types/block.proto";
-//
-//message Comm {
-//    int32 channel = 1;
-//    Block data = 2;
-//}
-//
-//message CommReq {
-//    BlockHeader proof = 1;
-//}
-//
-//message CommRes {
-//    Block b = 1;
-//}
-//
+syntax = "proto3";
+option java_package = "proto.types";
+package proto.types;
+option java_outer_classname = "comm";
+
+import "types/block.proto";
+
+message Comm {
+    int32 channel = 1;
+    proto.types.Block data = 2;
+}
+
+message CommReq {
+    proto.types.BlockHeader proof = 1;
+}
+
+message CommRes {
+    proto.types.Block b = 1;
+}
+

@@ -1,4 +1,4 @@
-package proto;
+package proto.prpcs.commService;
 
 import static io.grpc.MethodDescriptor.generateFullMethodName;
 import static io.grpc.stub.ClientCalls.asyncBidiStreamingCall;
@@ -19,38 +19,38 @@ import static io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall;
  */
 @javax.annotation.Generated(
     value = "by gRPC proto compiler (version 1.20.0)",
-    comments = "Source: commService.proto")
+    comments = "Source: prpcs/commService.proto")
 public final class CommunicationGrpc {
 
   private CommunicationGrpc() {}
 
-  public static final String SERVICE_NAME = "proto.Communication";
+  public static final String SERVICE_NAME = "proto.prpcs.commService.Communication";
 
   // Static method descriptors that strictly reflect the proto.
-  private static volatile io.grpc.MethodDescriptor<proto.Types.Comm,
-      proto.Types.Empty> getDsmMethod;
+  private static volatile io.grpc.MethodDescriptor<proto.types.comm.Comm,
+      proto.types.empty.Empty> getDsmMethod;
 
   @io.grpc.stub.annotations.RpcMethod(
       fullMethodName = SERVICE_NAME + '/' + "dsm",
-      requestType = proto.Types.Comm.class,
-      responseType = proto.Types.Empty.class,
+      requestType = proto.types.comm.Comm.class,
+      responseType = proto.types.empty.Empty.class,
       methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
-  public static io.grpc.MethodDescriptor<proto.Types.Comm,
-      proto.Types.Empty> getDsmMethod() {
-    io.grpc.MethodDescriptor<proto.Types.Comm, proto.Types.Empty> getDsmMethod;
+  public static io.grpc.MethodDescriptor<proto.types.comm.Comm,
+      proto.types.empty.Empty> getDsmMethod() {
+    io.grpc.MethodDescriptor<proto.types.comm.Comm, proto.types.empty.Empty> getDsmMethod;
     if ((getDsmMethod = CommunicationGrpc.getDsmMethod) == null) {
       synchronized (CommunicationGrpc.class) {
         if ((getDsmMethod = CommunicationGrpc.getDsmMethod) == null) {
           CommunicationGrpc.getDsmMethod = getDsmMethod = 
-              io.grpc.MethodDescriptor.<proto.Types.Comm, proto.Types.Empty>newBuilder()
+              io.grpc.MethodDescriptor.<proto.types.comm.Comm, proto.types.empty.Empty>newBuilder()
               .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
               .setFullMethodName(generateFullMethodName(
-                  "proto.Communication", "dsm"))
+                  "proto.prpcs.commService.Communication", "dsm"))
               .setSampledToLocalTracing(true)
               .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
-                  proto.Types.Comm.getDefaultInstance()))
+                  proto.types.comm.Comm.getDefaultInstance()))
               .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
-                  proto.Types.Empty.getDefaultInstance()))
+                  proto.types.empty.Empty.getDefaultInstance()))
                   .setSchemaDescriptor(new CommunicationMethodDescriptorSupplier("dsm"))
                   .build();
           }
@@ -59,30 +59,30 @@ public final class CommunicationGrpc {
      return getDsmMethod;
   }
 
-  private static volatile io.grpc.MethodDescriptor<proto.Types.commReq,
-      proto.Types.commRes> getReqBlockMethod;
+  private static volatile io.grpc.MethodDescriptor<proto.types.comm.CommReq,
+      proto.types.comm.CommRes> getReqBlockMethod;
 
   @io.grpc.stub.annotations.RpcMethod(
       fullMethodName = SERVICE_NAME + '/' + "reqBlock",
-      requestType = proto.Types.commReq.class,
-      responseType = proto.Types.commRes.class,
+      requestType = proto.types.comm.CommReq.class,
+      responseType = proto.types.comm.CommRes.class,
       methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
-  public static io.grpc.MethodDescriptor<proto.Types.commReq,
-      proto.Types.commRes> getReqBlockMethod() {
-    io.grpc.MethodDescriptor<proto.Types.commReq, proto.Types.commRes> getReqBlockMethod;
+  public static io.grpc.MethodDescriptor<proto.types.comm.CommReq,
+      proto.types.comm.CommRes> getReqBlockMethod() {
+    io.grpc.MethodDescriptor<proto.types.comm.CommReq, proto.types.comm.CommRes> getReqBlockMethod;
     if ((getReqBlockMethod = CommunicationGrpc.getReqBlockMethod) == null) {
       synchronized (CommunicationGrpc.class) {
         if ((getReqBlockMethod = CommunicationGrpc.getReqBlockMethod) == null) {
           CommunicationGrpc.getReqBlockMethod = getReqBlockMethod = 
-              io.grpc.MethodDescriptor.<proto.Types.commReq, proto.Types.commRes>newBuilder()
+              io.grpc.MethodDescriptor.<proto.types.comm.CommReq, proto.types.comm.CommRes>newBuilder()
               .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
               .setFullMethodName(generateFullMethodName(
-                  "proto.Communication", "reqBlock"))
+                  "proto.prpcs.commService.Communication", "reqBlock"))
               .setSampledToLocalTracing(true)
               .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
-                  proto.Types.commReq.getDefaultInstance()))
+                  proto.types.comm.CommReq.getDefaultInstance()))
               .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
-                  proto.Types.commRes.getDefaultInstance()))
+                  proto.types.comm.CommRes.getDefaultInstance()))
                   .setSchemaDescriptor(new CommunicationMethodDescriptorSupplier("reqBlock"))
                   .build();
           }
@@ -120,15 +120,15 @@ public final class CommunicationGrpc {
 
     /**
      */
-    public void dsm(proto.Types.Comm request,
-        io.grpc.stub.StreamObserver<proto.Types.Empty> responseObserver) {
+    public void dsm(proto.types.comm.Comm request,
+        io.grpc.stub.StreamObserver<proto.types.empty.Empty> responseObserver) {
       asyncUnimplementedUnaryCall(getDsmMethod(), responseObserver);
     }
 
     /**
      */
-    public void reqBlock(proto.Types.commReq request,
-        io.grpc.stub.StreamObserver<proto.Types.commRes> responseObserver) {
+    public void reqBlock(proto.types.comm.CommReq request,
+        io.grpc.stub.StreamObserver<proto.types.comm.CommRes> responseObserver) {
       asyncUnimplementedUnaryCall(getReqBlockMethod(), responseObserver);
     }
 
@@ -138,15 +138,15 @@ public final class CommunicationGrpc {
             getDsmMethod(),
             asyncUnaryCall(
               new MethodHandlers<
-                proto.Types.Comm,
-                proto.Types.Empty>(
+                proto.types.comm.Comm,
+                proto.types.empty.Empty>(
                   this, METHODID_DSM)))
           .addMethod(
             getReqBlockMethod(),
             asyncUnaryCall(
               new MethodHandlers<
-                proto.Types.commReq,
-                proto.Types.commRes>(
+                proto.types.comm.CommReq,
+                proto.types.comm.CommRes>(
                   this, METHODID_REQ_BLOCK)))
           .build();
     }
@@ -172,16 +172,16 @@ public final class CommunicationGrpc {
 
     /**
      */
-    public void dsm(proto.Types.Comm request,
-        io.grpc.stub.StreamObserver<proto.Types.Empty> responseObserver) {
+    public void dsm(proto.types.comm.Comm request,
+        io.grpc.stub.StreamObserver<proto.types.empty.Empty> responseObserver) {
       asyncUnaryCall(
           getChannel().newCall(getDsmMethod(), getCallOptions()), request, responseObserver);
     }
 
     /**
      */
-    public void reqBlock(proto.Types.commReq request,
-        io.grpc.stub.StreamObserver<proto.Types.commRes> responseObserver) {
+    public void reqBlock(proto.types.comm.CommReq request,
+        io.grpc.stub.StreamObserver<proto.types.comm.CommRes> responseObserver) {
       asyncUnaryCall(
           getChannel().newCall(getReqBlockMethod(), getCallOptions()), request, responseObserver);
     }
@@ -207,14 +207,14 @@ public final class CommunicationGrpc {
 
     /**
      */
-    public proto.Types.Empty dsm(proto.Types.Comm request) {
+    public proto.types.empty.Empty dsm(proto.types.comm.Comm request) {
       return blockingUnaryCall(
           getChannel(), getDsmMethod(), getCallOptions(), request);
     }
 
     /**
      */
-    public proto.Types.commRes reqBlock(proto.Types.commReq request) {
+    public proto.types.comm.CommRes reqBlock(proto.types.comm.CommReq request) {
       return blockingUnaryCall(
           getChannel(), getReqBlockMethod(), getCallOptions(), request);
     }
@@ -240,16 +240,16 @@ public final class CommunicationGrpc {
 
     /**
      */
-    public com.google.common.util.concurrent.ListenableFuture<proto.Types.Empty> dsm(
-        proto.Types.Comm request) {
+    public com.google.common.util.concurrent.ListenableFuture<proto.types.empty.Empty> dsm(
+        proto.types.comm.Comm request) {
       return futureUnaryCall(
           getChannel().newCall(getDsmMethod(), getCallOptions()), request);
     }
 
     /**
      */
-    public com.google.common.util.concurrent.ListenableFuture<proto.Types.commRes> reqBlock(
-        proto.Types.commReq request) {
+    public com.google.common.util.concurrent.ListenableFuture<proto.types.comm.CommRes> reqBlock(
+        proto.types.comm.CommReq request) {
       return futureUnaryCall(
           getChannel().newCall(getReqBlockMethod(), getCallOptions()), request);
     }
@@ -276,12 +276,12 @@ public final class CommunicationGrpc {
     public void invoke(Req request, io.grpc.stub.StreamObserver<Resp> responseObserver) {
       switch (methodId) {
         case METHODID_DSM:
-          serviceImpl.dsm((proto.Types.Comm) request,
-              (io.grpc.stub.StreamObserver<proto.Types.Empty>) responseObserver);
+          serviceImpl.dsm((proto.types.comm.Comm) request,
+              (io.grpc.stub.StreamObserver<proto.types.empty.Empty>) responseObserver);
           break;
         case METHODID_REQ_BLOCK:
-          serviceImpl.reqBlock((proto.Types.commReq) request,
-              (io.grpc.stub.StreamObserver<proto.Types.commRes>) responseObserver);
+          serviceImpl.reqBlock((proto.types.comm.CommReq) request,
+              (io.grpc.stub.StreamObserver<proto.types.comm.CommRes>) responseObserver);
           break;
         default:
           throw new AssertionError();
@@ -305,7 +305,7 @@ public final class CommunicationGrpc {
 
     @java.lang.Override
     public com.google.protobuf.Descriptors.FileDescriptor getFileDescriptor() {
-      return proto.CommService.getDescriptor();
+      return proto.prpcs.commService.commService.getDescriptor();
     }
 
     @java.lang.Override

@@ -5,7 +5,9 @@ import blockchain.validation.Validator;
 import com.google.protobuf.ByteString;
 import crypto.DigestMethod;
 import crypto.BlockDigSig;
-import proto.Types;
+import proto.types.block.*;
+import proto.types.transaction.*;
+import proto.types.meta.*;
 
 import java.nio.file.Path;
 import java.util.Objects;
@@ -20,15 +22,15 @@ public class Utils {
         SGC,
     }
 
-    static public boolean validateBlockHash(Types.Block prev, Types.Block b) {
+    static public boolean validateBlockHash(Block prev, Block b) {
         byte[] d = hashHeader(prev.getHeader());
         return DigestMethod.validate(b.getHeader().getPrev().toByteArray(),
                 Objects.requireNonNull(d));
     }
 
-    static public Types.BlockHeader createBlockHeader(Types.Block b, Types.BlockHeader header,
+    static public BlockHeader createBlockHeader(Block b, BlockHeader header,
                                                          int creatorID, int height, int cidSeries, int cid,
-                                                         int channel, Types.BlockID bid) {
+                                                         int channel, BlockID bid) {
 
         byte[] tHash = hashBlockData(b);
 
@@ -36,8 +38,8 @@ public class Utils {
         if (header != null) {
             headerHash = hashHeader(header);
         }
-        Types.BlockHeader h = Types.BlockHeader.newBuilder()
-                .setM(Types.Meta.newBuilder()
+        BlockHeader h = BlockHeader.newBuilder()
+                .setM(Meta.newBuilder()
                         .setCid(cid)
                         .setCidSeries(cidSeries)
                         .setChannel(channel))
@@ -46,7 +48,7 @@ public class Utils {
                 .setTransactionHash(ByteString.copyFrom(tHash))
                 .setPrev(ByteString.copyFrom(headerHash))
                 .setEmpty(b.getDataCount() == 0)
-                .setHst(Types.headerStatistics.newBuilder().setProposeTime(System.currentTimeMillis()).build())
+                .setHst(HeaderStatistics.newBuilder().setProposeTime(System.currentTimeMillis()).build())
                 .build();
 
         String signature = BlockDigSig.sign(h);
@@ -55,7 +57,7 @@ public class Utils {
         .build();
     }
 
-    static public boolean validateTransactionWRTBlock(Types.Block.Builder b, Types.Transaction tx, Validator v) {
+    static public boolean validateTransactionWRTBlock(Block.Builder b, Transaction tx, Validator v) {
         return v.validateTX(b, tx);
     }
 

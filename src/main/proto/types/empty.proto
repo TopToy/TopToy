@@ -1,7 +1,9 @@
-//syntax = "proto3";
-//option java_package = "proto.types.empty";
-//package proto.types.empty;
-//
-//message Empty {
-//
-//}
+syntax = "proto3";
+option java_package = "proto.types";
+package proto.types;
+option java_outer_classname = "empty";
+
+
+message Empty {
+
+}

@@ -1,18 +1,19 @@
-//syntax = "proto3";
-//option java_package = "proto.types.evidence";
-//package proto.types.evidence;
-//
-//import "types/meta.proto";
-//import "types/block.proto";
-//
-//message EvidenceReq {
-//    Meta _meta = 1;
-//    int32 height = 2;
-//    int32 sender = 3;
-//}
-//
-//message EvidenceRes {
-//    Meta m = 1;
-//    BlockHeader data = 2;
-//    int32 sender = 3;
-//}
+syntax = "proto3";
+option java_package = "proto.types";
+package proto.types;
+option java_outer_classname = "evidence";
+
+import "types/meta.proto";
+import "types/block.proto";
+
+message EvidenceReq {
+    proto.types.Meta _meta = 1;
+    int32 height = 2;
+    int32 sender = 3;
+}
+
+message EvidenceRes {
+    proto.types.Meta m = 1;
+    proto.types.BlockHeader data = 2;
+    int32 sender = 3;
+}
