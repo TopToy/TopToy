@@ -1,4 +1,4 @@
-package utils;
+package utils.cache;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -6,13 +6,13 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import proto.types.transaction.*;
 import proto.types.block.*;
 
-public class CacheUtils {
+public class TxCache {
     static private int maxCacheSize = 1000;
     static private @NonNull Cache<Object, Object> txCache;
 
-    public CacheUtils(int maxSize, int workers) {
+    public TxCache(int maxSize, int workers) {
         if (maxSize > 0) {
-            CacheUtils.maxCacheSize = maxSize;
+            TxCache.maxCacheSize = maxSize;
         }
         txCache = Caffeine
                 .newBuilder()

@@ -117,7 +117,7 @@ public class ClientTester {
 
     private static void test(ClientServiceBlockingStub stub, int server) {
         logger.info("Start client for " + server);
-        stub.write(Transaction.newBuilder() // This meant to remove the effect of connecting to the server
+        stub.txWrite(Transaction.newBuilder() // This meant to remove the effect of connecting to the server
                 .setData(ByteString.copyFrom(new byte[0]))
                 .setClientID(clientID)
                 .build());
@@ -128,13 +128,13 @@ public class ClientTester {
             byte[] tx = new byte[txSize];
             random.nextBytes(tx);
             TxID tid = stub //.withDeadlineAfter(3, TimeUnit.SECONDS)
-                    .write(Transaction.newBuilder()
+                    .txWrite(Transaction.newBuilder()
                     .setData(ByteString.copyFrom(tx))
                     .setClientID(clientID)
                     .build());
-            TxStatus sts = stub.status(ReadReq.newBuilder().setCid(clientID).setTid(tid)
+            TxStatus sts = stub.txStatus(TxReq.newBuilder().setCid(clientID).setTid(tid)
                     .setBlocking(true).build());
-            if (sts.getRes() != 0) {
+            if (!sts.getStatus().equals(TxState.COMMITTED)) {
                 logger.info("An uncommitted transaction");
                 continue;
             }

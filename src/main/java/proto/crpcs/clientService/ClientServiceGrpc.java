@@ -28,99 +28,99 @@ public final class ClientServiceGrpc {
 
   // Static method descriptors that strictly reflect the proto.
   private static volatile io.grpc.MethodDescriptor<proto.types.transaction.Transaction,
-      proto.types.transaction.TxID> getWriteMethod;
+      proto.types.transaction.TxID> getTxWriteMethod;
 
   @io.grpc.stub.annotations.RpcMethod(
-      fullMethodName = SERVICE_NAME + '/' + "write",
+      fullMethodName = SERVICE_NAME + '/' + "txWrite",
       requestType = proto.types.transaction.Transaction.class,
       responseType = proto.types.transaction.TxID.class,
       methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
   public static io.grpc.MethodDescriptor<proto.types.transaction.Transaction,
-      proto.types.transaction.TxID> getWriteMethod() {
-    io.grpc.MethodDescriptor<proto.types.transaction.Transaction, proto.types.transaction.TxID> getWriteMethod;
-    if ((getWriteMethod = ClientServiceGrpc.getWriteMethod) == null) {
+      proto.types.transaction.TxID> getTxWriteMethod() {
+    io.grpc.MethodDescriptor<proto.types.transaction.Transaction, proto.types.transaction.TxID> getTxWriteMethod;
+    if ((getTxWriteMethod = ClientServiceGrpc.getTxWriteMethod) == null) {
       synchronized (ClientServiceGrpc.class) {
-        if ((getWriteMethod = ClientServiceGrpc.getWriteMethod) == null) {
-          ClientServiceGrpc.getWriteMethod = getWriteMethod = 
+        if ((getTxWriteMethod = ClientServiceGrpc.getTxWriteMethod) == null) {
+          ClientServiceGrpc.getTxWriteMethod = getTxWriteMethod = 
               io.grpc.MethodDescriptor.<proto.types.transaction.Transaction, proto.types.transaction.TxID>newBuilder()
               .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
               .setFullMethodName(generateFullMethodName(
-                  "proto.crpcs.clientService.ClientService", "write"))
+                  "proto.crpcs.clientService.ClientService", "txWrite"))
               .setSampledToLocalTracing(true)
               .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
                   proto.types.transaction.Transaction.getDefaultInstance()))
               .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
                   proto.types.transaction.TxID.getDefaultInstance()))
-                  .setSchemaDescriptor(new ClientServiceMethodDescriptorSupplier("write"))
+                  .setSchemaDescriptor(new ClientServiceMethodDescriptorSupplier("txWrite"))
                   .build();
           }
         }
      }
-     return getWriteMethod;
+     return getTxWriteMethod;
   }
 
-  private static volatile io.grpc.MethodDescriptor<proto.types.client.ReadReq,
-      proto.types.transaction.Transaction> getReadMethod;
+  private static volatile io.grpc.MethodDescriptor<proto.types.client.TxReq,
+      proto.types.transaction.Transaction> getTxReadMethod;
 
   @io.grpc.stub.annotations.RpcMethod(
-      fullMethodName = SERVICE_NAME + '/' + "read",
-      requestType = proto.types.client.ReadReq.class,
+      fullMethodName = SERVICE_NAME + '/' + "txRead",
+      requestType = proto.types.client.TxReq.class,
       responseType = proto.types.transaction.Transaction.class,
       methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
-  public static io.grpc.MethodDescriptor<proto.types.client.ReadReq,
-      proto.types.transaction.Transaction> getReadMethod() {
-    io.grpc.MethodDescriptor<proto.types.client.ReadReq, proto.types.transaction.Transaction> getReadMethod;
-    if ((getReadMethod = ClientServiceGrpc.getReadMethod) == null) {
+  public static io.grpc.MethodDescriptor<proto.types.client.TxReq,
+      proto.types.transaction.Transaction> getTxReadMethod() {
+    io.grpc.MethodDescriptor<proto.types.client.TxReq, proto.types.transaction.Transaction> getTxReadMethod;
+    if ((getTxReadMethod = ClientServiceGrpc.getTxReadMethod) == null) {
       synchronized (ClientServiceGrpc.class) {
-        if ((getReadMethod = ClientServiceGrpc.getReadMethod) == null) {
-          ClientServiceGrpc.getReadMethod = getReadMethod = 
-              io.grpc.MethodDescriptor.<proto.types.client.ReadReq, proto.types.transaction.Transaction>newBuilder()
+        if ((getTxReadMethod = ClientServiceGrpc.getTxReadMethod) == null) {
+          ClientServiceGrpc.getTxReadMethod = getTxReadMethod = 
+              io.grpc.MethodDescriptor.<proto.types.client.TxReq, proto.types.transaction.Transaction>newBuilder()
               .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
               .setFullMethodName(generateFullMethodName(
-                  "proto.crpcs.clientService.ClientService", "read"))
+                  "proto.crpcs.clientService.ClientService", "txRead"))
               .setSampledToLocalTracing(true)
               .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
-                  proto.types.client.ReadReq.getDefaultInstance()))
+                  proto.types.client.TxReq.getDefaultInstance()))
               .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
                   proto.types.transaction.Transaction.getDefaultInstance()))
-                  .setSchemaDescriptor(new ClientServiceMethodDescriptorSupplier("read"))
+                  .setSchemaDescriptor(new ClientServiceMethodDescriptorSupplier("txRead"))
                   .build();
           }
         }
      }
-     return getReadMethod;
+     return getTxReadMethod;
   }
 
-  private static volatile io.grpc.MethodDescriptor<proto.types.client.ReadReq,
-      proto.types.client.TxStatus> getStatusMethod;
+  private static volatile io.grpc.MethodDescriptor<proto.types.client.TxReq,
+      proto.types.client.TxStatus> getTxStatusMethod;
 
   @io.grpc.stub.annotations.RpcMethod(
-      fullMethodName = SERVICE_NAME + '/' + "status",
-      requestType = proto.types.client.ReadReq.class,
+      fullMethodName = SERVICE_NAME + '/' + "txStatus",
+      requestType = proto.types.client.TxReq.class,
       responseType = proto.types.client.TxStatus.class,
       methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
-  public static io.grpc.MethodDescriptor<proto.types.client.ReadReq,
-      proto.types.client.TxStatus> getStatusMethod() {
-    io.grpc.MethodDescriptor<proto.types.client.ReadReq, proto.types.client.TxStatus> getStatusMethod;
-    if ((getStatusMethod = ClientServiceGrpc.getStatusMethod) == null) {
+  public static io.grpc.MethodDescriptor<proto.types.client.TxReq,
+      proto.types.client.TxStatus> getTxStatusMethod() {
+    io.grpc.MethodDescriptor<proto.types.client.TxReq, proto.types.client.TxStatus> getTxStatusMethod;
+    if ((getTxStatusMethod = ClientServiceGrpc.getTxStatusMethod) == null) {
       synchronized (ClientServiceGrpc.class) {
-        if ((getStatusMethod = ClientServiceGrpc.getStatusMethod) == null) {
-          ClientServiceGrpc.getStatusMethod = getStatusMethod = 
-              io.grpc.MethodDescriptor.<proto.types.client.ReadReq, proto.types.client.TxStatus>newBuilder()
+        if ((getTxStatusMethod = ClientServiceGrpc.getTxStatusMethod) == null) {
+          ClientServiceGrpc.getTxStatusMethod = getTxStatusMethod = 
+              io.grpc.MethodDescriptor.<proto.types.client.TxReq, proto.types.client.TxStatus>newBuilder()
               .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
               .setFullMethodName(generateFullMethodName(
-                  "proto.crpcs.clientService.ClientService", "status"))
+                  "proto.crpcs.clientService.ClientService", "txStatus"))
               .setSampledToLocalTracing(true)
               .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
-                  proto.types.client.ReadReq.getDefaultInstance()))
+                  proto.types.client.TxReq.getDefaultInstance()))
               .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
                   proto.types.client.TxStatus.getDefaultInstance()))
-                  .setSchemaDescriptor(new ClientServiceMethodDescriptorSupplier("status"))
+                  .setSchemaDescriptor(new ClientServiceMethodDescriptorSupplier("txStatus"))
                   .build();
           }
         }
      }
-     return getStatusMethod;
+     return getTxStatusMethod;
   }
 
   /**
@@ -152,48 +152,48 @@ public final class ClientServiceGrpc {
 
     /**
      */
-    public void write(proto.types.transaction.Transaction request,
+    public void txWrite(proto.types.transaction.Transaction request,
         io.grpc.stub.StreamObserver<proto.types.transaction.TxID> responseObserver) {
-      asyncUnimplementedUnaryCall(getWriteMethod(), responseObserver);
+      asyncUnimplementedUnaryCall(getTxWriteMethod(), responseObserver);
     }
 
     /**
      */
-    public void read(proto.types.client.ReadReq request,
+    public void txRead(proto.types.client.TxReq request,
         io.grpc.stub.StreamObserver<proto.types.transaction.Transaction> responseObserver) {
-      asyncUnimplementedUnaryCall(getReadMethod(), responseObserver);
+      asyncUnimplementedUnaryCall(getTxReadMethod(), responseObserver);
     }
 
     /**
      */
-    public void status(proto.types.client.ReadReq request,
+    public void txStatus(proto.types.client.TxReq request,
         io.grpc.stub.StreamObserver<proto.types.client.TxStatus> responseObserver) {
-      asyncUnimplementedUnaryCall(getStatusMethod(), responseObserver);
+      asyncUnimplementedUnaryCall(getTxStatusMethod(), responseObserver);
     }
 
     @java.lang.Override public final io.grpc.ServerServiceDefinition bindService() {
       return io.grpc.ServerServiceDefinition.builder(getServiceDescriptor())
           .addMethod(
-            getWriteMethod(),
+            getTxWriteMethod(),
             asyncUnaryCall(
               new MethodHandlers<
                 proto.types.transaction.Transaction,
                 proto.types.transaction.TxID>(
-                  this, METHODID_WRITE)))
+                  this, METHODID_TX_WRITE)))
           .addMethod(
-            getReadMethod(),
+            getTxReadMethod(),
             asyncUnaryCall(
               new MethodHandlers<
-                proto.types.client.ReadReq,
+                proto.types.client.TxReq,
                 proto.types.transaction.Transaction>(
-                  this, METHODID_READ)))
+                  this, METHODID_TX_READ)))
           .addMethod(
-            getStatusMethod(),
+            getTxStatusMethod(),
             asyncUnaryCall(
               new MethodHandlers<
-                proto.types.client.ReadReq,
+                proto.types.client.TxReq,
                 proto.types.client.TxStatus>(
-                  this, METHODID_STATUS)))
+                  this, METHODID_TX_STATUS)))
           .build();
     }
   }
@@ -218,26 +218,26 @@ public final class ClientServiceGrpc {
 
     /**
      */
-    public void write(proto.types.transaction.Transaction request,
+    public void txWrite(proto.types.transaction.Transaction request,
         io.grpc.stub.StreamObserver<proto.types.transaction.TxID> responseObserver) {
       asyncUnaryCall(
-          getChannel().newCall(getWriteMethod(), getCallOptions()), request, responseObserver);
+          getChannel().newCall(getTxWriteMethod(), getCallOptions()), request, responseObserver);
     }
 
     /**
      */
-    public void read(proto.types.client.ReadReq request,
+    public void txRead(proto.types.client.TxReq request,
         io.grpc.stub.StreamObserver<proto.types.transaction.Transaction> responseObserver) {
       asyncUnaryCall(
-          getChannel().newCall(getReadMethod(), getCallOptions()), request, responseObserver);
+          getChannel().newCall(getTxReadMethod(), getCallOptions()), request, responseObserver);
     }
 
     /**
      */
-    public void status(proto.types.client.ReadReq request,
+    public void txStatus(proto.types.client.TxReq request,
         io.grpc.stub.StreamObserver<proto.types.client.TxStatus> responseObserver) {
       asyncUnaryCall(
-          getChannel().newCall(getStatusMethod(), getCallOptions()), request, responseObserver);
+          getChannel().newCall(getTxStatusMethod(), getCallOptions()), request, responseObserver);
     }
   }
 
@@ -261,23 +261,23 @@ public final class ClientServiceGrpc {
 
     /**
      */
-    public proto.types.transaction.TxID write(proto.types.transaction.Transaction request) {
+    public proto.types.transaction.TxID txWrite(proto.types.transaction.Transaction request) {
       return blockingUnaryCall(
-          getChannel(), getWriteMethod(), getCallOptions(), request);
+          getChannel(), getTxWriteMethod(), getCallOptions(), request);
     }
 
     /**
      */
-    public proto.types.transaction.Transaction read(proto.types.client.ReadReq request) {
+    public proto.types.transaction.Transaction txRead(proto.types.client.TxReq request) {
       return blockingUnaryCall(
-          getChannel(), getReadMethod(), getCallOptions(), request);
+          getChannel(), getTxReadMethod(), getCallOptions(), request);
     }
 
     /**
      */
-    public proto.types.client.TxStatus status(proto.types.client.ReadReq request) {
+    public proto.types.client.TxStatus txStatus(proto.types.client.TxReq request) {
       return blockingUnaryCall(
-          getChannel(), getStatusMethod(), getCallOptions(), request);
+          getChannel(), getTxStatusMethod(), getCallOptions(), request);
     }
   }
 
@@ -301,32 +301,32 @@ public final class ClientServiceGrpc {
 
     /**
      */
-    public com.google.common.util.concurrent.ListenableFuture<proto.types.transaction.TxID> write(
+    public com.google.common.util.concurrent.ListenableFuture<proto.types.transaction.TxID> txWrite(
         proto.types.transaction.Transaction request) {
       return futureUnaryCall(
-          getChannel().newCall(getWriteMethod(), getCallOptions()), request);
+          getChannel().newCall(getTxWriteMethod(), getCallOptions()), request);
     }
 
     /**
      */
-    public com.google.common.util.concurrent.ListenableFuture<proto.types.transaction.Transaction> read(
-        proto.types.client.ReadReq request) {
+    public com.google.common.util.concurrent.ListenableFuture<proto.types.transaction.Transaction> txRead(
+        proto.types.client.TxReq request) {
       return futureUnaryCall(
-          getChannel().newCall(getReadMethod(), getCallOptions()), request);
+          getChannel().newCall(getTxReadMethod(), getCallOptions()), request);
     }
 
     /**
      */
-    public com.google.common.util.concurrent.ListenableFuture<proto.types.client.TxStatus> status(
-        proto.types.client.ReadReq request) {
+    public com.google.common.util.concurrent.ListenableFuture<proto.types.client.TxStatus> txStatus(
+        proto.types.client.TxReq request) {
       return futureUnaryCall(
-          getChannel().newCall(getStatusMethod(), getCallOptions()), request);
+          getChannel().newCall(getTxStatusMethod(), getCallOptions()), request);
     }
   }
 
-  private static final int METHODID_WRITE = 0;
-  private static final int METHODID_READ = 1;
-  private static final int METHODID_STATUS = 2;
+  private static final int METHODID_TX_WRITE = 0;
+  private static final int METHODID_TX_READ = 1;
+  private static final int METHODID_TX_STATUS = 2;
 
   private static final class MethodHandlers<Req, Resp> implements
       io.grpc.stub.ServerCalls.UnaryMethod<Req, Resp>,
@@ -345,16 +345,16 @@ public final class ClientServiceGrpc {
     @java.lang.SuppressWarnings("unchecked")
     public void invoke(Req request, io.grpc.stub.StreamObserver<Resp> responseObserver) {
       switch (methodId) {
-        case METHODID_WRITE:
-          serviceImpl.write((proto.types.transaction.Transaction) request,
+        case METHODID_TX_WRITE:
+          serviceImpl.txWrite((proto.types.transaction.Transaction) request,
               (io.grpc.stub.StreamObserver<proto.types.transaction.TxID>) responseObserver);
           break;
-        case METHODID_READ:
-          serviceImpl.read((proto.types.client.ReadReq) request,
+        case METHODID_TX_READ:
+          serviceImpl.txRead((proto.types.client.TxReq) request,
               (io.grpc.stub.StreamObserver<proto.types.transaction.Transaction>) responseObserver);
           break;
-        case METHODID_STATUS:
-          serviceImpl.status((proto.types.client.ReadReq) request,
+        case METHODID_TX_STATUS:
+          serviceImpl.txStatus((proto.types.client.TxReq) request,
               (io.grpc.stub.StreamObserver<proto.types.client.TxStatus>) responseObserver);
           break;
         default:
@@ -418,9 +418,9 @@ public final class ClientServiceGrpc {
         if (result == null) {
           serviceDescriptor = result = io.grpc.ServiceDescriptor.newBuilder(SERVICE_NAME)
               .setSchemaDescriptor(new ClientServiceFileDescriptorSupplier())
-              .addMethod(getWriteMethod())
-              .addMethod(getReadMethod())
-              .addMethod(getStatusMethod())
+              .addMethod(getTxWriteMethod())
+              .addMethod(getTxReadMethod())
+              .addMethod(getTxStatusMethod())
               .build();
         }
       }

@@ -17,16 +17,17 @@ public class ClientRpcsService extends ClientServiceImplBase {
     }
 
     @Override
-    public void write(Transaction request,
+    public void txWrite(Transaction request,
                       StreamObserver<TxID> responseObserver) {
-        logger.debug(format("received write request from [%d]", request.getClientID()));
+        logger.debug(format("received txWrite request from [%d]", request.getClientID()));
         TxID tid = topServer.addTransaction(request);
+        if (tid == null) tid = TxID.getDefaultInstance();
         responseObserver.onNext(tid);
         responseObserver.onCompleted();
     }
 
     @Override
-    public void read(ReadReq request,
+    public void txRead(TxReq request,
                      StreamObserver<Transaction> responseObserver) {
         logger.debug(format("received read request from [%d]", request.getCid()));
         Transaction tx = null;
@@ -41,16 +42,16 @@ public class ClientRpcsService extends ClientServiceImplBase {
     }
 
     @Override
-    public void status(ReadReq request,
+    public void txStatus(TxReq request,
                       StreamObserver<TxStatus> responseObserver) {
         logger.debug(format("received status request from [%d]", request.getCid()));
-        int sts = -1;
+        TxState sts = TxState.UNRECOGNIZED;
         try {
              sts = topServer.status(request.getTid(), request.getBlocking());
         } catch (InterruptedException e) {
             logger.error(e);
         }
-        responseObserver.onNext(TxStatus.newBuilder().setRes(sts).build());
+        responseObserver.onNext(TxStatus.newBuilder().setStatus(sts).build());
         responseObserver.onCompleted();
     }
 }
