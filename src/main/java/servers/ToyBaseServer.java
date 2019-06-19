@@ -107,8 +107,7 @@ public abstract class ToyBaseServer {
         }
     }
 
-    ToyBaseServer(int id, int worker, int n, int f, int maxTx, boolean fastMode,
-                  CommLayer comm) {
+    ToyBaseServer(int id, int worker, int n, int f, int maxTx, CommLayer comm) {
         this.id = id;
         this.f = f;
         this.n = n;

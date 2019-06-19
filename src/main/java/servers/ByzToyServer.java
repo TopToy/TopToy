@@ -22,9 +22,8 @@ class ByzToyServer extends ToyBaseServer {
     private final Queue<Block> byzProposed = new LinkedList<>();
 
 
-    ByzToyServer(int id, int worker, int n, int f, int maxTx, boolean fastMode,
-                 CommLayer comm) {
-        super(id, worker, n, f, maxTx, fastMode, comm);
+    ByzToyServer(int id, int worker, int n, int f, int maxTx, CommLayer comm) {
+        super(id, worker, n, f, maxTx, comm);
         groups.add(new ArrayList<>());
         for (int i = 0 ; i < n ; i++) {
             groups.get(0).add(i); // At the beginning there is no byzantine behaviour

@@ -12,9 +12,8 @@ public class AsyncToyServer extends ToyBaseServer {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(AsyncToyServer.class);
 
     private int maxTime = 0;
-    AsyncToyServer(int id, int worker, int n, int f, int maxTx, boolean fastMode,
-                   CommLayer comm) {
-        super(id, worker, n, f, maxTx, fastMode, comm);
+    AsyncToyServer(int id, int worker, int n, int f, int maxTx, CommLayer comm) {
+        super(id, worker, n, f, maxTx, comm);
     }
 
 

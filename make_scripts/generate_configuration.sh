@@ -14,11 +14,9 @@ generate_config_toml() {
 
 [setting]
     tmo = 1000
-    tmoInterval = 100
     ABConfigPath = \"src/main/resources/ABConfig\"
     maxTransactionInBlock = 1000
     caRootPath = \"\"
-    fastMode = true
 
 [server]
     privateKey = \"\"\"MIGNAgEAMBAGByqGSM49AgEGBSuBBAAKBHYwdAIBAQQg/ngTdAL+eZOyh4lilm6djqsl
