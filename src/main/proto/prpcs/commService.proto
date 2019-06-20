@@ -5,7 +5,7 @@ option java_outer_classname = "commService";
 
 
 import "types/comm.proto";
-import "types/empty.proto";
+import "types/utils.proto";
 
 service Communication {
     rpc dsm(proto.types.Comm) returns (proto.types.Empty) {};

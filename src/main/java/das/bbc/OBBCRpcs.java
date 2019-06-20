@@ -24,7 +24,7 @@ import static io.grpc.Metadata.ASCII_STRING_MARSHALLER;
 import static java.lang.String.format;
 import static proto.prpcs.obbcService.ObbcGrpc.newStub;
 import proto.types.bbc.*;
-import proto.types.empty.*;
+import proto.types.utils.Empty;
 import proto.types.block.*;
 import proto.types.meta.*;
 import proto.types.evidence.*;

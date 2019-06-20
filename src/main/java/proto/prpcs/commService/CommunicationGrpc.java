@@ -28,21 +28,21 @@ public final class CommunicationGrpc {
 
   // Static method descriptors that strictly reflect the proto.
   private static volatile io.grpc.MethodDescriptor<proto.types.comm.Comm,
-      proto.types.empty.Empty> getDsmMethod;
+      proto.types.utils.Empty> getDsmMethod;
 
   @io.grpc.stub.annotations.RpcMethod(
       fullMethodName = SERVICE_NAME + '/' + "dsm",
       requestType = proto.types.comm.Comm.class,
-      responseType = proto.types.empty.Empty.class,
+      responseType = proto.types.utils.Empty.class,
       methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
   public static io.grpc.MethodDescriptor<proto.types.comm.Comm,
-      proto.types.empty.Empty> getDsmMethod() {
-    io.grpc.MethodDescriptor<proto.types.comm.Comm, proto.types.empty.Empty> getDsmMethod;
+      proto.types.utils.Empty> getDsmMethod() {
+    io.grpc.MethodDescriptor<proto.types.comm.Comm, proto.types.utils.Empty> getDsmMethod;
     if ((getDsmMethod = CommunicationGrpc.getDsmMethod) == null) {
       synchronized (CommunicationGrpc.class) {
         if ((getDsmMethod = CommunicationGrpc.getDsmMethod) == null) {
           CommunicationGrpc.getDsmMethod = getDsmMethod = 
-              io.grpc.MethodDescriptor.<proto.types.comm.Comm, proto.types.empty.Empty>newBuilder()
+              io.grpc.MethodDescriptor.<proto.types.comm.Comm, proto.types.utils.Empty>newBuilder()
               .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
               .setFullMethodName(generateFullMethodName(
                   "proto.prpcs.commService.Communication", "dsm"))
@@ -50,7 +50,7 @@ public final class CommunicationGrpc {
               .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
                   proto.types.comm.Comm.getDefaultInstance()))
               .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
-                  proto.types.empty.Empty.getDefaultInstance()))
+                  proto.types.utils.Empty.getDefaultInstance()))
                   .setSchemaDescriptor(new CommunicationMethodDescriptorSupplier("dsm"))
                   .build();
           }
@@ -121,7 +121,7 @@ public final class CommunicationGrpc {
     /**
      */
     public void dsm(proto.types.comm.Comm request,
-        io.grpc.stub.StreamObserver<proto.types.empty.Empty> responseObserver) {
+        io.grpc.stub.StreamObserver<proto.types.utils.Empty> responseObserver) {
       asyncUnimplementedUnaryCall(getDsmMethod(), responseObserver);
     }
 
@@ -139,7 +139,7 @@ public final class CommunicationGrpc {
             asyncUnaryCall(
               new MethodHandlers<
                 proto.types.comm.Comm,
-                proto.types.empty.Empty>(
+                proto.types.utils.Empty>(
                   this, METHODID_DSM)))
           .addMethod(
             getReqBlockMethod(),
@@ -173,7 +173,7 @@ public final class CommunicationGrpc {
     /**
      */
     public void dsm(proto.types.comm.Comm request,
-        io.grpc.stub.StreamObserver<proto.types.empty.Empty> responseObserver) {
+        io.grpc.stub.StreamObserver<proto.types.utils.Empty> responseObserver) {
       asyncUnaryCall(
           getChannel().newCall(getDsmMethod(), getCallOptions()), request, responseObserver);
     }
@@ -207,7 +207,7 @@ public final class CommunicationGrpc {
 
     /**
      */
-    public proto.types.empty.Empty dsm(proto.types.comm.Comm request) {
+    public proto.types.utils.Empty dsm(proto.types.comm.Comm request) {
       return blockingUnaryCall(
           getChannel(), getDsmMethod(), getCallOptions(), request);
     }
@@ -240,7 +240,7 @@ public final class CommunicationGrpc {
 
     /**
      */
-    public com.google.common.util.concurrent.ListenableFuture<proto.types.empty.Empty> dsm(
+    public com.google.common.util.concurrent.ListenableFuture<proto.types.utils.Empty> dsm(
         proto.types.comm.Comm request) {
       return futureUnaryCall(
           getChannel().newCall(getDsmMethod(), getCallOptions()), request);
@@ -277,7 +277,7 @@ public final class CommunicationGrpc {
       switch (methodId) {
         case METHODID_DSM:
           serviceImpl.dsm((proto.types.comm.Comm) request,
-              (io.grpc.stub.StreamObserver<proto.types.empty.Empty>) responseObserver);
+              (io.grpc.stub.StreamObserver<proto.types.utils.Empty>) responseObserver);
           break;
         case METHODID_REQ_BLOCK:
           serviceImpl.reqBlock((proto.types.comm.CommReq) request,

@@ -1,8 +1,12 @@
 syntax = "proto3";
 option java_package = "proto.types";
-package proto.types;
-option java_outer_classname = "empty";
+option java_outer_classname = "utils";
 
+package proto.types;
+
+message Integer {
+    int32 num = 1;
+}
 
 message Empty {
 

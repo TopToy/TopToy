@@ -28,21 +28,21 @@ public final class ObbcGrpc {
 
   // Static method descriptors that strictly reflect the proto.
   private static volatile io.grpc.MethodDescriptor<proto.types.bbc.BbcMsg,
-      proto.types.empty.Empty> getFastVoteMethod;
+      proto.types.utils.Empty> getFastVoteMethod;
 
   @io.grpc.stub.annotations.RpcMethod(
       fullMethodName = SERVICE_NAME + '/' + "FastVote",
       requestType = proto.types.bbc.BbcMsg.class,
-      responseType = proto.types.empty.Empty.class,
+      responseType = proto.types.utils.Empty.class,
       methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
   public static io.grpc.MethodDescriptor<proto.types.bbc.BbcMsg,
-      proto.types.empty.Empty> getFastVoteMethod() {
-    io.grpc.MethodDescriptor<proto.types.bbc.BbcMsg, proto.types.empty.Empty> getFastVoteMethod;
+      proto.types.utils.Empty> getFastVoteMethod() {
+    io.grpc.MethodDescriptor<proto.types.bbc.BbcMsg, proto.types.utils.Empty> getFastVoteMethod;
     if ((getFastVoteMethod = ObbcGrpc.getFastVoteMethod) == null) {
       synchronized (ObbcGrpc.class) {
         if ((getFastVoteMethod = ObbcGrpc.getFastVoteMethod) == null) {
           ObbcGrpc.getFastVoteMethod = getFastVoteMethod = 
-              io.grpc.MethodDescriptor.<proto.types.bbc.BbcMsg, proto.types.empty.Empty>newBuilder()
+              io.grpc.MethodDescriptor.<proto.types.bbc.BbcMsg, proto.types.utils.Empty>newBuilder()
               .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
               .setFullMethodName(generateFullMethodName(
                   "proto.prpcs.obbcService.Obbc", "FastVote"))
@@ -50,7 +50,7 @@ public final class ObbcGrpc {
               .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
                   proto.types.bbc.BbcMsg.getDefaultInstance()))
               .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
-                  proto.types.empty.Empty.getDefaultInstance()))
+                  proto.types.utils.Empty.getDefaultInstance()))
                   .setSchemaDescriptor(new ObbcMethodDescriptorSupplier("FastVote"))
                   .build();
           }
@@ -121,7 +121,7 @@ public final class ObbcGrpc {
     /**
      */
     public void fastVote(proto.types.bbc.BbcMsg request,
-        io.grpc.stub.StreamObserver<proto.types.empty.Empty> responseObserver) {
+        io.grpc.stub.StreamObserver<proto.types.utils.Empty> responseObserver) {
       asyncUnimplementedUnaryCall(getFastVoteMethod(), responseObserver);
     }
 
@@ -139,7 +139,7 @@ public final class ObbcGrpc {
             asyncUnaryCall(
               new MethodHandlers<
                 proto.types.bbc.BbcMsg,
-                proto.types.empty.Empty>(
+                proto.types.utils.Empty>(
                   this, METHODID_FAST_VOTE)))
           .addMethod(
             getEvidenceReqMessageMethod(),
@@ -173,7 +173,7 @@ public final class ObbcGrpc {
     /**
      */
     public void fastVote(proto.types.bbc.BbcMsg request,
-        io.grpc.stub.StreamObserver<proto.types.empty.Empty> responseObserver) {
+        io.grpc.stub.StreamObserver<proto.types.utils.Empty> responseObserver) {
       asyncUnaryCall(
           getChannel().newCall(getFastVoteMethod(), getCallOptions()), request, responseObserver);
     }
@@ -207,7 +207,7 @@ public final class ObbcGrpc {
 
     /**
      */
-    public proto.types.empty.Empty fastVote(proto.types.bbc.BbcMsg request) {
+    public proto.types.utils.Empty fastVote(proto.types.bbc.BbcMsg request) {
       return blockingUnaryCall(
           getChannel(), getFastVoteMethod(), getCallOptions(), request);
     }
@@ -240,7 +240,7 @@ public final class ObbcGrpc {
 
     /**
      */
-    public com.google.common.util.concurrent.ListenableFuture<proto.types.empty.Empty> fastVote(
+    public com.google.common.util.concurrent.ListenableFuture<proto.types.utils.Empty> fastVote(
         proto.types.bbc.BbcMsg request) {
       return futureUnaryCall(
           getChannel().newCall(getFastVoteMethod(), getCallOptions()), request);
@@ -277,7 +277,7 @@ public final class ObbcGrpc {
       switch (methodId) {
         case METHODID_FAST_VOTE:
           serviceImpl.fastVote((proto.types.bbc.BbcMsg) request,
-              (io.grpc.stub.StreamObserver<proto.types.empty.Empty>) responseObserver);
+              (io.grpc.stub.StreamObserver<proto.types.utils.Empty>) responseObserver);
           break;
         case METHODID_EVIDENCE_REQ_MESSAGE:
           serviceImpl.evidenceReqMessage((proto.types.evidence.EvidenceReq) request,

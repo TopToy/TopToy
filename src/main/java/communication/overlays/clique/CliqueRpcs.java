@@ -19,7 +19,7 @@ import static java.lang.String.format;
 import static proto.prpcs.commService.CommunicationGrpc.newStub;
 import proto.types.block.*;
 import proto.types.comm.*;
-import proto.types.empty.*;
+import proto.types.utils.Empty;
 
 public class CliqueRpcs  extends CommunicationImplBase {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(CliqueRpcs.class);

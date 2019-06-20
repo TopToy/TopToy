@@ -5,7 +5,7 @@ option java_outer_classname = "wrbService";
 
 
 import "types/block.proto";
-import "types/empty.proto";
+import "types/utils.proto";
 import "types/wrb.proto";
 
 service Wrb {

@@ -24,7 +24,7 @@ import static io.grpc.Metadata.ASCII_STRING_MARSHALLER;
 import static java.lang.String.format;
 import static proto.prpcs.wrbService.WrbGrpc.newStub;
 import proto.types.block.*;
-import proto.types.empty.*;
+import proto.types.utils.Empty;
 import proto.types.wrb.*;
 import proto.types.meta.*;
 
