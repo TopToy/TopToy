@@ -123,6 +123,198 @@ public final class ClientServiceGrpc {
      return getTxStatusMethod;
   }
 
+  private static volatile io.grpc.MethodDescriptor<proto.types.client.BlockReq,
+      proto.types.block.Block> getBlockReadMethod;
+
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "blockRead",
+      requestType = proto.types.client.BlockReq.class,
+      responseType = proto.types.block.Block.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
+  public static io.grpc.MethodDescriptor<proto.types.client.BlockReq,
+      proto.types.block.Block> getBlockReadMethod() {
+    io.grpc.MethodDescriptor<proto.types.client.BlockReq, proto.types.block.Block> getBlockReadMethod;
+    if ((getBlockReadMethod = ClientServiceGrpc.getBlockReadMethod) == null) {
+      synchronized (ClientServiceGrpc.class) {
+        if ((getBlockReadMethod = ClientServiceGrpc.getBlockReadMethod) == null) {
+          ClientServiceGrpc.getBlockReadMethod = getBlockReadMethod = 
+              io.grpc.MethodDescriptor.<proto.types.client.BlockReq, proto.types.block.Block>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+              .setFullMethodName(generateFullMethodName(
+                  "proto.crpcs.clientService.ClientService", "blockRead"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  proto.types.client.BlockReq.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  proto.types.block.Block.getDefaultInstance()))
+                  .setSchemaDescriptor(new ClientServiceMethodDescriptorSupplier("blockRead"))
+                  .build();
+          }
+        }
+     }
+     return getBlockReadMethod;
+  }
+
+  private static volatile io.grpc.MethodDescriptor<proto.types.utils.Empty,
+      proto.types.utils.Empty> getIsAliveMethod;
+
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "isAlive",
+      requestType = proto.types.utils.Empty.class,
+      responseType = proto.types.utils.Empty.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
+  public static io.grpc.MethodDescriptor<proto.types.utils.Empty,
+      proto.types.utils.Empty> getIsAliveMethod() {
+    io.grpc.MethodDescriptor<proto.types.utils.Empty, proto.types.utils.Empty> getIsAliveMethod;
+    if ((getIsAliveMethod = ClientServiceGrpc.getIsAliveMethod) == null) {
+      synchronized (ClientServiceGrpc.class) {
+        if ((getIsAliveMethod = ClientServiceGrpc.getIsAliveMethod) == null) {
+          ClientServiceGrpc.getIsAliveMethod = getIsAliveMethod = 
+              io.grpc.MethodDescriptor.<proto.types.utils.Empty, proto.types.utils.Empty>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+              .setFullMethodName(generateFullMethodName(
+                  "proto.crpcs.clientService.ClientService", "isAlive"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  proto.types.utils.Empty.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  proto.types.utils.Empty.getDefaultInstance()))
+                  .setSchemaDescriptor(new ClientServiceMethodDescriptorSupplier("isAlive"))
+                  .build();
+          }
+        }
+     }
+     return getIsAliveMethod;
+  }
+
+  private static volatile io.grpc.MethodDescriptor<proto.types.utils.Empty,
+      proto.types.utils.Integer> getPoolSizeMethod;
+
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "poolSize",
+      requestType = proto.types.utils.Empty.class,
+      responseType = proto.types.utils.Integer.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
+  public static io.grpc.MethodDescriptor<proto.types.utils.Empty,
+      proto.types.utils.Integer> getPoolSizeMethod() {
+    io.grpc.MethodDescriptor<proto.types.utils.Empty, proto.types.utils.Integer> getPoolSizeMethod;
+    if ((getPoolSizeMethod = ClientServiceGrpc.getPoolSizeMethod) == null) {
+      synchronized (ClientServiceGrpc.class) {
+        if ((getPoolSizeMethod = ClientServiceGrpc.getPoolSizeMethod) == null) {
+          ClientServiceGrpc.getPoolSizeMethod = getPoolSizeMethod = 
+              io.grpc.MethodDescriptor.<proto.types.utils.Empty, proto.types.utils.Integer>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+              .setFullMethodName(generateFullMethodName(
+                  "proto.crpcs.clientService.ClientService", "poolSize"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  proto.types.utils.Empty.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  proto.types.utils.Integer.getDefaultInstance()))
+                  .setSchemaDescriptor(new ClientServiceMethodDescriptorSupplier("poolSize"))
+                  .build();
+          }
+        }
+     }
+     return getPoolSizeMethod;
+  }
+
+  private static volatile io.grpc.MethodDescriptor<proto.types.utils.Empty,
+      proto.types.utils.Integer> getPendingSizeMethod;
+
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "pendingSize",
+      requestType = proto.types.utils.Empty.class,
+      responseType = proto.types.utils.Integer.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
+  public static io.grpc.MethodDescriptor<proto.types.utils.Empty,
+      proto.types.utils.Integer> getPendingSizeMethod() {
+    io.grpc.MethodDescriptor<proto.types.utils.Empty, proto.types.utils.Integer> getPendingSizeMethod;
+    if ((getPendingSizeMethod = ClientServiceGrpc.getPendingSizeMethod) == null) {
+      synchronized (ClientServiceGrpc.class) {
+        if ((getPendingSizeMethod = ClientServiceGrpc.getPendingSizeMethod) == null) {
+          ClientServiceGrpc.getPendingSizeMethod = getPendingSizeMethod = 
+              io.grpc.MethodDescriptor.<proto.types.utils.Empty, proto.types.utils.Integer>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+              .setFullMethodName(generateFullMethodName(
+                  "proto.crpcs.clientService.ClientService", "pendingSize"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  proto.types.utils.Empty.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  proto.types.utils.Integer.getDefaultInstance()))
+                  .setSchemaDescriptor(new ClientServiceMethodDescriptorSupplier("pendingSize"))
+                  .build();
+          }
+        }
+     }
+     return getPendingSizeMethod;
+  }
+
+  private static volatile io.grpc.MethodDescriptor<proto.types.utils.Empty,
+      proto.types.client.Validators> getGetValidatorsMethod;
+
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "getValidators",
+      requestType = proto.types.utils.Empty.class,
+      responseType = proto.types.client.Validators.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
+  public static io.grpc.MethodDescriptor<proto.types.utils.Empty,
+      proto.types.client.Validators> getGetValidatorsMethod() {
+    io.grpc.MethodDescriptor<proto.types.utils.Empty, proto.types.client.Validators> getGetValidatorsMethod;
+    if ((getGetValidatorsMethod = ClientServiceGrpc.getGetValidatorsMethod) == null) {
+      synchronized (ClientServiceGrpc.class) {
+        if ((getGetValidatorsMethod = ClientServiceGrpc.getGetValidatorsMethod) == null) {
+          ClientServiceGrpc.getGetValidatorsMethod = getGetValidatorsMethod = 
+              io.grpc.MethodDescriptor.<proto.types.utils.Empty, proto.types.client.Validators>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+              .setFullMethodName(generateFullMethodName(
+                  "proto.crpcs.clientService.ClientService", "getValidators"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  proto.types.utils.Empty.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  proto.types.client.Validators.getDefaultInstance()))
+                  .setSchemaDescriptor(new ClientServiceMethodDescriptorSupplier("getValidators"))
+                  .build();
+          }
+        }
+     }
+     return getGetValidatorsMethod;
+  }
+
+  private static volatile io.grpc.MethodDescriptor<proto.types.utils.Empty,
+      proto.types.client.ConfigInfo> getGetConfigInfoMethod;
+
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "getConfigInfo",
+      requestType = proto.types.utils.Empty.class,
+      responseType = proto.types.client.ConfigInfo.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
+  public static io.grpc.MethodDescriptor<proto.types.utils.Empty,
+      proto.types.client.ConfigInfo> getGetConfigInfoMethod() {
+    io.grpc.MethodDescriptor<proto.types.utils.Empty, proto.types.client.ConfigInfo> getGetConfigInfoMethod;
+    if ((getGetConfigInfoMethod = ClientServiceGrpc.getGetConfigInfoMethod) == null) {
+      synchronized (ClientServiceGrpc.class) {
+        if ((getGetConfigInfoMethod = ClientServiceGrpc.getGetConfigInfoMethod) == null) {
+          ClientServiceGrpc.getGetConfigInfoMethod = getGetConfigInfoMethod = 
+              io.grpc.MethodDescriptor.<proto.types.utils.Empty, proto.types.client.ConfigInfo>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+              .setFullMethodName(generateFullMethodName(
+                  "proto.crpcs.clientService.ClientService", "getConfigInfo"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  proto.types.utils.Empty.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  proto.types.client.ConfigInfo.getDefaultInstance()))
+                  .setSchemaDescriptor(new ClientServiceMethodDescriptorSupplier("getConfigInfo"))
+                  .build();
+          }
+        }
+     }
+     return getGetConfigInfoMethod;
+  }
+
   /**
    * Creates a new async stub that supports all call types for the service
    */
@@ -171,6 +363,48 @@ public final class ClientServiceGrpc {
       asyncUnimplementedUnaryCall(getTxStatusMethod(), responseObserver);
     }
 
+    /**
+     */
+    public void blockRead(proto.types.client.BlockReq request,
+        io.grpc.stub.StreamObserver<proto.types.block.Block> responseObserver) {
+      asyncUnimplementedUnaryCall(getBlockReadMethod(), responseObserver);
+    }
+
+    /**
+     */
+    public void isAlive(proto.types.utils.Empty request,
+        io.grpc.stub.StreamObserver<proto.types.utils.Empty> responseObserver) {
+      asyncUnimplementedUnaryCall(getIsAliveMethod(), responseObserver);
+    }
+
+    /**
+     */
+    public void poolSize(proto.types.utils.Empty request,
+        io.grpc.stub.StreamObserver<proto.types.utils.Integer> responseObserver) {
+      asyncUnimplementedUnaryCall(getPoolSizeMethod(), responseObserver);
+    }
+
+    /**
+     */
+    public void pendingSize(proto.types.utils.Empty request,
+        io.grpc.stub.StreamObserver<proto.types.utils.Integer> responseObserver) {
+      asyncUnimplementedUnaryCall(getPendingSizeMethod(), responseObserver);
+    }
+
+    /**
+     */
+    public void getValidators(proto.types.utils.Empty request,
+        io.grpc.stub.StreamObserver<proto.types.client.Validators> responseObserver) {
+      asyncUnimplementedUnaryCall(getGetValidatorsMethod(), responseObserver);
+    }
+
+    /**
+     */
+    public void getConfigInfo(proto.types.utils.Empty request,
+        io.grpc.stub.StreamObserver<proto.types.client.ConfigInfo> responseObserver) {
+      asyncUnimplementedUnaryCall(getGetConfigInfoMethod(), responseObserver);
+    }
+
     @java.lang.Override public final io.grpc.ServerServiceDefinition bindService() {
       return io.grpc.ServerServiceDefinition.builder(getServiceDescriptor())
           .addMethod(
@@ -194,6 +428,48 @@ public final class ClientServiceGrpc {
                 proto.types.client.TxReq,
                 proto.types.client.TxStatus>(
                   this, METHODID_TX_STATUS)))
+          .addMethod(
+            getBlockReadMethod(),
+            asyncUnaryCall(
+              new MethodHandlers<
+                proto.types.client.BlockReq,
+                proto.types.block.Block>(
+                  this, METHODID_BLOCK_READ)))
+          .addMethod(
+            getIsAliveMethod(),
+            asyncUnaryCall(
+              new MethodHandlers<
+                proto.types.utils.Empty,
+                proto.types.utils.Empty>(
+                  this, METHODID_IS_ALIVE)))
+          .addMethod(
+            getPoolSizeMethod(),
+            asyncUnaryCall(
+              new MethodHandlers<
+                proto.types.utils.Empty,
+                proto.types.utils.Integer>(
+                  this, METHODID_POOL_SIZE)))
+          .addMethod(
+            getPendingSizeMethod(),
+            asyncUnaryCall(
+              new MethodHandlers<
+                proto.types.utils.Empty,
+                proto.types.utils.Integer>(
+                  this, METHODID_PENDING_SIZE)))
+          .addMethod(
+            getGetValidatorsMethod(),
+            asyncUnaryCall(
+              new MethodHandlers<
+                proto.types.utils.Empty,
+                proto.types.client.Validators>(
+                  this, METHODID_GET_VALIDATORS)))
+          .addMethod(
+            getGetConfigInfoMethod(),
+            asyncUnaryCall(
+              new MethodHandlers<
+                proto.types.utils.Empty,
+                proto.types.client.ConfigInfo>(
+                  this, METHODID_GET_CONFIG_INFO)))
           .build();
     }
   }
@@ -239,6 +515,54 @@ public final class ClientServiceGrpc {
       asyncUnaryCall(
           getChannel().newCall(getTxStatusMethod(), getCallOptions()), request, responseObserver);
     }
+
+    /**
+     */
+    public void blockRead(proto.types.client.BlockReq request,
+        io.grpc.stub.StreamObserver<proto.types.block.Block> responseObserver) {
+      asyncUnaryCall(
+          getChannel().newCall(getBlockReadMethod(), getCallOptions()), request, responseObserver);
+    }
+
+    /**
+     */
+    public void isAlive(proto.types.utils.Empty request,
+        io.grpc.stub.StreamObserver<proto.types.utils.Empty> responseObserver) {
+      asyncUnaryCall(
+          getChannel().newCall(getIsAliveMethod(), getCallOptions()), request, responseObserver);
+    }
+
+    /**
+     */
+    public void poolSize(proto.types.utils.Empty request,
+        io.grpc.stub.StreamObserver<proto.types.utils.Integer> responseObserver) {
+      asyncUnaryCall(
+          getChannel().newCall(getPoolSizeMethod(), getCallOptions()), request, responseObserver);
+    }
+
+    /**
+     */
+    public void pendingSize(proto.types.utils.Empty request,
+        io.grpc.stub.StreamObserver<proto.types.utils.Integer> responseObserver) {
+      asyncUnaryCall(
+          getChannel().newCall(getPendingSizeMethod(), getCallOptions()), request, responseObserver);
+    }
+
+    /**
+     */
+    public void getValidators(proto.types.utils.Empty request,
+        io.grpc.stub.StreamObserver<proto.types.client.Validators> responseObserver) {
+      asyncUnaryCall(
+          getChannel().newCall(getGetValidatorsMethod(), getCallOptions()), request, responseObserver);
+    }
+
+    /**
+     */
+    public void getConfigInfo(proto.types.utils.Empty request,
+        io.grpc.stub.StreamObserver<proto.types.client.ConfigInfo> responseObserver) {
+      asyncUnaryCall(
+          getChannel().newCall(getGetConfigInfoMethod(), getCallOptions()), request, responseObserver);
+    }
   }
 
   /**
@@ -278,6 +602,48 @@ public final class ClientServiceGrpc {
     public proto.types.client.TxStatus txStatus(proto.types.client.TxReq request) {
       return blockingUnaryCall(
           getChannel(), getTxStatusMethod(), getCallOptions(), request);
+    }
+
+    /**
+     */
+    public proto.types.block.Block blockRead(proto.types.client.BlockReq request) {
+      return blockingUnaryCall(
+          getChannel(), getBlockReadMethod(), getCallOptions(), request);
+    }
+
+    /**
+     */
+    public proto.types.utils.Empty isAlive(proto.types.utils.Empty request) {
+      return blockingUnaryCall(
+          getChannel(), getIsAliveMethod(), getCallOptions(), request);
+    }
+
+    /**
+     */
+    public proto.types.utils.Integer poolSize(proto.types.utils.Empty request) {
+      return blockingUnaryCall(
+          getChannel(), getPoolSizeMethod(), getCallOptions(), request);
+    }
+
+    /**
+     */
+    public proto.types.utils.Integer pendingSize(proto.types.utils.Empty request) {
+      return blockingUnaryCall(
+          getChannel(), getPendingSizeMethod(), getCallOptions(), request);
+    }
+
+    /**
+     */
+    public proto.types.client.Validators getValidators(proto.types.utils.Empty request) {
+      return blockingUnaryCall(
+          getChannel(), getGetValidatorsMethod(), getCallOptions(), request);
+    }
+
+    /**
+     */
+    public proto.types.client.ConfigInfo getConfigInfo(proto.types.utils.Empty request) {
+      return blockingUnaryCall(
+          getChannel(), getGetConfigInfoMethod(), getCallOptions(), request);
     }
   }
 
@@ -322,11 +688,65 @@ public final class ClientServiceGrpc {
       return futureUnaryCall(
           getChannel().newCall(getTxStatusMethod(), getCallOptions()), request);
     }
+
+    /**
+     */
+    public com.google.common.util.concurrent.ListenableFuture<proto.types.block.Block> blockRead(
+        proto.types.client.BlockReq request) {
+      return futureUnaryCall(
+          getChannel().newCall(getBlockReadMethod(), getCallOptions()), request);
+    }
+
+    /**
+     */
+    public com.google.common.util.concurrent.ListenableFuture<proto.types.utils.Empty> isAlive(
+        proto.types.utils.Empty request) {
+      return futureUnaryCall(
+          getChannel().newCall(getIsAliveMethod(), getCallOptions()), request);
+    }
+
+    /**
+     */
+    public com.google.common.util.concurrent.ListenableFuture<proto.types.utils.Integer> poolSize(
+        proto.types.utils.Empty request) {
+      return futureUnaryCall(
+          getChannel().newCall(getPoolSizeMethod(), getCallOptions()), request);
+    }
+
+    /**
+     */
+    public com.google.common.util.concurrent.ListenableFuture<proto.types.utils.Integer> pendingSize(
+        proto.types.utils.Empty request) {
+      return futureUnaryCall(
+          getChannel().newCall(getPendingSizeMethod(), getCallOptions()), request);
+    }
+
+    /**
+     */
+    public com.google.common.util.concurrent.ListenableFuture<proto.types.client.Validators> getValidators(
+        proto.types.utils.Empty request) {
+      return futureUnaryCall(
+          getChannel().newCall(getGetValidatorsMethod(), getCallOptions()), request);
+    }
+
+    /**
+     */
+    public com.google.common.util.concurrent.ListenableFuture<proto.types.client.ConfigInfo> getConfigInfo(
+        proto.types.utils.Empty request) {
+      return futureUnaryCall(
+          getChannel().newCall(getGetConfigInfoMethod(), getCallOptions()), request);
+    }
   }
 
   private static final int METHODID_TX_WRITE = 0;
   private static final int METHODID_TX_READ = 1;
   private static final int METHODID_TX_STATUS = 2;
+  private static final int METHODID_BLOCK_READ = 3;
+  private static final int METHODID_IS_ALIVE = 4;
+  private static final int METHODID_POOL_SIZE = 5;
+  private static final int METHODID_PENDING_SIZE = 6;
+  private static final int METHODID_GET_VALIDATORS = 7;
+  private static final int METHODID_GET_CONFIG_INFO = 8;
 
   private static final class MethodHandlers<Req, Resp> implements
       io.grpc.stub.ServerCalls.UnaryMethod<Req, Resp>,
@@ -356,6 +776,30 @@ public final class ClientServiceGrpc {
         case METHODID_TX_STATUS:
           serviceImpl.txStatus((proto.types.client.TxReq) request,
               (io.grpc.stub.StreamObserver<proto.types.client.TxStatus>) responseObserver);
+          break;
+        case METHODID_BLOCK_READ:
+          serviceImpl.blockRead((proto.types.client.BlockReq) request,
+              (io.grpc.stub.StreamObserver<proto.types.block.Block>) responseObserver);
+          break;
+        case METHODID_IS_ALIVE:
+          serviceImpl.isAlive((proto.types.utils.Empty) request,
+              (io.grpc.stub.StreamObserver<proto.types.utils.Empty>) responseObserver);
+          break;
+        case METHODID_POOL_SIZE:
+          serviceImpl.poolSize((proto.types.utils.Empty) request,
+              (io.grpc.stub.StreamObserver<proto.types.utils.Integer>) responseObserver);
+          break;
+        case METHODID_PENDING_SIZE:
+          serviceImpl.pendingSize((proto.types.utils.Empty) request,
+              (io.grpc.stub.StreamObserver<proto.types.utils.Integer>) responseObserver);
+          break;
+        case METHODID_GET_VALIDATORS:
+          serviceImpl.getValidators((proto.types.utils.Empty) request,
+              (io.grpc.stub.StreamObserver<proto.types.client.Validators>) responseObserver);
+          break;
+        case METHODID_GET_CONFIG_INFO:
+          serviceImpl.getConfigInfo((proto.types.utils.Empty) request,
+              (io.grpc.stub.StreamObserver<proto.types.client.ConfigInfo>) responseObserver);
           break;
         default:
           throw new AssertionError();
@@ -421,6 +865,12 @@ public final class ClientServiceGrpc {
               .addMethod(getTxWriteMethod())
               .addMethod(getTxReadMethod())
               .addMethod(getTxStatusMethod())
+              .addMethod(getBlockReadMethod())
+              .addMethod(getIsAliveMethod())
+              .addMethod(getPoolSizeMethod())
+              .addMethod(getPendingSizeMethod())
+              .addMethod(getGetValidatorsMethod())
+              .addMethod(getGetConfigInfoMethod())
               .build();
         }
       }

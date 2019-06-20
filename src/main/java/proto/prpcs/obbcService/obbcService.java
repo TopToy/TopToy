@@ -24,7 +24,7 @@ public final class obbcService {
   static {
     java.lang.String[] descriptorData = {
       "\n\027prpcs/obbcService.proto\022\027proto.prpcs.o" +
-      "bbcService\032\017types/bbc.proto\032\021types/empty" +
+      "bbcService\032\017types/bbc.proto\032\021types/utils" +
       ".proto\032\024types/evidence.proto2\211\001\n\004Obbc\0225\n" +
       "\010FastVote\022\023.proto.types.BbcMsg\032\022.proto.t" +
       "ypes.Empty\"\000\022J\n\022EvidenceReqMessage\022\030.pro" +
@@ -44,11 +44,11 @@ public final class obbcService {
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
           proto.types.bbc.getDescriptor(),
-          proto.types.empty.getDescriptor(),
+          proto.types.utils.getDescriptor(),
           proto.types.evidence.getDescriptor(),
         }, assigner);
     proto.types.bbc.getDescriptor();
-    proto.types.empty.getDescriptor();
+    proto.types.utils.getDescriptor();
     proto.types.evidence.getDescriptor();
   }
 

@@ -24,8 +24,8 @@ public final class commService {
   static {
     java.lang.String[] descriptorData = {
       "\n\027prpcs/commService.proto\022\027proto.prpcs.c" +
-      "ommService\032\020types/comm.proto\032\021types/empt" +
-      "y.proto2y\n\rCommunication\022.\n\003dsm\022\021.proto." +
+      "ommService\032\020types/comm.proto\032\021types/util" +
+      "s.proto2y\n\rCommunication\022.\n\003dsm\022\021.proto." +
       "types.Comm\032\022.proto.types.Empty\"\000\0228\n\010reqB" +
       "lock\022\024.proto.types.CommReq\032\024.proto.types" +
       ".CommRes\"\000B&\n\027proto.prpcs.commServiceB\013c" +
@@ -43,10 +43,10 @@ public final class commService {
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
           proto.types.comm.getDescriptor(),
-          proto.types.empty.getDescriptor(),
+          proto.types.utils.getDescriptor(),
         }, assigner);
     proto.types.comm.getDescriptor();
-    proto.types.empty.getDescriptor();
+    proto.types.utils.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

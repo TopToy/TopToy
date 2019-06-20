@@ -24,7 +24,7 @@ public final class wrbService {
   static {
     java.lang.String[] descriptorData = {
       "\n\026prpcs/wrbService.proto\022\026proto.prpcs.wr" +
-      "bService\032\021types/block.proto\032\021types/empty" +
+      "bService\032\021types/block.proto\032\021types/utils" +
       ".proto\032\017types/wrb.proto2\205\001\n\003Wrb\022D\n\022Disse" +
       "minateMessage\022\030.proto.types.BlockHeader\032" +
       "\022.proto.types.Empty\"\000\0228\n\nreqMessage\022\023.pr" +
@@ -44,11 +44,11 @@ public final class wrbService {
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
           proto.types.block.getDescriptor(),
-          proto.types.empty.getDescriptor(),
+          proto.types.utils.getDescriptor(),
           proto.types.wrb.getDescriptor(),
         }, assigner);
     proto.types.block.getDescriptor();
-    proto.types.empty.getDescriptor();
+    proto.types.utils.getDescriptor();
     proto.types.wrb.getDescriptor();
   }
 

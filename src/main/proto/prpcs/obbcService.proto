@@ -4,7 +4,7 @@ package proto.prpcs.obbcService;
 option java_outer_classname = "obbcService";
 
 import "types/bbc.proto";
-import "types/empty.proto";
+import "types/utils.proto";
 import "types/evidence.proto";
 
 service Obbc {
