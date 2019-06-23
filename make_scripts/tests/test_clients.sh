@@ -30,8 +30,11 @@ run_channels() {
     for i in `seq ${1} ${3} ${2}`; do
         configure_channels ${i} ${cdest}
         configure_channels ${i} ${cldest}
-        run_dockers ${compose_file_correct_with_clients}
-        wait
+        docker-compose -f ${compose_file_correct} up &
+        pid=$!
+        sleep 30
+        docker-compose -f ${compose_file_standalone_clients} up
+        kill -9 ${pid}
         collect_res_from_servers ${outputDir}
         collect_res_from_clients ${outputDir}
     done

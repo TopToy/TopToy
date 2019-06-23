@@ -1,5 +1,5 @@
-correct test_correct
-benign test_benign_failure
-async test_async
-byz test_byz_failure
-correct_with_clients test_correct_with_clients
+#correct test_correct
+#benign test_benign_failure
+#async test_async
+#byz test_byz_failure
+clients test_clients
