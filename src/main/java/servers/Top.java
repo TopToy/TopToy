@@ -198,15 +198,10 @@ public class Top {
         return toys[txID.getChannel()].getTx(txID, blocking);
     }
 
-    public Block deliver(int index) throws InterruptedException {
+    public Block deliver(int index, boolean blocking) throws InterruptedException {
         int channel_num = index % workers;
         int block_num = index / workers;
-        return toys[channel_num].deliver(block_num);
-    }
-
-    public Block nonBlockingDeliver(int index) {
-        int channel_num = index % workers;
-        int block_num = index / workers;
+        if (blocking) return toys[channel_num].deliver(block_num);
         return toys[channel_num].nonBlockingdeliver(block_num);
     }
 
@@ -241,6 +236,22 @@ public class Top {
             }
         }
 
+    }
+
+    public int poolSize() {
+        int ps = 0;
+        for (int i = 0 ; i < workers ; i++) {
+            ps += toys[i].getTxPoolSize();
+        }
+        return ps;
+    }
+
+    public int pendingSize() {
+        int ps = 0;
+        for (int i = 0; i < workers ; i++) {
+            ps += toys[i].getPendingSize();
+        }
+        return ps;
     }
 
 }

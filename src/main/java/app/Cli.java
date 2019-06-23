@@ -1,12 +1,11 @@
 package app;
 import blockchain.data.BCS;
 import com.google.protobuf.ByteString;
-import config.Config;
+import utils.Config;
 import crypto.BlockDigSig;
 import das.ms.BFD;
 import org.apache.commons.cli.*;
 import proto.types.block.*;
-import proto.types.client;
 import proto.types.transaction.*;
 import proto.types.meta.*;
 import utils.statistics.Statistics;

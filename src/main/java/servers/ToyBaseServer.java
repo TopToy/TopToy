@@ -5,7 +5,7 @@ import blockchain.validation.Tvalidator;
 import blockchain.validation.Validator;
 import com.google.protobuf.ByteString;
 import communication.CommLayer;
-import config.Config;
+import utils.Config;
 import das.ab.ABService;
 import das.data.Data;
 import das.ms.BFD;
@@ -374,17 +374,30 @@ public abstract class ToyBaseServer {
         synchronized (cbl) {
             synchronized (blocksForPropose) {
                 if (blocksForPropose.size() == 0) return currBLock.getDataCount();
-                return (blocksForPropose.size() * maxTransactionInBlock) +
-                        currBLock.getDataCount();
+                int ret = 0;
+                for (Block b : blocksForPropose) {
+                    ret += b.getDataCount();
+                }
+                return ret + currBLock.getDataCount();
             }
         }
 
     }
 
+    int getPendingSize() {
+        synchronized (proposedBlocks) {
+            int ret = 0;
+            for (Block b : proposedBlocks) {
+                ret += b.getDataCount();
+            }
+            return ret;
+        }
+    }
+
     TxID addTransaction(Transaction tx) {
-        if (getTxPoolSize() > txPoolMax) return null;
+        if (getTxPoolSize() > txPoolMax) return TxID.getDefaultInstance();
         synchronized (cbl) {
-            if (currBLock.getDataCount() + 1 > maxTransactionInBlock) return null;
+            if (currBLock.getDataCount() + 1 > maxTransactionInBlock) return TxID.getDefaultInstance();
             int cbid = currBLock.getId().getBid();
             int txnum = currBLock.getDataCount();
             Transaction ntx = tx.toBuilder()

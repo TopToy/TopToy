@@ -1,6 +1,6 @@
 package app;
 
-import config.Config;
+import utils.Config;
 import servers.Top;
 import utils.GEH;
 import java.nio.file.Path;
