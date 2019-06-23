@@ -1,7 +1,6 @@
-package config;
+package utils;
 
 import com.moandjiezana.toml.Toml;
-import utils.Node;
 
 import java.io.IOException;
 import java.nio.charset.Charset;

@@ -1,7 +1,7 @@
 package app;
 
 import com.google.protobuf.ByteString;
-import config.Config;
+import utils.Config;
 import io.grpc.ManagedChannelBuilder;
 import proto.crpcs.clientService.ClientServiceGrpc.*;
 import utils.CSVUtils;
