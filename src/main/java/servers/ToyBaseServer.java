@@ -229,10 +229,10 @@ public abstract class ToyBaseServer {
         synchronized (cbl) {
             synchronized (proposedBlocks) {
                 if (proposedBlocks.isEmpty()) {
-                    Block b = currBLock.build();
+                    Block b = configureNewBlock().build();
                     logger.debug(format("[#%d-C[%d]] creates an empty header [height=%d ; cidSeries=%d ; cid=%d ; bid=%d]",
                             getID(), worker, height, cidSeries, cid, b.getId().getBid()));
-                    currBLock = configureNewBlock();
+//                    currBLock = configureNewBlock();
                     return createBlockHeader(b, prev, getID(), height, cidSeries, cid, worker, b.getId());
                 }
 
