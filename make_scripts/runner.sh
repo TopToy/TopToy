@@ -3,6 +3,7 @@
 source $PWD/definitions.sh
 
 run2() {
+    docker network create toy_net --gateway 172.18.0.1 --subnet 172.18.0.0/16
     while read -r line; do
         sudo rm -r -f ${docker_out}
         sudo rm -r -f ${cdocker_out}

@@ -62,21 +62,41 @@ public class ClientTester {
         testTXS = Integer.parseInt(argv[2]);
         Config.setConfig(null, clientID);
         logger = org.apache.log4j.Logger.getLogger(ClientTester.class);
+        logger.info(format("Going to commit %d transactions", testTXS));
         txSize = Config.getTxSize();
         n = Config.getN();
         clients = Executors.newFixedThreadPool(n);
 
         start();
-        testTime = System.currentTimeMillis();
-        try {
-            Thread.sleep(30*1000);
-        } catch (InterruptedException e) {
-            logger.error(e);
-            return;
+        switch (argv[3]) {
+            case "p": testP();
+                    break;
+            default:
+                break;
+
         }
+
+        System.out.println("Client goodbye :)");
+
+    }
+
+
+    private static void start() {
+        logger.info("init clients");
+        stubs = new ClientServiceBlockingStub[n];
+        for (int i = 0 ; i < n ; i++) {
+            stubs[i] = newBlockingStub(
+                    ManagedChannelBuilder
+                            .forAddress(Config.getIP(i), serverPort)
+                            .usePlaintext()
+                            .build());
+        }
+    }
+    private static void testP() {
+        testTime = System.currentTimeMillis();
         for (int i = 0 ; i < n ; i++) {
             int finalI = i;
-            clients.submit(() -> test(stubs[finalI], finalI));
+            clients.submit(() -> testPerformace(stubs[finalI], finalI));
 
         }
         synchronized (notifier) {
@@ -98,30 +118,14 @@ public class ClientTester {
         } catch (IOException e) {
             logger.error(e);
         }
-        System.out.println("Client goodbye :)");
-
     }
-
-
-    private static void start() {
-        logger.info("init clients");
-        stubs = new ClientServiceBlockingStub[n];
-        for (int i = 0 ; i < n ; i++) {
-            stubs[i] = newBlockingStub(
-                    ManagedChannelBuilder
-                            .forAddress(Config.getIP(i), serverPort)
-                            .usePlaintext()
-                            .build());
-        }
-    }
-
-    private static void test(ClientServiceBlockingStub stub, int server) {
+    private static void testPerformace(ClientServiceBlockingStub stub, int server) {
         logger.info("Start client for " + server);
         stub.txWrite(Transaction.newBuilder() // This meant to remove the effect of connecting to the server
                 .setData(ByteString.copyFrom(new byte[0]))
                 .setClientID(clientID)
                 .build());
-
+        logger.debug("Writing tx");
         while(txNum.get() < testTXS) {
             long txStart = System.currentTimeMillis();
             SecureRandom random = new SecureRandom();
@@ -132,8 +136,13 @@ public class ClientTester {
                     .setData(ByteString.copyFrom(tx))
                     .setClientID(clientID)
                     .build());
+            if (tid.equals(TxID.getDefaultInstance())) {
+                logger.info("received default tid");
+                continue;
+            }
             TxStatus sts = stub.txStatus(TxReq.newBuilder().setCid(clientID).setTid(tid)
                     .setBlocking(true).build());
+            logger.info(format("Transaction status is %s", sts.getStatus()));
             if (!sts.getStatus().equals(TxState.COMMITTED)) {
                 logger.info("An uncommitted transaction");
                 continue;
@@ -214,4 +223,6 @@ public class ClientTester {
         writer.flush();
         writer.close();
     }
+
+
 }

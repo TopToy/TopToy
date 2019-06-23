@@ -17,7 +17,6 @@ configurations=${curr_out}/configurations
 output=${curr_out}/out
 composed=${curr_out}/composed
 
-
 cdest=${configurations}/correct
 fbdest=${configurations}/fbenign
 asdest=${configurations}/async
@@ -29,7 +28,7 @@ compose_file_benign_failures=${composed}/docker-compose-benign-failures.yml
 compose_file_async=${composed}/docker-compose-async.yml
 compose_file_byz=${composed}/docker-compose-byz.yml
 compose_file_correct_with_clients=${composed}/docker-compose-correct-with-clients.yml
-
+compose_file_standalone_clients=${composed}/docker-compose-standalone-clients.yml
 docker_out=${curr_out}/curr
 cdocker_out=${curr_out}/ccurr
 

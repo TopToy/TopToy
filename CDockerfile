@@ -14,10 +14,11 @@ VOLUME ${TOY_HOME}/bin/src/main/resources
 ENV CID=0
 ENV SID=0
 ENV TXS=100
+ENV TEST=p
 
 #Copy configuration
 COPY cbin $TOY_HOME/bin
 
-ENTRYPOINT ${TOY_HOME}/bin/run_cdocker.sh ${CID} ${SID} ${TXS}
+ENTRYPOINT ${TOY_HOME}/bin/run_cdocker.sh ${CID} ${SID} ${TXS} ${TEST}
 
 STOPSIGNAL SIGTERM
