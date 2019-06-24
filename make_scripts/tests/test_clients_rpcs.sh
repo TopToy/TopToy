@@ -33,8 +33,9 @@ run_channels() {
         docker-compose -f ${compose_file_correct} up &
         pid=$!
         sleep 30
-        docker-compose -f ${compose_file_standalone_clients} up
+        docker-compose -f ${compose_file_standalone_clients_r} up
         kill -9 ${pid}
+        docker stop $(docker ps -q --filter ancestor=${docker_image})
         collect_res_from_servers ${outputDir}
         collect_res_from_clients ${outputDir}
     done

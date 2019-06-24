@@ -43,7 +43,7 @@ echo \
         - CID=${id}
         - SID=${id}
         - TXS=100
-        - TEST=p
+        - TEST=${6}
         volumes:
         - ${out}:/tmp/JToy
         - ${conf}:/JToy/bin/src/main/resources
@@ -216,7 +216,7 @@ compose_async_dockers() {
 compose_standalone_clients() {
     containers_n=$((${C} - 1))
     for i in `seq 0 ${containers_n}`; do
-        compose_standalone_client $i ${cdocker_image} ${cldest} ${cdocker_out} ${compose_file_standalone_clients}
+        compose_standalone_client $i ${cdocker_image} ${cldest} ${cdocker_out} ${2} ${1}
     done
 
 }
@@ -264,16 +264,25 @@ main_byz(){
     compose_footer ${compose_file_byz}
 }
 
-main_standalone_clients() {
-    compose_header ${compose_file_standalone_clients}
-    compose_standalone_clients
-    compose_standalone_client_footer ${compose_file_standalone_clients}
+main_standalone_clients_p() {
+    compose_header ${compose_file_standalone_clients_p}
+    compose_standalone_clients 'p' ${compose_file_standalone_clients_p}
+    compose_standalone_client_footer ${compose_file_standalone_clients_p}
 
 }
+
+main_standalone_clients_r() {
+    compose_header ${compose_file_standalone_clients_r}
+    compose_standalone_clients 'r' ${compose_file_standalone_clients_r}
+    compose_standalone_client_footer ${compose_file_standalone_clients_r}
+
+}
+
 mkdir -p ${composed}
 main_correct
 main_benign_failures
 main_async
 main_byz
 #main_correct_with_clients
-main_standalone_clients
+main_standalone_clients_p
+main_standalone_clients_r

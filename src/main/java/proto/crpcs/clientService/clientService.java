@@ -26,22 +26,23 @@ public final class clientService {
       "\n\031crpcs/clientService.proto\022\031proto.crpcs" +
       ".clientService\032\027types/transaction.proto\032" +
       "\021types/block.proto\032\022types/client.proto\032\021" +
-      "types/utils.proto2\236\004\n\rClientService\0228\n\007t" +
-      "xWrite\022\030.proto.types.Transaction\032\021.proto" +
-      ".types.TxID\"\000\0228\n\006txRead\022\022.proto.types.Tx" +
+      "types/utils.proto2\327\004\n\rClientService\0228\n\007w" +
+      "riteTx\022\030.proto.types.Transaction\032\021.proto" +
+      ".types.TxID\"\000\0228\n\006readTx\022\022.proto.types.Tx" +
       "Req\032\030.proto.types.Transaction\"\000\0227\n\010txSta" +
       "tus\022\022.proto.types.TxReq\032\025.proto.types.Tx" +
-      "Status\"\000\0228\n\tblockRead\022\025.proto.types.Bloc" +
-      "kReq\032\022.proto.types.Block\"\000\0223\n\007isAlive\022\022." +
-      "proto.types.Empty\032\022.proto.types.Empty\"\000\022" +
-      "6\n\010poolSize\022\022.proto.types.Empty\032\024.proto." +
-      "types.Integer\"\000\0229\n\013pendingSize\022\022.proto.t" +
-      "ypes.Empty\032\024.proto.types.Integer\"\000\022>\n\rge" +
-      "tValidators\022\022.proto.types.Empty\032\027.proto." +
-      "types.Validators\"\000\022>\n\rgetConfigInfo\022\022.pr" +
-      "oto.types.Empty\032\027.proto.types.ConfigInfo" +
-      "\"\000B*\n\031proto.crpcs.clientServiceB\rclientS" +
-      "erviceb\006proto3"
+      "Status\"\000\0228\n\treadBlock\022\025.proto.types.Bloc" +
+      "kReq\032\022.proto.types.Block\"\000\0227\n\tgetHeight\022" +
+      "\022.proto.types.Empty\032\024.proto.types.Intege" +
+      "r\"\000\0223\n\007isAlive\022\022.proto.types.Empty\032\022.pro" +
+      "to.types.Empty\"\000\0226\n\010poolSize\022\022.proto.typ" +
+      "es.Empty\032\024.proto.types.Integer\"\000\0229\n\013pend" +
+      "ingSize\022\022.proto.types.Empty\032\024.proto.type" +
+      "s.Integer\"\000\022>\n\rgetValidators\022\022.proto.typ" +
+      "es.Empty\032\027.proto.types.Validators\"\000\022>\n\rg" +
+      "etConfigInfo\022\022.proto.types.Empty\032\027.proto" +
+      ".types.ConfigInfo\"\000B*\n\031proto.crpcs.clien" +
+      "tServiceB\rclientServiceb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

@@ -1,5 +1,6 @@
 package servers;
 
+import blockchain.data.BCS;
 import io.grpc.stub.StreamObserver;
 import proto.crpcs.clientService.ClientServiceGrpc.*;
 import proto.types.block.*;
@@ -20,7 +21,7 @@ public class ClientRpcsService extends ClientServiceImplBase {
     }
 
     @Override
-    public void txWrite(Transaction request,
+    public void writeTx(Transaction request,
                       StreamObserver<TxID> responseObserver) {
         logger.debug(format("received txWrite request from [%d]", request.getClientID()));
         TxID tid = topServer.addTransaction(request);
@@ -29,7 +30,7 @@ public class ClientRpcsService extends ClientServiceImplBase {
     }
 
     @Override
-    public void txRead(TxReq request,
+    public void readTx(TxReq request,
                      StreamObserver<Transaction> responseObserver) {
         logger.debug(format("received read request from [%d]", request.getCid()));
         try {
@@ -62,7 +63,7 @@ public class ClientRpcsService extends ClientServiceImplBase {
     }
 
     @Override
-    public void blockRead(BlockReq request,
+    public void readBlock(BlockReq request,
                           StreamObserver<Block> responseObserver) {
         try {
             Block b = topServer.deliver(request.getHeight(), request.getBlocking());
@@ -86,6 +87,13 @@ public class ClientRpcsService extends ClientServiceImplBase {
     public void poolSize(utils.Empty request,
                          StreamObserver<utils.Integer> responseObserver) {
         responseObserver.onNext(utils.Integer.newBuilder().setNum(topServer.poolSize()).build());
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void getHeight(utils.Empty request,
+                         StreamObserver<utils.Integer> responseObserver) {
+        responseObserver.onNext(utils.Integer.newBuilder().setNum(BCS.height()).build());
         responseObserver.onCompleted();
     }
 
