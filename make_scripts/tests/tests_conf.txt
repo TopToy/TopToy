@@ -2,4 +2,5 @@
 #benign test_benign_failure
 #async test_async
 #byz test_byz_failure
-clients test_clients
+clients_rpcs test_clients_rpcs
+#clients_performance test_clients_performance

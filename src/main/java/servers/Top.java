@@ -191,10 +191,12 @@ public class Top {
     }
 
     public client.TxState status(TxID tid, boolean blocking) throws InterruptedException {
+        if (tid.getChannel() > workers) return client.TxState.UNKNOWN;
         return toys[tid.getChannel()].status(tid, blocking);
     }
 
     public Transaction getTransaction(TxID txID, boolean blocking) throws InterruptedException {
+        if (txID.getChannel() > workers) return Transaction.getDefaultInstance();
         return toys[txID.getChannel()].getTx(txID, blocking);
     }
 

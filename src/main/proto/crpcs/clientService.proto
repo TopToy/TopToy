@@ -9,10 +9,11 @@ import "types/client.proto";
 import "types/utils.proto";
 
 service ClientService {
-    rpc txWrite(proto.types.Transaction) returns (proto.types.TxID) {};
-    rpc txRead(proto.types.TxReq) returns (proto.types.Transaction) {};
+    rpc writeTx(proto.types.Transaction) returns (proto.types.TxID) {};
+    rpc readTx(proto.types.TxReq) returns (proto.types.Transaction) {};
     rpc txStatus(proto.types.TxReq) returns (proto.types.TxStatus) {};
-    rpc blockRead(proto.types.BlockReq) returns (proto.types.Block) {};
+    rpc readBlock(proto.types.BlockReq) returns (proto.types.Block) {};
+    rpc getHeight(proto.types.Empty) returns (proto.types.Integer) {};
     rpc isAlive(proto.types.Empty) returns (proto.types.Empty) {};
     rpc poolSize(proto.types.Empty) returns (proto.types.Integer) {};
     rpc pendingSize(proto.types.Empty) returns (proto.types.Integer) {};

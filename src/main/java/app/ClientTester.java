@@ -1,6 +1,9 @@
 package app;
 
 import com.google.protobuf.ByteString;
+import io.grpc.stub.StreamObserver;
+import proto.types.block.*;
+import proto.types.utils;
 import utils.Config;
 import io.grpc.ManagedChannelBuilder;
 import proto.crpcs.clientService.ClientServiceGrpc.*;
@@ -10,6 +13,7 @@ import proto.types.client.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.SecureRandom;
@@ -23,6 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static java.lang.StrictMath.max;
 import static java.lang.String.format;
 import static proto.crpcs.clientService.ClientServiceGrpc.newBlockingStub;
+import static proto.crpcs.clientService.ClientServiceGrpc.newStub;
 
 public class ClientTester {
     private static org.apache.log4j.Logger logger;
@@ -71,6 +76,8 @@ public class ClientTester {
         switch (argv[3]) {
             case "p": testP();
                     break;
+            case "r" :testRpcs();
+                    break;
             default:
                 break;
 
@@ -92,6 +99,43 @@ public class ClientTester {
                             .build());
         }
     }
+
+    private static void testRpcs() {
+        for (int i = 0 ; i < n ; i++) {
+            System.out.println(format("Testing testTxWrite... [%s]",
+                    testTxWrite(i) ? "OK" : "Failed"));
+
+            System.out.println(format("Testing testTxRead... [%s]",
+                    testTxRead(i) ? "OK" : "Failed"));
+
+            System.out.println(format("Testing testStatus... [%s]",
+                    testStatus(i) ? "OK" : "Failed"));
+
+            System.out.println(format("Testing testGetHeight... [%s]",
+                    testGetHeight(i) ? "OK" : "Failed"));
+
+            System.out.println(format("Testing testGetBlock... [%s]",
+                    testGetBlock(i) ? "OK" : "Failed"));
+
+            System.out.println(format("Testing testIsAlive... [%s]",
+                    testIsAlive(i) ? "OK" : "Failed"));
+
+            System.out.println(format("Testing testGetValidators... [%s]",
+                    testGetValidators(i) ? "OK" : "Failed"));
+
+            System.out.println(format("Testing testGetConfigData... [%s]",
+                    testGetConfigData(i) ? "OK" : "Failed"));
+
+            System.out.println(format("Testing testPoolSize... [%d]",
+                    testPoolSize(i)));
+
+            System.out.println(format("Testing testPendingSize... [%d]",
+                    testPendingSize(i)));
+
+        }
+    }
+
+
     private static void testP() {
         testTime = System.currentTimeMillis();
         for (int i = 0 ; i < n ; i++) {
@@ -121,21 +165,18 @@ public class ClientTester {
     }
     private static void testPerformace(ClientServiceBlockingStub stub, int server) {
         logger.info("Start client for " + server);
-        stub.txWrite(Transaction.newBuilder() // This meant to remove the effect of connecting to the server
+        stub.writeTx(Transaction.newBuilder() // This meant to remove the effect of connecting to the server
                 .setData(ByteString.copyFrom(new byte[0]))
                 .setClientID(clientID)
                 .build());
         logger.debug("Writing tx");
         while(txNum.get() < testTXS) {
             long txStart = System.currentTimeMillis();
-            SecureRandom random = new SecureRandom();
-            byte[] tx = new byte[txSize];
-            random.nextBytes(tx);
+//            SecureRandom random = new SecureRandom();
+//            byte[] tx = new byte[txSize];
+//            random.nextBytes(tx);
             TxID tid = stub //.withDeadlineAfter(3, TimeUnit.SECONDS)
-                    .txWrite(Transaction.newBuilder()
-                    .setData(ByteString.copyFrom(tx))
-                    .setClientID(clientID)
-                    .build());
+                    .writeTx(createRandomTransaction());
             if (tid.equals(TxID.getDefaultInstance())) {
                 logger.info("received default tid");
                 continue;
@@ -222,6 +263,171 @@ public class ClientTester {
         CSVUtils.writeLines(writer, data);
         writer.flush();
         writer.close();
+    }
+
+    static boolean testTxWrite(int sid) {
+//        SecureRandom random = new SecureRandom();
+//        byte[] tx = new byte[txSize];
+//        random.nextBytes(tx);
+        TxID tid = stubs[sid] //.withDeadlineAfter(3, TimeUnit.SECONDS)
+                .writeTx(createRandomTransaction());
+        return !tid.equals(TxID.getDefaultInstance());
+    }
+
+    static boolean testTxRead(int sid) {
+        SecureRandom random = new SecureRandom();
+        byte[] tx = new byte[txSize];
+        random.nextBytes(tx);
+        TxID tid = stubs[sid]
+                .writeTx(Transaction.newBuilder()
+                        .setData(ByteString.copyFrom(tx))
+                        .setClientID(clientID)
+                        .build());
+        Transaction t = stubs[sid].readTx(TxReq.newBuilder().setCid(clientID)
+                .setTid(tid).setBlocking(true).build());
+        return t.getId().equals(tid) && Arrays.compare(t.getData().toByteArray(), tx) == 0;
+    }
+
+    static boolean testStatus(int sid) {
+        TxID ftid = TxID
+                .newBuilder()
+                .setBid(100)
+                .setChannel(15)
+                .setProposerID(34)
+                .setTxNum(90)
+                .build();
+
+        if (!stubs[sid]
+                .txStatus(TxReq
+                        .newBuilder()
+                        .setBlocking(false)
+                        .setTid(ftid)
+                        .setCid(clientID)
+                        .build())
+                .getStatus().equals(TxState.UNKNOWN))
+            return false;
+
+//        SecureRandom random = new SecureRandom();
+//        byte[] tx = new byte[txSize];
+//        random.nextBytes(tx);
+        TxID tid = stubs[sid]
+                .writeTx(createRandomTransaction());
+
+        return stubs[sid].txStatus(TxReq.newBuilder().setCid(clientID)
+                .setTid(tid)
+                .setBlocking(true).build()).getStatus().equals(TxState.COMMITTED);
+    }
+
+    static boolean testGetHeight(int sid) {
+//        SecureRandom random = new SecureRandom();
+//        byte[] tx = new byte[txSize];
+//        random.nextBytes(tx);
+        stubs[sid]
+                .writeTx(createRandomTransaction());
+        return stubs[sid].getHeight(utils.Empty.newBuilder().build()).getNum() > 0;
+
+    }
+    static boolean testGetBlock(int sid) {
+        int h = stubs[sid].getHeight(utils.Empty.newBuilder().build()).getNum();
+        for (int i = 0 ; i < h + 1 ; i++) {
+            Block b = stubs[sid].readBlock(BlockReq.newBuilder()
+                    .setCid(clientID)
+                    .setHeight(i)
+                    .setBlocking(true).build());
+            if (b.getHeader().getHeight() != i) return false;
+        }
+        return true;
+    }
+
+    static boolean testIsAlive(int sid) {
+        stubs[sid].isAlive(utils.Empty.newBuilder().build());
+        return true;
+    }
+
+    static int testPoolSize(int sid) {
+        ClientServiceStub asyncStub = newStub(ManagedChannelBuilder
+                .forAddress(Config.getIP(sid), serverPort)
+                .usePlaintext()
+                .build());
+
+        for (int i = 0 ; i < 10000 ; i++) {
+            asyncStub.writeTx(createRandomTransaction(), new StreamObserver<TxID>() {
+                @Override
+                public void onNext(TxID txID) {
+
+                }
+
+                @Override
+                public void onError(Throwable throwable) {
+
+                }
+
+                @Override
+                public void onCompleted() {
+
+                }
+            });
+        }
+
+
+       return stubs[sid].poolSize(utils.Empty.newBuilder().build()).getNum();
+    }
+
+    static int testPendingSize(int sid) {
+        ClientServiceStub asyncStub = newStub(ManagedChannelBuilder
+                .forAddress(Config.getIP(sid), serverPort)
+                .usePlaintext()
+                .build());
+
+        for (int i = 0 ; i < 10000 ; i++) {
+            asyncStub.writeTx(createRandomTransaction(), new StreamObserver<TxID>() {
+                @Override
+                public void onNext(TxID txID) {
+
+                }
+
+                @Override
+                public void onError(Throwable throwable) {
+
+                }
+
+                @Override
+                public void onCompleted() {
+
+                }
+            });
+        }
+
+
+        return stubs[sid].pendingSize(utils.Empty.newBuilder().build()).getNum();
+    }
+
+    static boolean testGetValidators(int sid) {
+        Validators val = stubs[sid].getValidators(utils.Empty.newBuilder().build());
+        for (int i = 0 ; i < Config.getN() ; i++) {
+            if (!val.getIpsList().contains(Config.getIP(i))) return false;
+        }
+        return true;
+    }
+
+    static boolean testGetConfigData(int sid) {
+        ConfigInfo c = stubs[sid].getConfigInfo(utils.Empty.newBuilder().build());
+        if (c.getClusterSize() != Config.getN()) return false;
+        if (c.getMaxFailures() != Config.getF()) return false;
+        if (c.getWorkers() !=  Config.getC()) return false;
+        if (c.getInitTmo() != Config.getTMO()) return false;
+        if (c.getMaxTxInBlock() != Config.getMaxTransactionsInBlock()) return false;
+        if (c.getServerID() != sid) return false;
+        return true;
+    }
+
+    static Transaction createRandomTransaction() {
+        SecureRandom random = new SecureRandom();
+        byte[] tx = new byte[txSize];
+        random.nextBytes(tx);
+        return Transaction.newBuilder()
+                .setData(ByteString.copyFrom(tx))
+                .setClientID(clientID).build();
     }
 
 

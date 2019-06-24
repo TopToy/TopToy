@@ -28,67 +28,67 @@ public final class ClientServiceGrpc {
 
   // Static method descriptors that strictly reflect the proto.
   private static volatile io.grpc.MethodDescriptor<proto.types.transaction.Transaction,
-      proto.types.transaction.TxID> getTxWriteMethod;
+      proto.types.transaction.TxID> getWriteTxMethod;
 
   @io.grpc.stub.annotations.RpcMethod(
-      fullMethodName = SERVICE_NAME + '/' + "txWrite",
+      fullMethodName = SERVICE_NAME + '/' + "writeTx",
       requestType = proto.types.transaction.Transaction.class,
       responseType = proto.types.transaction.TxID.class,
       methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
   public static io.grpc.MethodDescriptor<proto.types.transaction.Transaction,
-      proto.types.transaction.TxID> getTxWriteMethod() {
-    io.grpc.MethodDescriptor<proto.types.transaction.Transaction, proto.types.transaction.TxID> getTxWriteMethod;
-    if ((getTxWriteMethod = ClientServiceGrpc.getTxWriteMethod) == null) {
+      proto.types.transaction.TxID> getWriteTxMethod() {
+    io.grpc.MethodDescriptor<proto.types.transaction.Transaction, proto.types.transaction.TxID> getWriteTxMethod;
+    if ((getWriteTxMethod = ClientServiceGrpc.getWriteTxMethod) == null) {
       synchronized (ClientServiceGrpc.class) {
-        if ((getTxWriteMethod = ClientServiceGrpc.getTxWriteMethod) == null) {
-          ClientServiceGrpc.getTxWriteMethod = getTxWriteMethod = 
+        if ((getWriteTxMethod = ClientServiceGrpc.getWriteTxMethod) == null) {
+          ClientServiceGrpc.getWriteTxMethod = getWriteTxMethod = 
               io.grpc.MethodDescriptor.<proto.types.transaction.Transaction, proto.types.transaction.TxID>newBuilder()
               .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
               .setFullMethodName(generateFullMethodName(
-                  "proto.crpcs.clientService.ClientService", "txWrite"))
+                  "proto.crpcs.clientService.ClientService", "writeTx"))
               .setSampledToLocalTracing(true)
               .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
                   proto.types.transaction.Transaction.getDefaultInstance()))
               .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
                   proto.types.transaction.TxID.getDefaultInstance()))
-                  .setSchemaDescriptor(new ClientServiceMethodDescriptorSupplier("txWrite"))
+                  .setSchemaDescriptor(new ClientServiceMethodDescriptorSupplier("writeTx"))
                   .build();
           }
         }
      }
-     return getTxWriteMethod;
+     return getWriteTxMethod;
   }
 
   private static volatile io.grpc.MethodDescriptor<proto.types.client.TxReq,
-      proto.types.transaction.Transaction> getTxReadMethod;
+      proto.types.transaction.Transaction> getReadTxMethod;
 
   @io.grpc.stub.annotations.RpcMethod(
-      fullMethodName = SERVICE_NAME + '/' + "txRead",
+      fullMethodName = SERVICE_NAME + '/' + "readTx",
       requestType = proto.types.client.TxReq.class,
       responseType = proto.types.transaction.Transaction.class,
       methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
   public static io.grpc.MethodDescriptor<proto.types.client.TxReq,
-      proto.types.transaction.Transaction> getTxReadMethod() {
-    io.grpc.MethodDescriptor<proto.types.client.TxReq, proto.types.transaction.Transaction> getTxReadMethod;
-    if ((getTxReadMethod = ClientServiceGrpc.getTxReadMethod) == null) {
+      proto.types.transaction.Transaction> getReadTxMethod() {
+    io.grpc.MethodDescriptor<proto.types.client.TxReq, proto.types.transaction.Transaction> getReadTxMethod;
+    if ((getReadTxMethod = ClientServiceGrpc.getReadTxMethod) == null) {
       synchronized (ClientServiceGrpc.class) {
-        if ((getTxReadMethod = ClientServiceGrpc.getTxReadMethod) == null) {
-          ClientServiceGrpc.getTxReadMethod = getTxReadMethod = 
+        if ((getReadTxMethod = ClientServiceGrpc.getReadTxMethod) == null) {
+          ClientServiceGrpc.getReadTxMethod = getReadTxMethod = 
               io.grpc.MethodDescriptor.<proto.types.client.TxReq, proto.types.transaction.Transaction>newBuilder()
               .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
               .setFullMethodName(generateFullMethodName(
-                  "proto.crpcs.clientService.ClientService", "txRead"))
+                  "proto.crpcs.clientService.ClientService", "readTx"))
               .setSampledToLocalTracing(true)
               .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
                   proto.types.client.TxReq.getDefaultInstance()))
               .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
                   proto.types.transaction.Transaction.getDefaultInstance()))
-                  .setSchemaDescriptor(new ClientServiceMethodDescriptorSupplier("txRead"))
+                  .setSchemaDescriptor(new ClientServiceMethodDescriptorSupplier("readTx"))
                   .build();
           }
         }
      }
-     return getTxReadMethod;
+     return getReadTxMethod;
   }
 
   private static volatile io.grpc.MethodDescriptor<proto.types.client.TxReq,
@@ -124,35 +124,67 @@ public final class ClientServiceGrpc {
   }
 
   private static volatile io.grpc.MethodDescriptor<proto.types.client.BlockReq,
-      proto.types.block.Block> getBlockReadMethod;
+      proto.types.block.Block> getReadBlockMethod;
 
   @io.grpc.stub.annotations.RpcMethod(
-      fullMethodName = SERVICE_NAME + '/' + "blockRead",
+      fullMethodName = SERVICE_NAME + '/' + "readBlock",
       requestType = proto.types.client.BlockReq.class,
       responseType = proto.types.block.Block.class,
       methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
   public static io.grpc.MethodDescriptor<proto.types.client.BlockReq,
-      proto.types.block.Block> getBlockReadMethod() {
-    io.grpc.MethodDescriptor<proto.types.client.BlockReq, proto.types.block.Block> getBlockReadMethod;
-    if ((getBlockReadMethod = ClientServiceGrpc.getBlockReadMethod) == null) {
+      proto.types.block.Block> getReadBlockMethod() {
+    io.grpc.MethodDescriptor<proto.types.client.BlockReq, proto.types.block.Block> getReadBlockMethod;
+    if ((getReadBlockMethod = ClientServiceGrpc.getReadBlockMethod) == null) {
       synchronized (ClientServiceGrpc.class) {
-        if ((getBlockReadMethod = ClientServiceGrpc.getBlockReadMethod) == null) {
-          ClientServiceGrpc.getBlockReadMethod = getBlockReadMethod = 
+        if ((getReadBlockMethod = ClientServiceGrpc.getReadBlockMethod) == null) {
+          ClientServiceGrpc.getReadBlockMethod = getReadBlockMethod = 
               io.grpc.MethodDescriptor.<proto.types.client.BlockReq, proto.types.block.Block>newBuilder()
               .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
               .setFullMethodName(generateFullMethodName(
-                  "proto.crpcs.clientService.ClientService", "blockRead"))
+                  "proto.crpcs.clientService.ClientService", "readBlock"))
               .setSampledToLocalTracing(true)
               .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
                   proto.types.client.BlockReq.getDefaultInstance()))
               .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
                   proto.types.block.Block.getDefaultInstance()))
-                  .setSchemaDescriptor(new ClientServiceMethodDescriptorSupplier("blockRead"))
+                  .setSchemaDescriptor(new ClientServiceMethodDescriptorSupplier("readBlock"))
                   .build();
           }
         }
      }
-     return getBlockReadMethod;
+     return getReadBlockMethod;
+  }
+
+  private static volatile io.grpc.MethodDescriptor<proto.types.utils.Empty,
+      proto.types.utils.Integer> getGetHeightMethod;
+
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "getHeight",
+      requestType = proto.types.utils.Empty.class,
+      responseType = proto.types.utils.Integer.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
+  public static io.grpc.MethodDescriptor<proto.types.utils.Empty,
+      proto.types.utils.Integer> getGetHeightMethod() {
+    io.grpc.MethodDescriptor<proto.types.utils.Empty, proto.types.utils.Integer> getGetHeightMethod;
+    if ((getGetHeightMethod = ClientServiceGrpc.getGetHeightMethod) == null) {
+      synchronized (ClientServiceGrpc.class) {
+        if ((getGetHeightMethod = ClientServiceGrpc.getGetHeightMethod) == null) {
+          ClientServiceGrpc.getGetHeightMethod = getGetHeightMethod = 
+              io.grpc.MethodDescriptor.<proto.types.utils.Empty, proto.types.utils.Integer>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+              .setFullMethodName(generateFullMethodName(
+                  "proto.crpcs.clientService.ClientService", "getHeight"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  proto.types.utils.Empty.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  proto.types.utils.Integer.getDefaultInstance()))
+                  .setSchemaDescriptor(new ClientServiceMethodDescriptorSupplier("getHeight"))
+                  .build();
+          }
+        }
+     }
+     return getGetHeightMethod;
   }
 
   private static volatile io.grpc.MethodDescriptor<proto.types.utils.Empty,
@@ -344,16 +376,16 @@ public final class ClientServiceGrpc {
 
     /**
      */
-    public void txWrite(proto.types.transaction.Transaction request,
+    public void writeTx(proto.types.transaction.Transaction request,
         io.grpc.stub.StreamObserver<proto.types.transaction.TxID> responseObserver) {
-      asyncUnimplementedUnaryCall(getTxWriteMethod(), responseObserver);
+      asyncUnimplementedUnaryCall(getWriteTxMethod(), responseObserver);
     }
 
     /**
      */
-    public void txRead(proto.types.client.TxReq request,
+    public void readTx(proto.types.client.TxReq request,
         io.grpc.stub.StreamObserver<proto.types.transaction.Transaction> responseObserver) {
-      asyncUnimplementedUnaryCall(getTxReadMethod(), responseObserver);
+      asyncUnimplementedUnaryCall(getReadTxMethod(), responseObserver);
     }
 
     /**
@@ -365,9 +397,16 @@ public final class ClientServiceGrpc {
 
     /**
      */
-    public void blockRead(proto.types.client.BlockReq request,
+    public void readBlock(proto.types.client.BlockReq request,
         io.grpc.stub.StreamObserver<proto.types.block.Block> responseObserver) {
-      asyncUnimplementedUnaryCall(getBlockReadMethod(), responseObserver);
+      asyncUnimplementedUnaryCall(getReadBlockMethod(), responseObserver);
+    }
+
+    /**
+     */
+    public void getHeight(proto.types.utils.Empty request,
+        io.grpc.stub.StreamObserver<proto.types.utils.Integer> responseObserver) {
+      asyncUnimplementedUnaryCall(getGetHeightMethod(), responseObserver);
     }
 
     /**
@@ -408,19 +447,19 @@ public final class ClientServiceGrpc {
     @java.lang.Override public final io.grpc.ServerServiceDefinition bindService() {
       return io.grpc.ServerServiceDefinition.builder(getServiceDescriptor())
           .addMethod(
-            getTxWriteMethod(),
+            getWriteTxMethod(),
             asyncUnaryCall(
               new MethodHandlers<
                 proto.types.transaction.Transaction,
                 proto.types.transaction.TxID>(
-                  this, METHODID_TX_WRITE)))
+                  this, METHODID_WRITE_TX)))
           .addMethod(
-            getTxReadMethod(),
+            getReadTxMethod(),
             asyncUnaryCall(
               new MethodHandlers<
                 proto.types.client.TxReq,
                 proto.types.transaction.Transaction>(
-                  this, METHODID_TX_READ)))
+                  this, METHODID_READ_TX)))
           .addMethod(
             getTxStatusMethod(),
             asyncUnaryCall(
@@ -429,12 +468,19 @@ public final class ClientServiceGrpc {
                 proto.types.client.TxStatus>(
                   this, METHODID_TX_STATUS)))
           .addMethod(
-            getBlockReadMethod(),
+            getReadBlockMethod(),
             asyncUnaryCall(
               new MethodHandlers<
                 proto.types.client.BlockReq,
                 proto.types.block.Block>(
-                  this, METHODID_BLOCK_READ)))
+                  this, METHODID_READ_BLOCK)))
+          .addMethod(
+            getGetHeightMethod(),
+            asyncUnaryCall(
+              new MethodHandlers<
+                proto.types.utils.Empty,
+                proto.types.utils.Integer>(
+                  this, METHODID_GET_HEIGHT)))
           .addMethod(
             getIsAliveMethod(),
             asyncUnaryCall(
@@ -494,18 +540,18 @@ public final class ClientServiceGrpc {
 
     /**
      */
-    public void txWrite(proto.types.transaction.Transaction request,
+    public void writeTx(proto.types.transaction.Transaction request,
         io.grpc.stub.StreamObserver<proto.types.transaction.TxID> responseObserver) {
       asyncUnaryCall(
-          getChannel().newCall(getTxWriteMethod(), getCallOptions()), request, responseObserver);
+          getChannel().newCall(getWriteTxMethod(), getCallOptions()), request, responseObserver);
     }
 
     /**
      */
-    public void txRead(proto.types.client.TxReq request,
+    public void readTx(proto.types.client.TxReq request,
         io.grpc.stub.StreamObserver<proto.types.transaction.Transaction> responseObserver) {
       asyncUnaryCall(
-          getChannel().newCall(getTxReadMethod(), getCallOptions()), request, responseObserver);
+          getChannel().newCall(getReadTxMethod(), getCallOptions()), request, responseObserver);
     }
 
     /**
@@ -518,10 +564,18 @@ public final class ClientServiceGrpc {
 
     /**
      */
-    public void blockRead(proto.types.client.BlockReq request,
+    public void readBlock(proto.types.client.BlockReq request,
         io.grpc.stub.StreamObserver<proto.types.block.Block> responseObserver) {
       asyncUnaryCall(
-          getChannel().newCall(getBlockReadMethod(), getCallOptions()), request, responseObserver);
+          getChannel().newCall(getReadBlockMethod(), getCallOptions()), request, responseObserver);
+    }
+
+    /**
+     */
+    public void getHeight(proto.types.utils.Empty request,
+        io.grpc.stub.StreamObserver<proto.types.utils.Integer> responseObserver) {
+      asyncUnaryCall(
+          getChannel().newCall(getGetHeightMethod(), getCallOptions()), request, responseObserver);
     }
 
     /**
@@ -585,16 +639,16 @@ public final class ClientServiceGrpc {
 
     /**
      */
-    public proto.types.transaction.TxID txWrite(proto.types.transaction.Transaction request) {
+    public proto.types.transaction.TxID writeTx(proto.types.transaction.Transaction request) {
       return blockingUnaryCall(
-          getChannel(), getTxWriteMethod(), getCallOptions(), request);
+          getChannel(), getWriteTxMethod(), getCallOptions(), request);
     }
 
     /**
      */
-    public proto.types.transaction.Transaction txRead(proto.types.client.TxReq request) {
+    public proto.types.transaction.Transaction readTx(proto.types.client.TxReq request) {
       return blockingUnaryCall(
-          getChannel(), getTxReadMethod(), getCallOptions(), request);
+          getChannel(), getReadTxMethod(), getCallOptions(), request);
     }
 
     /**
@@ -606,9 +660,16 @@ public final class ClientServiceGrpc {
 
     /**
      */
-    public proto.types.block.Block blockRead(proto.types.client.BlockReq request) {
+    public proto.types.block.Block readBlock(proto.types.client.BlockReq request) {
       return blockingUnaryCall(
-          getChannel(), getBlockReadMethod(), getCallOptions(), request);
+          getChannel(), getReadBlockMethod(), getCallOptions(), request);
+    }
+
+    /**
+     */
+    public proto.types.utils.Integer getHeight(proto.types.utils.Empty request) {
+      return blockingUnaryCall(
+          getChannel(), getGetHeightMethod(), getCallOptions(), request);
     }
 
     /**
@@ -667,18 +728,18 @@ public final class ClientServiceGrpc {
 
     /**
      */
-    public com.google.common.util.concurrent.ListenableFuture<proto.types.transaction.TxID> txWrite(
+    public com.google.common.util.concurrent.ListenableFuture<proto.types.transaction.TxID> writeTx(
         proto.types.transaction.Transaction request) {
       return futureUnaryCall(
-          getChannel().newCall(getTxWriteMethod(), getCallOptions()), request);
+          getChannel().newCall(getWriteTxMethod(), getCallOptions()), request);
     }
 
     /**
      */
-    public com.google.common.util.concurrent.ListenableFuture<proto.types.transaction.Transaction> txRead(
+    public com.google.common.util.concurrent.ListenableFuture<proto.types.transaction.Transaction> readTx(
         proto.types.client.TxReq request) {
       return futureUnaryCall(
-          getChannel().newCall(getTxReadMethod(), getCallOptions()), request);
+          getChannel().newCall(getReadTxMethod(), getCallOptions()), request);
     }
 
     /**
@@ -691,10 +752,18 @@ public final class ClientServiceGrpc {
 
     /**
      */
-    public com.google.common.util.concurrent.ListenableFuture<proto.types.block.Block> blockRead(
+    public com.google.common.util.concurrent.ListenableFuture<proto.types.block.Block> readBlock(
         proto.types.client.BlockReq request) {
       return futureUnaryCall(
-          getChannel().newCall(getBlockReadMethod(), getCallOptions()), request);
+          getChannel().newCall(getReadBlockMethod(), getCallOptions()), request);
+    }
+
+    /**
+     */
+    public com.google.common.util.concurrent.ListenableFuture<proto.types.utils.Integer> getHeight(
+        proto.types.utils.Empty request) {
+      return futureUnaryCall(
+          getChannel().newCall(getGetHeightMethod(), getCallOptions()), request);
     }
 
     /**
@@ -738,15 +807,16 @@ public final class ClientServiceGrpc {
     }
   }
 
-  private static final int METHODID_TX_WRITE = 0;
-  private static final int METHODID_TX_READ = 1;
+  private static final int METHODID_WRITE_TX = 0;
+  private static final int METHODID_READ_TX = 1;
   private static final int METHODID_TX_STATUS = 2;
-  private static final int METHODID_BLOCK_READ = 3;
-  private static final int METHODID_IS_ALIVE = 4;
-  private static final int METHODID_POOL_SIZE = 5;
-  private static final int METHODID_PENDING_SIZE = 6;
-  private static final int METHODID_GET_VALIDATORS = 7;
-  private static final int METHODID_GET_CONFIG_INFO = 8;
+  private static final int METHODID_READ_BLOCK = 3;
+  private static final int METHODID_GET_HEIGHT = 4;
+  private static final int METHODID_IS_ALIVE = 5;
+  private static final int METHODID_POOL_SIZE = 6;
+  private static final int METHODID_PENDING_SIZE = 7;
+  private static final int METHODID_GET_VALIDATORS = 8;
+  private static final int METHODID_GET_CONFIG_INFO = 9;
 
   private static final class MethodHandlers<Req, Resp> implements
       io.grpc.stub.ServerCalls.UnaryMethod<Req, Resp>,
@@ -765,21 +835,25 @@ public final class ClientServiceGrpc {
     @java.lang.SuppressWarnings("unchecked")
     public void invoke(Req request, io.grpc.stub.StreamObserver<Resp> responseObserver) {
       switch (methodId) {
-        case METHODID_TX_WRITE:
-          serviceImpl.txWrite((proto.types.transaction.Transaction) request,
+        case METHODID_WRITE_TX:
+          serviceImpl.writeTx((proto.types.transaction.Transaction) request,
               (io.grpc.stub.StreamObserver<proto.types.transaction.TxID>) responseObserver);
           break;
-        case METHODID_TX_READ:
-          serviceImpl.txRead((proto.types.client.TxReq) request,
+        case METHODID_READ_TX:
+          serviceImpl.readTx((proto.types.client.TxReq) request,
               (io.grpc.stub.StreamObserver<proto.types.transaction.Transaction>) responseObserver);
           break;
         case METHODID_TX_STATUS:
           serviceImpl.txStatus((proto.types.client.TxReq) request,
               (io.grpc.stub.StreamObserver<proto.types.client.TxStatus>) responseObserver);
           break;
-        case METHODID_BLOCK_READ:
-          serviceImpl.blockRead((proto.types.client.BlockReq) request,
+        case METHODID_READ_BLOCK:
+          serviceImpl.readBlock((proto.types.client.BlockReq) request,
               (io.grpc.stub.StreamObserver<proto.types.block.Block>) responseObserver);
+          break;
+        case METHODID_GET_HEIGHT:
+          serviceImpl.getHeight((proto.types.utils.Empty) request,
+              (io.grpc.stub.StreamObserver<proto.types.utils.Integer>) responseObserver);
           break;
         case METHODID_IS_ALIVE:
           serviceImpl.isAlive((proto.types.utils.Empty) request,
@@ -862,10 +936,11 @@ public final class ClientServiceGrpc {
         if (result == null) {
           serviceDescriptor = result = io.grpc.ServiceDescriptor.newBuilder(SERVICE_NAME)
               .setSchemaDescriptor(new ClientServiceFileDescriptorSupplier())
-              .addMethod(getTxWriteMethod())
-              .addMethod(getTxReadMethod())
+              .addMethod(getWriteTxMethod())
+              .addMethod(getReadTxMethod())
               .addMethod(getTxStatusMethod())
-              .addMethod(getBlockReadMethod())
+              .addMethod(getReadBlockMethod())
+              .addMethod(getGetHeightMethod())
               .addMethod(getIsAliveMethod())
               .addMethod(getPoolSizeMethod())
               .addMethod(getPendingSizeMethod())
