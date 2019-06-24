@@ -3,6 +3,12 @@ package das.bbc;
 import blockchain.data.BCS;
 import com.google.protobuf.ByteString;
 import communication.CommLayer;
+import proto.prpcs.obbcService.ObbcGrpc.*;
+import proto.types.meta.*;
+import proto.types.bbc.*;
+import proto.types.evidence.*;
+import proto.types.block.*;
+
 import utils.Node;
 
 import crypto.BlockDigSig;
@@ -10,15 +16,13 @@ import das.data.BbcDecData;
 
 import das.data.Data;
 import das.data.VoteData;
-import proto.ObbcGrpc;
-import proto.Types;
 import utils.statistics.Statistics;
 
 import java.util.ArrayList;
 import static das.data.Data.*;
 import static java.lang.String.format;
 
-public class OBBC extends ObbcGrpc.ObbcImplBase  {
+public class OBBC extends ObbcImplBase {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(OBBC.class);
 
     static private int id;
@@ -43,9 +47,9 @@ public class OBBC extends ObbcGrpc.ObbcImplBase  {
     }
 
 
-    static public BbcDecData propose(Types.BbcMsg v, int worker, int height, int expSender) throws InterruptedException
+    static public BbcDecData propose(BbcMsg v, int worker, int height, int expSender) throws InterruptedException
     {
-        Types.Meta key = v.getM();
+        Meta key = v.getM();
         rpcs.broadcastFVMessage(v);
         synchronized (bbcFastDec[worker]) {
             while (!bbcFastDec[worker].containsKey(key)) {
@@ -61,7 +65,7 @@ public class OBBC extends ObbcGrpc.ObbcImplBase  {
         logger.info(format("C[%d] unable to decide fast, start full BBC phase [cidSeries=%d ; cid=%d ; height=%d]", worker, key.getCidSeries(), key.getCid(), height));
         pending[worker].computeIfAbsent(key, k -> {
             logger.debug(format("C[%d] broadcast evidence request [cidSeries=%d ; cid=%d ; height=%d]", worker, key.getCidSeries(), key.getCid(), height));
-            rpcs.broadcastEvidenceReq(Types.EvidenceReq.newBuilder()
+            rpcs.broadcastEvidenceReq(EvidenceReq.newBuilder()
                     .setHeight(height)
                     .setMeta(key)
                     .build(), key, expSender);
@@ -79,14 +83,14 @@ public class OBBC extends ObbcGrpc.ObbcImplBase  {
         boolean vote = false;
 
         if (pending[worker].containsKey(key)) {
-            Types.BlockHeader h = pending[worker].get(key);
+            BlockHeader h = pending[worker].get(key);
             if (comm.contains(worker, h)) {
                 vote = true;
             }
 
         }
 
-        BbcDecData dec = BBC.propose(Types.BbcMsg.newBuilder()
+        BbcDecData dec = BBC.propose(BbcMsg.newBuilder()
                 .setM(key)
                 .setVote(vote)
                 .setHeight(height)
@@ -99,14 +103,14 @@ public class OBBC extends ObbcGrpc.ObbcImplBase  {
         return dec;
     }
     
-    static void reCons(Types.Meta key, int id, int height) {
+    static void reCons(Meta key, int id, int height) {
         int worker = key.getChannel();
         bbcFastDec[worker].computeIfPresent(key, (k1, v1) -> {
             if (v1.getDec()) {
                 bbcVotes[worker].computeIfAbsent(key, k2 -> {
                     logger.info(format("[#%d-C[%d]] (reCons) found that a full bbc initialized, thus propose [cidSeries=%d ; cid=%d]",
                              id, worker, key.getCidSeries(),  key.getCid()));
-                    BBC.nonBlockingPropose(Types.BbcMsg.newBuilder()
+                    BBC.nonBlockingPropose(BbcMsg.newBuilder()
                             .setM(key)
                             .setHeight(height)
                             .setSender(id)
@@ -121,7 +125,7 @@ public class OBBC extends ObbcGrpc.ObbcImplBase  {
                 logger.info(format("[#%d-C[%d]] (reCons) found that a full bbc initialized and a block is exist, " +
                                 "thus propose [cidSeries=%d ; cid=%d; height=%d]",
                         id, worker, key.getCidSeries(),  key.getCid(), height));
-                BBC.nonBlockingPropose(Types.BbcMsg.newBuilder()
+                BBC.nonBlockingPropose(BbcMsg.newBuilder()
                         .setM(key)
                         .setHeight(height)
                         .setSender(id)
@@ -134,8 +138,8 @@ public class OBBC extends ObbcGrpc.ObbcImplBase  {
 
     }
 
-    static public Types.BbcMsg setFastBbcVote(Types.Meta key, int channel, int sender, int cidSeries, int cid, Types.BlockHeader next) {
-        Types.BbcMsg.Builder bv = Types.BbcMsg
+    static public BbcMsg setFastBbcVote(Meta key, int channel, int sender, int cidSeries, int cid, BlockHeader next) {
+        BbcMsg.Builder bv = BbcMsg
                 .newBuilder()
                 .setM(key)
                 .setSender(id)
@@ -150,7 +154,7 @@ public class OBBC extends ObbcGrpc.ObbcImplBase  {
 //                logger.debug(format("[#%d-C[%d]][s=%d:%d; w=%d:%d ; cidSeries=%d:%d ; cid=%d:%d]",sender, val.getBid().getPid(), channel, val.getM().getChannel(), cidSeries, val.getM().getCidSeries(), cid, val.getM().getCid()));
                 return val;
             }
-            Types.BlockID bid = val.getBid();
+            BlockID bid = val.getBid();
             if (!comm.contains(channel, val)) {
                 logger.debug(format("[#%d-C[%d]] comm does not contains the block itself (or it is invalid) [cidSeries=%d ; cid=%d ; bid=%d ; empty=%b]",
                         id, channel, val.getM().getCidSeries(), val.getM().getCid(), bid.getBid(), val.getEmpty()));
@@ -169,8 +173,8 @@ public class OBBC extends ObbcGrpc.ObbcImplBase  {
         return bv.build();
     }
 
-    static private Types.BlockHeader setFastModeData(Types.BlockHeader curr, Types.BlockHeader next) {
-        Types.BlockHeader.Builder nextBuilder = next
+    static private BlockHeader setFastModeData(BlockHeader curr, BlockHeader next) {
+        BlockHeader.Builder nextBuilder = next
                 .toBuilder()
                 .setPrev(ByteString
                         .copyFrom(BlockDigSig.hashHeader(curr)));

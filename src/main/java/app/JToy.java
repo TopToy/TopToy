@@ -1,6 +1,6 @@
 package app;
 
-import config.Config;
+import utils.Config;
 import servers.Top;
 import utils.GEH;
 import java.nio.file.Path;
@@ -65,10 +65,9 @@ public class JToy {
         switch (type) {
             default:
                 s = new Top(serverID, Config.getN(), Config.getF(), Config.getC(), Config.getTMO(),
-                        Config.getTMOInterval(), Config.getMaxTransactionsInBlock(), Config.getFastMode(),
-                        Config.getObbcCluster(), Config.getWrbCluster(), Config.getCommCluster(),
-                        Config.getABConfigHome(), type, Config.getServerCrtPath(), Config.getServerPrivKeyPath(),
-                        Config.getCaRootPath());
+                        Config.getMaxTransactionsInBlock(), Config.getObbcCluster(), Config.getWrbCluster(),
+                        Config.getCommCluster(), Config.getABConfigHome(), type, Config.getServerCrtPath(),
+                        Config.getServerPrivKeyPath(), Config.getCaRootPath());
                 break;
         }
     }

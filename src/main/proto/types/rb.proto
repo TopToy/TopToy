@@ -1,0 +1,13 @@
+syntax = "proto3";
+option java_package = "proto.types";
+package proto.types;
+option java_outer_classname = "rb";
+
+import "types/meta.proto";
+
+message RBMsg {
+    proto.types.Meta m = 1;
+    int32 type = 2;
+    bytes data = 3;
+    int32 sender = 4;
+}

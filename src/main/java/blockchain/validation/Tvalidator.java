@@ -1,10 +1,10 @@
 package blockchain.validation;
-
-import proto.Types;
+import proto.types.transaction.*;
+import proto.types.block.*;
 
 public class Tvalidator implements Validator{
     @Override
-    public boolean validateTX(Types.Block.Builder b, Types.Transaction tx) {
+    public boolean validateTX(Block.Builder b, Transaction tx) {
         return true;
     }
 }

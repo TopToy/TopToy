@@ -1,4 +1,4 @@
-//import config.Config;
+//import utils.Config;
 //import utils.Node;
 //import org.apache.commons.lang.ArrayUtils;
 //import org.junit.jupiter.api.Test;
@@ -13,7 +13,7 @@
 //import java.util.HashMap;
 //import java.util.List;
 //
-//import static config.Config.setConfig;
+//import static utils.Config.setConfig;
 //import static java.lang.String.format;
 //import static org.junit.jupiter.api.Assertions.assertEquals;
 //

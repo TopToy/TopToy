@@ -4,8 +4,8 @@ import blockchain.data.BCS;
 import com.google.protobuf.ByteString;
 import communication.CommLayer;
 import das.wrb.WRB;
-import proto.Types;
-
+import proto.types.block.*;
+import proto.types.transaction.*;
 import java.security.SecureRandom;
 import java.util.*;
 
@@ -19,12 +19,11 @@ class ByzToyServer extends ToyBaseServer {
     private boolean fullByz = false;
     private List<List<Integer>> groups = new ArrayList<>();
     private int delayTime;
-    private final Queue<Types.Block> byzProposed = new LinkedList<>();
+    private final Queue<Block> byzProposed = new LinkedList<>();
 
 
-    ByzToyServer(int id, int worker, int n, int f, int maxTx, boolean fastMode,
-                 CommLayer comm) {
-        super(id, worker, n, f, maxTx, fastMode, comm);
+    ByzToyServer(int id, int worker, int n, int f, int maxTx, CommLayer comm) {
+        super(id, worker, n, f, maxTx, comm);
         groups.add(new ArrayList<>());
         for (int i = 0 ; i < n ; i++) {
             groups.get(0).add(i); // At the beginning there is no byzantine behaviour
@@ -34,8 +33,8 @@ class ByzToyServer extends ToyBaseServer {
     @Override
     void commSendLogic() throws InterruptedException {
         while (!stopped.get()) {
-            Types.Block b1;
-            Types.Block b2;
+            Block b1;
+            Block b2;
             synchronized (blocksForPropose) {
                 while (blocksForPropose.isEmpty()) {
                     blocksForPropose.wait();
@@ -61,7 +60,7 @@ class ByzToyServer extends ToyBaseServer {
         }
     }
 
-    Types.BlockHeader leaderImpl() throws InterruptedException {
+    BlockHeader leaderImpl() throws InterruptedException {
         addTransactionsToCurrBlock();
 
         if (currLeader != getID()) {
@@ -80,7 +79,7 @@ class ByzToyServer extends ToyBaseServer {
 
 
             if (groups.size() > 1 && byzProposed.size() > 0) {
-                Types.Block byz = byzProposed.element();
+                Block byz = byzProposed.element();
                 WRB.WRBSend(createBlockHeader(byz, BCS.nbGetBlock(worker, currHeight - 1).getHeader(), getID(),
                         currHeight, cidSeries, cid, worker, byz.getId()),  groups.get(1).stream().mapToInt(j->j).toArray());
             }
@@ -90,7 +89,7 @@ class ByzToyServer extends ToyBaseServer {
     }
 
     @Override
-    void removeFromPendings(Types.BlockHeader recHeader, Types.Block recBlock) {
+    void removeFromPendings(BlockHeader recHeader, Block recBlock) {
         super.removeFromPendings(recHeader, recBlock);
         if (currLeader == getID() && !recHeader.getEmpty()) {
             logger.debug(format("[#%d-C[%d]] byz nullifies currBlock [sender=%d] [height=%d] [cidSeries=%d ; cid=%d]",
@@ -140,12 +139,12 @@ class ByzToyServer extends ToyBaseServer {
 
     }
 
-    private Types.Block getByzBlock(Types.Block b) {
+    private Block getByzBlock(Block b) {
         SecureRandom random = new SecureRandom();
         byte[] byzTx = new byte[40];
         int bid = random.nextInt();
-        return b.toBuilder().addData(Types.Transaction.newBuilder()
-                .setId(Types.txID.newBuilder()
+        return b.toBuilder().addData(Transaction.newBuilder()
+                .setId(TxID.newBuilder()
                         .setProposerID(getID())
                         .setBid(bid)
                         .setTxNum(1)

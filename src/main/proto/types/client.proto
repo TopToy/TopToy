@@ -1,0 +1,42 @@
+syntax = "proto3";
+option java_package = "proto.types";
+package proto.types;
+option java_outer_classname = "client";
+
+import "types/transaction.proto";
+
+enum TxState {
+    COMMITTED = 0;
+    PENDING = 1;
+    PROPOSED = 2;
+    UNKNOWN = 3;
+}
+
+message TxStatus {
+    TxState status = 1;
+}
+
+message TxReq {
+    proto.types.TxID tid = 1;
+    bool blocking = 2;
+    int32 cid = 3;
+}
+
+message BlockReq {
+    int32 height = 1;
+    bool blocking = 2;
+    int32 cid = 3;
+}
+
+message Validators {
+    repeated string ips = 1;
+}
+
+message ConfigInfo {
+    int32 clusterSize = 1;
+    int32 maxFailures = 2;
+    int32 workers = 3;
+    int32 initTmo = 4;
+    int32 maxTxInBlock = 5;
+    int32 serverID = 6;
+}

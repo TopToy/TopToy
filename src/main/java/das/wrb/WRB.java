@@ -7,7 +7,6 @@ import das.data.Data;
 
 import das.ms.BFD;
 import das.utils.TmoUtils;
-import proto.Types.*;
 import utils.statistics.Statistics;
 
 import java.util.*;
@@ -16,6 +15,9 @@ import static das.bbc.OBBC.setFastBbcVote;
 import static das.utils.TmoUtils.*;
 import static java.lang.Math.max;
 import static java.lang.String.format;
+import proto.types.block.*;
+import proto.types.meta.*;
+import proto.types.wrb.*;
 
 public class WRB {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(WRB.class);
@@ -25,7 +27,7 @@ public class WRB {
     private static int f;
     private static WrbRpcs rpcs;
 
-    public WRB(int id, int workers, int n, int f, int tmo, int tmoInterval, ArrayList<Node> wrbCluster,
+    public WRB(int id, int workers, int n, int f, int tmo, ArrayList<Node> wrbCluster,
                String serverCrt, String serverPrivKey, String caRoot) {
 
         WRB.f = f;
@@ -37,8 +39,7 @@ public class WRB {
         new BFD(n, f, workers,20 * tmo);
         BFD.activateAll();
         WRB.rpcs = new WrbRpcs(id, workers, n, f, wrbCluster, serverCrt, serverPrivKey, caRoot);
-        logger.info(format("Initiated WRB: [id=%d; n=%d; f=%d; tmo=%d; tmoInterval=%d]", id, n, f, tmo,
-                tmoInterval));
+        logger.info(format("Initiated WRB: [id=%d; n=%d; f=%d; tmo=%d]", id, n, f, tmo));
     }
 
 

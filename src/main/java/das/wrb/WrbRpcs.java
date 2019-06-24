@@ -1,6 +1,7 @@
 package das.wrb;
 
 import blockchain.data.BCS;
+import proto.prpcs.wrbService.WrbGrpc.*;
 import utils.Node;
 import crypto.BlockDigSig;
 import crypto.SslUtils;
@@ -10,8 +11,6 @@ import io.grpc.netty.NettyServerBuilder;
 import io.grpc.stub.StreamObserver;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
-import proto.Types;
-import proto.WrbGrpc;
 
 import javax.net.ssl.SSLException;
 import java.io.IOException;
@@ -23,8 +22,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static das.data.Data.addToPendings;
 import static io.grpc.Metadata.ASCII_STRING_MARSHALLER;
 import static java.lang.String.format;
+import static proto.prpcs.wrbService.WrbGrpc.newStub;
+import proto.types.block.*;
+import proto.types.utils.Empty;
+import proto.types.wrb.*;
+import proto.types.meta.*;
 
-public class WrbRpcs extends WrbGrpc.WrbImplBase {
+public class WrbRpcs extends WrbImplBase {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(WRB.class);
 
 
@@ -76,7 +80,7 @@ public class WrbRpcs extends WrbGrpc.WrbImplBase {
 
     class peer {
         ManagedChannel channel;
-        WrbGrpc.WrbStub stub;
+        WrbStub stub;
         AtomicInteger[] pending;
         int maxPending = 100;
 
@@ -93,14 +97,14 @@ public class WrbRpcs extends WrbGrpc.WrbImplBase {
             for (int i = 0 ; i < workers ; i++) {
                 pending[i] = new AtomicInteger(0);
             }
-            stub = WrbGrpc.newStub(channel);
+            stub = newStub(channel);
         }
-        void send(Types.BlockHeader h, int w) {
+        void send(BlockHeader h, int w) {
 //            if (pending[w].get() > maxPending) return;
 //            pending[w].incrementAndGet();
-            stub.disseminateMessage(h, new StreamObserver<Types.Empty>() {
+            stub.disseminateMessage(h, new StreamObserver<Empty>() {
                 @Override
-                public void onNext(Types.Empty empty) {
+                public void onNext(Empty empty) {
 //                    pending[w].decrementAndGet();
                 }
 
@@ -181,17 +185,17 @@ public class WrbRpcs extends WrbGrpc.WrbImplBase {
         wrbServer.shutdown();
     }
 
-    private void sendDataMessage(peer p, Types.BlockHeader msg) {
+    private void sendDataMessage(peer p, BlockHeader msg) {
         p.send(msg, msg.getM().getChannel());
     }
 
-    private void sendReqMessage(WrbGrpc.WrbStub stub, Types.WrbReq req, int worker,
+    private void sendReqMessage(WrbStub stub, WrbReq req, int worker,
                                 int cidSeries, int cid, int sender) {
         stub.reqMessage(req, new StreamObserver<>() {
             @Override
-            public void onNext(Types.WrbRes res) {
-                if (res.equals(Types.WrbRes.getDefaultInstance())) return;
-                Types.Meta key = Types.Meta.newBuilder()
+            public void onNext(WrbRes res) {
+                if (res.equals(WrbRes.getDefaultInstance())) return;
+                Meta key = Meta.newBuilder()
                         .setChannel(worker)
                         .setCidSeries(cidSeries)
                         .setCid(cid)
@@ -227,7 +231,7 @@ public class WrbRpcs extends WrbGrpc.WrbImplBase {
         });
     }
 
-    void broadcastReqMsg(Types.WrbReq req, int channel, int cidSeries, int cid, int sender) {
+    void broadcastReqMsg(WrbReq req, int channel, int cidSeries, int cid, int sender) {
         logger.debug(format("[#%d-C[%d]] broadcasts request message [cidSeries=%d ; cid=%d; height=%d]", id,
                 req.getMeta().getChannel(), cidSeries, cid, req.getHeight()));
         for (int p : peers.keySet()) {
@@ -236,35 +240,35 @@ public class WrbRpcs extends WrbGrpc.WrbImplBase {
         }
     }
 
-    void wrbSend(Types.BlockHeader msg, int[] recipients) {
+    void wrbSend(BlockHeader msg, int[] recipients) {
         for (int i : recipients) {
             sendDataMessage(peers.get(i), msg);
         }
 
     }
-    void wrbBroadcast(Types.BlockHeader msg) {
+    void wrbBroadcast(BlockHeader msg) {
         for (peer p : peers.values()) {
             sendDataMessage(p, msg);
         }
     }
 
     @Override
-    public void disseminateMessage(Types.BlockHeader request, StreamObserver<Types.Empty> responseObserver) {
-        Types.Meta key1 = request.getM();
+    public void disseminateMessage(BlockHeader request, StreamObserver<Empty> responseObserver) {
+        Meta key1 = request.getM();
         logger.debug(format("received a header for [w=%d; cidSeries=%d; cid=%d]", key1.getChannel(),
                 key1.getCidSeries(), key1.getCid()));
         addToPendings(request, key1);
-        responseObserver.onNext(Types.Empty.newBuilder().build());
+        responseObserver.onNext(Empty.newBuilder().build());
         responseObserver.onCompleted();
     }
 
     @Override
-    public void reqMessage(Types.WrbReq request, StreamObserver<Types.WrbRes> responseObserver)  {
-        Types.BlockHeader msg;
+    public void reqMessage(WrbReq request, StreamObserver<WrbRes> responseObserver)  {
+        BlockHeader msg;
         int cid = request.getMeta().getCid();
         int cidSeries = request.getMeta().getCidSeries();
         int worker = request.getMeta().getChannel();
-        Types.Meta key =  Types.Meta.newBuilder()
+        Meta key =  Meta.newBuilder()
                 .setChannel(worker)
                 .setCidSeries(cidSeries)
                 .setCid(cid)
@@ -276,12 +280,12 @@ public class WrbRpcs extends WrbGrpc.WrbImplBase {
         if (msg != null) {
             logger.debug(format("[#%d-C[%d]] has received request message from [#%d] of [cidSeries=%d ; cid=%d]",
                     id, worker, request.getSender(), cidSeries, cid));
-            Types.Meta meta = Types.Meta.newBuilder().
+            Meta meta = Meta.newBuilder().
                     setChannel(worker).
                     setCid(cid).
                     setCidSeries(cidSeries).
                     build();
-            responseObserver.onNext(Types.WrbRes.newBuilder().
+            responseObserver.onNext(WrbRes.newBuilder().
                     setData(msg).
                     setM(meta).
                     setSender(id).
@@ -289,7 +293,7 @@ public class WrbRpcs extends WrbGrpc.WrbImplBase {
         } else {
             logger.debug(format("[#%d-C[%d]] has received request message from [#%d] of [cidSeries=%d ; cid=%d] but buffers are empty",
                     id, worker, request.getSender(), cidSeries, cid));
-            responseObserver.onNext(Types.WrbRes.getDefaultInstance());
+            responseObserver.onNext(WrbRes.getDefaultInstance());
         }
         responseObserver.onCompleted();
     }

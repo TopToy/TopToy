@@ -3,6 +3,7 @@ package servers;
 import blockchain.data.BCS;
 import communication.CommLayer;
 import communication.overlays.clique.Clique;
+import proto.types.client;
 import utils.Node;
 import das.ab.ABService;
 import das.bbc.BBC;
@@ -11,10 +12,12 @@ import das.ms.Membership;
 import das.wrb.WRB;
 import io.grpc.Server;
 import io.grpc.netty.NettyServerBuilder;
-import proto.Types;
-import utils.CacheUtils;
+
+import utils.cache.TxCache;
 import utils.DBUtils;
 import utils.DiskUtils;
+import proto.types.transaction.*;
+import proto.types.block.*;
 
 import java.io.IOException;
 import java.util.*;
@@ -35,8 +38,8 @@ public class Top {
 //    private EventLoopGroup gnio = new NioEventLoopGroup(2);
 
 
-    public Top(int id, int n, int f, int workers, int tmo, int tmoInterval,
-               int maxTx, boolean fastMode, ArrayList<Node> obbcCluster,
+    public Top(int id, int n, int f, int workers, int tmo,
+               int maxTx, ArrayList<Node> obbcCluster,
                ArrayList<Node> wrbCluster, ArrayList<Node> commCluster,
                String abConfig, String type, String serverCrt, String serverPrivKey, String caRoot) {
         this.n = n;
@@ -45,31 +48,31 @@ public class Top {
         this.toys = new ToyBaseServer[workers];
         this.id = id;
         new BCS(id, n, f, workers);
-        initProtocols(obbcCluster, wrbCluster, tmo, tmoInterval, serverCrt,
+        initProtocols(obbcCluster, wrbCluster, tmo, serverCrt,
                 serverPrivKey, caRoot, commCluster, abConfig);
 
         this.type = type;
         // TODO: Apply to more types
         if (type.equals("r")) {
             for (int i = 0 ; i < workers ; i++) {
-                toys[i] = new ToyServer(id, i, n, f, maxTx, fastMode, comm);
+                toys[i] = new ToyServer(id, i, n, f, maxTx, comm);
             }
         }
         if (type.equals("b")) {
             for (int i = 0 ; i < workers ; i++) {
-                toys[i] = new ByzToyServer(id, i, n, f, maxTx, fastMode, comm);
+                toys[i] = new ByzToyServer(id, i, n, f, maxTx, comm);
             }
         }
         if (type.equals("a")) {
             for (int i = 0 ; i < workers ; i++) {
-                toys[i] = new AsyncToyServer(id, i, n, f, maxTx, fastMode, comm);
+                toys[i] = new AsyncToyServer(id, i, n, f, maxTx, comm);
             }
         }
         logger.info(format("Initiated TOP: [id=%d; n=%d; f=%d; workers=%d]", id, n, f, workers));
 
     }
 
-    private void initProtocols(ArrayList<Node> obbcCluster, ArrayList<Node> wrbCluster, int tmo, int tmoInterval,
+    private void initProtocols(ArrayList<Node> obbcCluster, ArrayList<Node> wrbCluster, int tmo,
                                String serverCrt, String serverPrivKey, String caRoot,
                                ArrayList<Node> commCluster, String abConfigHome) {
         comm = new Clique(id, workers, this.n, commCluster);
@@ -80,11 +83,11 @@ public class Top {
         logger.info(format("[%d] has initiated BBC", id));
         new OBBC(id, n, f, workers, n - f, obbcCluster, comm, caRoot, serverCrt, serverPrivKey);
         logger.info(format("[%d] has initiated OBBC service", id));
-        new WRB(id, workers, n, f, tmo, tmoInterval, wrbCluster, serverCrt, serverPrivKey, caRoot);
+        new WRB(id, workers, n, f, tmo, wrbCluster, serverCrt, serverPrivKey, caRoot);
         logger.info(format("[%d] has initiated WRB", id));
         new Membership(n);
         logger.info(format("[%d] has initiated Membership", id));
-        new CacheUtils(0, workers);
+        new TxCache(0, workers);
         logger.info(format("[%d] has initiated Cache utils", id));
         new DBUtils(workers);
         logger.info(format("[%d] has initiated DB Utils", id));
@@ -161,7 +164,7 @@ public class Top {
         logger.info("Start serving, everything looks good");
     }
 
-    public Types.txID addTransaction(Types.Transaction tx) {
+    public TxID addTransaction(Transaction tx) {
         int ps = toys[0].getTxPoolSize();
         int worker = 0;
         for (int i = 1 ; i < workers ; i++) {
@@ -174,7 +177,7 @@ public class Top {
         return toys[worker].addTransaction(tx);
     }
 
-    public Types.txID addTransaction(byte[] data, int clientID) {
+    public TxID addTransaction(byte[] data, int clientID) {
        int ps = toys[0].getTxPoolSize();
        int worker = 0;
        for (int i = 1 ; i < workers ; i++) {
@@ -187,23 +190,20 @@ public class Top {
         return toys[worker].addTransaction(data, clientID);
     }
 
-    public int status(Types.txID tid, boolean blocking) throws InterruptedException {
+    public client.TxState status(TxID tid, boolean blocking) throws InterruptedException {
+        if (tid.getChannel() > workers) return client.TxState.UNKNOWN;
         return toys[tid.getChannel()].status(tid, blocking);
     }
 
-    public Types.Transaction getTransaction(Types.txID txID, boolean blocking) throws InterruptedException {
+    public Transaction getTransaction(TxID txID, boolean blocking) throws InterruptedException {
+        if (txID.getChannel() > workers) return Transaction.getDefaultInstance();
         return toys[txID.getChannel()].getTx(txID, blocking);
     }
 
-    public Types.Block deliver(int index) throws InterruptedException {
+    public Block deliver(int index, boolean blocking) throws InterruptedException {
         int channel_num = index % workers;
         int block_num = index / workers;
-        return toys[channel_num].deliver(block_num);
-    }
-
-    public Types.Block nonBlockingDeliver(int index) {
-        int channel_num = index % workers;
-        int block_num = index / workers;
+        if (blocking) return toys[channel_num].deliver(block_num);
         return toys[channel_num].nonBlockingdeliver(block_num);
     }
 
@@ -238,6 +238,22 @@ public class Top {
             }
         }
 
+    }
+
+    public int poolSize() {
+        int ps = 0;
+        for (int i = 0 ; i < workers ; i++) {
+            ps += toys[i].getTxPoolSize();
+        }
+        return ps;
+    }
+
+    public int pendingSize() {
+        int ps = 0;
+        for (int i = 0; i < workers ; i++) {
+            ps += toys[i].getPendingSize();
+        }
+        return ps;
     }
 
 }

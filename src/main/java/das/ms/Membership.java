@@ -3,9 +3,11 @@ package das.ms;
 import com.google.protobuf.InvalidProtocolBufferException;
 import das.ab.ABService;
 import das.data.Data;
-import proto.Types;
 
 import java.util.concurrent.CountDownLatch;
+import proto.types.meta.*;
+import proto.types.fd.*;
+import proto.types.rb.*;
 
 import static java.lang.String.format;
 
@@ -19,7 +21,7 @@ public class Membership {
     }
 
     static public int start(int id) {
-        ABService.broadcast(Types.startMsg.newBuilder().setId(id).build().toByteArray(), Types.Meta.newBuilder().build(), Data.RBTypes.START);
+        ABService.broadcast(StartMsg.newBuilder().setId(id).build().toByteArray(), Meta.newBuilder().build(), Data.RBTypes.START);
         try {
             startLetch.await();
         } catch (InterruptedException e) {
@@ -29,8 +31,8 @@ public class Membership {
         return 0;
     }
 
-    static public void handleStartMsg(Types.RBMsg msg) throws InvalidProtocolBufferException {
-        Types.startMsg m = Types.startMsg.parseFrom(msg.getData());
+    static public void handleStartMsg(RBMsg msg) throws InvalidProtocolBufferException {
+        StartMsg m = StartMsg.parseFrom(msg.getData());
         logger.info(format("Received start msg from [%d]", m.getId()));
         startLetch.countDown();
     }

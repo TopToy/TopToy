@@ -71,10 +71,10 @@ The benchmarks parameters are described in the [wiki]().
 Benchmark | Description
 ----------|-------------
 test_correct | Test the system when no failures occur
-test_benign_failure | Test the system with (i) _f_ benign failures 
+test_benign_failure | Test the system with _f_ benign failures 
 test_async | Test the system in a asynchronous period
 test_byz_failure | Test the system with (i) _f_ Byzantine failures and (ii) in an asynchronous period
-test_correct_with_clients | Test the system when no failures occur with clients running on top of docker containers
+test_clients_performance | Test the system when no failures occur with clients running on top of docker containers
 
 ### Running A Benchmark
 1. Go to `definitions.sh` and set _n_ and _f_

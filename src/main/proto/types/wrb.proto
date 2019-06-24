@@ -1,0 +1,19 @@
+syntax = "proto3";
+option java_package = "proto.types";
+package proto.types;
+option java_outer_classname = "wrb";
+
+import "types/meta.proto";
+import "types/block.proto";
+
+message WrbReq {
+    proto.types.Meta _meta = 1;
+    int32 height = 2;
+    int32 sender = 3;
+}
+
+message WrbRes {
+    proto.types.Meta m = 1;
+    proto.types.BlockHeader data = 2;
+    int32 sender = 3;
+}

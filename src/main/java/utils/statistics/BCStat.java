@@ -1,11 +1,10 @@
 package utils.statistics;
 
-import proto.Types;
-
+import proto.types.block.*;
 public class BCStat {
         public int pid;
-        public Types.blockStatistics bst;
-        public Types.headerStatistics hst;
+        public BlockStatistics bst;
+        public HeaderStatistics hst;
         public int txCount;
 
 }

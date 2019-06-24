@@ -5,8 +5,8 @@ BIN_DIR=${BASE_DIR}/bin
 CBIN_DIR=${BASE_DIR}/cbin
 RESOURCES_DIR=${BIN_DIR}/src/main/resources
 CRESOURCES_DIR=${CBIN_DIR}/src/main/resources
-C=4
-F=1
+C=1
+F=0
 make_script_dir=${BASE_DIR}/make_scripts
 docker_image=toy:0.1
 cdocker_image=ctoy:0.1
@@ -16,7 +16,6 @@ configurations=${curr_out}/configurations
 
 output=${curr_out}/out
 composed=${curr_out}/composed
-
 
 cdest=${configurations}/correct
 fbdest=${configurations}/fbenign
@@ -29,7 +28,8 @@ compose_file_benign_failures=${composed}/docker-compose-benign-failures.yml
 compose_file_async=${composed}/docker-compose-async.yml
 compose_file_byz=${composed}/docker-compose-byz.yml
 compose_file_correct_with_clients=${composed}/docker-compose-correct-with-clients.yml
-
+compose_file_standalone_clients_p=${composed}/docker-compose-standalone-clients_p.yml
+compose_file_standalone_clients_r=${composed}/docker-compose-standalone-clients_r.yml
 docker_out=${curr_out}/curr
 cdocker_out=${curr_out}/ccurr
 

@@ -1,0 +1,22 @@
+syntax = "proto3";
+option java_package = "proto.crpcs.clientService";
+package proto.crpcs.clientService;
+option java_outer_classname = "clientService";
+
+import "types/transaction.proto";
+import "types/block.proto";
+import "types/client.proto";
+import "types/utils.proto";
+
+service ClientService {
+    rpc writeTx(proto.types.Transaction) returns (proto.types.TxID) {};
+    rpc readTx(proto.types.TxReq) returns (proto.types.Transaction) {};
+    rpc txStatus(proto.types.TxReq) returns (proto.types.TxStatus) {};
+    rpc readBlock(proto.types.BlockReq) returns (proto.types.Block) {};
+    rpc getHeight(proto.types.Empty) returns (proto.types.Integer) {};
+    rpc isAlive(proto.types.Empty) returns (proto.types.Empty) {};
+    rpc poolSize(proto.types.Empty) returns (proto.types.Integer) {};
+    rpc pendingSize(proto.types.Empty) returns (proto.types.Integer) {};
+    rpc getValidators(proto.types.Empty) returns (proto.types.Validators) {};
+    rpc getConfigInfo(proto.types.Empty) returns (proto.types.ConfigInfo) {};
+}

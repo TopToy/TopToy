@@ -3,7 +3,8 @@ package communication.overlays.clique;
 import communication.CommLayer;
 import communication.data.Data;
 import utils.Node;
-import proto.Types;
+import proto.types.block.*;
+import proto.types.comm.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -38,7 +39,7 @@ public class Clique implements CommLayer {
     }
 
     @Override
-    public void broadcast(int worker, Types.Block data) {
+    public void broadcast(int worker, Block data) {
         logger.debug(format("[%d-%d] broadcast block data [bid=%d]", id, worker, data.getId().getBid()));
         rpcs.broadcast(worker, data);
     }
@@ -46,12 +47,12 @@ public class Clique implements CommLayer {
     // Meant to test Byzantine activity
 
     @Override
-    public void send(int worker, Types.Block data, int[] recipients) {
+    public void send(int worker, Block data, int[] recipients) {
         rpcs.send(worker, data, recipients);
     }
 
-    private Types.Block getBlockFromData(int channel, Types.BlockID bid, Types.BlockHeader proof) {
-        final Types.Block[] res = {null};
+    private Block getBlockFromData(int channel, BlockID bid, BlockHeader proof) {
+        final Block[] res = {null};
         int pid = bid.getPid();
         Data.blocks[pid][channel].computeIfPresent(bid, (k, v) -> {
             v = v.stream()
@@ -63,11 +64,11 @@ public class Clique implements CommLayer {
     }
 
     @Override
-    public Types.Block recBlock(int channel, Types.BlockHeader proof) throws InterruptedException {
-        Types.BlockID bid = proof.getBid();
-        Types.Block res = getBlockFromData(channel, bid, proof);
+    public Block recBlock(int channel, BlockHeader proof) throws InterruptedException {
+        BlockID bid = proof.getBid();
+        Block res = getBlockFromData(channel, bid, proof);
         if (res != null) return res;
-        rpcs.broadcastCommReq(Types.commReq.newBuilder().setProof(proof).build());
+        rpcs.broadcastCommReq(CommReq.newBuilder().setProof(proof).build());
         int pid = bid.getPid();
         synchronized (Data.blocks[pid][channel]) {
             while (res == null) {
@@ -79,9 +80,9 @@ public class Clique implements CommLayer {
     }
 
     @Override
-    public boolean contains(int channel, Types.BlockHeader proof) {
+    public boolean contains(int channel, BlockHeader proof) {
         if (proof.getEmpty()) return true;
-        Types.BlockID bid = proof.getBid();
+        BlockID bid = proof.getBid();
         int pid = bid.getPid();
         Data.blocks[pid][channel].computeIfPresent(bid, (k, v) -> {
             int bef = v.size();

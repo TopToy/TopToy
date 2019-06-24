@@ -1,0 +1,13 @@
+syntax = "proto3";
+option java_package = "proto.types";
+package proto.types;
+option java_outer_classname = "version";
+
+import "types/block.proto";
+
+message SubChainVersion {
+    int32 forkPoint = 1;
+    int32 suggested = 2;
+    repeated proto.types.Block v = 3;
+    int32 sender = 4;
+}
