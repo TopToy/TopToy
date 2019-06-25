@@ -27,8 +27,11 @@ class ToyServer extends ToyBaseServer {
         if (currLeader != getID()) {
             return null;
         }
-        logger.info(format("[#%d-C[%d]] prepare to disseminate a new block header for [height=%d] [cidSeries=%d ; cid=%d]",
-                getID(), worker, currHeight, cidSeries, cid));
+        if (currHeight % 1000 == 0) {
+            logger.info(format("[#%d-C[%d]] prepare to disseminate a new block header for [height=%d] [cidSeries=%d ; cid=%d]",
+                    getID(), worker, currHeight, cidSeries, cid));
+        }
+
         WRB.WRBBroadcast(getHeaderForCurrentBlock(BCS.nbGetBlock(worker, currHeight - 1).getHeader(),
                 currHeight, cidSeries, cid));
         return null;
@@ -38,8 +41,11 @@ class ToyServer extends ToyBaseServer {
         if ((currLeader + 1) % n != getID()) {
             return null;
         }
-        logger.info(format("[#%d-C[%d]] prepare fast mode phase for [height=%d] [cidSeries=%d ; cid=%d]",
-                getID(), worker, currHeight + 1, cidSeries, cid + 1));
+        if (currHeight % 1000 == 0) {
+            logger.info(format("[#%d-C[%d]] prepare fast mode phase for [height=%d] [cidSeries=%d ; cid=%d]",
+                    getID(), worker, currHeight + 1, cidSeries, cid + 1));
+        }
+
         return getHeaderForCurrentBlock(null, currHeight + 1, cidSeries, cid + 1);
     }
 

@@ -16,8 +16,8 @@ ENV Type=r
 #Copy configuration
 COPY bin $TOY_HOME/bin
 
-#ENTRYPOINT ["chmod 777 ${TOY_HOME}/bin/run_docker.sh", "./${TOY_HOME}/bin/run_docker.sh"]
-#CMD echo ${ID}
+EXPOSE 9876
+
 ENTRYPOINT ${TOY_HOME}/bin/run_docker.sh ${ID} ${Type}
-#CMD cat ${TOY_HOME}/bin/src/main/resources/inst/input.inst
+
 STOPSIGNAL SIGTERM

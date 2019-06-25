@@ -24,6 +24,8 @@ echo \
         volumes:
         - ${out}:/tmp/JToy
         - ${conf}:/JToy/bin/src/main/resources
+        ports:
+        - \"9876:9876\"
         networks:
             toy_net:
                 ipv4_address: 172.18.0.$((${id} + 3))" \
@@ -96,6 +98,8 @@ echo \
         volumes:
         - ${out}:/tmp/JToy
         - ${conf}:/JToy/bin/src/main/resources
+        ports:
+        - \"9876:9876\"
         networks:
             toy_net:
                 ipv4_address: 172.18.0.$((${id} + 3))" \
@@ -117,6 +121,8 @@ echo \
         volumes:
         - ${out}:/tmp/JToy
         - ${conf}:/JToy/bin/src/main/resources
+        ports:
+        - \"9876:9876\"
         networks:
             toy_net:
                 ipv4_address: 172.18.0.$((${id} + 3))" \
@@ -138,6 +144,8 @@ echo \
         volumes:
         - ${out}:/tmp/JToy
         - ${conf}:/JToy/bin/src/main/resources
+        ports:
+        - \"9876:9876\"
         networks:
             toy_net:
                 ipv4_address: 172.18.0.$((${id} + 3))" \

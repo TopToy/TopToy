@@ -73,6 +73,13 @@ class Cli {
                 return;
             }
 
+            if (args[0].equals("up")) {
+                init();
+                serve();
+                while (true) {
+                    Thread.sleep(Long.MAX_VALUE);
+                }
+            }
 
             if (args[0].equals("serve")) {
                 serve();

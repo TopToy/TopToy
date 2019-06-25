@@ -37,6 +37,11 @@ stop
 quit" > ${2}/inst/input.inst
 }
 
+configure_up_inst(){
+echo \
+"up" > ${1}/inst/input.inst
+}
+
 configure_async_byz_inst(){
 local tme=$((${1}/2))
 echo \

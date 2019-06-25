@@ -157,7 +157,7 @@ public class Top {
 //                    .maxConcurrentCallsPerConnection(5) // TODO: Inspect this limit
                     .build()
                     .start();
-            logger.info("starting client RPCs server, listening on port 30100");
+            logger.info("starting client RPCs server, listening on port 9876");
         } catch (IOException e) {
             logger.error("", e);
         }
