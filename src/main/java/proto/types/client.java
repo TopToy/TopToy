@@ -20,40 +20,40 @@ public final class client {
   public enum TxState
       implements com.google.protobuf.ProtocolMessageEnum {
     /**
-     * <code>COMMITTED = 0;</code>
+     * <code>UNKNOWN = 0;</code>
      */
-    COMMITTED(0),
+    UNKNOWN(0),
     /**
-     * <code>PENDING = 1;</code>
+     * <code>COMMITTED = 1;</code>
      */
-    PENDING(1),
+    COMMITTED(1),
     /**
-     * <code>PROPOSED = 2;</code>
+     * <code>PENDING = 2;</code>
      */
-    PROPOSED(2),
+    PENDING(2),
     /**
-     * <code>UNKNOWN = 3;</code>
+     * <code>PROPOSED = 3;</code>
      */
-    UNKNOWN(3),
+    PROPOSED(3),
     UNRECOGNIZED(-1),
     ;
 
     /**
-     * <code>COMMITTED = 0;</code>
+     * <code>UNKNOWN = 0;</code>
      */
-    public static final int COMMITTED_VALUE = 0;
+    public static final int UNKNOWN_VALUE = 0;
     /**
-     * <code>PENDING = 1;</code>
+     * <code>COMMITTED = 1;</code>
      */
-    public static final int PENDING_VALUE = 1;
+    public static final int COMMITTED_VALUE = 1;
     /**
-     * <code>PROPOSED = 2;</code>
+     * <code>PENDING = 2;</code>
      */
-    public static final int PROPOSED_VALUE = 2;
+    public static final int PENDING_VALUE = 2;
     /**
-     * <code>UNKNOWN = 3;</code>
+     * <code>PROPOSED = 3;</code>
      */
-    public static final int UNKNOWN_VALUE = 3;
+    public static final int PROPOSED_VALUE = 3;
 
 
     public final int getNumber() {
@@ -74,10 +74,10 @@ public final class client {
 
     public static TxState forNumber(int value) {
       switch (value) {
-        case 0: return COMMITTED;
-        case 1: return PENDING;
-        case 2: return PROPOSED;
-        case 3: return UNKNOWN;
+        case 0: return UNKNOWN;
+        case 1: return COMMITTED;
+        case 2: return PENDING;
+        case 3: return PROPOSED;
         default: return null;
       }
     }
@@ -252,7 +252,7 @@ public final class client {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (status_ != proto.types.client.TxState.COMMITTED.getNumber()) {
+      if (status_ != proto.types.client.TxState.UNKNOWN.getNumber()) {
         output.writeEnum(1, status_);
       }
       unknownFields.writeTo(output);
@@ -264,7 +264,7 @@ public final class client {
       if (size != -1) return size;
 
       size = 0;
-      if (status_ != proto.types.client.TxState.COMMITTED.getNumber()) {
+      if (status_ != proto.types.client.TxState.UNKNOWN.getNumber()) {
         size += com.google.protobuf.CodedOutputStream
           .computeEnumSize(1, status_);
       }
@@ -3397,8 +3397,8 @@ public final class client {
       "o\022\023\n\013clusterSize\030\001 \001(\005\022\023\n\013maxFailures\030\002 " +
       "\001(\005\022\017\n\007workers\030\003 \001(\005\022\017\n\007initTmo\030\004 \001(\005\022\024\n" +
       "\014maxTxInBlock\030\005 \001(\005\022\020\n\010serverID\030\006 \001(\005*@\n" +
-      "\007TxState\022\r\n\tCOMMITTED\020\000\022\013\n\007PENDING\020\001\022\014\n\010" +
-      "PROPOSED\020\002\022\013\n\007UNKNOWN\020\003B\025\n\013proto.typesB\006" +
+      "\007TxState\022\013\n\007UNKNOWN\020\000\022\r\n\tCOMMITTED\020\001\022\013\n\007" +
+      "PENDING\020\002\022\014\n\010PROPOSED\020\003B\025\n\013proto.typesB\006" +
       "clientb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =

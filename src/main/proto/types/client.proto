@@ -6,10 +6,10 @@ option java_outer_classname = "client";
 import "types/transaction.proto";
 
 enum TxState {
-    COMMITTED = 0;
-    PENDING = 1;
-    PROPOSED = 2;
-    UNKNOWN = 3;
+    UNKNOWN = 0;
+    COMMITTED = 1;
+    PENDING = 2;
+    PROPOSED = 3;
 }
 
 message TxStatus {
