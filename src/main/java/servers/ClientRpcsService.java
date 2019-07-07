@@ -14,17 +14,17 @@ import static utils.Config.*;
 public class ClientRpcsService extends ClientServiceImplBase {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ClientRpcsService.class);
 
-    private Top topServer;
+//    private Top topServer;
 
-    ClientRpcsService(Top topServer)  {
-        this.topServer = topServer;
-    }
+//    ClientRpcsService(Top topServer)  {
+//        this.topServer = topServer;
+//    }
 
     @Override
     public void writeTx(Transaction request,
                       StreamObserver<TxID> responseObserver) {
         logger.debug(format("received txWrite request from [%d]", request.getClientID()));
-        TxID tid = topServer.addTransaction(request);
+        TxID tid = Top.addTransaction(request);
         responseObserver.onNext(tid);
         responseObserver.onCompleted();
     }
@@ -34,7 +34,7 @@ public class ClientRpcsService extends ClientServiceImplBase {
                      StreamObserver<Transaction> responseObserver) {
         logger.debug(format("received read request from [%d]", request.getCid()));
         try {
-            Transaction tx = topServer.getTransaction(request.getTid(), request.getBlocking());
+            Transaction tx = Top.getTransaction(request.getTid(), request.getBlocking());
             responseObserver.onNext(tx);
         } catch (InterruptedException e) {
             logger.error(e);
@@ -50,7 +50,7 @@ public class ClientRpcsService extends ClientServiceImplBase {
                       StreamObserver<TxStatus> responseObserver) {
         logger.debug(format("received status request from [%d]", request.getCid()));
         try {
-            TxState sts = topServer.status(request.getTid(), request.getBlocking());
+            TxState sts = Top.status(request.getTid(), request.getBlocking());
             responseObserver.onNext(TxStatus.newBuilder().setStatus(sts).build());
         } catch (InterruptedException e) {
             logger.error(e);
@@ -66,7 +66,7 @@ public class ClientRpcsService extends ClientServiceImplBase {
     public void readBlock(BlockReq request,
                           StreamObserver<Block> responseObserver) {
         try {
-            Block b = topServer.deliver(request.getHeight(), request.getBlocking());
+            Block b = Top.deliver(request.getHeight(), request.getBlocking());
             responseObserver.onNext(b);
         } catch (InterruptedException e) {
             logger.error(e);
@@ -86,7 +86,7 @@ public class ClientRpcsService extends ClientServiceImplBase {
     @Override
     public void poolSize(utils.Empty request,
                          StreamObserver<utils.Integer> responseObserver) {
-        responseObserver.onNext(utils.Integer.newBuilder().setNum(topServer.poolSize()).build());
+        responseObserver.onNext(utils.Integer.newBuilder().setNum(Top.poolSize()).build());
         responseObserver.onCompleted();
     }
 
@@ -100,7 +100,7 @@ public class ClientRpcsService extends ClientServiceImplBase {
     @Override
     public void pendingSize(utils.Empty request,
                          StreamObserver<utils.Integer> responseObserver) {
-        responseObserver.onNext(utils.Integer.newBuilder().setNum(topServer.pendingSize()).build());
+        responseObserver.onNext(utils.Integer.newBuilder().setNum(Top.pendingSize()).build());
         responseObserver.onCompleted();
     }
 
@@ -121,7 +121,7 @@ public class ClientRpcsService extends ClientServiceImplBase {
         responseObserver.onNext(ConfigInfo.newBuilder()
                 .setClusterSize(getN())
                 .setMaxFailures(getF())
-                .setServerID(topServer.getID())
+                .setServerID(Top.getID())
                 .setWorkers(getC())
                 .setInitTmo(getTMO())
                 .setMaxTxInBlock(getMaxTransactionsInBlock())

@@ -1,6 +1,7 @@
 package app;
 import blockchain.data.BCS;
 import com.google.protobuf.ByteString;
+import servers.Top;
 import utils.Config;
 import crypto.BlockDigSig;
 import das.ms.BFD;
@@ -131,7 +132,7 @@ class Cli {
             }
 
             if (args[0].equals("byz")) {
-                JToy.s.setByzSetting();
+                Top.setByzSetting();
                 return;
             }
 
@@ -144,7 +145,7 @@ class Cli {
             }
 
             if (args[0].equals("stStart")) {
-               Statistics.activate(JToy.s.getID());
+               Statistics.activate(Top.getID());
                 return;
 
             }
@@ -178,16 +179,16 @@ class Cli {
 
         private void init() {
             JToy.init();
-            JToy.s.start();
+            Top.start();
         }
 
         private void serve() {
             if (JToy.type.equals("m")) return;
             logger.debug("start serving");
-            JToy.s.serve();
+            Top.serve();
         }
         private void stop() {
-            JToy.s.shutdown();
+            Top.shutdown();
         }
 
 
@@ -198,7 +199,7 @@ class Cli {
                     .setTxNum(tid)
                     .setChannel(channel)
                     .build();
-            return JToy.s.status(txid, false).toString();
+            return Top.status(txid, false).toString();
 
         }
         private void signBlockFromBuilder(Block.Builder b) {
@@ -292,7 +293,7 @@ class Cli {
             if (Config.getTxSize() != 512) return;
             logger.info("Starting writeBlocks");
             String pathString = "/tmp/JToy/res/";
-            Path path = Paths.get(pathString, String.valueOf(JToy.s.getID()), "bsummary.csv");
+            Path path = Paths.get(pathString, String.valueOf(Top.getID()), "bsummary.csv");
             File f = new File(path.toString());
 
             try {
@@ -314,7 +315,7 @@ class Cli {
                             b.getHeader().getHst().getDefiniteTime()).collect(Collectors.toList()));
                     for (int j = 0 ; j < workers ; j++) {
                         Block b = rBlocks.get(j);
-                        if (b.getId().getPid() != JToy.s.getID()) continue;
+                        if (b.getId().getPid() != Top.getID()) continue;
                         long pt = b.getBst().getProposeTime();
                         long tt = b.getHeader().getHst().getTentativeTime();
                         long dt = b.getHeader().getHst().getDefiniteTime();
@@ -348,7 +349,7 @@ class Cli {
 
         private void writeSummery(String pathString) {
             logger.info("Starting writeSummary");
-            Path path = Paths.get(pathString, String.valueOf(JToy.s.getID()), "summary.csv");
+            Path path = Paths.get(pathString, String.valueOf(Top.getID()), "summary.csv");
             File f = new File(path.toString());
 
             try {
@@ -441,7 +442,7 @@ class Cli {
 
                 List<String> row = Arrays.asList(
                         String.valueOf(valid)
-                        , String.valueOf(JToy.s.getID())
+                        , String.valueOf(Top.getID())
                         , JToy.type
                         , String.valueOf(Config.getC())
                         , String.valueOf(avgTmo)
@@ -486,7 +487,7 @@ class Cli {
 
     void writeByzSummery(String pathString) {
         logger.info("Starting writeSummary");
-        Path path = Paths.get(pathString, String.valueOf(JToy.s.getID()), "summary.csv");
+        Path path = Paths.get(pathString, String.valueOf(Top.getID()), "summary.csv");
         File f = new File(path.toString());
 
         try {
@@ -560,7 +561,7 @@ class Cli {
 
             List<String> row = Arrays.asList(
                     String.valueOf(valid)
-                    , String.valueOf(JToy.s.getID())
+                    , String.valueOf(Top.getID())
                     , JToy.type
                     , String.valueOf(Config.getC())
                     , String.valueOf(avgTmo)
@@ -606,12 +607,12 @@ class Cli {
 
     private void asyncPeriod(int sec, int duration) throws InterruptedException {
         System.out.println(format("setting async params [%d] sec delay for [%d] sec", sec/1000, duration/1000));
-        JToy.s.setAsyncParam(sec);
+        Top.setAsyncParam(sec);
         if (duration > 0) {
             Thread.sleep(duration);
         }
         System.out.println("return to normal");
-        JToy.s.setAsyncParam(0);
+        Top.setAsyncParam(0);
     }
 
 }

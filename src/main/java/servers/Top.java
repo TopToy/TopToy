@@ -26,14 +26,14 @@ import static java.lang.String.format;
 public class Top {
 
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Top.class);
-    private CommLayer comm;
-    private int n;
-    private int f;
-    private ToyBaseServer[] toys;
-    private int id;
-    private int workers;
-    private String type;
-    private Server txsServer;
+    private static CommLayer comm;
+    private static int n;
+    private static int f;
+    private static ToyBaseServer[] toys;
+    private static int id;
+    private static int workers;
+    private static String type;
+    private static Server txsServer;
 //    private ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(1);
 //    private EventLoopGroup gnio = new NioEventLoopGroup(2);
 
@@ -42,16 +42,16 @@ public class Top {
                int maxTx, ArrayList<Node> obbcCluster,
                ArrayList<Node> wrbCluster, ArrayList<Node> commCluster,
                String abConfig, String type, String serverCrt, String serverPrivKey, String caRoot) {
-        this.n = n;
-        this.f = f;
-        this.workers = workers;
-        this.toys = new ToyBaseServer[workers];
-        this.id = id;
+        Top.n = n;
+        Top.f = f;
+        Top.workers = workers;
+        Top.toys = new ToyBaseServer[workers];
+        Top.id = id;
         new BCS(id, n, f, workers);
         initProtocols(obbcCluster, wrbCluster, tmo, serverCrt,
                 serverPrivKey, caRoot, commCluster, abConfig);
 
-        this.type = type;
+        Top.type = type;
         // TODO: Apply to more types
         if (type.equals("r")) {
             for (int i = 0 ; i < workers ; i++) {
@@ -72,10 +72,10 @@ public class Top {
 
     }
 
-    private void initProtocols(ArrayList<Node> obbcCluster, ArrayList<Node> wrbCluster, int tmo,
+    private static void initProtocols(ArrayList<Node> obbcCluster, ArrayList<Node> wrbCluster, int tmo,
                                String serverCrt, String serverPrivKey, String caRoot,
                                ArrayList<Node> commCluster, String abConfigHome) {
-        comm = new Clique(id, workers, this.n, commCluster);
+        comm = new Clique(id, workers, Top.n, commCluster);
         logger.info(format("[%d] has initiated communication layer", id));
         new ABService(id, n, f, abConfigHome);
         logger.info(format("[%d] has initiated ab service", id));
@@ -95,7 +95,7 @@ public class Top {
     }
 
 
-    public void start() {
+    public static void start() {
         logger.info("Starting OBBC");
         OBBC.start();
         logger.info("Starting wrb");
@@ -114,7 +114,7 @@ public class Top {
 
     }
 
-    public void shutdown() {
+    public static void shutdown() {
         ABService.shutdown();
         logger.info("shutdown AB");
         comm.leave();
@@ -137,7 +137,7 @@ public class Top {
         logger.info("ByeBye");
     }
 
-    public void serve() {
+    public static void serve() {
         try {
             for (int i = 0 ; i < workers ; i++) {
                 toys[i].serve();
@@ -153,7 +153,7 @@ public class Top {
 //                    .executor(Executors.newFixedThreadPool(2))
 //                    .bossEventLoopGroup(gnio)
 //                    .workerEventLoopGroup(gnio)
-                    .addService(new ClientRpcsService(this))
+                    .addService(new ClientRpcsService())
 //                    .maxConcurrentCallsPerConnection(5) // TODO: Inspect this limit
                     .build()
                     .start();
@@ -164,7 +164,7 @@ public class Top {
         logger.info("Start serving, everything looks good");
     }
 
-    public TxID addTransaction(Transaction tx) {
+    public static TxID addTransaction(Transaction tx) {
         int ps = toys[0].getTxPoolSize();
         int worker = 0;
         for (int i = 1 ; i < workers ; i++) {
@@ -177,7 +177,7 @@ public class Top {
         return toys[worker].addTransaction(tx);
     }
 
-    public TxID addTransaction(byte[] data, int clientID) {
+    public static TxID addTransaction(byte[] data, int clientID) {
        int ps = toys[0].getTxPoolSize();
        int worker = 0;
        for (int i = 1 ; i < workers ; i++) {
@@ -190,28 +190,28 @@ public class Top {
         return toys[worker].addTransaction(data, clientID);
     }
 
-    public client.TxState status(TxID tid, boolean blocking) throws InterruptedException {
+    public static client.TxState status(TxID tid, boolean blocking) throws InterruptedException {
         if (tid.getChannel() > workers) return client.TxState.UNKNOWN;
         return toys[tid.getChannel()].status(tid, blocking);
     }
 
-    public Transaction getTransaction(TxID txID, boolean blocking) throws InterruptedException {
+    public static Transaction getTransaction(TxID txID, boolean blocking) throws InterruptedException {
         if (txID.getChannel() > workers) return Transaction.getDefaultInstance();
         return toys[txID.getChannel()].getTx(txID, blocking);
     }
 
-    public Block deliver(int index, boolean blocking) throws InterruptedException {
+    public static Block deliver(int index, boolean blocking) throws InterruptedException {
         int channel_num = index % workers;
         int block_num = index / workers;
         if (blocking) return toys[channel_num].deliver(block_num);
         return toys[channel_num].nonBlockingdeliver(block_num);
     }
 
-    public int getID() {
+    public static int getID() {
         return id;
     }
 
-    public void setByzSetting() {
+    public static void setByzSetting() {
         if (!type.equals("b")) {
             logger.debug("Unable to set byzantine behaviour to non byzantine node");
             return;
@@ -221,7 +221,7 @@ public class Top {
         }
     }
 
-    public void setAsyncParam(int maxTime) {
+    public static void setAsyncParam(int maxTime) {
         if (!type.equals("a") && !type.equals("b")) {
             logger.debug("Unable to set async behaviour to non async node");
             return;
@@ -240,7 +240,7 @@ public class Top {
 
     }
 
-    public int poolSize() {
+    public static int poolSize() {
         int ps = 0;
         for (int i = 0 ; i < workers ; i++) {
             ps += toys[i].getTxPoolSize();
@@ -248,7 +248,7 @@ public class Top {
         return ps;
     }
 
-    public int pendingSize() {
+    public static int pendingSize() {
         int ps = 0;
         for (int i = 0; i < workers ; i++) {
             ps += toys[i].getPendingSize();

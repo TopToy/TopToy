@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 
 public class JToy {
     private static org.apache.log4j.Logger logger;
-    static Top s;
+//    static Top s;
     static String type;
     private static int serverID;
     public static void main(String[] argv) {
@@ -64,7 +64,11 @@ public class JToy {
     static void init() {
         switch (type) {
             default:
-                s = new Top(serverID, Config.getN(), Config.getF(), Config.getC(), Config.getTMO(),
+//                s = new Top(serverID, Config.getN(), Config.getF(), Config.getC(), Config.getTMO(),
+//                        Config.getMaxTransactionsInBlock(), Config.getObbcCluster(), Config.getWrbCluster(),
+//                        Config.getCommCluster(), Config.getABConfigHome(), type, Config.getServerCrtPath(),
+//                        Config.getServerPrivKeyPath(), Config.getCaRootPath());
+                new Top(serverID, Config.getN(), Config.getF(), Config.getC(), Config.getTMO(),
                         Config.getMaxTransactionsInBlock(), Config.getObbcCluster(), Config.getWrbCluster(),
                         Config.getCommCluster(), Config.getABConfigHome(), type, Config.getServerCrtPath(),
                         Config.getServerPrivKeyPath(), Config.getCaRootPath());
