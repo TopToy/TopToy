@@ -57,26 +57,26 @@ quit" > ${3}/inst/input.inst
 }
 
 configure_channels(){
-    sed -i 's/c =.*/c = '${1}'/g' ${2}/config.toml
+    sed -i 's/w: .*/w: '${1}'/g' ${2}/config.yaml
 
 }
 
 configure_tx_size() {
-    sed -i 's/txSize = .*/txSize = '${1}'/g' ${2}/config.toml
+    sed -i 's/txSize: .*/txSize: '${1}'/g' ${2}/config.yaml
 }
 
 
 configure_max_tx_in_block() {
-   sed -i 's/maxTransactionInBlock = .*/maxTransactionInBlock = '${1}'/g' ${2}/config.toml
+   sed -i 's/maxTransactionInBlock: .*/maxTransactionInBlock: '${1}'/g' ${2}/config.yaml
 }
 
 
 configure_tmo()  {
-    sed -i 's/tmo =.*/tmo = '${1}'/g' ${2}/config.toml
+    sed -i 's/tmo: .*/tmo: '${1}'/g' ${2}/config.yaml
 }
 
 configure_testing()  {
-    sed -i 's/testing =.*/testing = '${1}'/g' ${2}/config.toml
+    sed -i 's/testing: .*/testing: '${1}'/g' ${2}/config.yaml
 }
 
 run_dockers(){

@@ -13,7 +13,7 @@ run_channels() {
     configure_tx_size ${4} ${cdest}
     configure_tmo ${5} ${cdest}
     configure_max_tx_in_block ${6} ${cdest}
-    configure_testing "false" ${cdest}
+    configure_testing 0 ${cdest}
     for i in `seq ${1} ${3} ${2}`; do
         configure_channels ${i} ${cdest}
         run_dockers ${compose_file_correct}

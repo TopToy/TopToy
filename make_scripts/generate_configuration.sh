@@ -4,41 +4,36 @@ source $PWD/definitions.sh
 
 generate_config_toml() {
     echo \
-"title = \"configuration\"
-[system]
-    n = ${C}
-    f = ${F}
-    c = 20
-    testing = true
-    txSize = 0
+"title: \"configuration\"
+eVersion: 1
+system:
+    n: ${C}
+    f: ${F}
+    w: 1
+    testing: 1
+settings:
+    tmo: 1000
+    atomicbroadcast: \"src/main/resources/ABConfig\"
+    maxTransactionInBlock: 1000
+    txSize: 512
+    caRootPath: \"\"
+server:
+    privateKey: \"MIGNAgEAMBAGByqGSM49AgEGBSuBBAAKBHYwdAIBAQQg/ngTdAL+eZOyh4lilm6djqslRDHT5C60eLxRcEoNjAGgBwYFK4EEAAqhRANCAASeFQqtyOwJcJtYceofW2TeNg7rJBlWL28GZn+tk32fz95JqVS3+iF6JdoM1clkRFLliyXSxEnS1iO4wzRKGQwm\"
+    tlsPrivKeyPath: \"src/main/resources/sslConfig/server.pem\"
+    tlsCertPath: \"src/main/resources/sslConfig/server.crt\"
 
-[setting]
-    tmo = 1000
-    ABConfigPath = \"src/main/resources/ABConfig\"
-    maxTransactionInBlock = 1000
-    caRootPath = \"\"
-
-[server]
-    privateKey = \"\"\"MIGNAgEAMBAGByqGSM49AgEGBSuBBAAKBHYwdAIBAQQg/ngTdAL+eZOyh4lilm6djqsl
-                    RDHT5C60eLxRcEoNjAGgBwYFK4EEAAqhRANCAASeFQqtyOwJcJtYceofW2TeNg7rJBlW
-                    L28GZn+tk32fz95JqVS3+iF6JdoM1clkRFLliyXSxEnS1iO4wzRKGQwm\"\"\"
-
-    TlsPrivKeyPath = \"src/main/resources/sslConfig/server.pem\"
-    TlsCertPath = \"src/main/resources/sslConfig/server.crt\"
-
-[[cluster]]" \
-> ${1}/config.toml
+cluster:" \
+> ${1}/config.yaml
 n=$((${C} - 1))
 for i in `seq 0 ${n}`; do
-    echo "      [cluster.s${i}]
-            id = ${i}
-            ip = \"172.18.0.$((${i} + 3))\"
-            wrbPort = 30000
-            commPort = 30010
-            obbcPort = 30020
-            publicKey =\"\"\"MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
-                           N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg==\"\"\"
-    " >> ${1}/config.toml
+    echo " \
+- id: ${i}
+   ip: \"172.18.0.$((${i} + 3))\"
+   wrbPort: 30000
+   commPort: 30010
+   obbcPort: 30020
+   publicKey: \"MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg==\"
+    " >> ${1}/config.yaml
 done
 }
 
