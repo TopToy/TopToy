@@ -1,7 +1,7 @@
 package utils.statistics;
 
 import blockchain.data.BCS;
-import utils.Config;
+import utils.config.Config;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;

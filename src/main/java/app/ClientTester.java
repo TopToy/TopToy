@@ -4,7 +4,7 @@ import com.google.protobuf.ByteString;
 import io.grpc.stub.StreamObserver;
 import proto.types.block.*;
 import proto.types.utils;
-import utils.Config;
+import utils.config.Config;
 import io.grpc.ManagedChannelBuilder;
 import proto.crpcs.clientService.ClientServiceGrpc.*;
 import utils.CSVUtils;

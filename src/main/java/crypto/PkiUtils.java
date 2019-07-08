@@ -1,6 +1,6 @@
 package crypto;
 
-import utils.Config;
+import utils.config.Config;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import java.security.*;

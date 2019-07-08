@@ -9,7 +9,7 @@ import proto.types.client.*;
 import proto.types.utils;
 import utils.customException.ClientException;
 import static java.lang.String.format;
-import static utils.Config.*;
+import static utils.config.Config.*;
 
 public class ClientRpcsService extends ClientServiceImplBase {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ClientRpcsService.class);

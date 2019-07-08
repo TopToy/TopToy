@@ -2,7 +2,7 @@ package app;
 import blockchain.data.BCS;
 import com.google.protobuf.ByteString;
 import servers.Top;
-import utils.Config;
+import utils.config.Config;
 import crypto.BlockDigSig;
 import das.ms.BFD;
 import org.apache.commons.cli.*;
