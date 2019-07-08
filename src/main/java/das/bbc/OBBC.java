@@ -9,8 +9,6 @@ import proto.types.bbc.*;
 import proto.types.evidence.*;
 import proto.types.block.*;
 
-import utils.Node;
-
 import crypto.BlockDigSig;
 import das.data.BbcDecData;
 
@@ -19,7 +17,6 @@ import das.data.VoteData;
 import utils.config.yaml.ServerPublicDetails;
 import utils.statistics.Statistics;
 
-import java.util.ArrayList;
 import static das.data.Data.*;
 import static java.lang.String.format;
 

@@ -4,7 +4,6 @@ import blockchain.data.BCS;
 import communication.CommLayer;
 import communication.overlays.clique.Clique;
 import proto.types.client;
-import utils.Node;
 import das.ab.ABService;
 import das.bbc.BBC;
 import das.bbc.OBBC;
@@ -21,7 +20,7 @@ import proto.types.block.*;
 import utils.config.yaml.ServerPublicDetails;
 
 import java.io.IOException;
-import java.util.*;
+
 import static java.lang.String.format;
 
 public class Top {

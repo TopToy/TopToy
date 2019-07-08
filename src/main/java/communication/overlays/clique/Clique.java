@@ -2,7 +2,6 @@ package communication.overlays.clique;
 
 import communication.CommLayer;
 import communication.data.Data;
-import utils.Node;
 import proto.types.block.*;
 import proto.types.comm.*;
 import utils.config.yaml.ServerPublicDetails;

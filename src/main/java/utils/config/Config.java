@@ -8,9 +8,7 @@ import das.bbc.OBBC;
 import das.ms.Membership;
 import das.wrb.WRB;
 import servers.Top;
-import utils.Node;
 import utils.config.yaml.Root;
-import utils.config.yaml.ServerPrivateDetails;
 import utils.config.yaml.ServerPublicDetails;
 
 import java.io.File;
@@ -99,45 +97,14 @@ public class Config {
         }
     }
 
-//    public static ArrayList<Node> getCommCluster() {
-//        synchronized (gLock) {
-////            Toml t = conf.getTables(tomlKeys.CLUSTER_KEY).get(0);
-////            ArrayList<Node> ret = new ArrayList<>();
-////            for (int i = 0 ; i < getN() ; i++) {
-////                Toml node = t.getTable("s" + i);
-////                ret.add(new Node(node.getString("ip"),
-////                        Math.toIntExact(node.getLong("commPort")),
-////                        Math.toIntExact(node.getLong("id"))));
-////            }
-//            return null;
-//        }
-//
-//    }
-//
-//    public static ArrayList<Node> getObbcCluster() {
-//        synchronized (gLock) {
-////            Toml t = conf.getTables(tomlKeys.CLUSTER_KEY).get(0);
-////            ArrayList<Node> ret = new ArrayList<>();
-////            for (int i = 0 ; i < getN() ; i++) {
-////                Toml node = t.getTable("s" + i);
-////                ret.add(new Node(node.getString("ip"),
-////                        Math.toIntExact(node.getLong("obbcPort")),
-////                        Math.toIntExact(node.getLong("id"))));
-////            }
-//            return null;
-//        }
-//
-//    }
-
     public static HashMap<Integer, String> getClusterPubKeys() {
         synchronized (gLock) {
-//            Toml t = conf.getTables(tomlKeys.CLUSTER_KEY).get(0);
-//            HashMap<Integer, String> ret = new HashMap<>();
-//            for (int i = 0 ; i < getN() ; i++) {
-//                Toml node = t.getTable("s" + i);
-//                ret.put(Math.toIntExact(node.getLong("id")), node.getString("publicKey"));
-//            }
-            return null;
+            HashMap<Integer, String> ret = new HashMap<>();
+            for (ServerPublicDetails s : getCluster()) {
+                ret.put(s.getId(), s.getPublicKey());
+
+            }
+            return ret;
         }
 
     }
@@ -210,7 +177,7 @@ public class Config {
         try {
             mapper.writeValue(new File(yamlPath.toString()), configration);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e);
         }
     }
 

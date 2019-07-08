@@ -2,7 +2,6 @@ package das.wrb;
 
 import blockchain.data.BCS;
 import proto.prpcs.wrbService.WrbGrpc.*;
-import utils.Node;
 import crypto.BlockDigSig;
 import crypto.SslUtils;
 import das.data.Data;

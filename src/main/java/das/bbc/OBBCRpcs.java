@@ -2,7 +2,6 @@ package das.bbc;
 
 import blockchain.data.BCS;
 import proto.prpcs.obbcService.ObbcGrpc.*;
-import utils.Node;
 import crypto.BlockDigSig;
 import crypto.SslUtils;
 import das.data.BbcDecData;

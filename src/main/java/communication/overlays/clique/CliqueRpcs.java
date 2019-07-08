@@ -3,7 +3,6 @@ package communication.overlays.clique;
 import blockchain.data.BCS;
 import communication.data.Data;
 import proto.prpcs.commService.CommunicationGrpc.*;
-import utils.Node;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.Server;
