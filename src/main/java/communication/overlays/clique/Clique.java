@@ -5,6 +5,7 @@ import communication.data.Data;
 import utils.Node;
 import proto.types.block.*;
 import proto.types.comm.*;
+import utils.config.yaml.ServerPublicDetails;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -21,11 +22,11 @@ public class Clique implements CommLayer {
     private int n;
     private CliqueRpcs rpcs;
 
-    public Clique(int id, int workers, int n,  ArrayList<Node> nodes) {
+    public Clique(int id, int workers, int n,  ServerPublicDetails[] cluster) {
         this.id = id;
         this.n = n;
         new Data(n, workers);
-        rpcs = new CliqueRpcs(id, nodes, n, workers);
+        rpcs = new CliqueRpcs(id, cluster, n, workers);
     }
 
     @Override
@@ -36,6 +37,11 @@ public class Clique implements CommLayer {
     @Override
     public void leave() {
        rpcs.shutdown();
+    }
+
+    @Override
+    public void reconfigure() {
+        rpcs.reconfigure();
     }
 
     @Override

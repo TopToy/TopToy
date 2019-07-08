@@ -2,7 +2,6 @@ package utils.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.moandjiezana.toml.Toml;
 import das.ab.ABService;
 import das.bbc.BBC;
 import das.bbc.OBBC;
@@ -11,17 +10,16 @@ import das.wrb.WRB;
 import servers.Top;
 import utils.Node;
 import utils.config.yaml.Root;
+import utils.config.yaml.ServerPrivateDetails;
+import utils.config.yaml.ServerPublicDetails;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import static java.lang.String.format;
 
 
 public class Config {
@@ -95,49 +93,41 @@ public class Config {
 
     }
 
-    public static ArrayList<Node> getWrbCluster() {
+    public static ServerPublicDetails[] getCluster() {
         synchronized (gLock) {
-//            Toml t = conf.getTables(tomlKeys.CLUSTER_KEY).get(0);
-//            ArrayList<Node> ret = new ArrayList<>();
-//            for (int i = 0 ; i < getN() ; i++) {
-//                Toml node = t.getTable("s" + i);
-//                ret.add(new Node(node.getString("ip"),
-//                        Math.toIntExact(node.getLong("wrbPort")),
-//                        Math.toIntExact(node.getLong("id"))));
-//            }
-            return null;
+            return configration.getCluster();
         }
     }
 
-    public static ArrayList<Node> getCommCluster() {
-        synchronized (gLock) {
-//            Toml t = conf.getTables(tomlKeys.CLUSTER_KEY).get(0);
-//            ArrayList<Node> ret = new ArrayList<>();
-//            for (int i = 0 ; i < getN() ; i++) {
-//                Toml node = t.getTable("s" + i);
-//                ret.add(new Node(node.getString("ip"),
-//                        Math.toIntExact(node.getLong("commPort")),
-//                        Math.toIntExact(node.getLong("id"))));
-//            }
-            return null;
-        }
-
-    }
-
-    public static ArrayList<Node> getObbcCluster() {
-        synchronized (gLock) {
-//            Toml t = conf.getTables(tomlKeys.CLUSTER_KEY).get(0);
-//            ArrayList<Node> ret = new ArrayList<>();
-//            for (int i = 0 ; i < getN() ; i++) {
-//                Toml node = t.getTable("s" + i);
-//                ret.add(new Node(node.getString("ip"),
-//                        Math.toIntExact(node.getLong("obbcPort")),
-//                        Math.toIntExact(node.getLong("id"))));
-//            }
-            return null;
-        }
-
-    }
+//    public static ArrayList<Node> getCommCluster() {
+//        synchronized (gLock) {
+////            Toml t = conf.getTables(tomlKeys.CLUSTER_KEY).get(0);
+////            ArrayList<Node> ret = new ArrayList<>();
+////            for (int i = 0 ; i < getN() ; i++) {
+////                Toml node = t.getTable("s" + i);
+////                ret.add(new Node(node.getString("ip"),
+////                        Math.toIntExact(node.getLong("commPort")),
+////                        Math.toIntExact(node.getLong("id"))));
+////            }
+//            return null;
+//        }
+//
+//    }
+//
+//    public static ArrayList<Node> getObbcCluster() {
+//        synchronized (gLock) {
+////            Toml t = conf.getTables(tomlKeys.CLUSTER_KEY).get(0);
+////            ArrayList<Node> ret = new ArrayList<>();
+////            for (int i = 0 ; i < getN() ; i++) {
+////                Toml node = t.getTable("s" + i);
+////                ret.add(new Node(node.getString("ip"),
+////                        Math.toIntExact(node.getLong("obbcPort")),
+////                        Math.toIntExact(node.getLong("id"))));
+////            }
+//            return null;
+//        }
+//
+//    }
 
     public static HashMap<Integer, String> getClusterPubKeys() {
         synchronized (gLock) {

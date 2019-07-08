@@ -36,4 +36,8 @@ public class Membership {
         logger.info(format("Received start msg from [%d]", m.getId()));
         startLetch.countDown();
     }
+
+    static public void reconfigure() {
+
+    }
 }

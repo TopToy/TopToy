@@ -1,7 +1,7 @@
-#correct test_correct
+correct test_correct
 #benign test_benign_failure
 #async test_async
 #byz test_byz_failure
 #clients_rpcs test_clients_rpcs
 #clients_performance test_clients_performance
-server_up test_up
+#server_up test_up

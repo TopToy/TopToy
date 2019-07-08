@@ -20,6 +20,7 @@ import static proto.prpcs.commService.CommunicationGrpc.newStub;
 import proto.types.block.*;
 import proto.types.comm.*;
 import proto.types.utils.Empty;
+import utils.config.yaml.ServerPublicDetails;
 
 public class CliqueRpcs  extends CommunicationImplBase {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(CliqueRpcs.class);
@@ -72,23 +73,28 @@ public class CliqueRpcs  extends CommunicationImplBase {
 
     private Server rpcServer;
     private Map<Integer, Peer> peers = new HashMap<>();
-    private List<Node> nodes;
+    private ServerPublicDetails[] nodes;
     private int id;
     private int n;
     private int workers;
 
-    CliqueRpcs(int id, ArrayList<Node> commCluster, int n, int workers) {
+    CliqueRpcs(int id, ServerPublicDetails[] cluster, int n, int workers) {
         this.id = id;
-        this.nodes = commCluster;
+        this.nodes = cluster;
         this.n = n;
         this.workers = workers;
     }
+
+    void reconfigure() {
+
+    }
+
     // TODO: Re configure grpc server so it would be enable to handle mass of messages.
     public void start() {
 //        Executor executor = Executors.newFixedThreadPool(n);
         rpcServer =
                 NettyServerBuilder
-                .forPort(nodes.get(id).getPort())
+                .forPort(nodes[id].getCommPort())
                 .addService(this)
                 .maxInboundMessageSize(16 * 1024 * 1024)
                 .maxConcurrentCallsPerConnection(10)
@@ -100,8 +106,8 @@ public class CliqueRpcs  extends CommunicationImplBase {
             logger.error(format("[%d] error while starting server", id), e);
         }
 
-        for (Node n : nodes) {
-            peers.put(n.getID(), new Peer(n.getAddr(), n.getPort(), workers));
+        for (ServerPublicDetails n : nodes) {
+            peers.put(n.getId(), new Peer(n.getIp(), n.getCommPort(), workers));
         }
         logger.debug("starting clique rpc server");
     }

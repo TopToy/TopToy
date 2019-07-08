@@ -28,6 +28,7 @@ import proto.types.utils.Empty;
 import proto.types.block.*;
 import proto.types.meta.*;
 import proto.types.evidence.*;
+import utils.config.yaml.ServerPublicDetails;
 
 public class OBBCRpcs extends ObbcImplBase {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(OBBCRpcs.class);
@@ -127,7 +128,7 @@ public class OBBCRpcs extends ObbcImplBase {
 
     private Server ObbcInnerServer;
     private Map<Integer, Peer> peers = new HashMap<>();
-    private List<Node> nodes;
+    private ServerPublicDetails[] nodes;
     private int id;
     private int n;
     private int f;
@@ -137,10 +138,10 @@ public class OBBCRpcs extends ObbcImplBase {
     private String serverPrivKey;
     private int workers;
 
-    OBBCRpcs(int id, int n, int f, int workers, int qSize, ArrayList<Node> obbcCluster, String caRoot, String serverCrt,
+    OBBCRpcs(int id, int n, int f, int workers, int qSize, ServerPublicDetails[] cluster, String caRoot, String serverCrt,
              String serverPrivKey) {
         this.id = id;
-        this.nodes = obbcCluster;
+        this.nodes = cluster;
         this.n = n;
         this.f = f;
         this.qSize = qSize;
@@ -154,7 +155,7 @@ public class OBBCRpcs extends ObbcImplBase {
     public void start() {
         try {
             ObbcInnerServer = NettyServerBuilder.
-                    forPort(nodes.get(id).getPort())
+                    forPort(nodes[id].getObbcPort())
                     .sslContext(SslUtils.buildSslContextForServer(serverCrt,
                             caRoot, serverPrivKey)).
                             addService(this).
@@ -166,8 +167,8 @@ public class OBBCRpcs extends ObbcImplBase {
             logger.fatal("", e);
         }
 
-        for (Node n : nodes) {
-            peers.put(n.getID(), new Peer(n.getAddr(), n.getPort(), workers, caRoot, serverCrt, serverPrivKey));
+        for (ServerPublicDetails n : nodes) {
+            peers.put(n.getId(), new Peer(n.getIp(), n.getObbcPort(), workers, caRoot, serverCrt, serverPrivKey));
         }
     }
 

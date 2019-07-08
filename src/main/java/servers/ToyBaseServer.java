@@ -5,7 +5,7 @@ import blockchain.validation.Tvalidator;
 import blockchain.validation.Validator;
 import com.google.protobuf.ByteString;
 import communication.CommLayer;
-import utils.Config;
+import utils.config.Config;
 import das.ab.ABService;
 import das.data.Data;
 import das.ms.BFD;
@@ -750,6 +750,10 @@ public abstract class ToyBaseServer {
                 proposedBlocks.clear();
             }
         }
+    }
+
+    void reconfigure() {
+
     }
 
 

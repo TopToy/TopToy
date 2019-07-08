@@ -27,6 +27,7 @@ import proto.types.block.*;
 import proto.types.utils.Empty;
 import proto.types.wrb.*;
 import proto.types.meta.*;
+import utils.config.yaml.ServerPublicDetails;
 
 public class WrbRpcs extends WrbImplBase {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(WRB.class);
@@ -126,7 +127,7 @@ public class WrbRpcs extends WrbImplBase {
 
     private int id;
     private Map<Integer, peer> peers = new HashMap<>();
-    private List<Node> nodes;
+    private ServerPublicDetails[] nodes;
     private Server wrbServer;
     private int workers;
     private int n;
@@ -135,13 +136,13 @@ public class WrbRpcs extends WrbImplBase {
     private String serverPrivKey;
     private String caRoot;
 
-    WrbRpcs(int id, int workers, int n, int f, ArrayList<Node> wrbCluster,
+    WrbRpcs(int id, int workers, int n, int f, ServerPublicDetails[] cluster,
             String serverCrt, String serverPrivKey, String caRoot) {
         this.workers = workers;
         this.id = id;
         this.n = n;
         this.f = f;
-        this.nodes = wrbCluster;
+        this.nodes = cluster;
         this.serverCrt = serverCrt;
         this.serverPrivKey = serverPrivKey;
         this.caRoot = caRoot;
@@ -155,7 +156,7 @@ public class WrbRpcs extends WrbImplBase {
             Executor executor = Executors.newFixedThreadPool(n);
             EventLoopGroup weg = new NioEventLoopGroup(cores);
             wrbServer = NettyServerBuilder.
-                    forPort(nodes.get(id).getPort())
+                    forPort(nodes[id].getWrbPort())
                     .executor(executor)
                     .workerEventLoopGroup(weg)
                     .bossEventLoopGroup(weg)
@@ -170,8 +171,8 @@ public class WrbRpcs extends WrbImplBase {
             logger.fatal(format("[#%d]", id), e);
         }
 
-        for (Node n : nodes) {
-            peers.put(n.getID(), new peer(n.getAddr(),n.getPort(), workers, caRoot, serverCrt, serverPrivKey));
+        for (ServerPublicDetails n : nodes) {
+            peers.put(n.getId(), new peer(n.getIp(),n.getWrbPort(), workers, caRoot, serverCrt, serverPrivKey));
         }
 
         logger.debug(format("[#%d] initiates wrbRpcs", id));

@@ -29,6 +29,10 @@ public class BBC {
 
     }
 
+    static public void reconfigure() {
+
+    }
+
     static public BbcDecData propose(BbcMsg bm, Meta key) throws InterruptedException {
         logger.debug(format("[#%d-C[%d]] broadcast BBC message [cidSeries=%d ; cid=%d ; height=%d ; vote=%b]",
                 id, bm.getM().getChannel(), bm.getM().getCidSeries(), bm.getM().getCid(), bm.getHeight(), bm.getVote()));

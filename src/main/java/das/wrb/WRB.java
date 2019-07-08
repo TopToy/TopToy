@@ -7,6 +7,7 @@ import das.data.Data;
 
 import das.ms.BFD;
 import das.utils.TmoUtils;
+import utils.config.yaml.ServerPublicDetails;
 import utils.statistics.Statistics;
 
 import java.util.*;
@@ -27,7 +28,7 @@ public class WRB {
     private static int f;
     private static WrbRpcs rpcs;
 
-    public WRB(int id, int workers, int n, int f, int tmo, ArrayList<Node> wrbCluster,
+    public WRB(int id, int workers, int n, int f, int tmo, ServerPublicDetails[] cluster,
                String serverCrt, String serverPrivKey, String caRoot) {
 
         WRB.f = f;
@@ -38,11 +39,13 @@ public class WRB {
         new Data(workers);
         new BFD(n, f, workers,20 * tmo);
         BFD.activateAll();
-        WRB.rpcs = new WrbRpcs(id, workers, n, f, wrbCluster, serverCrt, serverPrivKey, caRoot);
+        WRB.rpcs = new WrbRpcs(id, workers, n, f, cluster, serverCrt, serverPrivKey, caRoot);
         logger.info(format("Initiated WRB: [id=%d; n=%d; f=%d; tmo=%d]", id, n, f, tmo));
     }
 
+    static public void reconfigure() {
 
+    }
     static public void start() {
         rpcs.start();
     }

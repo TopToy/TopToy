@@ -16,6 +16,7 @@ import das.data.BbcDecData;
 
 import das.data.Data;
 import das.data.VoteData;
+import utils.config.yaml.ServerPublicDetails;
 import utils.statistics.Statistics;
 
 import java.util.ArrayList;
@@ -29,15 +30,18 @@ public class OBBC extends ObbcImplBase {
     private static OBBCRpcs rpcs;
     private static CommLayer comm;
 
-    public OBBC(int id, int n, int f, int workers, int qSize,  ArrayList<Node> obbcCluster, CommLayer comm, String caRoot, String serverCrt,
+    public OBBC(int id, int n, int f, int workers, int qSize, ServerPublicDetails[] cluster, CommLayer comm, String caRoot, String serverCrt,
                 String serverPrivKey) {
         OBBC.id = id;
-        rpcs = new OBBCRpcs(id, n, f, workers, qSize, obbcCluster, caRoot, serverCrt, serverPrivKey);
+        rpcs = new OBBCRpcs(id, n, f, workers, qSize, cluster, caRoot, serverCrt, serverPrivKey);
         OBBC.comm = comm;
         logger.info(format("Initiated OBBC: [id=%d]", id));
 
     }
 
+    static public void reconfigure() {
+
+    }
     static public void start() {
         rpcs.start();
     }

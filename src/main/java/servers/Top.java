@@ -18,6 +18,7 @@ import utils.DBUtils;
 import utils.DiskUtils;
 import proto.types.transaction.*;
 import proto.types.block.*;
+import utils.config.yaml.ServerPublicDetails;
 
 import java.io.IOException;
 import java.util.*;
@@ -39,8 +40,7 @@ public class Top {
 
 
     public Top(int id, int n, int f, int workers, int tmo,
-               int maxTx, ArrayList<Node> obbcCluster,
-               ArrayList<Node> wrbCluster, ArrayList<Node> commCluster,
+               int maxTx, ServerPublicDetails[] cluster,
                String abConfig, String type, String serverCrt, String serverPrivKey, String caRoot) {
         Top.n = n;
         Top.f = f;
@@ -48,8 +48,8 @@ public class Top {
         Top.toys = new ToyBaseServer[workers];
         Top.id = id;
         new BCS(id, n, f, workers);
-        initProtocols(obbcCluster, wrbCluster, tmo, serverCrt,
-                serverPrivKey, caRoot, commCluster, abConfig);
+        initProtocols(cluster, tmo, serverCrt,
+                serverPrivKey, caRoot,  abConfig);
 
         Top.type = type;
         // TODO: Apply to more types
@@ -72,18 +72,17 @@ public class Top {
 
     }
 
-    private static void initProtocols(ArrayList<Node> obbcCluster, ArrayList<Node> wrbCluster, int tmo,
-                               String serverCrt, String serverPrivKey, String caRoot,
-                               ArrayList<Node> commCluster, String abConfigHome) {
-        comm = new Clique(id, workers, Top.n, commCluster);
+    private static void initProtocols(ServerPublicDetails[] cluster, int tmo,
+                               String serverCrt, String serverPrivKey, String caRoot, String abConfigHome) {
+        comm = new Clique(id, workers, Top.n, cluster);
         logger.info(format("[%d] has initiated communication layer", id));
         new ABService(id, n, f, abConfigHome);
         logger.info(format("[%d] has initiated ab service", id));
         new BBC(id, n, f, n - f);
         logger.info(format("[%d] has initiated BBC", id));
-        new OBBC(id, n, f, workers, n - f, obbcCluster, comm, caRoot, serverCrt, serverPrivKey);
+        new OBBC(id, n, f, workers, n - f, cluster, comm, caRoot, serverCrt, serverPrivKey);
         logger.info(format("[%d] has initiated OBBC service", id));
-        new WRB(id, workers, n, f, tmo, wrbCluster, serverCrt, serverPrivKey, caRoot);
+        new WRB(id, workers, n, f, tmo, cluster, serverCrt, serverPrivKey, caRoot);
         logger.info(format("[%d] has initiated WRB", id));
         new Membership(n);
         logger.info(format("[%d] has initiated Membership", id));
@@ -92,6 +91,13 @@ public class Top {
         new DBUtils(workers);
         logger.info(format("[%d] has initiated DB Utils", id));
 
+    }
+
+    public static void reconfigure() {
+        comm.reconfigure();
+        for (int i = 0 ; i < workers ; i++) {
+            toys[i].reconfigure();
+        }
     }
 
 

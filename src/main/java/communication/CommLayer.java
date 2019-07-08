@@ -9,4 +9,5 @@ public interface CommLayer {
     boolean contains(int channel, BlockHeader proof);
     void join();
     void leave();
+    void reconfigure();
 }

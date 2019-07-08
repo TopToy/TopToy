@@ -69,9 +69,8 @@ public class JToy {
 //                        Config.getCommCluster(), Config.getABConfigHome(), type, Config.getServerCrtPath(),
 //                        Config.getServerPrivKeyPath(), Config.getCaRootPath());
                 new Top(serverID, Config.getN(), Config.getF(), Config.getC(), Config.getTMO(),
-                        Config.getMaxTransactionsInBlock(), Config.getObbcCluster(), Config.getWrbCluster(),
-                        Config.getCommCluster(), Config.getABConfigHome(), type, Config.getServerCrtPath(),
-                        Config.getServerPrivKeyPath(), Config.getCaRootPath());
+                        Config.getMaxTransactionsInBlock(), Config.getCluster(), Config.getABConfigHome(),
+                        type, Config.getServerCrtPath(), Config.getServerPrivKeyPath(), Config.getCaRootPath());
                 break;
         }
     }

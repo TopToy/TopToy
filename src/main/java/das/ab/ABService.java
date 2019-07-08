@@ -16,6 +16,9 @@ public class ABService {
 
     }
 
+    static public void reconfigure() {
+
+    }
 
     static public void start() {
         bs.start();
