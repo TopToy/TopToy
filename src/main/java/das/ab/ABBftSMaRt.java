@@ -42,6 +42,7 @@ public class ABBftSMaRt extends DefaultSingleRecoverable {
     }
     public void start() {
         sr = new ServiceReplica(id, this, this, configHome);
+        logger.info("Start bft-smart service replica");
         ABProxy = new AsynchServiceProxy(id, configHome);
         logger.info("Start ABBftSMaRt");
 

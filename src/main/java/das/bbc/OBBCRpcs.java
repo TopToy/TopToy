@@ -182,7 +182,7 @@ public class OBBCRpcs extends ObbcImplBase {
         BlockHeader nxt = msg.getNext();
         int worker = nxt.getM().getChannel();
         if (BCS.contains(worker, nxt.getHeight())) return;
-        Data.addToPendings(nxt, msg.getM());
+        Data.addToPendings(nxt, msg.getNext().getM());
     }
 
     @Override

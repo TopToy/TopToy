@@ -29,7 +29,7 @@ import proto.types.meta.*;
 import utils.config.yaml.ServerPublicDetails;
 
 public class WrbRpcs extends WrbImplBase {
-    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(WRB.class);
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(WrbRpcs.class);
 
 
     class authInterceptor implements ServerInterceptor {
