@@ -145,7 +145,7 @@ public class Config {
             Membership.reconfigure();
     }
 
-    static int version() {
+    public static int version() {
         return configurations.size() - 1;
     }
 

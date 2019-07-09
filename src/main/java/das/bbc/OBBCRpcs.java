@@ -180,17 +180,9 @@ public class OBBCRpcs extends ObbcImplBase {
 
     private void handlePgbMsg(BbcMsg msg) {
         BlockHeader nxt = msg.getNext();
-//        int sender = nxt.getBid().getPid();
-        int cid = nxt.getM().getCid();
         int worker = nxt.getM().getChannel();
-        int cidSeries = nxt.getM().getCidSeries();
-        Meta key = Meta.newBuilder()
-                .setChannel(worker)
-                .setCidSeries(cidSeries)
-                .setCid(cid)
-                .build();
         if (BCS.contains(worker, nxt.getHeight())) return;
-        Data.addToPendings(nxt, key);
+        Data.addToPendings(nxt, msg.getM());
     }
 
     @Override
@@ -258,13 +250,7 @@ public class OBBCRpcs extends ObbcImplBase {
         int cid = request.getMeta().getCid();
         int cidSeries = request.getMeta().getCidSeries();
         int worker = request.getMeta().getChannel();
-        Meta key =  Meta.newBuilder()
-                .setChannel(worker)
-                .setCidSeries(cidSeries)
-                .setCid(cid)
-                .build();
-
-        msg = Data.pending[worker].get(key);
+        msg = Data.pending[worker].get(request.getMeta());
         if (msg == null && BCS.contains(worker, request.getHeight())) {
             msg = BCS.nbGetBlock(worker, request.getHeight()).getHeader();
         }
@@ -279,15 +265,10 @@ public class OBBCRpcs extends ObbcImplBase {
                     id, worker, request.getSender(), cidSeries, cid));
         }
 
-        Meta meta = Meta.newBuilder().
-                setChannel(worker).
-                setCid(cid).
-                setCidSeries(cidSeries).
-                build();
         responseObserver.onNext(EvidenceRes.newBuilder().
                 setData(msg).
                 setSender(id).
-                setM(meta).
+                setM(request.getMeta()).
                 build());
         responseObserver.onCompleted();
     }

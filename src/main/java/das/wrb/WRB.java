@@ -13,6 +13,8 @@ import static das.bbc.OBBC.setFastBbcVote;
 import static das.utils.TmoUtils.*;
 import static java.lang.Math.max;
 import static java.lang.String.format;
+import static utils.commons.createMeta;
+
 import proto.types.block.*;
 import proto.types.meta.*;
 import proto.types.wrb.*;
@@ -60,18 +62,14 @@ public class WRB {
         rpcs.wrbSend(h, recipients);
     }
 
-    static public BlockHeader WRBDeliver(int worker, int cidSeries, int cid, int sender, int height, BlockHeader next)
+    static public BlockHeader WRBDeliver(int worker, int cidSeries, int cid, int sender, int height, int version, BlockHeader next)
             throws InterruptedException {
         Statistics.updateAll();
-        Meta key = Meta.newBuilder()
-                .setChannel(worker)
-                .setCidSeries(cidSeries)
-                .setCid(cid)
-                .build();
+        Meta key = createMeta(worker, cid, cidSeries, version);
 
-        preDeliverLogic(key, worker, cidSeries, cid, sender);
+        preDeliverLogic(key, sender);
 
-        BbcDecData dec = OBBC.propose(setFastBbcVote(key, worker, sender, cidSeries, cid, next), worker, height, sender);
+        BbcDecData dec = OBBC.propose(setFastBbcVote(key, sender, next), worker, height, sender);
 
         if (!dec.getDec()) {
             logger.debug(format("[#%d-C[%d]] bbc returned [%d] for [cidSeries=%d ; cid=%d]", id, worker, 0, cidSeries, cid));
@@ -84,11 +82,13 @@ public class WRB {
         }
         logger.debug(format("[#%d-C[%d]] bbc returned [%d] for [cidSeries=%d ; cid=%d]", id, worker, 1, cidSeries, cid));
 
-        return postDeliverLogic(key, worker, cidSeries, cid, sender, height);
+        return postDeliverLogic(key, height, sender);
     }
 
-    static private void preDeliverLogic(Meta key, int worker, int cidSeries, int cid, int sender) throws InterruptedException {
-
+    static private void preDeliverLogic(Meta key, int sender) throws InterruptedException {
+        int worker = key.getChannel();
+        int cidSeries = key.getCidSeries();
+        int cid = key.getCid();
         if (BFD.isSuspected(sender, worker)) {
             if (!Data.pending[worker].containsKey(key)) {
                 logger.info(format("Suspect [%d:%d] skipping...", sender, worker));
@@ -129,33 +129,26 @@ public class WRB {
 
     }
 
-    static private BlockHeader postDeliverLogic(Meta key, int channel, int cidSeries, int cid, int sender, int height) throws InterruptedException {
-        requestData(channel, cidSeries, cid, sender, height);
+    static private BlockHeader postDeliverLogic(Meta key, int height, int sender) throws InterruptedException {
+        requestData(key, height, sender);
+        int channel = key.getChannel();
         if (!Data.pending[channel].containsKey(key)) {
             logger.error("header was not found [cidSeries=d ; cid=%d]");
         }
         return Data.pending[channel].get(key);
     }
 
-    static private void requestData(int channel, int cidSeries, int cid, int sender, int height) throws InterruptedException {
-        Meta key = Meta.newBuilder()
-                .setChannel(channel)
-                .setCidSeries(cidSeries)
-                .setCid(cid)
-                .build();
+    static private void requestData(Meta key, int height, int sender) throws InterruptedException {
+
+        int channel = key.getChannel();
         if (Data.pending[channel].containsKey(key)) return;
-        Meta meta = Meta.
-                newBuilder().
-                setCid(cid).
-                setCidSeries(cidSeries).
-                setChannel(channel).
-                build();
+
         WrbReq req = WrbReq.newBuilder()
-                .setMeta(meta)
+                .setMeta(key)
                 .setHeight(height)
                 .setSender(id)
                 .build();
-        rpcs.broadcastReqMsg(req,channel, cidSeries, cid, sender);
+        rpcs.broadcastReqMsg(req, key, sender);
         synchronized (Data.pending[channel]) {
             while (!Data.pending[channel].containsKey(key)) {
                 Data.pending[channel].wait();

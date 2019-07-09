@@ -14,6 +14,7 @@ import java.util.Objects;
 
 import static crypto.BlockDigSig.hashBlockData;
 import static crypto.BlockDigSig.hashHeader;
+import static utils.commons.createMeta;
 
 public class Utils {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Utils.class);
@@ -30,7 +31,7 @@ public class Utils {
 
     static public BlockHeader createBlockHeader(Block b, BlockHeader header,
                                                          int creatorID, int height, int cidSeries, int cid,
-                                                         int channel, BlockID bid) {
+                                                         int channel, BlockID bid, int version) {
 
         byte[] tHash = hashBlockData(b);
 
@@ -39,10 +40,7 @@ public class Utils {
             headerHash = hashHeader(header);
         }
         BlockHeader h = BlockHeader.newBuilder()
-                .setM(Meta.newBuilder()
-                        .setCid(cid)
-                        .setCidSeries(cidSeries)
-                        .setChannel(channel))
+                .setM(createMeta(channel, cid, cidSeries, version))
                 .setHeight(height)
                 .setBid(bid)
                 .setTransactionHash(ByteString.copyFrom(tHash))

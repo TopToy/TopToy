@@ -5,7 +5,7 @@ source $PWD/definitions.sh
 generate_config_toml() {
     echo \
 "title: \"configuration\"
-eVersion: 1
+eVersion: 0
 system:
     n: ${C}
     f: ${F}

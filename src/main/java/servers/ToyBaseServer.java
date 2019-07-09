@@ -29,6 +29,7 @@ import proto.types.version.*;
 import static blockchain.Utils.*;
 import static java.lang.Math.max;
 import static java.lang.String.format;
+import static utils.commons.createMeta;
 
 import utils.statistics.Statistics;
 
@@ -44,6 +45,7 @@ public abstract class ToyBaseServer {
     protected int f;
     protected int n;
     int currLeader;
+    int version = 0;
     protected AtomicBoolean stopped = new AtomicBoolean(false);
     private int maxTransactionInBlock;
     private Thread mainThread;
@@ -233,13 +235,13 @@ public abstract class ToyBaseServer {
                     logger.debug(format("[#%d-C[%d]] creates an empty header [height=%d ; cidSeries=%d ; cid=%d ; bid=%d]",
                             getID(), worker, height, cidSeries, cid, b.getId().getBid()));
 //                    currBLock = configureNewBlock();
-                    return createBlockHeader(b, prev, getID(), height, cidSeries, cid, worker, b.getId());
+                    return createBlockHeader(b, prev, getID(), height, cidSeries, cid, worker, b.getId(), version);
                 }
 
                 Block b = proposedBlocks.element();
                 logger.debug(format("[#%d-C[%d]] creates header for [height=%d ; cidSeries=%d ; cid=%d ; bid=%d]",
                         getID(), worker, height, cidSeries, cid, b.getId().getBid()));
-                return createBlockHeader(b, prev, getID(), height, cidSeries, cid, worker, b.getId());
+                return createBlockHeader(b, prev, getID(), height, cidSeries, cid, worker, b.getId(), version);
             }
         }
 
@@ -271,7 +273,7 @@ public abstract class ToyBaseServer {
 
             try {
                 long startTime = System.currentTimeMillis();
-                recHeader = WRB.WRBDeliver(worker, cidSeries, cid, currLeader, currHeight, next);
+                recHeader = WRB.WRBDeliver(worker, cidSeries, cid, currLeader, currHeight, version, next);
                 logger.debug(format("[#%d-C[%d]] WRB deliver took about [%d] ms [cidSeries=%d ; cid=%d ; height=%d ; dec=%b]",
                         getID(), worker, System.currentTimeMillis() - startTime, cidSeries, cid, currHeight, recHeader != null));
 
@@ -575,12 +577,7 @@ public abstract class ToyBaseServer {
                 setPrev(BCS.nbGetBlock(worker, BCS.lastIndex(worker))).
                 setSender(getID()).
                 build();
-        Meta key = Meta.newBuilder()
-                .setChannel(worker)
-                .setCidSeries(cidSeries)
-                .setCid(cid)
-                .build();
-        ABService.broadcast(p.toByteArray(), key, Data.RBTypes.FORK);
+        ABService.broadcast(p.toByteArray(), b.getHeader().getM(), Data.RBTypes.FORK);
         logger.info(format("[#%d-C[%d]] done announce fork [height=%d]",
                 getID(), worker, currHeight));
     }
@@ -615,11 +612,7 @@ public abstract class ToyBaseServer {
             sv.setForkPoint(forkPoint);
 
         }
-        Meta key = Meta.newBuilder()
-                .setChannel(worker)
-                .setCidSeries(cidSeries)
-                .setCid(cid)
-                .build();
+        Meta key = createMeta(worker, cid, cidSeries, version);
         ABService.broadcast(sv.build().toByteArray(), key, Data.RBTypes.SYNC);
     }
 
@@ -734,10 +727,7 @@ public abstract class ToyBaseServer {
 
     void resetState() {
         logger.debug(format("C[%d] - removing old data", worker));
-        Data.evacuateAllOldData(worker, Meta.newBuilder()
-                .setChannel(worker)
-                .setCidSeries(cidSeries)
-                .setCid(cid).build());
+        Data.evacuateAllOldData(worker, createMeta(worker, cid, cidSeries, version));
         BlockID bid;
         synchronized (cbl) {
             bid = currBLock.getId();

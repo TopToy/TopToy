@@ -74,7 +74,7 @@ public class BFD {
     static public void suspect(int id, int w, int tmo) {
         if (!active[w] || byzActivity[w]) return;
         if (tmo  < threshold) return;
-        if (sus[w].size() >= f) {
+        if (sus[w].size() >= f && f > 0) {
             if (tmo <= sus[w].peek().getTmo()) return;
             sus[w].remove();
         }

@@ -189,17 +189,14 @@ public class WrbRpcs extends WrbImplBase {
         p.send(msg, msg.getM().getChannel());
     }
 
-    private void sendReqMessage(WrbStub stub, WrbReq req, int worker,
-                                int cidSeries, int cid, int sender) {
+    private void sendReqMessage(WrbStub stub, WrbReq req, Meta key, int sender) {
         stub.reqMessage(req, new StreamObserver<>() {
             @Override
             public void onNext(WrbRes res) {
                 if (res.equals(WrbRes.getDefaultInstance())) return;
-                Meta key = Meta.newBuilder()
-                        .setChannel(worker)
-                        .setCidSeries(cidSeries)
-                        .setCid(cid)
-                        .build();
+                int cid = key.getCid();
+                int cidSeries = key.getCidSeries();
+                int worker = key.getChannel();
                 if (res.getData().getM().getCid() == cid &&
                         res.getData().getM().getCidSeries() == cidSeries
                         && res.getM().getChannel() == worker &&
@@ -231,12 +228,12 @@ public class WrbRpcs extends WrbImplBase {
         });
     }
 
-    void broadcastReqMsg(WrbReq req, int channel, int cidSeries, int cid, int sender) {
+    void broadcastReqMsg(WrbReq req, Meta key, int sender) {
         logger.debug(format("[#%d-C[%d]] broadcasts request message [cidSeries=%d ; cid=%d; height=%d]", id,
-                req.getMeta().getChannel(), cidSeries, cid, req.getHeight()));
+                req.getMeta().getChannel(), key.getCidSeries(), key.getCid(), req.getHeight()));
         for (int p : peers.keySet()) {
             if (p == id) continue;
-            sendReqMessage(peers.get(p).stub, req, channel, cidSeries, cid, sender);
+            sendReqMessage(peers.get(p).stub, req, key, sender);
         }
     }
 
@@ -265,34 +262,35 @@ public class WrbRpcs extends WrbImplBase {
     @Override
     public void reqMessage(WrbReq request, StreamObserver<WrbRes> responseObserver)  {
         BlockHeader msg;
-        int cid = request.getMeta().getCid();
-        int cidSeries = request.getMeta().getCidSeries();
+//        int cid = request.getMeta().getCid();
+//        int cidSeries = request.getMeta().getCidSeries();
         int worker = request.getMeta().getChannel();
-        Meta key =  Meta.newBuilder()
-                .setChannel(worker)
-                .setCidSeries(cidSeries)
-                .setCid(cid)
-                .build();
+//        Meta key =  Meta.newBuilder()
+//                .setChannel(worker)
+//                .setCidSeries(cidSeries)
+//                .setCid(cid)
+//                .build();
+        Meta key = request.getMeta();
         msg = Data.pending[worker].get(key);
         if (msg == null && BCS.contains(worker, request.getHeight())) {
             msg = BCS.nbGetBlock(worker, request.getHeight()).getHeader();
         }
         if (msg != null) {
             logger.debug(format("[#%d-C[%d]] has received request message from [#%d] of [cidSeries=%d ; cid=%d]",
-                    id, worker, request.getSender(), cidSeries, cid));
-            Meta meta = Meta.newBuilder().
-                    setChannel(worker).
-                    setCid(cid).
-                    setCidSeries(cidSeries).
-                    build();
+                    id, worker, request.getSender(), key.getCidSeries(), key.getCid()));
+//            Meta meta = Meta.newBuilder().
+//                    setChannel(worker).
+//                    setCid(cid).
+//                    setCidSeries(cidSeries).
+//                    build();
             responseObserver.onNext(WrbRes.newBuilder().
                     setData(msg).
-                    setM(meta).
+                    setM(key).
                     setSender(id).
                     build());
         } else {
             logger.debug(format("[#%d-C[%d]] has received request message from [#%d] of [cidSeries=%d ; cid=%d] but buffers are empty",
-                    id, worker, request.getSender(), cidSeries, cid));
+                    id, worker, request.getSender(), key.getCidSeries(), key.getCid()));
             responseObserver.onNext(WrbRes.getDefaultInstance());
         }
         responseObserver.onCompleted();

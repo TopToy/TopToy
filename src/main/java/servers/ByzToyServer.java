@@ -81,7 +81,7 @@ class ByzToyServer extends ToyBaseServer {
             if (groups.size() > 1 && byzProposed.size() > 0) {
                 Block byz = byzProposed.element();
                 WRB.WRBSend(createBlockHeader(byz, BCS.nbGetBlock(worker, currHeight - 1).getHeader(), getID(),
-                        currHeight, cidSeries, cid, worker, byz.getId()),  groups.get(1).stream().mapToInt(j->j).toArray());
+                        currHeight, cidSeries, cid, worker, byz.getId(), version),  groups.get(1).stream().mapToInt(j->j).toArray());
             }
         }
 

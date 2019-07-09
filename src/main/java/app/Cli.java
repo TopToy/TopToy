@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 
 import static crypto.BlockDigSig.hashBlockData;
 import static java.lang.String.format;
+import static utils.commons.createMeta;
 
 class Cli {
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Cli.class);
@@ -231,10 +232,7 @@ class Cli {
             random.nextBytes(tx);
 
             return bb.setHeader(BlockHeader.newBuilder()
-                    .setM(Meta.newBuilder()
-                            .setChannel(0)
-                            .setCidSeries(0)
-                            .setCid(0))
+                    .setM(createMeta(0, 0, 0, 0))
                     .setHeight(0)
                     .setBid(BlockID.newBuilder().setBid(0).setPid(0).build())
                     .setPrev(ByteString.copyFrom(tx)));

@@ -139,12 +139,15 @@ public class OBBC extends ObbcImplBase {
 
     }
 
-    static public BbcMsg setFastBbcVote(Meta key, int channel, int sender, int cidSeries, int cid, BlockHeader next) {
+    static public BbcMsg setFastBbcVote(Meta key, int sender, BlockHeader next) {
         BbcMsg.Builder bv = BbcMsg
                 .newBuilder()
                 .setM(key)
                 .setSender(id)
                 .setVote(false);
+        int channel = key.getChannel();
+        int cidSeries = key.getCidSeries();
+        int cid = key.getCid();
 
         Data.pending[channel].computeIfPresent(key, (k, val) -> {
 
