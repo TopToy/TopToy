@@ -7,4 +7,5 @@ message Meta {
     int32 channel = 1;
     int32 cid = 2;
     int32 cidSeries = 3;
+    int32 version = 4;
 }

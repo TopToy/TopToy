@@ -32,6 +32,11 @@ public final class meta {
      * <code>int32 cidSeries = 3;</code>
      */
     int getCidSeries();
+
+    /**
+     * <code>int32 version = 4;</code>
+     */
+    int getVersion();
   }
   /**
    * Protobuf type {@code proto.types.Meta}
@@ -85,6 +90,11 @@ public final class meta {
             case 24: {
 
               cidSeries_ = input.readInt32();
+              break;
+            }
+            case 32: {
+
+              version_ = input.readInt32();
               break;
             }
             default: {
@@ -146,6 +156,15 @@ public final class meta {
       return cidSeries_;
     }
 
+    public static final int VERSION_FIELD_NUMBER = 4;
+    private int version_;
+    /**
+     * <code>int32 version = 4;</code>
+     */
+    public int getVersion() {
+      return version_;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -169,6 +188,9 @@ public final class meta {
       if (cidSeries_ != 0) {
         output.writeInt32(3, cidSeries_);
       }
+      if (version_ != 0) {
+        output.writeInt32(4, version_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -189,6 +211,10 @@ public final class meta {
       if (cidSeries_ != 0) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(3, cidSeries_);
+      }
+      if (version_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(4, version_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -211,6 +237,8 @@ public final class meta {
           != other.getCid()) return false;
       if (getCidSeries()
           != other.getCidSeries()) return false;
+      if (getVersion()
+          != other.getVersion()) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -228,6 +256,8 @@ public final class meta {
       hash = (53 * hash) + getCid();
       hash = (37 * hash) + CIDSERIES_FIELD_NUMBER;
       hash = (53 * hash) + getCidSeries();
+      hash = (37 * hash) + VERSION_FIELD_NUMBER;
+      hash = (53 * hash) + getVersion();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -367,6 +397,8 @@ public final class meta {
 
         cidSeries_ = 0;
 
+        version_ = 0;
+
         return this;
       }
 
@@ -396,6 +428,7 @@ public final class meta {
         result.channel_ = channel_;
         result.cid_ = cid_;
         result.cidSeries_ = cidSeries_;
+        result.version_ = version_;
         onBuilt();
         return result;
       }
@@ -452,6 +485,9 @@ public final class meta {
         }
         if (other.getCidSeries() != 0) {
           setCidSeries(other.getCidSeries());
+        }
+        if (other.getVersion() != 0) {
+          setVersion(other.getVersion());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -559,6 +595,32 @@ public final class meta {
         onChanged();
         return this;
       }
+
+      private int version_ ;
+      /**
+       * <code>int32 version = 4;</code>
+       */
+      public int getVersion() {
+        return version_;
+      }
+      /**
+       * <code>int32 version = 4;</code>
+       */
+      public Builder setVersion(int value) {
+        
+        version_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int32 version = 4;</code>
+       */
+      public Builder clearVersion() {
+        
+        version_ = 0;
+        onChanged();
+        return this;
+      }
       @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -626,9 +688,10 @@ public final class meta {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\020types/meta.proto\022\013proto.types\"7\n\004Meta\022" +
+      "\n\020types/meta.proto\022\013proto.types\"H\n\004Meta\022" +
       "\017\n\007channel\030\001 \001(\005\022\013\n\003cid\030\002 \001(\005\022\021\n\tcidSeri" +
-      "es\030\003 \001(\005B\023\n\013proto.typesB\004metab\006proto3"
+      "es\030\003 \001(\005\022\017\n\007version\030\004 \001(\005B\023\n\013proto.types" +
+      "B\004metab\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -647,7 +710,7 @@ public final class meta {
     internal_static_proto_types_Meta_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_proto_types_Meta_descriptor,
-        new java.lang.String[] { "Channel", "Cid", "CidSeries", });
+        new java.lang.String[] { "Channel", "Cid", "CidSeries", "Version", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)
