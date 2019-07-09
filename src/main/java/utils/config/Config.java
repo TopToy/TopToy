@@ -17,16 +17,20 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
+import static java.lang.String.format;
 
 
 public class Config {
 
-    private static final Object gLock = new Object();
+//    private static final Object gLock = new Object();
     private static int s_id;
-    private static Path yamlPath;
-    private static Root configration;
+    private static Path yamlDirPath;
+    private static ConcurrentHashMap<Integer, Root> configurations = new ConcurrentHashMap<>();
     private static org.apache.log4j.Logger logger;
+//    private static int currVersion = 0;
+    private static String configFileName = "config.yaml";
     public Config() {
         logger.debug("logger is configured");
     }
@@ -34,120 +38,101 @@ public class Config {
     public static void setConfig(Path path, int id) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy:hh:mm:ss");
         System.setProperty("current.date.time", dateFormat.format(new Date()));
-        yamlPath =  Paths.get("src", "main", "resources", "config.yaml");
+        yamlDirPath =  Paths.get("src", "main", "resources");
         if (path != null) {
-            yamlPath = path;
+            yamlDirPath = path;
         }
         s_id = id;
         System.setProperty("s_id", Integer.toString(s_id));
         logger = org.apache.log4j.Logger.getLogger(Config.class);
-        readConf(yamlPath);
+        readConf();
     }
 
-    private static void readConf(Path yamlPath) {
+    private static void readConf() {
+        Path cp = Paths.get(yamlDirPath.toString(), configFileName);
+        if (version() + 1 > 0) {
+            cp = Paths.get(yamlDirPath.toString(), format("config_%d.yaml", version()));
+        }
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         try {
-            configration = mapper.readValue(new File(yamlPath.toString()), Root.class);
+            configurations.put(version() + 1, mapper.readValue(new File(cp.toString()), Root.class));
         } catch (IOException e) {
             e.printStackTrace();
         }
 
     }
 
+    public static int getN(int version) {
+       return configurations.get(version).getSystem().getN();
+    }
+
+    public static int getF(int version) {
+        return configurations.get(version).getSystem().getF();
+    }
+
     public static int getN() {
-        synchronized (gLock) {
-           return configration.getSystem().getN();
-        }
+        return configurations.get(version()).getSystem().getN();
     }
 
     public static int getF() {
-        synchronized (gLock) {
-            return configration.getSystem().getF();
-        }
+        return configurations.get(version()).getSystem().getF();
     }
 
     public static int getTMO() {
-        synchronized (gLock) {
-           return configration.getSettings().getTmo();
-        }
+       return configurations.get(version()).getSettings().getTmo();
     }
 
     public static int getC() {
-        synchronized (gLock) {
-           return configration.getSystem().getW();
-        }
+       return configurations.get(version()).getSystem().getW();
     }
 
     public static boolean getTesting() {
-        synchronized (gLock) {
-            return configration.getSystem().getTesting() == 1;
-        }
+        return configurations.get(version()).getSystem().getTesting() == 1;
     }
 
     public static String getIP(int sID) {
-        synchronized (gLock) {
-            return configration.getCluster()[sID].getIp();
-        }
-
+        return configurations.get(version()).getCluster()[sID].getIp();
     }
 
     public static ServerPublicDetails[] getCluster() {
-        synchronized (gLock) {
-            return configration.getCluster();
-        }
+        return configurations.get(version()).getCluster();
     }
 
     public static HashMap<Integer, String> getClusterPubKeys() {
-        synchronized (gLock) {
             HashMap<Integer, String> ret = new HashMap<>();
             for (ServerPublicDetails s : getCluster()) {
                 ret.put(s.getId(), s.getPublicKey());
 
             }
             return ret;
-        }
-
     }
+
     public static int getMaxTransactionsInBlock() {
-        synchronized (gLock) {
-            return configration.getSettings().getMaxTransactionInBlock();
-        }
+        return configurations.get(version()).getSettings().getMaxTransactionInBlock();
     }
 
     public static String getABConfigHome() {
-        synchronized (gLock) {
-           return configration.getSettings().getAtomicbroadcast();
-        }
+        return configurations.get(version()).getSettings().getAtomicbroadcast();
     }
 
     public static String getPrivateKey() {
-        synchronized (gLock) {
-            return configration.getServer().getPrivateKey();
-        }
+        return configurations.get(version()).getServer().getPrivateKey();
     }
 
     public static String getServerPrivKeyPath() {
-        synchronized (gLock) {
-            return configration.getServer().getTlsPrivKeyPath();
-        }
+        return configurations.get(version()).getServer().getTlsPrivKeyPath();
     }
 
     public static String getCaRootPath() {
-        synchronized (gLock) {
-            return configration.getSettings().getCaRootPath();
-        }
+        return configurations.get(version()).getSettings().getCaRootPath();
     }
 
     public static String getServerCrtPath() {
-        synchronized (gLock) {
-            return configration.getServer().getTlsCertPath();
-        }
+        return configurations.get(version()).getServer().getTlsCertPath();
     }
 
     public static int getTxSize() {
-        synchronized (gLock) {
-            return configration.getSettings().getTxSize();
-        }
+        return configurations.get(version()).getSettings().getTxSize();
     }
 
     // TODO: What about race conditions? on which point we should reconfigure the system?
@@ -160,22 +145,21 @@ public class Config {
             Membership.reconfigure();
     }
 
-    static void setN(int n) {
-        configration.getSystem().setN(n);
+    static int version() {
+        return configurations.size() - 1;
     }
 
-
-    static void setF(int f) {
-        configration.getSystem().setF(f);
+    static public void updateConfiguration(int n, int f) {
+        Root newConf = configurations.get(version());
+        newConf.getSystem().setN(n);
+        newConf.getSystem().setF(f);
+        writeConfiguration(newConf);
     }
-
-    static void writeConfiguration() {
-        // Create an ObjectMapper mapper for YAML
+    static void writeConfiguration(Root newConf) {
+        Path cp = Paths.get(yamlDirPath.toString(), format("config_%d.yaml", version() + 1));
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-
-// Write object as YAML file
         try {
-            mapper.writeValue(new File(yamlPath.toString()), configration);
+            mapper.writeValue(new File(cp.toString()), newConf);
         } catch (IOException e) {
             logger.error(e);
         }
