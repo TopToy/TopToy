@@ -328,12 +328,12 @@ public abstract class ToyBaseServer {
                                                 .setDefiniteTime(System.currentTimeMillis())
                                                 .setTentative(false)))
                 .build());
-//                if (permanent.getHeader().getHeight() % 1000 == 0) {
+                if (permanent.getHeader().getHeight() % 1000 == 0) {
                     logger.info(format("[#%d-C[%d]] Deliver [[height=%d], [sender=%d], [channel=%d], [size=%d]]",
                             getID(), worker, permanent.getHeader().getHeight(), permanent.getHeader().getBid().getPid(),
                             permanent.getHeader().getM().getChannel(),
                             permanent.getDataCount()));
-//                }
+                }
 
 
                 DBUtils.writeBlockToTable(permanent);
