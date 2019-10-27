@@ -86,13 +86,13 @@ collect_res_from_server() {
     local blocks=${6}
     local sigs=${7}
 
-    echo "getting files from server ${1}"
+    echo "getting files from server ${1} [tmp is ${tmp}]"
     scp -o ConnectTimeout=30 -r ${1}:/tmp/JToy/logs/* $logs  > /dev/null
     scp -o ConnectTimeout=30 -r ${1}:/tmp/JToy/res/* $tmp  > /dev/null
 
-    echo "collecting results summery from server ${1}"
-    cat $tmp/${2}/summery.csv >> $sum
-    cat $tmp/${2}/bsummery.csv >> $blocks
+    echo "collecting results summery from server ${1} [tmp is ${tmp}]"
+    cat $tmp/${2}/summary.csv >> $sum
+    cat $tmp/${2}/bsummary.csv >> $blocks
     cat $tmp/${2}/sig_summery.csv >> $sigs
 }
 
@@ -107,7 +107,6 @@ collect_res_from_servers() {
     mkdir -p ${home}/out/summeries/sigs
     mkdir -p $logs
     mkdir -p $tmp
-
     print_servers_summery_header ${sum} ${blocks}
     print_sig_test_headers $sigs
 

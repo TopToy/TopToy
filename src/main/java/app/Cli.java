@@ -24,6 +24,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import static app.JToy.serverID;
 import static crypto.BlockDigSig.hashBlockData;
 import static java.lang.String.format;
 
@@ -32,7 +33,6 @@ class Cli {
         private Options options = new Options();
         private static String outPath = "/tmp/JToy/res/";
         private AtomicBoolean recorded = new AtomicBoolean(false);
-
         Cli() {
             options.addOption("help", "print this message");
             options.addOption("init", "init a toy server");
@@ -144,7 +144,7 @@ class Cli {
             }
 
             if (args[0].equals("stStart")) {
-               Statistics.activate(JToy.s.getID());
+               Statistics.activate(serverID);
                 return;
 
             }
@@ -178,15 +178,26 @@ class Cli {
 
         private void init() {
             JToy.init();
+//            if (bftSMaRtSettings) {
+//                logger.debug("bftsmart is on, returning");
+//                return;
+//            }
             JToy.s.start();
         }
 
         private void serve() {
             if (JToy.type.equals("m")) return;
             logger.debug("start serving");
+//            if (bftSMaRtSettings) {
+//                JToy.bftsmartServer.start();
+//                return;
+//            }
             JToy.s.serve();
         }
         private void stop() {
+//            if (bftSMaRtSettings) {
+//                JToy.bftsmartServer.shutdown();
+//            }
             JToy.s.shutdown();
         }
 
@@ -292,7 +303,7 @@ class Cli {
             if (Config.getTxSize() != 512) return;
             logger.info("Starting writeBlocks");
             String pathString = "/tmp/JToy/res/";
-            Path path = Paths.get(pathString, String.valueOf(JToy.s.getID()), "bsummary.csv");
+            Path path = Paths.get(pathString, String.valueOf(serverID), "bsummary.csv");
             File f = new File(path.toString());
 
             try {
@@ -314,7 +325,7 @@ class Cli {
                             b.getHeader().getHst().getDefiniteTime()).collect(Collectors.toList()));
                     for (int j = 0 ; j < workers ; j++) {
                         Block b = rBlocks.get(j);
-                        if (b.getId().getPid() != JToy.s.getID()) continue;
+                        if (b.getId().getPid() != serverID) continue;
                         long pt = b.getBst().getProposeTime();
                         long tt = b.getHeader().getHst().getTentativeTime();
                         long dt = b.getHeader().getHst().getDefiniteTime();
@@ -348,7 +359,7 @@ class Cli {
 
         private void writeSummery(String pathString) {
             logger.info("Starting writeSummary");
-            Path path = Paths.get(pathString, String.valueOf(JToy.s.getID()), "summary.csv");
+            Path path = Paths.get(pathString, String.valueOf(serverID), "summary.csv");
             File f = new File(path.toString());
 
             try {
@@ -441,7 +452,7 @@ class Cli {
 
                 List<String> row = Arrays.asList(
                         String.valueOf(valid)
-                        , String.valueOf(JToy.s.getID())
+                        , String.valueOf(serverID)
                         , JToy.type
                         , String.valueOf(Config.getC())
                         , String.valueOf(avgTmo)
@@ -472,11 +483,13 @@ class Cli {
                         , String.valueOf(HP2DL)
                         , String.valueOf(HT2D)
                         , String.valueOf(HD2DL)
-                        , String.valueOf(BFD.getSuspected())
+                        //, String.valueOf(BFD.getSuspected())
+                        , String.valueOf(0)
                 );
                 CSVUtils.writeLine(writer, row);
                 writer.flush();
                 writer.close();
+                logger.info(row);
                 logger.info("ended writeSummary");
             } catch (IOException e) {
                 logger.error(e);
@@ -486,7 +499,7 @@ class Cli {
 
     void writeByzSummery(String pathString) {
         logger.info("Starting writeSummary");
-        Path path = Paths.get(pathString, String.valueOf(JToy.s.getID()), "summary.csv");
+        Path path = Paths.get(pathString, String.valueOf(serverID), "summary.csv");
         File f = new File(path.toString());
 
         try {
@@ -560,7 +573,7 @@ class Cli {
 
             List<String> row = Arrays.asList(
                     String.valueOf(valid)
-                    , String.valueOf(JToy.s.getID())
+                    , String.valueOf(serverID)
                     , JToy.type
                     , String.valueOf(Config.getC())
                     , String.valueOf(avgTmo)
@@ -591,7 +604,8 @@ class Cli {
                     , String.valueOf(0)
                     , String.valueOf(0)
                     , String.valueOf(0)
-                    , String.valueOf(BFD.getSuspected())
+                    //, String.valueOf(BFD.getSuspected())
+                    , String.valueOf(0)
             );
             CSVUtils.writeLine(writer, row);
             writer.flush();

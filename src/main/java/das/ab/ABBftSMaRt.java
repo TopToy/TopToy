@@ -12,6 +12,7 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import das.data.Data;
 import das.ms.BFD;
+import proto.types.block;
 import proto.types.rb.*;
 import proto.types.meta.*;
 import proto.types.forkproof.*;
@@ -82,6 +83,8 @@ public class ABBftSMaRt extends DefaultSingleRecoverable {
                     break;
                 case START: handleStartMsg(msg);
                     break;
+                case ORDERING: addToBftSmartData(msg);
+                    break;
                 case NOT_MAPPED:
                     logger.error("Invalid type for RB message");
                     return new byte[0];
@@ -151,6 +154,15 @@ public class ABBftSMaRt extends DefaultSingleRecoverable {
             if (Data.syncRBData[channel].get(fp).size() == n - f) {
                 Data.syncRBData[channel].notifyAll();
             }
+        }
+    }
+
+    private static void addToBftSmartData(RBMsg msg) throws InvalidProtocolBufferException {
+        block.Block b = block.Block.parseFrom(msg.getData());
+        int channel = b.getHeader().getM().getChannel();
+        synchronized (Data.bftsmartData[channel]) {
+            Data.bftsmartData[channel].add(b);
+            Data.bftsmartData[channel].notifyAll();
         }
     }
 }

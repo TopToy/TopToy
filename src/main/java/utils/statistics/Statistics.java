@@ -8,6 +8,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
+import static app.JToy.bftSMaRtSettings;
+
 import static java.lang.Math.max;
 
 public class Statistics {
@@ -30,6 +32,7 @@ public class Statistics {
     static private AtomicLong negTime = new AtomicLong(0);
     static private AtomicBoolean active = new AtomicBoolean(false);
 
+    static AtomicInteger txCountForBftSmart = new AtomicInteger(0);
     private static int txCount = 0;
     private static int nob = 0;
     private static int neb = 0;
@@ -77,6 +80,11 @@ public class Statistics {
     }
 
     static public void activate(int id) {
+        if (bftSMaRtSettings) {
+            activateForBFTSMaRtSettings(id);
+            return;
+        }
+
         if (active.get()) return;
         logger.info("Start statistics");
         Statistics.id = id;
@@ -92,13 +100,37 @@ public class Statistics {
         });
     }
 
+    static void activateForBFTSMaRtSettings(int id) {
+        if (active.get()) return;
+        logger.info("Start statistics");
+        Statistics.id = id;
+        active.set(true);
+        start = System.currentTimeMillis();
+    }
+
+    static void deactivateForBFTSMaRtSettings() {
+        if (!active.get()) return;
+        logger.info("stop statistics");
+        active.set(false);
+        stop = System.currentTimeMillis();
+        worker.shutdownNow();
+    }
+
     static public void deactivate() {
+        if (bftSMaRtSettings) {
+            deactivateForBFTSMaRtSettings();
+            return;
+        }
         if (!active.get()) return;
         logger.info("stop statistics");
         active.set(false);
         h2 = BCS.height();
         stop = System.currentTimeMillis();
         worker.shutdownNow();
+    }
+
+    static public void updateTxCount(int count) {
+        txCountForBftSmart.addAndGet(count);
     }
 
     static public void updateTmo(int newTmo) {
@@ -169,6 +201,7 @@ public class Statistics {
     }
 
     public static int getTxCount() {
+        if (bftSMaRtSettings) return txCountForBftSmart.get();
         return txCount;
     }
 

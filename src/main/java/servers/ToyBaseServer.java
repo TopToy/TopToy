@@ -5,6 +5,7 @@ import blockchain.validation.Tvalidator;
 import blockchain.validation.Validator;
 import com.google.protobuf.ByteString;
 import communication.CommLayer;
+import proto.types.transaction;
 import utils.Config;
 import das.ab.ABService;
 import das.data.Data;
@@ -26,9 +27,11 @@ import proto.types.meta.*;
 import proto.types.forkproof.*;
 import proto.types.version.*;
 
+import static app.JToy.bftSMaRtSettings;
 import static blockchain.Utils.*;
 import static java.lang.Math.max;
 import static java.lang.String.format;
+import static utils.statistics.Statistics.updateTxCount;
 
 import utils.statistics.Statistics;
 
@@ -70,6 +73,12 @@ public abstract class ToyBaseServer {
 
     private void initThreads() {
         mainThread = new Thread(this::intMain);
+        if (bftSMaRtSettings) {
+            startLatch.countDown();
+            startLatch.countDown();
+            return;
+        }
+
         panicThread = new Thread(() -> {
             startLatch.countDown();
             try {
@@ -144,10 +153,13 @@ public abstract class ToyBaseServer {
 
 
     void serve() throws InterruptedException {
-        commSendThread.start();
-        logger.debug(format("[#%d-C[%d]] starts commSendThread thread", getID(), worker));
-        panicThread.start();
-        logger.debug(format("[#%d-C[%d]] starts panic thread", getID(), worker));
+        if (!bftSMaRtSettings) {
+            commSendThread.start();
+            logger.debug(format("[#%d-C[%d]] starts commSendThread thread", getID(), worker));
+            panicThread.start();
+            logger.debug(format("[#%d-C[%d]] starts panic thread", getID(), worker));
+        }
+
         mainThread.start();
         logger.debug(format("[#%d-C[%d]] starts main thread", getID(), worker));
         startLatch.await();
@@ -157,12 +169,15 @@ public abstract class ToyBaseServer {
     void shutdown() {
         stopped.set(true);
         try {
-            logger.info(format("[#%d-C[%d]] interrupt panic thread", getID(), worker));
-            panicThread.interrupt();
-            panicThread.join();
-            logger.info(format("[#%d-C[%d]] interrupt commSendThread thread", getID(), worker));
-            commSendThread.interrupt();
-            commSendThread.join();
+            if (!bftSMaRtSettings) {
+                logger.info(format("[#%d-C[%d]] interrupt panic thread", getID(), worker));
+                panicThread.interrupt();
+                panicThread.join();
+                logger.info(format("[#%d-C[%d]] interrupt commSendThread thread", getID(), worker));
+                commSendThread.interrupt();
+                commSendThread.join();
+            }
+
             logger.info(format("[#%d-C[%d]] interrupt main thread", getID(), worker));
             if (!mainThread.isInterrupted()) {
                 mainThread.interrupt();
@@ -245,9 +260,50 @@ public abstract class ToyBaseServer {
 
     }
 
-    private boolean mainLoop() {
+    private void bftsmartMain() throws InterruptedException {
 
+        leaderImpl();
+
+        Block recBlock;
+        synchronized (Data.bftsmartData[worker]) {
+            while (Data.bftsmartData[worker].isEmpty()) {
+                Data.bftsmartData[worker].wait();
+            }
+            recBlock = Data.bftsmartData[worker].remove();
+        }
+        BCS.addBlock(worker, recBlock.toBuilder()
+                .setHeader(recBlock.getHeader().toBuilder()
+                        .setHst(recBlock.getHeader().getHst().toBuilder()
+                                .setTentativeTime(System.currentTimeMillis())
+                                .setTentative(false)))
+                .build());
+        updateTxCount(recBlock.getDataCount());
+        if (recBlock.getHeader().getHeight() % 1000 == 0) {
+            logger.info(format("[#%d-C[%d]] Deliver [[height=%d], [sender=%d], [channel=%d], [size=%d]]",
+                    getID(), worker, recBlock.getHeader().getHeight(), recBlock.getHeader().getBid().getPid(),
+                    recBlock.getHeader().getM().getChannel(),
+                    recBlock.getDataCount()));
+        }
+        DBUtils.writeBlockToTable(recBlock);
+        BCS.notifyOnNewDefiniteBlock();
+        updateLeaderAndHeight();
+        BCS.writeNextToDiskAsync(worker);
+
+    }
+
+    private boolean mainLoop() {
         while (!stopped.get()) {
+
+            if (bftSMaRtSettings) {
+                try {
+                    bftsmartMain();
+                } catch (InterruptedException e) {
+                    logger.error(e);
+                    return false;
+                }
+                continue;
+            }
+
             if (Thread.interrupted()) return true;
             checkSyncEvent();
             while (!BCS.validateCurrentLeader(worker, currLeader, f)) {
@@ -396,8 +452,10 @@ public abstract class ToyBaseServer {
 
     TxID addTransaction(Transaction tx) {
         if (getTxPoolSize() > txPoolMax) return TxID.getDefaultInstance();
+//        logger.debug(format("(1) add transaction No. %d", tx.getId().getTxNum()));
         synchronized (cbl) {
             if (currBLock.getDataCount() + 1 > maxTransactionInBlock) return TxID.getDefaultInstance();
+//            logger.debug(format("(2) add transaction No. %d", tx.getId().getTxNum()));
             int cbid = currBLock.getId().getBid();
             int txnum = currBLock.getDataCount();
             Transaction ntx = tx.toBuilder()
@@ -410,13 +468,16 @@ public abstract class ToyBaseServer {
             if (validateTransactionWRTBlock(currBLock, ntx, v)) {
                 currBLock.addData(ntx);
             }
-            if (currBLock.getDataCount() == maxTransactionInBlock) {
-                synchronized (blocksForPropose) {
-                    blocksForPropose.add(currBLock.build());
-                    currBLock = configureNewBlock();
-                    blocksForPropose.notifyAll();
+            if (!bftSMaRtSettings) {
+                if (currBLock.getDataCount() == maxTransactionInBlock) {
+                    synchronized (blocksForPropose) {
+                        blocksForPropose.add(currBLock.build());
+                        currBLock = configureNewBlock();
+                        blocksForPropose.notifyAll();
+                    }
                 }
             }
+
             return ntx.getId();
         }
 
@@ -476,14 +537,17 @@ public abstract class ToyBaseServer {
 
     private void createTxToBlock() {
         int missingTxs = -1;
-        synchronized (proposedBlocks) {
-            if (proposedBlocks.size() > 5) {
-                return;
+        if (!bftSMaRtSettings) {
+            synchronized (proposedBlocks) {
+                if (proposedBlocks.size() > 5) {
+                    return;
+                }
             }
         }
         synchronized (cbl) {
              missingTxs = maxTransactionInBlock - currBLock.getDataCount();
         }
+        logger.debug(format("going to add %d transactions", missingTxs));
         if (missingTxs >  0) {
             for (int i = 0 ; i < missingTxs ; i++) {
                 SecureRandom random = new SecureRandom();
@@ -503,8 +567,7 @@ public abstract class ToyBaseServer {
                 createTxToBlock();
             }
     }
-
-    void sendCurrentBlockIfNeeded() {
+    void sendCurrBlockForToy() {
         synchronized (cbl) {
             if (currBLock.getDataCount() == 0) return;
             synchronized (proposedBlocks) {
@@ -519,7 +582,31 @@ public abstract class ToyBaseServer {
                 blocksForPropose.notifyAll();
             }
         }
+    }
 
+    void sendCurrBlockForBFTSMaRt() {
+        synchronized (cbl) {
+            logger.debug(format("Sending block [bid=%d:%d ; size=%d]",
+                    currBLock.getId().getPid(), currBLock.getId().getBid(), currBLock.getDataCount()));
+            ABService.broadcast(currBLock
+                            .setHeader(createBlockHeader(currBLock.build(),
+                                    BCS.nbGetBlock(worker, currHeight - 1).getHeader(),
+                                    getID(), currHeight, cidSeries, cid, worker, currBLock.getId()))
+                            .build()
+                            .toByteArray(),
+                    Meta.newBuilder().setChannel(worker).build(),
+                    Data.RBTypes.ORDERING);
+            currBLock = configureNewBlock();
+        }
+
+    }
+
+    void sendCurrentBlockIfNeeded() {
+        if (bftSMaRtSettings) {
+            sendCurrBlockForBFTSMaRt();
+            return;
+        }
+        sendCurrBlockForToy();
     }
 
     private void mainFork() throws InterruptedException, IOException {

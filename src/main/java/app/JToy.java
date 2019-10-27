@@ -1,5 +1,6 @@
 package app;
 
+import servers.BFTSMaRtOrderer;
 import utils.Config;
 import servers.Top;
 import utils.GEH;
@@ -14,8 +15,10 @@ import java.util.regex.Pattern;
 public class JToy {
     private static org.apache.log4j.Logger logger;
     static Top s;
+//    static BFTSMaRtOrderer bftsmartServer;
     static String type;
-    private static int serverID;
+    public static int serverID;
+    public static boolean bftSMaRtSettings = false;
     public static void main(String[] argv) {
         mainImpl(argv);
 //
@@ -62,6 +65,11 @@ public class JToy {
     }
 
     static void init() {
+//        if (bftSMaRtSettings) {
+//            bftsmartServer = new BFTSMaRtOrderer(serverID, 10,
+//                    Config.getMaxTransactionsInBlock(), Config.getABConfigHome());
+//            return;
+//        }
         switch (type) {
             default:
                 s = new Top(serverID, Config.getN(), Config.getF(), Config.getC(), Config.getTMO(),

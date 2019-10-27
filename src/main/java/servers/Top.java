@@ -3,6 +3,7 @@ package servers;
 import blockchain.data.BCS;
 import communication.CommLayer;
 import communication.overlays.clique.Clique;
+import das.data.Data;
 import proto.types.client;
 import utils.Node;
 import das.ab.ABService;
@@ -21,6 +22,8 @@ import proto.types.block.*;
 
 import java.io.IOException;
 import java.util.*;
+
+import static app.JToy.bftSMaRtSettings;
 import static java.lang.String.format;
 
 public class Top {
@@ -71,10 +74,25 @@ public class Top {
         logger.info(format("Initiated TOP: [id=%d; n=%d; f=%d; workers=%d]", id, n, f, workers));
 
     }
+    private void initProtocolsForBftSmart(String abConfigHome) {
+        new Data(workers);
+        new ABService(id, n, f, abConfigHome);
+        logger.info(format("[%d] has initiated ab service", id));
+        new Membership(n);
+        logger.info(format("[%d] has initiated Membership", id));
+        new TxCache(0, workers);
+        logger.info(format("[%d] has initiated Cache utils", id));
+        new DBUtils(workers);
+        logger.info(format("[%d] has initiated DB Utils", id));
 
+    }
     private void initProtocols(ArrayList<Node> obbcCluster, ArrayList<Node> wrbCluster, int tmo,
                                String serverCrt, String serverPrivKey, String caRoot,
                                ArrayList<Node> commCluster, String abConfigHome) {
+        if (bftSMaRtSettings) {
+            initProtocolsForBftSmart(abConfigHome);
+            return;
+        }
         comm = new Clique(id, workers, this.n, commCluster);
         logger.info(format("[%d] has initiated communication layer", id));
         new ABService(id, n, f, abConfigHome);
@@ -94,8 +112,21 @@ public class Top {
 
     }
 
-
+    public void startForbftSmart() {
+        ABService.start();
+        if (Membership.start(id) == -1) {
+            // Temporarily! Here we assume that everyone still correct
+            logger.error("Error while trying to connect");
+            shutdown();
+            System.exit(0);
+        }
+        logger.info("Everything is up and good");
+    }
     public void start() {
+        if (bftSMaRtSettings) {
+            startForbftSmart();
+            return;
+        }
         logger.info("Starting OBBC");
         OBBC.start();
         logger.info("Starting wrb");
@@ -117,12 +148,15 @@ public class Top {
     public void shutdown() {
         ABService.shutdown();
         logger.info("shutdown AB");
-        comm.leave();
-        logger.info("leaving communication layer");
-        WRB.shutdown();
-        logger.info("shutdown WRB");
-        OBBC.shutdown();
-        logger.info("shutdown OBBC");
+        if (!bftSMaRtSettings) {
+            comm.leave();
+            logger.info("leaving communication layer");
+            WRB.shutdown();
+            logger.info("shutdown WRB");
+            OBBC.shutdown();
+            logger.info("shutdown OBBC");
+        }
+
         txsServer.shutdown();
         logger.info("shutdown txsServer");
         for (int i = 0 ; i < workers ; i++) {

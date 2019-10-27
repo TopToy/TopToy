@@ -8,6 +8,8 @@ import utils.statistics.BCStat;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
+
+import static app.JToy.bftSMaRtSettings;
 import static blockchain.Utils.createBlockchain;
 import static com.google.common.primitives.Ints.min;
 import static java.lang.Integer.max;
@@ -96,6 +98,7 @@ public class BCS {
 
 
     public static int height(int w) {
+        if (bftSMaRtSettings) return lastIndex(w);
         return max(0, lastIndex(w) - (f + 2));
     }
 

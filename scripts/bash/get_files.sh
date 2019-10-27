@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-out_path_t=/home/yoni/toy/${2}
+out_path_t=/home/yon/toy/${2}
 #readarray -t gate < ./data/gateway.txt
 
 gate=${1}

@@ -20,6 +20,8 @@ public class Data {
         SYNC,
         BBC,
         START,
+        TX,
+        ORDERING,
         NOT_MAPPED
 
     };
@@ -33,6 +35,7 @@ public class Data {
     public static ConcurrentHashMap<Meta, List<Integer>>[] preConsVote;
     public static ConcurrentHashMap<Meta, VoteData>[] fvData;
     public static ArrayList<Meta>[] preConsDone;
+    public static Queue<Block>[] bftsmartData;
 
     public Data(int channels) {
         bbcFastDec = new ConcurrentHashMap[channels];
@@ -44,6 +47,7 @@ public class Data {
         fvData = new ConcurrentHashMap[channels];
         preConsVote = new ConcurrentHashMap[channels];
         preConsDone = new ArrayList[channels];
+        bftsmartData = new Queue[channels];
         for (int i = 0 ; i < channels ; i++) {
             bbcFastDec[i] = new ConcurrentHashMap<>();
             bbcRegDec[i] = new ConcurrentHashMap<>();
@@ -54,6 +58,7 @@ public class Data {
             fvData[i] = new ConcurrentHashMap<>();
             preConsVote[i] = new ConcurrentHashMap<>();
             preConsDone[i] = new ArrayList<>();
+            bftsmartData[i] = new LinkedList<>();
         }
     }
 
@@ -161,6 +166,8 @@ public class Data {
             case 1: return RBTypes.SYNC;
             case 2: return RBTypes.BBC;
             case 3: return RBTypes.START;
+            case 4: return RBTypes.TX;
+            case 5: return RBTypes.ORDERING;
         }
         return RBTypes.NOT_MAPPED;
     }

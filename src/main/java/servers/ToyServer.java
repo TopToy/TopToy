@@ -5,6 +5,8 @@ import communication.CommLayer;
 
 import das.wrb.WRB;
 import proto.types.block.*;
+
+import static app.JToy.bftSMaRtSettings;
 import static java.lang.String.format;
 
 class ToyServer extends ToyBaseServer {
@@ -18,6 +20,9 @@ class ToyServer extends ToyBaseServer {
     BlockHeader leaderImpl() {
         addTransactionsToCurrBlock();
         sendCurrentBlockIfNeeded();
+        if (bftSMaRtSettings) {
+            return null;
+        }
         if (!fastMode) normalLeaderPhase();
         return fastModePhase();
     }

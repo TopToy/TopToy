@@ -26,7 +26,7 @@ title = "configuration"
 [[cluster]]
       [cluster.s0]
             id = 0
-            ip = "172.31.26.52"
+            ip = "172.31.0.130"
             wrbPort = 30000
             commPort = 30010
             obbcPort = 30020
