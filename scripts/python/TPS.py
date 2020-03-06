@@ -35,20 +35,37 @@ def getYrange(index):
 
 def tps(dirs, oPath):
     rows = 3
-    cols = 3
+    cols = 2
     index = 1
 
     nu="$n=$"
     # beta="$\\beta=$"
     beta = "$\\beta=$"
-    names = [nu + '4, ' + beta + '10', nu + '4, ' + beta + '100'
-        , nu + '4, ' + beta + '1000', nu + '7, ' + beta + '10'
-        , nu + '7, ' + beta + '100', nu + '7, ' + beta + '1000'
-        , nu + '10, ' + beta + '10', nu + '10, ' + beta + '100'
-        , nu + '10, ' + beta + '1000']
+    # names = [
+    #     nu + '4, ' + beta + '10', nu + '4, ' + beta + '100'
+    #     , nu + '4, ' + beta + '1000', nu + '7, ' + beta + '10'
+    #     , nu + '7, ' + beta + '100', nu + '7, ' + beta + '1000'
+    #     , nu + '10, ' + beta + '10', nu + '10, ' + beta + '100'
+    #     , nu + '10, ' + beta + '1000']
+    names = [
+        # nu + '4, ' + beta + '10'
+        nu + '4, ' + beta + '100'
+        , nu + '4, ' + beta + '1000'
+        # , nu + '7, ' + beta + '10'
+        , nu + '7, ' + beta + '100'
+        , nu + '7, ' + beta + '1000'
+        # , nu + '10, ' + beta + '10'
+        , nu + '10, ' + beta + '100'
+        , nu + '10, ' + beta + '1000'
+    ]
+
     n = 0
     txSize = [512, 1024, 4096]
-    blockSize = [10, 100, 1000]
+    blockSize = [
+        # 10,
+        100,
+        1000
+    ]
     fig, ax = plt.subplots(nrows=rows, ncols=cols)
     plt.subplots_adjust(wspace=0.2, hspace=0.5)
     r, c = 0, 0
@@ -95,11 +112,11 @@ def tps(dirs, oPath):
     fig.text(0.02, 0.5, "KTPS ($\\frac{Ktransactions}{sec}$)", ha="center", va="center", fontsize=fs, rotation=90)
     fig.tight_layout(rect=[0.02, 0.04, 1, 1.03])
     for d in oPath:
-        plt.savefig(d + '/tps2.pdf')
-        plt.savefig(d + '/tps2')
+        plt.savefig(d + '/tps2.1.pdf')
+        plt.savefig(d + '/tps2.1')
 
 if __name__ == "__main__":
-    tps(["/home/yoni/toy/m5/correct/4"
-         ,"/home/yoni/toy/m5/correct/7"
-         ,"/home/yoni/toy/m5/correct/10"],
-        ["/home/yoni/toy/figures", "/home/yoni/Dropbox/paper/figures"])
+    tps(["/home/yon/toy/m5/correct/4"
+         ,"/home/yon/toy/m5/correct/7"
+         ,"/home/yon/toy/m5/correct/10"],
+        ["/home/yon/toy/figures", "/home/yon/Dropbox/paper/figures"])

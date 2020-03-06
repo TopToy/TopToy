@@ -1,0 +1,602 @@
+title = "configuration"
+[system]
+    n = 64
+    f = 21
+    c = 1
+    testing = true
+    txSize = 0
+
+[setting]
+    tmo = 1000
+    tmoInterval = 100
+    ABConfigPath = "src/main/resources/ABConfig"
+    maxTransactionInBlock = 1000
+    caRootPath = ""
+    fastMode = true
+
+[server]
+    privateKey = """MIGNAgEAMBAGByqGSM49AgEGBSuBBAAKBHYwdAIBAQQg/ngTdAL+eZOyh4lilm6djqsl
+                    RDHT5C60eLxRcEoNjAGgBwYFK4EEAAqhRANCAASeFQqtyOwJcJtYceofW2TeNg7rJBlW
+                    L28GZn+tk32fz95JqVS3+iF6JdoM1clkRFLliyXSxEnS1iO4wzRKGQwm"""
+
+    TlsPrivKeyPath = "src/main/resources/sslConfig/server.pem"
+    TlsCertPath = "src/main/resources/sslConfig/server.crt"
+
+
+[[cluster]]
+      [cluster.s0]
+            id = 0
+            ip = "172.31.32.82"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s1]
+            id = 1
+            ip = "172.31.45.211"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s2]
+            id = 2
+            ip = "172.31.38.78"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s3]
+            id = 3
+            ip = "172.31.41.145"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s4]
+            id = 4
+            ip = "172.31.46.156"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s5]
+            id = 5
+            ip = "172.31.37.221"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s6]
+            id = 6
+            ip = "172.31.43.153"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s7]
+            id = 7
+            ip = "172.31.37.26"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s8]
+            id = 8
+            ip = "172.31.35.30"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s9]
+            id = 9
+            ip = "172.31.47.159"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s10]
+            id = 10
+            ip = "172.31.36.55"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s11]
+            id = 11
+            ip = "172.31.40.249"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s12]
+            id = 12
+            ip = "172.31.42.118"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s13]
+            id = 13
+            ip = "172.31.34.246"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s14]
+            id = 14
+            ip = "172.31.43.63"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s15]
+            id = 15
+            ip = "172.31.42.129"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s16]
+            id = 16
+            ip = "172.31.35.185"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s17]
+            id = 17
+            ip = "172.31.47.59"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s18]
+            id = 18
+            ip = "172.31.35.70"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s19]
+            id = 19
+            ip = "172.31.40.71"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s20]
+            id = 20
+            ip = "172.31.46.132"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s21]
+            id = 21
+            ip = "172.31.41.134"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s22]
+            id = 22
+            ip = "172.31.33.202"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s23]
+            id = 23
+            ip = "172.31.46.12"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s24]
+            id = 24
+            ip = "172.31.44.9"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s25]
+            id = 25
+            ip = "172.31.32.202"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s26]
+            id = 26
+            ip = "172.31.38.228"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s27]
+            id = 27
+            ip = "172.31.33.228"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s28]
+            id = 28
+            ip = "172.31.39.97"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s29]
+            id = 29
+            ip = "172.31.36.99"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s30]
+            id = 30
+            ip = "172.31.34.43"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s31]
+            id = 31
+            ip = "172.31.46.238"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s32]
+            id = 32
+            ip = "172.31.39.170"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s33]
+            id = 33
+            ip = "172.31.40.170"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s34]
+            id = 34
+            ip = "172.31.42.176"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s35]
+            id = 35
+            ip = "172.31.33.176"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s36]
+            id = 36
+            ip = "172.31.46.239"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s37]
+            id = 37
+            ip = "172.31.42.112"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s38]
+            id = 38
+            ip = "172.31.45.243"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s39]
+            id = 39
+            ip = "172.31.47.181"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s40]
+            id = 40
+            ip = "172.31.47.240"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s41]
+            id = 41
+            ip = "172.31.43.242"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s42]
+            id = 42
+            ip = "172.31.42.32"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s43]
+            id = 43
+            ip = "172.31.0.21"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s44]
+            id = 44
+            ip = "172.31.9.18"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s45]
+            id = 45
+            ip = "172.31.14.30"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s46]
+            id = 46
+            ip = "172.31.15.24"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s47]
+            id = 47
+            ip = "172.31.10.30"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s48]
+            id = 48
+            ip = "172.31.2.142"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s49]
+            id = 49
+            ip = "172.31.6.133"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s50]
+            id = 50
+            ip = "172.31.12.154"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s51]
+            id = 51
+            ip = "172.31.13.147"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s52]
+            id = 52
+            ip = "172.31.8.107"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s53]
+            id = 53
+            ip = "172.31.5.108"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s54]
+            id = 54
+            ip = "172.31.8.101"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s55]
+            id = 55
+            ip = "172.31.2.127"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s56]
+            id = 56
+            ip = "172.31.10.120"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s57]
+            id = 57
+            ip = "172.31.7.118"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s58]
+            id = 58
+            ip = "172.31.0.112"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s59]
+            id = 59
+            ip = "172.31.1.79"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s60]
+            id = 60
+            ip = "172.31.9.77"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s61]
+            id = 61
+            ip = "172.31.13.73"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s62]
+            id = 62
+            ip = "172.31.0.93"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    
+      [cluster.s63]
+            id = 63
+            ip = "172.31.13.47"
+            wrbPort = 30000
+            commPort = 30010
+            obbcPort = 30020
+            publicKey ="""MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnhUKrcjsCXCbWHHqH1tk3jYO6yQZVi9vBmZ/rZ
+                               N9n8/eSalUt/oheiXaDNXJZERS5Ysl0sRJ0tYjuMM0ShkMJg=="""
+    

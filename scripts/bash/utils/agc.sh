@@ -2,8 +2,8 @@
 
 #config_dir=./gconfigurations
 data_dir=../data/agc
-n=4
-f=1
+n=128
+f=42
 
 
 # ${1} - out directory

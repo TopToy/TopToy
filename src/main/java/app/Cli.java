@@ -300,7 +300,7 @@ class Cli {
         }
 
         private void writeBlocks() {
-            if (Config.getTxSize() != 512) return;
+//            if (Config.getTxSize() != 512) return;
             logger.info("Starting writeBlocks");
             String pathString = "/tmp/JToy/res/";
             Path path = Paths.get(pathString, String.valueOf(serverID), "bsummary.csv");

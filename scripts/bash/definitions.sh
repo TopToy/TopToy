@@ -27,5 +27,5 @@ config_rb=${conf}/ABConfig/hosts.config
 config_toml=${conf}/config.toml
 inst=${conf}/inst/input.inst
 
-n=1
-f=0
+n=128
+f=42
