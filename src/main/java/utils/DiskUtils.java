@@ -31,6 +31,17 @@ public class DiskUtils {
         }
     }
 
+    public static void removeStorageDir(Path pathToDir) {
+        try {
+            File dir = new File(pathToDir.toString());
+            if (dir.exists()) {
+                FileUtils.forceDelete(dir);
+            }
+        } catch (IOException e) {
+            logger.error(e);
+        }
+    }
+
     public static void cutBlock(Block b, Path path) throws IOException {
         Path blockFile = Paths.get(path.toString(), String.valueOf(b.getHeader().getHeight()));
         Files.write(blockFile, b.toByteArray(), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
@@ -45,6 +56,12 @@ public class DiskUtils {
         Path blockFile = Paths.get(path.toString(), String.valueOf(height));
         Files.deleteIfExists(blockFile);
     }
+
+    public static boolean isBlockExistInStorage(int height, Path path) {
+        File blockFile = new File(Paths.get(path.toString(), String.valueOf(height)).toString());
+        return blockFile.exists();
+    }
+
     public static Future cutBlockAsync(Block b, Path path) {
         return worker.submit(() -> {
             try {
